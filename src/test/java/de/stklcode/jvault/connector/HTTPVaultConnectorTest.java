@@ -1,0 +1,377 @@
+package de.stklcode.jvault.connector;
+
+import de.stklcode.jvault.connector.test.VaultConfiguration;
+import de.stklcode.jvault.connector.exception.InvalidRequestException;
+import de.stklcode.jvault.connector.exception.PermissionDeniedException;
+import de.stklcode.jvault.connector.exception.VaultConnectorException;
+import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
+import de.stklcode.jvault.connector.model.AuthBackend;
+import de.stklcode.jvault.connector.model.response.AuthResponse;
+import de.stklcode.jvault.connector.model.response.SealResponse;
+import de.stklcode.jvault.connector.model.response.SecretResponse;
+import de.stklcode.jvault.connector.model.response.TokenResponse;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
+
+/**
+ * JUnit Test for HTTP Vault connector.
+ *
+ * @author  Stefan Kalscheuer
+ * @since   0.1
+ */
+public class HTTPVaultConnectorTest {
+    private static String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
+    private static String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
+    private static String USER_VALID = "validUser";
+    private static String PASS_VALID = "validPass";
+    private static String APP_ID = "152AEA38-85FB-47A8-9CBD-612D645BFACA";
+    private static String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
+    private static String SECRET_PATH = "userstore";
+    private static String SECRET_KEY = "foo";
+    private static String SECRET_VALUE = "bar";
+
+    private Process vaultProcess;
+    private VaultConnector connector;
+
+    @Rule
+    public TemporaryFolder tmpDir =  new TemporaryFolder();
+
+    /**
+     * Initialize Vault instance with generated configuration and provided file backend.
+     * Requires "vault" binary to be in current user's executable path. Not using MLock, so no extended rights required.
+     */
+    @Before
+    public void setUp() {
+        /* Initialize Vault */
+        VaultConfiguration config = initializeVault();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        /* Initialize connector */
+        connector = VaultConnectorFactory.httpFactory()
+                .withHost(config.getHost())
+                .withPort(config.getPort())
+                .withoutTLS()
+                .build();
+        /* Unseal Vault and check result */
+        SealResponse sealStatus = connector.unseal(KEY);
+        assumeNotNull(sealStatus);
+        assumeFalse(sealStatus.isSealed());
+    }
+
+    @After
+    public void tearDown() {
+        if (vaultProcess != null && vaultProcess.isAlive())
+            vaultProcess.destroy();
+    }
+
+    /**
+     * Test listing of authentication backends
+     */
+    @Test
+    public void authMethodsTest() {
+        /* Authenticate as valid user */
+        try {
+            connector.authToken(TOKEN_ROOT);
+        }
+        catch(VaultConnectorException ignored) {
+        }
+        assumeTrue(connector.isAuthorized());
+
+        List<AuthBackend> supportedBackends = null;
+        try {
+            supportedBackends = connector.getAuthBackends();
+        } catch (VaultConnectorException e) {
+            fail("Could not list supported auth backends: " + e.getMessage());
+        }
+        assertThat(supportedBackends.size(), is(3));
+        assertThat(supportedBackends, hasItems(AuthBackend.TOKEN, AuthBackend.USERPASS, AuthBackend.APPID));
+    }
+
+    /**
+     * Test authentication using token.
+     */
+    @Test
+    public void authTokenTest() {
+        TokenResponse res = null;
+        try {
+            res = connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6");
+            fail("Logged in with invalid token");
+        } catch (VaultConnectorException ignored) {
+        }
+
+        try {
+            res = connector.authToken(TOKEN_ROOT);
+            assertNotNull("Login failed with valid token", res);
+            assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
+        } catch (VaultConnectorException ignored) {
+            fail("Login failed with valid token");
+        }
+    }
+
+    /**
+     * Test authentication using username and password.
+     */
+    @Test
+    public void authUserPassTest() {
+        AuthResponse res = null;
+        try {
+            connector.authUserPass("foo", "bar");
+            fail("Logged in with invalid credentials");
+        }
+        catch(VaultConnectorException ignored) {
+        }
+
+        try {
+            res = connector.authUserPass(USER_VALID, PASS_VALID);
+        } catch (VaultConnectorException ignored) {
+            fail("Login failed with valid credentials: Exception thrown");
+        }
+        assertNotNull("Login failed with valid credentials: Response not available", res.getAuth());
+        assertThat("Login failed with valid credentials: Connector not authorized", connector.isAuthorized(), is(true));
+    }
+
+    /**
+     * App-ID authentication roundtrip.
+     */
+    @Test
+    public void authAppIdTest() {
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+
+        /* Register App-ID */
+        try {
+            boolean res = connector.registerAppId(APP_ID, "user", "App Name");
+            assertThat("Failed to register App-ID", res, is(true));
+        }
+        catch (VaultConnectorException e) {
+            fail("Failed to register App-ID: " + e.getMessage());
+        }
+
+        /* Register User-ID */
+        try {
+            boolean res = connector.registerUserId(APP_ID, USER_ID);
+            assertThat("Failed to register App-ID", res, is(true));
+        }
+        catch (VaultConnectorException e) {
+            fail("Failed to register App-ID: " + e.getMessage());
+        }
+
+        connector.resetAuth();
+        assumeFalse(connector.isAuthorized());
+
+        /* Authenticate with created credentials */
+        try {
+            AuthResponse res = connector.authAppId(APP_ID, USER_ID);
+            assertThat("Authorization flag not set after App-ID login.", connector.isAuthorized(), is(true));
+        } catch (VaultConnectorException e) {
+            fail("Failed to authenticate using App-ID: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test reading of secrets.
+     */
+    @Test
+    public void readSecretTest() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        /* Try to read path user has no permission to read */
+        SecretResponse res = null;
+        try {
+            res = connector.readSecret("invalid/path");
+            fail("Invalid secret path successfully read.");
+        } catch (VaultConnectorException e) {
+            assertThat(e, instanceOf(PermissionDeniedException.class));
+        }
+        /* Try to read accessible path with known value */
+        try {
+            res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY);
+            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET_VALUE));
+        } catch (VaultConnectorException e) {
+            fail("Valid secret path could not be read: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test listing secrets.
+     */
+    @Test
+    public void listSecretsTest() {
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+        /* Try to list secrets from valid path */
+        try {
+            List<String> secrets = connector.listSecrets(SECRET_PATH);
+            assertThat("Invalid nmber of secrets.", secrets.size(), greaterThan(0));
+            assertThat("Known secret key not found", secrets, hasItem(SECRET_KEY));
+        } catch (VaultConnectorException e) {
+            fail("Secrets could not be listed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test writing secrets.
+     */
+    @Test
+    public void writeSecretTest() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        /* Try to write to null path */
+        try {
+            boolean res = connector.writeSecret(null, "someValue");
+            fail("Secret written to null path.");
+        } catch (VaultConnectorException e) {
+            assertThat(e, instanceOf(InvalidRequestException.class));
+        }
+        /* Try to write to invalid path */
+        try {
+            boolean res = connector.writeSecret("", "someValue");
+            fail("Secret written to invalid path.");
+        } catch (VaultConnectorException e) {
+            assertThat(e, instanceOf(InvalidRequestException.class));
+        }
+        /* Try to write to a path the user has no access for */
+        try {
+            boolean res = connector.writeSecret("invalid/path", "someValue");
+            fail("Secret written to inaccessible path.");
+        } catch (VaultConnectorException e) {
+            assertThat(e, instanceOf(PermissionDeniedException.class));
+        }
+        /* Perform a valid write/read roundtrip to valid path. Also check UTF8-encoding. */
+        try {
+            boolean res = connector.writeSecret(SECRET_PATH + "/temp", "Abc123äöü,!");
+            assertThat("Secret could not be written to valid path.", res, is(true));
+        } catch (VaultConnectorException e) {
+            fail("Secret written to inaccessible path.");
+        }
+        try {
+            SecretResponse res = connector.readSecret(SECRET_PATH + "/temp");
+            assertThat(res.getValue(), is("Abc123äöü,!"));
+        } catch (VaultConnectorException e) {
+            fail("Written secret could not be read.");
+        }
+    }
+
+    /**
+     * Initialize Vault with resource datastore and generated configuration.
+     * @return  Vault Configuration
+     * @throws IllegalStateException
+     */
+    private VaultConfiguration initializeVault() throws IllegalStateException {
+        String dataResource = getClass().getResource("/data_dir").getPath();
+
+        /* Generate vault local unencrypted configuration */
+        VaultConfiguration config = new VaultConfiguration()
+                .withHost("127.0.0.1")
+                .withPort(getFreePort())
+                .withDataLocation(dataResource)
+                .disableMlock();
+
+        /* Write configuration file */
+        BufferedWriter bw = null;
+        File configFIle = null;
+        try {
+            configFIle = tmpDir.newFile("vault.conf");
+            bw = new BufferedWriter(new FileWriter(configFIle));
+            bw.write(config.toString());
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Unable to generate config file.");
+        }
+        finally {
+            try {
+                if (bw != null)
+                    bw.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /* Start vault process */
+        try {
+            vaultProcess = Runtime.getRuntime().exec("vault server -config " + configFIle.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Unable to start vault. Make sure vault binary is in your executable path.");
+        }
+
+        return config;
+    }
+
+    /**
+     * Authenticate with root token.
+     */
+    private void authRoot() {
+        /* Authenticate as valid user */
+        try {
+            connector.authToken(TOKEN_ROOT);
+        }
+        catch(VaultConnectorException ignored) {
+        }
+    }
+
+    /**
+     * Authenticate with user credentials.
+     */
+    private void authUser() {
+        try {
+            connector.authUserPass(USER_VALID, PASS_VALID);
+        }
+        catch(VaultConnectorException ignored) {
+        }
+    }
+
+    /**
+     * Find and return a free TCP port.
+     * @return  port number
+     */
+    private static Integer getFreePort() {
+        ServerSocket socket = null;
+        try {
+            socket = new ServerSocket(0);
+            socket.setReuseAddress(true);
+            int port = socket.getLocalPort();
+            try {
+                socket.close();
+            } catch (IOException e) {
+                // Ignore IOException on close()
+            }
+            return port;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        throw new IllegalStateException("Unable to find a free TCP port.");
+    }
+}
