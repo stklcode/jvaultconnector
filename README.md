@@ -14,7 +14,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * Write secrets
     * List secrets
 * Connector Factory with builder pattern
-* Tested against Vault 0.5.2
+* Tested against Vault 0.6.0
 
 **Usage Example**
 

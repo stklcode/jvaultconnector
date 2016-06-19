@@ -381,7 +381,14 @@ public class HTTPVaultConnector implements VaultConnector {
                     InvalidResponseException ex = new InvalidResponseException("Invalid response code")
                             .withStatusCode(response.getStatusLine().getStatusCode());
                     try {
-                        throw ex.withResponse(IOUtils.toString(response.getEntity().getContent()));
+                        /* Try to parse error response */
+                        ErrorResponse er = jsonMapper.readValue(IOUtils.toString(response.getEntity().getContent()),
+                                ErrorResponse.class);
+                        /* Check for "permission denied" response */
+                        if (er.getErrors().size() > 0 && er.getErrors().get(0).equals("permission denied"))
+                            throw new PermissionDeniedException();
+
+                        throw ex.withResponse(er.toString());
                     }
                     catch (IOException e) {
                         throw ex;
