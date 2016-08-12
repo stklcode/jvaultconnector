@@ -293,7 +293,7 @@ public class HTTPVaultConnector implements VaultConnector {
         StringEntity input;
         try {
             input = new StringEntity(jsonMapper.writeValueAsString(payload), HTTP.UTF_8);
-        } catch (UnsupportedEncodingException | JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             throw new InvalidRequestException("Unable to parse response", e);
         }
         input.setContentEncoding("UTF-8");
