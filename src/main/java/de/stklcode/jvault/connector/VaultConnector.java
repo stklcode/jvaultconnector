@@ -60,6 +60,7 @@ public interface VaultConnector {
     /**
      * Get all availale authentication backends.
      * @return  List of backends
+     * @throws VaultConnectorException  on error
      */
     List<AuthBackend> getAuthBackends() throws VaultConnectorException;
 
@@ -67,6 +68,7 @@ public interface VaultConnector {
      * Authorize to Vault using token.
      * @param token     The token
      * @return          Token response
+     * @throws VaultConnectorException  on error
      */
     TokenResponse authToken(final String token) throws VaultConnectorException;
 
@@ -75,7 +77,7 @@ public interface VaultConnector {
      * @param username  The username
      * @param password  The password
      * @return          Authorization result
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on error
      */
     AuthResponse authUserPass(final String username, final String password) throws VaultConnectorException;
 
@@ -84,6 +86,7 @@ public interface VaultConnector {
      * @param appID     The App ID
      * @param userID    The User ID
      * @return          TRUE on success
+     * @throws VaultConnectorException  on error
      */
     AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException;
 
@@ -93,7 +96,7 @@ public interface VaultConnector {
      * @param policy        The policy to associate with
      * @param displayName   Arbitrary name to display
      * @return              TRUE on success
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on error
      */
     boolean registerAppId(final String appID, final String policy, final String displayName) throws VaultConnectorException;
 
@@ -102,7 +105,7 @@ public interface VaultConnector {
      * @param appID     The App-ID
      * @param userID    The User-ID
      * @return          TRUE on success
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on error
      */
     boolean registerUserId(final String appID, final String userID) throws VaultConnectorException;
 
@@ -113,7 +116,7 @@ public interface VaultConnector {
      * @param displayName   Arbitrary name to display
      * @param userID        The User-ID
      * @return              TRUE on success
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on error
      */
     default boolean registerAppUserId(final String appID, final String policy, final String displayName, final String userID) throws VaultConnectorException {
         return registerAppId(appID, policy, userID) && registerUserId(appID, userID);
@@ -129,6 +132,7 @@ public interface VaultConnector {
      * Retrieve secret form Vault.
      * @param key   Secret identifier
      * @return      Secret response
+     * @throws VaultConnectorException  on error
      */
     SecretResponse readSecret(final String key) throws VaultConnectorException;
 
@@ -136,6 +140,7 @@ public interface VaultConnector {
      * List available secrets from Vault.
      * @param path  Root path to search
      * @return      List of secret keys
+     * @throws VaultConnectorException  on error
      */
     List<String> listSecrets(final String path) throws VaultConnectorException;
 
@@ -144,6 +149,7 @@ public interface VaultConnector {
      * @param key   Secret path
      * @param value Secret value
      * @return      TRUE on success
+     * @throws VaultConnectorException  on error
      */
     boolean writeSecret(final String key, final String value) throws VaultConnectorException;
 }
