@@ -6,21 +6,23 @@ import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +47,6 @@ public class HTTPVaultConnector implements VaultConnector {
 
     private final ObjectMapper jsonMapper;
 
-    private final HttpClient httpClient;        /* HTTP client for connection */
     private final String baseURL;               /* Base URL of Vault */
 
     private boolean authorized = false;         /* authorization status */
@@ -91,7 +92,6 @@ public class HTTPVaultConnector implements VaultConnector {
      */
     public HTTPVaultConnector(String baseURL) {
         this.baseURL = baseURL;
-        this.httpClient = new DefaultHttpClient();
         this.jsonMapper = new ObjectMapper();
     }
 
@@ -110,6 +110,9 @@ public class HTTPVaultConnector implements VaultConnector {
         } catch (VaultConnectorException | IOException e) {
             e.printStackTrace();
             return null;
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            return null;
         }
     }
 
@@ -126,10 +129,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public SealResponse unseal(final String key, final Boolean reset) {
-        Map<String, Object> param = new HashMap<>();
+        Map<String, String> param = new HashMap<>();
         param.put("key", key);
         if (reset != null)
-            param.put("reset", reset);
+            param.put("reset", reset.toString());
         try {
             String response = requestPut(PATH_UNSEAL, param);
             return jsonMapper.readValue(response, SealResponse.class);
@@ -159,6 +162,9 @@ public class HTTPVaultConnector implements VaultConnector {
             return amr.getSupportedMethods().stream().map(AuthMethod::getType).collect(Collectors.toList());
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
         }
     }
 
@@ -255,6 +261,9 @@ public class HTTPVaultConnector implements VaultConnector {
             return jsonMapper.readValue(response, SecretResponse.class);
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
         }
     }
 
@@ -263,12 +272,15 @@ public class HTTPVaultConnector implements VaultConnector {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
-        String response = requestGet(PATH_SECRET + "/" + path + "/?list=true", new HashMap<>());
         try {
+            String response = requestGet(PATH_SECRET + "/" + path + "/?list=true", new HashMap<>());
             SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
             return secrets.getKeys();
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
         }
     }
 
@@ -297,7 +309,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* generate JSON from payload */
         StringEntity input;
         try {
-            input = new StringEntity(jsonMapper.writeValueAsString(payload), HTTP.UTF_8);
+            input = new StringEntity(jsonMapper.writeValueAsString(payload), StandardCharsets.UTF_8);
         } catch (JsonProcessingException e) {
             throw new InvalidRequestException("Unable to parse response", e);
         }
@@ -318,7 +330,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @return          HTTP response
      * @throws VaultConnectorException  on connection error
      */
-    private String requestPut(final String path, final Map<String, Object> payload) throws VaultConnectorException {
+    private String requestPut(final String path, final Map<String, String> payload) throws VaultConnectorException {
         /* Initialize post */
         HttpPut put = new HttpPut(baseURL + path);
         /* generate JSON from payload */
@@ -344,13 +356,13 @@ public class HTTPVaultConnector implements VaultConnector {
      * @return          HTTP response
      * @throws VaultConnectorException  on connection error
      */
-    private String requestGet(final String path, final Map<String, Object> payload) throws VaultConnectorException {
-        /* Initialize post */
-        HttpGet get = new HttpGet(baseURL + path);
-        /* Parse parameters */
-        HttpParams params = new BasicHttpParams();
-        payload.forEach(params::setParameter);
-        get.setParams(params);
+    private String requestGet(final String path, final Map<String, String> payload) throws VaultConnectorException, URISyntaxException {
+        /* Add parameters to URI */
+        URIBuilder uriBuilder = new URIBuilder(baseURL + path);
+        payload.forEach(uriBuilder::addParameter);
+
+        /* Initialize request */
+        HttpGet get = new HttpGet(uriBuilder.build());
 
         /* Set X-Vault-Token header */
         if (token != null)
@@ -370,14 +382,17 @@ public class HTTPVaultConnector implements VaultConnector {
         base.addHeader("accept", "application/json");
 
         HttpResponse response = null;
-        try {
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
             response = httpClient.execute(base);
             /* Check if response is valid */
             if (response == null)
                 throw new InvalidResponseException("Response unavailable");
+
             switch (response.getStatusLine().getStatusCode()) {
                 case 200:
-                    return IOUtils.toString(response.getEntity().getContent());
+                    try(BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+                        return br.lines().collect(Collectors.joining("\n"));
+                    } catch (IOException ignored) { }
                 case 204:
                     return "";
                 case 403:
@@ -385,19 +400,18 @@ public class HTTPVaultConnector implements VaultConnector {
                 default:
                     InvalidResponseException ex = new InvalidResponseException("Invalid response code")
                             .withStatusCode(response.getStatusLine().getStatusCode());
-                    try {
-                        /* Try to parse error response */
-                        ErrorResponse er = jsonMapper.readValue(IOUtils.toString(response.getEntity().getContent()),
-                                ErrorResponse.class);
-                        /* Check for "permission denied" response */
-                        if (er.getErrors().size() > 0 && er.getErrors().get(0).equals("permission denied"))
-                            throw new PermissionDeniedException();
-
-                        throw ex.withResponse(er.toString());
+                    if (response.getEntity() != null) {
+                        try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+                            String responseString = br.lines().collect(Collectors.joining("\n"));
+                            ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
+                            /* Check for "permission denied" response */
+                            if (er.getErrors().size() > 0 && er.getErrors().get(0).equals("permission denied"))
+                                throw new PermissionDeniedException();
+                            throw ex.withResponse(er.toString());
+                        } catch (IOException ignored) {
+                        }
                     }
-                    catch (IOException e) {
-                        throw ex;
-                    }
+                    throw ex;
             }
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to read response", e);
@@ -405,7 +419,7 @@ public class HTTPVaultConnector implements VaultConnector {
         finally {
             if (response != null && response.getEntity() != null)
                 try {
-                    response.getEntity().consumeContent();
+                    EntityUtils.consume(response.getEntity());
                 } catch (IOException ignored) {
                 }
         }
