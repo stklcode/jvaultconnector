@@ -50,6 +50,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     private boolean authorized = false;         /* authorization status */
     private String token;                       /* current token */
+    private long tokenTTL = 0;                  /* expiration time for current token */
 
     /**
      * Create connector using hostname and schema.
@@ -97,6 +98,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public void resetAuth() {
         token = null;
+        tokenTTL = 0;
         authorized = false;
     }
 
@@ -139,7 +141,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public boolean isAuthorized() {
-        return authorized;
+        return authorized && (tokenTTL == 0 || tokenTTL >= System.currentTimeMillis());
     }
 
     @Override
@@ -164,6 +166,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public TokenResponse authToken(final String token) throws VaultConnectorException {
         /* set token */
         this.token = token;
+        this.tokenTTL = 0;
         try {
             String response = requestPost(PATH_TOKEN_LOOKUP, new HashMap<>());
             TokenResponse res = jsonMapper.readValue(response, TokenResponse.class);
@@ -185,6 +188,7 @@ public class HTTPVaultConnector implements VaultConnector {
             AuthResponse upr = jsonMapper.readValue(response, AuthResponse.class);
             /* verify response */
             this.token = upr.getAuth().getClientToken();
+            this.tokenTTL = System.currentTimeMillis() + upr.getAuth().getLeaseDuration() * 1000L;
             this.authorized = true;
             return upr;
         } catch (IOException e) {
@@ -204,6 +208,7 @@ public class HTTPVaultConnector implements VaultConnector {
             AuthResponse auth = jsonMapper.readValue(response, AuthResponse.class);
             /* verify response */
             this.token = auth.getAuth().getClientToken();
+            this.tokenTTL = System.currentTimeMillis() + auth.getAuth().getLeaseDuration() * 1000L;
             this.authorized = true;
             return auth;
         } catch (IOException e) {
@@ -284,7 +289,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param path      URL path (relative to base)
      * @param payload   Map of payload values (will be converted to JSON)
      * @return          HTTP response
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on connection error
      */
     private String requestPost(final String path, final Map payload) throws VaultConnectorException {
         /* Initialize post */
@@ -311,7 +316,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param path      URL path (relative to base)
      * @param payload   Map of payload values (will be converted to JSON)
      * @return          HTTP response
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on connection error
      */
     private String requestPut(final String path, final Map<String, Object> payload) throws VaultConnectorException {
         /* Initialize post */
@@ -337,7 +342,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param path      URL path (relative to base)
      * @param payload   Map of payload values (will be converted to JSON)
      * @return          HTTP response
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on connection error
      */
     private String requestGet(final String path, final Map<String, Object> payload) throws VaultConnectorException {
         /* Initialize post */
@@ -358,7 +363,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * Execute prepared HTTP request and return result
      * @param base      Prepares Request
      * @return          HTTP response
-     * @throws VaultConnectorException
+     * @throws VaultConnectorException  on connection error
      */
     private String request(HttpRequestBase base) throws VaultConnectorException {
         /* Set JSON Header */
