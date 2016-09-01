@@ -159,7 +159,7 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestGet(PATH_AUTH, new HashMap<>());
             /* Parse response */
             AuthMethodsResponse amr = jsonMapper.readValue(response, AuthMethodsResponse.class);
-            return amr.getSupportedMethods().stream().map(AuthMethod::getType).collect(Collectors.toList());
+            return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response", e);
         } catch (URISyntaxException ignored) {
