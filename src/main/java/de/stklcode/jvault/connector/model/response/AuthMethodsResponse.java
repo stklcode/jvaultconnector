@@ -1,11 +1,12 @@
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -14,19 +15,27 @@ import java.util.Map;
  * @author  Stefan Kalscheuer
  * @since   0.1
  */
-public class AuthMethodsResponse implements VaultResponse {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AuthMethodsResponse extends VaultDataResponse {
+    private Map<String, AuthMethod> supportedMethods;
 
-    private List<AuthMethod> supportedMethods;
-
-    @JsonAnySetter
-    public void setMethod(String path, Map<String, String> data) throws InvalidResponseException {
-        if (supportedMethods == null)
-            supportedMethods = new ArrayList<>();
-
-        supportedMethods.add(new AuthMethod(path, data.get("description"), data.get("type")));
+    public AuthMethodsResponse() {
+        this.supportedMethods = new HashMap<>();
     }
 
-    public List<AuthMethod> getSupportedMethods() {
+    @Override
+    public void setData(Map<String, Object> data) throws InvalidResponseException {
+        ObjectMapper mapper = new ObjectMapper();
+        for (String path : data.keySet()) {
+            try {
+                this.supportedMethods.put(path, mapper.readValue(mapper.writeValueAsString(data.get(path)), AuthMethod.class));
+            } catch (IOException e) {
+                throw new InvalidResponseException();
+            }
+        }
+    }
+
+    public Map<String, AuthMethod> getSupportedMethods() {
         return supportedMethods;
     }
 }

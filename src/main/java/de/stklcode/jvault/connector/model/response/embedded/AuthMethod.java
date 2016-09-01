@@ -1,7 +1,10 @@
 package de.stklcode.jvault.connector.model.response.embedded;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import de.stklcode.jvault.connector.model.AuthBackend;
+
+import java.util.Map;
 
 /**
  * Embedded authentication method response.
@@ -12,12 +15,15 @@ import de.stklcode.jvault.connector.model.AuthBackend;
 public class AuthMethod {
     private AuthBackend type;
     private String rawType;
-    private String path;
+
+    @JsonProperty("description")
     private String description;
 
-    public AuthMethod(String path, String description, String type) {
-        this.path = path;
-        this.description = description;
+    @JsonProperty("config")
+    private Map<String, String> config;
+
+    @JsonSetter("type")
+    public void setType(String type) {
         this.rawType = type;
         this.type = AuthBackend.forType(type);
     }
@@ -30,11 +36,11 @@ public class AuthMethod {
         return rawType;
     }
 
-    public String getPath() {
-        return path;
-    }
-
     public String getDescription() {
         return description;
+    }
+
+    public Map<String, String> getConfig() {
+        return config;
     }
 }
