@@ -2,10 +2,7 @@ package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.AuthBackend;
-import de.stklcode.jvault.connector.model.response.SealResponse;
-import de.stklcode.jvault.connector.model.response.SecretResponse;
-import de.stklcode.jvault.connector.model.response.TokenResponse;
-import de.stklcode.jvault.connector.model.response.AuthResponse;
+import de.stklcode.jvault.connector.model.response.*;
 
 import java.util.List;
 

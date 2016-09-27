@@ -1,15 +1,14 @@
 package de.stklcode.jvault.connector;
 
+import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.model.response.*;
+import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 import de.stklcode.jvault.connector.model.AuthBackend;
-import de.stklcode.jvault.connector.model.response.AuthResponse;
-import de.stklcode.jvault.connector.model.response.SealResponse;
-import de.stklcode.jvault.connector.model.response.SecretResponse;
-import de.stklcode.jvault.connector.model.response.TokenResponse;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
@@ -20,9 +19,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -45,6 +42,7 @@ public class HTTPVaultConnectorTest {
     private static String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
     private static String SECRET_PATH = "userstore";
     private static String SECRET_KEY = "foo";
+    private static String SECRET_KEY_JSON = "json";
     private static String SECRET_VALUE = "bar";
 
     private Process vaultProcess;
@@ -112,9 +110,9 @@ public class HTTPVaultConnectorTest {
      */
     @Test
     public void authTokenTest() {
-        TokenResponse res = null;
+        TokenResponse res;
         try {
-            res = connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6");
+            connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6");
             fail("Logged in with invalid token");
         } catch (VaultConnectorException ignored) {
         }
@@ -211,6 +209,21 @@ public class HTTPVaultConnectorTest {
         } catch (VaultConnectorException e) {
             fail("Valid secret path could not be read: " + e.getMessage());
         }
+        /* Try to read accessible path with JSON value */
+        try {
+            res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON);
+            assertThat("Known secret returned null value.", res.getValue(), notNullValue());
+        } catch (VaultConnectorException e) {
+            fail("Valid secret path could not be read: " + e.getMessage());
+        }
+        try {
+            Credentials parsedRes = res.getValue(Credentials.class);
+            assertThat("JSON response was null", parsedRes, notNullValue());
+            assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
+            assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
+        } catch (InvalidResponseException e) {
+            fail("JSON response could not be parsed: " + e.getMessage());
+        }
     }
 
     /**
@@ -277,7 +290,7 @@ public class HTTPVaultConnectorTest {
     /**
      * Initialize Vault with resource datastore and generated configuration.
      * @return  Vault Configuration
-     * @throws IllegalStateException
+     * @throws IllegalStateException on error
      */
     private VaultConfiguration initializeVault() throws IllegalStateException {
         String dataResource = getClass().getResource("/data_dir").getPath();
@@ -291,10 +304,10 @@ public class HTTPVaultConnectorTest {
 
         /* Write configuration file */
         BufferedWriter bw = null;
-        File configFIle = null;
+        File configFile = null;
         try {
-            configFIle = tmpDir.newFile("vault.conf");
-            bw = new BufferedWriter(new FileWriter(configFIle));
+            configFile = tmpDir.newFile("vault.conf");
+            bw = new BufferedWriter(new FileWriter(configFile));
             bw.write(config.toString());
         }
         catch (IOException e) {
@@ -313,7 +326,7 @@ public class HTTPVaultConnectorTest {
 
         /* Start vault process */
         try {
-            vaultProcess = Runtime.getRuntime().exec("vault server -config " + configFIle.toString());
+            vaultProcess = Runtime.getRuntime().exec("vault server -config " + configFile.toString());
         } catch (IOException e) {
             e.printStackTrace();
             throw new IllegalStateException("Unable to start vault. Make sure vault binary is in your executable path.");

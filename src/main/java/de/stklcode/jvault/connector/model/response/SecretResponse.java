@@ -1,8 +1,12 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -26,5 +30,21 @@ public class SecretResponse extends VaultDataResponse {
 
     public String getValue() {
         return value;
+    }
+
+    /**
+     * Get response parsed as JSON
+     * @param type  Class to parse response
+     * @param <T>   Class to parse response
+     * @return      Parsed object
+     * @throws InvalidResponseException on parsing error
+     * @since 0.3
+     */
+    public <T> T getValue(Class<T> type) throws InvalidResponseException {
+        try {
+            return new ObjectMapper().readValue(getValue(), type);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
+        }
     }
 }
