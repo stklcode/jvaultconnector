@@ -14,7 +14,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * Write secrets
     * List secrets
 * Connector Factory with builder pattern
-* Tested against Vault 0.6.1
+* Tested against Vault 0.6.2
 
 **Usage Example**
 
@@ -38,7 +38,7 @@ String secret = vault.readSecret("some/secret/key").getValue();
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>connector</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
