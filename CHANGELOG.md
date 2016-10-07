@@ -1,4 +1,4 @@
-## 0.3.0 [2016-10-xx]
+## 0.3.0 [2016-10-07]
 * [feature] Retrieval of JSON objects (#1)
 * [test] Tested against Vault 0.6.2
 
