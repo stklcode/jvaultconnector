@@ -60,6 +60,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH_USERPASS = "auth/userpass/login/";
     private static final String PATH_AUTH_APPID =    "auth/app-id/";
     private static final String PATH_SECRET =        "secret";
+    private static final String PATH_REVOKE =        "sys/revoke/";
 
     private final ObjectMapper jsonMapper;
 
@@ -71,6 +72,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     /**
      * Create connector using hostname and schema.
+     *
      * @param hostname  The hostname
      * @param useTLS    If TRUE, use HTTPS, otherwise HTTP
      */
@@ -80,6 +82,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     /**
      * Create connector using hostname, schema and port.
+     *
      * @param hostname  The hostname
      * @param useTLS    If TRUE, use HTTPS, otherwise HTTP
      * @param port      The port
@@ -89,7 +92,8 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     /**
-     * Create connector using hostname, schame, port and path
+     * Create connector using hostname, schame, port and path.
+     *
      * @param hostname  The hostname
      * @param useTLS    If TRUE, use HTTPS, otherwise HTTP
      * @param port      The port
@@ -103,7 +107,8 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     /**
-     * Create connector using full URL
+     * Create connector using full URL.
+     *
      * @param baseURL   The URL
      */
     public HTTPVaultConnector(String baseURL) {
@@ -310,10 +315,26 @@ public class HTTPVaultConnector implements VaultConnector {
         return requestPost(PATH_SECRET + "/" + key, param).equals("");
     }
 
+    @Override
+    public boolean revoke(String leaseID) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        /* Request HTTP response and expect empty result */
+        String response = requestPut(PATH_REVOKE + leaseID, new HashMap<>());
+        return response.equals("");
+    }
+
+    @Override
+    public VaultResponse renew(String leaseID, Integer seconds) {
+        /* TODO */
+        return null;
+    }
 
 
     /**
      * Execute HTTP request using POST method.
+     *
      * @param path      URL path (relative to base)
      * @param payload   Map of payload values (will be converted to JSON)
      * @return          HTTP response
@@ -341,6 +362,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     /**
      * Execute HTTP request using PUT method.
+     *
      * @param path      URL path (relative to base)
      * @param payload   Map of payload values (will be converted to JSON)
      * @return          HTTP response
@@ -367,9 +389,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
     /**
      * Execute HTTP request using GET method.
+     *
      * @param path      URL path (relative to base)
      * @param payload   Map of payload values (will be converted to JSON)
-     * @return          HTTP response
+     * @return HTTP response
      * @throws VaultConnectorException  on connection error
      */
     private String requestGet(final String path, final Map<String, String> payload) throws VaultConnectorException, URISyntaxException {
@@ -388,9 +411,10 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     /**
-     * Execute prepared HTTP request and return result
-     * @param base      Prepares Request
-     * @return          HTTP response
+     * Execute prepared HTTP request and return result.
+     *
+     * @param base  Prepares Request
+     * @return      HTTP response
      * @throws VaultConnectorException  on connection error
      */
     private String request(HttpRequestBase base) throws VaultConnectorException {

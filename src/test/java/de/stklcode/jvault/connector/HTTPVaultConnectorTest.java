@@ -35,13 +35,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeNotNull;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.Assume.*;
 
 /**
  * JUnit Test for HTTP Vault connector.
@@ -300,6 +297,45 @@ public class HTTPVaultConnectorTest {
             assertThat(res.getValue(), is("Abc123äöü,!"));
         } catch (VaultConnectorException e) {
             fail("Written secret could not be read.");
+        }
+    }
+
+    /**
+     * Test revocation of secrets.
+     */
+    @Test
+    public void revokeTest() {
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+
+        /* Write a test secret to vault */
+        try {
+            boolean res = connector.writeSecret(SECRET_PATH + "/toRevoke", "secret content");
+            assumeThat("Secret could not be written path.", res, is(true));
+        } catch (VaultConnectorException e) {
+            fail("Secret written to inaccessible path.");
+        }
+        SecretResponse res = null;
+        try {
+            res = connector.readSecret(SECRET_PATH + "/toRevoke");
+        } catch (VaultConnectorException e) {
+            fail("Written secret could not be read.");
+        }
+        assumeThat(res, is(notNullValue()));
+
+        /* Revoke secret by lease id */
+        try {
+            boolean revoked = connector.revoke(SECRET_PATH + "/toRevoke");
+            assertThat("Revocation of secret faiked.", revoked, is(true));
+        } catch (VaultConnectorException e) {
+            fail("Revocation threw unexpected exception.");
+        }
+
+        try {
+            connector.readSecret(SECRET_PATH + "/toRevoke");
+            fail("Revoked secret could still be read");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(notNullValue()));
         }
     }
 
