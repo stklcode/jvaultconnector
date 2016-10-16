@@ -23,10 +23,7 @@ import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -316,6 +313,16 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public boolean deleteSecret(String key) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        /* Request HTTP response and expect empty result */
+        String response = requestDelete(PATH_SECRET + "/" + key);
+        return response.equals("");
+    }
+
+    @Override
     public boolean revoke(String leaseID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
@@ -369,7 +376,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @throws VaultConnectorException  on connection error
      */
     private String requestPut(final String path, final Map<String, String> payload) throws VaultConnectorException {
-        /* Initialize post */
+        /* Initialize put */
         HttpPut put = new HttpPut(baseURL + path);
         /* generate JSON from payload */
         StringEntity entity = null;
@@ -385,6 +392,23 @@ public class HTTPVaultConnector implements VaultConnector {
             put.addHeader("X-Vault-Token", token);
 
         return request(put);
+    }
+
+    /**
+     * Execute HTTP request using DELETE method.
+     *
+     * @param path      URL path (relative to base)
+     * @return          HTTP response
+     * @throws VaultConnectorException  on connection error
+     */
+    private String requestDelete(final String path) throws VaultConnectorException {
+        /* Initialize delete */
+        HttpDelete delete = new HttpDelete(baseURL + path);
+        /* Set X-Vault-Token header */
+        if (token != null)
+            delete.addHeader("X-Vault-Token", token);
+
+        return request(delete);
     }
 
     /**

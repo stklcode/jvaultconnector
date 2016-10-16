@@ -183,6 +183,15 @@ public interface VaultConnector {
     boolean writeSecret(final String key, final String value) throws VaultConnectorException;
 
     /**
+     * Delete secret from Vault.
+     *
+     * @param key Secret path
+     * @return TRUE on succevss
+     * @throws VaultConnectorException on error
+     */
+    boolean deleteSecret(final String key) throws VaultConnectorException;
+
+    /**
      * Revoke given lease immediately.
      *
      * @param leaseID the lease ID

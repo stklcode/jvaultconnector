@@ -301,6 +301,47 @@ public class HTTPVaultConnectorTest {
     }
 
     /**
+     * Test deletion of secrets.
+     */
+    @Test
+    public void deleteTest() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        /* Write a test secret to vault */
+        try {
+            boolean res = connector.writeSecret(SECRET_PATH + "/toDelete", "secret content");
+            assumeThat("Secret could not be written path.", res, is(true));
+        } catch (VaultConnectorException e) {
+            fail("Secret written to inaccessible path.");
+        }
+        SecretResponse res = null;
+        try {
+            res = connector.readSecret(SECRET_PATH + "/toDelete");
+        } catch (VaultConnectorException e) {
+            fail("Written secret could not be read.");
+        }
+        assumeThat(res, is(notNullValue()));
+
+        /* Delete secret */
+        try {
+            boolean deleted = connector.deleteSecret(SECRET_PATH + "/toDelete");
+            assertThat("Revocation of secret faiked.", deleted, is(true));
+        } catch (VaultConnectorException e) {
+            fail("Revocation threw unexpected exception.");
+        }
+
+        /* Try to read again */
+        try {
+            connector.readSecret(SECRET_PATH + "/toDelete");
+            fail("Successfully read deleted secret.");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
+            assertThat(((InvalidResponseException)e).getStatusCode(), is(404));
+        }
+    }
+
+    /**
      * Test revocation of secrets.
      */
     @Test
@@ -323,19 +364,12 @@ public class HTTPVaultConnectorTest {
         }
         assumeThat(res, is(notNullValue()));
 
-        /* Revoke secret by lease id */
+        /* Revoke secret */
         try {
             boolean revoked = connector.revoke(SECRET_PATH + "/toRevoke");
             assertThat("Revocation of secret faiked.", revoked, is(true));
         } catch (VaultConnectorException e) {
             fail("Revocation threw unexpected exception.");
-        }
-
-        try {
-            connector.readSecret(SECRET_PATH + "/toRevoke");
-            fail("Revoked secret could still be read");
-        } catch (VaultConnectorException e) {
-            assertThat(e, is(notNullValue()));
         }
     }
 
