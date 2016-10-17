@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.AuthBackend;
+import de.stklcode.jvault.connector.model.Token;
 import de.stklcode.jvault.connector.model.response.*;
 
 import java.util.List;
@@ -208,4 +209,13 @@ public interface VaultConnector {
      * @return Renewed lease
      */
     VaultResponse renew(final String leaseID, final Integer seconds);
+
+    /**
+     * Create a new token.
+     *
+     * @param token the token
+     * @return the result response
+     * @throws VaultConnectorException on error
+     */
+    TokenResponse createToken(final Token token) throws VaultConnectorException;
 }

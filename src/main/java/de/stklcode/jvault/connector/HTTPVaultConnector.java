@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.AuthBackend;
+import de.stklcode.jvault.connector.model.Token;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 import org.apache.http.HttpResponse;
@@ -334,6 +335,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public VaultResponse renew(String leaseID, Integer seconds) {
+        /* TODO */
+        return null;
+    }
+
+    @Override
+    public TokenResponse createToken(final Token token) throws VaultConnectorException {
         /* TODO */
         return null;
     }
