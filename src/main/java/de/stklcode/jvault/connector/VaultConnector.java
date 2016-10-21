@@ -217,5 +217,25 @@ public interface VaultConnector {
      * @return the result response
      * @throws VaultConnectorException on error
      */
-    TokenResponse createToken(final Token token) throws VaultConnectorException;
+    AuthResponse createToken(final Token token) throws VaultConnectorException;
+
+    /**
+     * Create a new token.
+     *
+     * @param token  the token
+     * @param orphan create orphan token
+     * @return the result response
+     * @throws VaultConnectorException on error
+     */
+    AuthResponse createToken(final Token token, boolean orphan) throws VaultConnectorException;
+
+    /**
+     * Create a new token for specific role.
+     *
+     * @param token the token
+     * @param role  the role name
+     * @return the result response
+     * @throws VaultConnectorException on error
+     */
+    AuthResponse createToken(final Token token, final String role) throws VaultConnectorException;
 }

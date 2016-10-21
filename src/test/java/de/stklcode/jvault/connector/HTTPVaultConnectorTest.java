@@ -17,6 +17,8 @@
 package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.model.Token;
+import de.stklcode.jvault.connector.model.TokenBuilder;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
@@ -33,6 +35,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -370,6 +374,81 @@ public class HTTPVaultConnectorTest {
             assertThat("Revocation of secret faiked.", revoked, is(true));
         } catch (VaultConnectorException e) {
             fail("Revocation threw unexpected exception.");
+        }
+    }
+
+    /**
+     * Test revocation of secrets.
+     */
+    @Test
+    public void createTokenTest() {
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+
+        /* Create token */
+        Token token = new TokenBuilder()
+                .withId("test-id")
+                .withDisplayName("test name")
+                .build();
+
+        /* Create token */
+        try {
+            AuthResponse res = connector.createToken(token);
+            assertThat("No result given.", res, is(notNullValue()));
+            assertThat("Token creation returned warnings.", res.getWarnings(), is(nullValue()));
+            assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id"));
+            assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
+            assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("root"));
+            assertThat("Metadata unexpected.", res.getAuth().getMetadata(), is(nullValue()));
+            assertThat("Root token should not be renewable", res.getAuth().isRenewable(), is(false));
+        } catch (VaultConnectorException e) {
+            fail("Secret written to inaccessible path.");
+        }
+
+        /* Create token with attributes */
+        token = new TokenBuilder()
+                .withId("test-id2")
+                .withDisplayName("test name 2")
+                .withPolicies(Collections.singletonList("testpolicy"))
+                .withoutDefaultPolicy()
+                .withMeta("foo", "bar")
+                .build();
+        try {
+            AuthResponse res = connector.createToken(token);
+            assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id2"));
+            assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
+            assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("testpolicy"));
+            assertThat("Metadata not given.", res.getAuth().getMetadata(), is(notNullValue()));
+            assertThat("Metadata not correct.", res.getAuth().getMetadata().get("foo"), is("bar"));
+            assertThat("Token should be renewable", res.getAuth().isRenewable(), is(true));
+        } catch (VaultConnectorException e) {
+            fail("Secret written to inaccessible path.");
+        }
+
+        /* Overwrite token */
+        token = new TokenBuilder()
+                .withId("test-id2")
+                .withDisplayName("test name 3")
+                .withPolicies(Arrays.asList("pol1", "pol2"))
+                .withDefaultPolicy()
+                .withMeta("test", "success")
+                .withMeta("key", "value")
+                .withTtl(1234)
+                .build();
+        try {
+            AuthResponse res = connector.createToken(token);
+            assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id2"));
+            assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(3));
+            assertThat("Policies not returned as expected.", res.getAuth().getPolicies(), contains("default", "pol1", "pol2"));
+            assertThat("Old policy not overwritten.", res.getAuth().getPolicies(), not(contains("testpolicy")));
+            assertThat("Metadata not given.", res.getAuth().getMetadata(), is(notNullValue()));
+            assertThat("Metadata not correct.", res.getAuth().getMetadata().get("test"), is("success"));
+            assertThat("Metadata not correct.", res.getAuth().getMetadata().get("key"), is("value"));
+            assertThat("Old metadata not overwritten.", res.getAuth().getMetadata().get("foo"), is(nullValue()));
+            assertThat("TTL not set correctly", res.getAuth().getLeaseDuration(), is(1234));
+            assertThat("Token should be renewable", res.getAuth().isRenewable(), is(true));
+        } catch (VaultConnectorException e) {
+            fail("Secret written to inaccessible path.");
         }
     }
 

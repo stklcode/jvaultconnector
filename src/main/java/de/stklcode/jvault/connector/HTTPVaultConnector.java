@@ -54,7 +54,10 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_UNSEAL =        "sys/unseal";
     private static final String PATH_INIT =          "sys/init";
     private static final String PATH_AUTH =          "sys/auth";
-    private static final String PATH_TOKEN_LOOKUP =  "auth/token/lookup";
+    private static final String PATH_TOKEN =         "auth/token";
+    private static final String PATH_LOOKUP =        "/lookup";
+    private static final String PATH_CREATE =        "/create";
+    private static final String PATH_CREATE_ORPHAN = "/create-orphan";
     private static final String PATH_AUTH_USERPASS = "auth/userpass/login/";
     private static final String PATH_AUTH_APPID =    "auth/app-id/";
     private static final String PATH_SECRET =        "secret";
@@ -193,7 +196,7 @@ public class HTTPVaultConnector implements VaultConnector {
         this.token = token;
         this.tokenTTL = 0;
         try {
-            String response = requestPost(PATH_TOKEN_LOOKUP, new HashMap<>());
+            String response = requestPost(PATH_TOKEN + PATH_LOOKUP, new HashMap<>());
             TokenResponse res = jsonMapper.readValue(response, TokenResponse.class);
             authorized = true;
             return res;
@@ -305,6 +308,9 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public boolean writeSecret(final String key, final String value) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
         if (key == null || key.isEmpty())
             throw new InvalidRequestException("Secret path must not be empty.");
 
@@ -320,7 +326,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Request HTTP response and expect empty result */
         String response = requestDelete(PATH_SECRET + "/" + key);
-        return response.equals("");
+
+        /* Response should be code 204 without content */
+        if (!response.equals(""))
+            throw new InvalidResponseException("Received response where non was expected.");
+
+        return true;
     }
 
     @Override
@@ -330,7 +341,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Request HTTP response and expect empty result */
         String response = requestPut(PATH_REVOKE + leaseID, new HashMap<>());
-        return response.equals("");
+
+        /* Response should be code 204 without content */
+        if (!response.equals(""))
+            throw new InvalidResponseException("Received response where non was expected.");
+
+        return true;
     }
 
     @Override
@@ -340,9 +356,44 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public TokenResponse createToken(final Token token) throws VaultConnectorException {
-        /* TODO */
-        return null;
+    public AuthResponse createToken(final Token token) throws VaultConnectorException {
+        return createTokenInternal(token, PATH_TOKEN + PATH_CREATE);
+    }
+
+    @Override
+    public AuthResponse createToken(final Token token, boolean orphan) throws VaultConnectorException {
+        return createTokenInternal(token, PATH_TOKEN + PATH_CREATE_ORPHAN);
+    }
+
+    @Override
+    public AuthResponse createToken(final Token token, final String role) throws VaultConnectorException {
+        if (role == null || role.isEmpty())
+            throw new InvalidRequestException("No role name specified.");
+        return createTokenInternal(token, PATH_TOKEN + PATH_CREATE + "/" + role);
+    }
+
+    /**
+     * Create token.
+     * Centralized method to handle different token creation requests.
+     *
+     * @param token the token
+     * @param path  request path
+     * @return the response
+     * @throws VaultConnectorException on error
+     */
+    private AuthResponse createTokenInternal(final Token token, final String path) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        if (token == null)
+            throw new InvalidRequestException("Token must be provided.");
+
+        String response = requestPost(path, token);
+        try {
+            return jsonMapper.readValue(response, AuthResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        }
     }
 
 
@@ -354,7 +405,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @return          HTTP response
      * @throws VaultConnectorException  on connection error
      */
-    private String requestPost(final String path, final Map payload) throws VaultConnectorException {
+    private String requestPost(final String path, final Object payload) throws VaultConnectorException {
         /* Initialize post */
         HttpPost post = new HttpPost(baseURL + path);
         /* generate JSON from payload */
