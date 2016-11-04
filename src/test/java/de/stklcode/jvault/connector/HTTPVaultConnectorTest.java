@@ -17,8 +17,7 @@
 package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
-import de.stklcode.jvault.connector.model.Token;
-import de.stklcode.jvault.connector.model.TokenBuilder;
+import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
@@ -26,7 +25,6 @@ import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
-import de.stklcode.jvault.connector.model.AuthBackend;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
@@ -35,9 +33,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -57,6 +53,10 @@ public class HTTPVaultConnectorTest {
     private static String PASS_VALID = "validPass";
     private static String APP_ID = "152AEA38-85FB-47A8-9CBD-612D645BFACA";
     private static String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
+    private static String APPROLE_ROLE_NAME = "testrole1";                          // role with secret ID
+    private static String APPROLE_ROLE = "627b6400-90c3-a239-49a9-af65a448ca10";
+    private static String APPROLE_SECRET = "154fe52a-6df2-b4e9-2dbd-d3c5e6539f9b";
+    private static String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";   // role with CIDR subnet
     private static String SECRET_PATH = "userstore";
     private static String SECRET_KEY = "foo";
     private static String SECRET_KEY_JSON = "json";
@@ -118,8 +118,8 @@ public class HTTPVaultConnectorTest {
         } catch (VaultConnectorException e) {
             fail("Could not list supported auth backends: " + e.getMessage());
         }
-        assertThat(supportedBackends.size(), is(3));
-        assertThat(supportedBackends, hasItems(AuthBackend.TOKEN, AuthBackend.USERPASS, AuthBackend.APPID));
+        assertThat(supportedBackends, hasSize(4));
+        assertThat(supportedBackends, hasItems(AuthBackend.TOKEN, AuthBackend.USERPASS, AuthBackend.APPID, AuthBackend.APPROLE));
     }
 
     /**
@@ -200,6 +200,218 @@ public class HTTPVaultConnectorTest {
             assertThat("Authorization flag not set after App-ID login.", connector.isAuthorized(), is(true));
         } catch (VaultConnectorException e) {
             fail("Failed to authenticate using App-ID: " + e.getMessage());
+        }
+    }
+
+    /**
+     * App-ID authentication roundtrip.
+     */
+    @Test
+    public void authAppRole() {
+        assumeFalse(connector.isAuthorized());
+
+        /* Authenticate with correct credentials */
+        try {
+            AuthResponse res = connector.authAppRole(APPROLE_ROLE, APPROLE_SECRET);
+            assertThat("Authorization flag not set after AppRole login.", connector.isAuthorized(), is(true));
+        } catch (VaultConnectorException e) {
+            fail("Failed to authenticate using AppRole: " + e.getMessage());
+        }
+
+        /* Authenticate with valid secret ID against unknown role */
+        try {
+            AuthResponse res = connector.authAppRole("foo", APPROLE_SECRET);
+            fail("Successfully logged in with unknown role");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
+        }
+
+        /* Authenticate without wrong secret ID */
+        try {
+            AuthResponse res = connector.authAppRole(APPROLE_ROLE, "foo");
+            fail("Successfully logged in without secret ID");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
+        }
+
+        /* Authenticate without secret ID */
+        try {
+            AuthResponse res = connector.authAppRole(APPROLE_ROLE);
+            fail("Successfully logged in without secret ID");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
+        }
+
+        /* Authenticate with secret ID on role with CIDR whitelist */
+        try {
+            AuthResponse res = connector.authAppRole(APPROLE_ROLE2, APPROLE_SECRET);
+            assertThat("Authorization flag not set after AppRole login.", connector.isAuthorized(), is(true));
+        } catch (VaultConnectorException e) {
+            fail("Failed to log in without secret ID");
+        }
+    }
+
+    /**
+     * Test creation of a new AppRole.
+     */
+    @Test
+    public void createAppRoleTest() {
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+
+        String roleName = "TestRole";
+
+        /* Create role model */
+        AppRole role = new AppRoleBuilder(roleName).build();
+
+        /* Create role */
+        try {
+            boolean res = connector.createAppRole(role);
+            assertThat("No result given.", res, is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Role creation failed.");
+        }
+
+        /* Lookup role */
+        try {
+            AppRoleResponse res = connector.lookupAppRole(roleName);
+            assertThat("Role lookup returned no role.", res.getRole(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Role lookup failed.");
+        }
+
+        /* Lookup role ID */
+        try {
+            String res = connector.getAppRoleID(roleName);
+            assertThat("Role ID lookup returned empty ID.", res, is(not(emptyString())));
+        } catch (VaultConnectorException e) {
+            fail("Role ID lookup failed.");
+        }
+
+        /* Set custom role ID */
+        String roleID = "custom-role-id";
+        try {
+            connector.setAppRoleID(roleName, roleID);
+        } catch (VaultConnectorException e) {
+            fail("Setting custom role ID failed.");
+        }
+
+        /* Verify role ID */
+        try {
+            String res = connector.getAppRoleID(roleName);
+            assertThat("Role ID lookup returned wrong ID.", res, is(roleID));
+        } catch (VaultConnectorException e) {
+            fail("Role ID lookup failed.");
+        }
+
+        /* Create role by name */
+        roleName = "RoleByName";
+        try {
+            connector.createAppRole(roleName);
+        } catch (VaultConnectorException e) {
+            fail("Creation of role by name failed.");
+        }
+        try {
+            AppRoleResponse res = connector.lookupAppRole(roleName);
+            assertThat("Role lookuo returned not value", res.getRole(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Creation of role by name failed.");
+        }
+
+        /* Create role by name with custom ID */
+        roleName = "RoleByName";
+        roleID = "RolyByNameID";
+        try {
+            connector.createAppRole(roleName, roleID);
+        } catch (VaultConnectorException e) {
+            fail("Creation of role by name failed.");
+        }
+        try {
+            AppRoleResponse res = connector.lookupAppRole(roleName);
+            assertThat("Role lookuo returned not value", res.getRole(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Creation of role by name failed.");
+        }
+
+        try {
+            String res = connector.getAppRoleID(roleName);
+            assertThat("Role lookuo returned wrong ID", res, is(roleID));
+        } catch (VaultConnectorException e) {
+            fail("Creation of role by name failed.");
+        }
+
+        /* Create role by name with policies */
+        try {
+            connector.createAppRole(roleName, Collections.singletonList("testpolicy"));
+        } catch (VaultConnectorException e) {
+            fail("Creation of role by name failed.");
+        }
+        try {
+            AppRoleResponse res = connector.lookupAppRole(roleName);
+            assertThat("Role lookuo returned wrong policy count", res.getRole().getPolicies(), hasSize(2));
+            assertThat("Role lookuo returned wrong policies", res.getRole().getPolicies(), hasItem("testpolicy"));
+        } catch (VaultConnectorException e) {
+            fail("Creation of role by name failed.");
+        }
+
+        /* Delete role */
+        try {
+            connector.deleteAppRole(roleName);
+        } catch (VaultConnectorException e) {
+            fail("Deletion of role failed.");
+        }
+        try {
+            connector.lookupAppRole(roleName);
+            fail("Deleted role could be looked up.");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
+        }
+    }
+
+    /**
+     * Test creation of AppRole secrets.
+     */
+    @Test
+    public void createAppRoleSecretTest() {
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+
+        /* Create default (random) secret for existing role */
+        try {
+            AppRoleSecretResponse res = connector.createAppRoleSecret(APPROLE_ROLE_NAME);
+            assertThat("No secret returned", res.getSecret(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("AppRole secret creation failed.");
+        }
+
+        /* Create secret with custom ID */
+        String secretID = "customSecretId";
+        try {
+            AppRoleSecretResponse res = connector.createAppRoleSecret(APPROLE_ROLE_NAME, secretID);
+            assertThat("Unexpected secret ID returned", res.getSecret().getId(), is(secretID));
+        } catch (VaultConnectorException e) {
+            fail("AppRole secret creation failed.");
+        }
+
+        /* Lookup secret */
+        try {
+            AppRoleSecretResponse res = connector.lookupAppRoleSecret(APPROLE_ROLE_NAME, secretID);
+            assertThat("No secret information returned", res.getSecret(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("AppRole secret lookup failed.");
+        }
+
+        /* Destroy secret */
+        try {
+            connector.destroyAppRoleSecret(APPROLE_ROLE_NAME, secretID);
+        } catch (VaultConnectorException e) {
+            fail("AppRole secret destruction failed.");
+        }
+        try {
+            AppRoleSecretResponse res = connector.lookupAppRoleSecret(APPROLE_ROLE_NAME, secretID);
+            fail("Destroyed AppRole secret successfully read.");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
         }
     }
 

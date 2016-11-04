@@ -19,8 +19,7 @@ package de.stklcode.jvault.connector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.*;
-import de.stklcode.jvault.connector.model.AuthBackend;
-import de.stklcode.jvault.connector.model.Token;
+import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 import org.apache.http.HttpResponse;
@@ -44,24 +43,25 @@ import java.util.stream.Collectors;
 /**
  * Vault Connector implementatin using Vault's HTTP API.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public class HTTPVaultConnector implements VaultConnector {
-    private static final String PATH_PREFIX =        "/v1/";
-    private static final String PATH_SEAL_STATUS =   "sys/seal-status";
-    private static final String PATH_SEAL =          "sys/seal";
-    private static final String PATH_UNSEAL =        "sys/unseal";
-    private static final String PATH_INIT =          "sys/init";
-    private static final String PATH_AUTH =          "sys/auth";
-    private static final String PATH_TOKEN =         "auth/token";
-    private static final String PATH_LOOKUP =        "/lookup";
-    private static final String PATH_CREATE =        "/create";
+    private static final String PATH_PREFIX = "/v1/";
+    private static final String PATH_SEAL_STATUS = "sys/seal-status";
+    private static final String PATH_SEAL = "sys/seal";
+    private static final String PATH_UNSEAL = "sys/unseal";
+    private static final String PATH_INIT = "sys/init";
+    private static final String PATH_AUTH = "sys/auth";
+    private static final String PATH_TOKEN = "auth/token";
+    private static final String PATH_LOOKUP = "/lookup";
+    private static final String PATH_CREATE = "/create";
     private static final String PATH_CREATE_ORPHAN = "/create-orphan";
     private static final String PATH_AUTH_USERPASS = "auth/userpass/login/";
-    private static final String PATH_AUTH_APPID =    "auth/app-id/";
-    private static final String PATH_SECRET =        "secret";
-    private static final String PATH_REVOKE =        "sys/revoke/";
+    private static final String PATH_AUTH_APPID = "auth/app-id/";
+    private static final String PATH_AUTH_APPROLE = "auth/approle/";
+    private static final String PATH_SECRET = "secret";
+    private static final String PATH_REVOKE = "sys/revoke/";
 
     private final ObjectMapper jsonMapper;
 
@@ -74,8 +74,8 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using hostname and schema.
      *
-     * @param hostname  The hostname
-     * @param useTLS    If TRUE, use HTTPS, otherwise HTTP
+     * @param hostname The hostname
+     * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
      */
     public HTTPVaultConnector(String hostname, boolean useTLS) {
         this(hostname, useTLS, null);
@@ -84,9 +84,9 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using hostname, schema and port.
      *
-     * @param hostname  The hostname
-     * @param useTLS    If TRUE, use HTTPS, otherwise HTTP
-     * @param port      The port
+     * @param hostname The hostname
+     * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
+     * @param port     The port
      */
     public HTTPVaultConnector(String hostname, boolean useTLS, Integer port) {
         this(hostname, useTLS, port, PATH_PREFIX);
@@ -95,10 +95,10 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using hostname, schame, port and path.
      *
-     * @param hostname  The hostname
-     * @param useTLS    If TRUE, use HTTPS, otherwise HTTP
-     * @param port      The port
-     * @param prefix    HTTP API prefix (default: /v1/"
+     * @param hostname The hostname
+     * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
+     * @param port     The port
+     * @param prefix   HTTP API prefix (default: /v1/"
      */
     public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix) {
         this(((useTLS) ? "https" : "http") +
@@ -110,7 +110,7 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using full URL.
      *
-     * @param baseURL   The URL
+     * @param baseURL The URL
      */
     public HTTPVaultConnector(String baseURL) {
         this.baseURL = baseURL;
@@ -207,31 +207,40 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public AuthResponse authUserPass(final String username, final String password) throws VaultConnectorException {
-        Map<String, String> payload = new HashMap<>();
+        final Map<String, String> payload = new HashMap<>();
         payload.put("password", password);
-        try {
-            /* Get response */
-            String response = requestPost(PATH_AUTH_USERPASS + username, payload);
-            /* Parse response */
-            AuthResponse upr = jsonMapper.readValue(response, AuthResponse.class);
-            /* verify response */
-            this.token = upr.getAuth().getClientToken();
-            this.tokenTTL = System.currentTimeMillis() + upr.getAuth().getLeaseDuration() * 1000L;
-            this.authorized = true;
-            return upr;
-        } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
-        }
+        return queryAuth(PATH_AUTH_USERPASS + username, payload);
     }
 
     @Override
     public AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
-        Map<String, String> payload = new HashMap<>();
+        final Map<String, String> payload = new HashMap<>();
         payload.put("app_id", appID);
         payload.put("user_id", userID);
+        return queryAuth(PATH_AUTH_APPID + "login", payload);
+    }
+
+    @Override
+    public AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException {
+        final Map<String, String> payload = new HashMap<>();
+        payload.put("role_id", roleID);
+        if (secretID != null)
+            payload.put("secret_id", secretID);
+        return queryAuth(PATH_AUTH_APPROLE + "login", payload);
+    }
+
+    /**
+     * Query authorization request to given backend
+     *
+     * @param path    The path to request
+     * @param payload Payload (credentials)
+     * @return The AuthResponse
+     * @throws VaultConnectorException on errors
+     */
+    private AuthResponse queryAuth(final String path, final Map<String, String> payload) throws VaultConnectorException {
         try {
             /* Get response */
-            String response = requestPost(PATH_AUTH_APPID + "login", payload);
+            String response = requestPost(path, payload);
             /* Parse response */
             AuthResponse auth = jsonMapper.readValue(response, AuthResponse.class);
             /* verify response */
@@ -271,6 +280,162 @@ public class HTTPVaultConnector implements VaultConnector {
         if (!response.equals(""))
             throw new InvalidResponseException("Received response where non was expected.");
         return true;
+    }
+
+    @Override
+    public boolean createAppRole(final AppRole role) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+        /* Get response */
+        String response = requestPost(PATH_AUTH_APPROLE + "role/" + role.getName(), role);
+        /* Response should be code 204 without content */
+        if (!response.equals(""))
+            throw new InvalidResponseException("Received response where non was expected.");
+
+        /* Set custom ID if provided */
+        return !(role.getId() != null && !role.getId().isEmpty()) || setAppRoleID(role.getName(), role.getId());
+    }
+
+    @Override
+    public AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+        /* Request HTTP response and parse Secret */
+        try {
+            String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName, new HashMap<>());
+            return jsonMapper.readValue(response, AppRoleResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
+        }
+    }
+
+    @Override
+    public boolean deleteAppRole(String roleName) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        /* Request HTTP response and expect empty result */
+        String response = requestDelete(PATH_AUTH_APPROLE + "role/" + roleName);
+
+        /* Response should be code 204 without content */
+        if (!response.equals(""))
+            throw new InvalidResponseException("Received response where non was expected.");
+
+        return true;
+    }
+
+    @Override
+    public String getAppRoleID(final String roleName) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+        /* Request HTTP response and parse Secret */
+        try {
+            String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName + "/role-id", new HashMap<>());
+            return jsonMapper.readValue(response, RawDataResponse.class).getData().get("role_id").toString();
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
+        }
+    }
+
+    @Override
+    public boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+        /* Request HTTP response and parse Secret */
+        Map<String, String> payload = new HashMap<>();
+        payload.put("role_id", roleID);
+        String response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/role-id", payload);
+        /* Response should be code 204 without content */
+        if (!response.equals(""))
+            throw new InvalidResponseException("Received response where non was expected.");
+        return true;
+    }
+
+    @Override
+    public AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+        /* Get response */
+        String response;
+        if (secret.getId() != null && !secret.getId().isEmpty())
+            response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/custom-secret-id", secret);
+        else
+            response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id", secret);
+
+        try {
+            /* Extract the secret ID from response */
+            return jsonMapper.readValue(response, AppRoleSecretResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response.");
+        }
+    }
+
+    @Override
+    public AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+        /* Request HTTP response and parse Secret */
+        try {
+            String response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/lookup", new AppRoleSecret(secretID));
+            return jsonMapper.readValue(response, AppRoleSecretResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        }
+    }
+
+    @Override
+    public boolean destroyAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        /* Request HTTP response and expect empty result */
+        String response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/destroy", new AppRoleSecret(secretID));
+
+        /* Response should be code 204 without content */
+        if (!response.equals(""))
+            throw new InvalidResponseException("Received response where non was expected.");
+
+        return true;
+    }
+
+    @Override
+    public List<String> listAppRoles() throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        try {
+            String response = requestGet(PATH_AUTH_APPROLE + "role?list=true", new HashMap<>());
+            SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
+            return secrets.getKeys();
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
+        }
+    }
+
+    @Override
+    public List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        try {
+            String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id?list=true", new HashMap<>());
+            SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
+            return secrets.getKeys();
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
+        }
     }
 
     @Override
@@ -400,10 +565,10 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Execute HTTP request using POST method.
      *
-     * @param path      URL path (relative to base)
-     * @param payload   Map of payload values (will be converted to JSON)
-     * @return          HTTP response
-     * @throws VaultConnectorException  on connection error
+     * @param path    URL path (relative to base)
+     * @param payload Map of payload values (will be converted to JSON)
+     * @return HTTP response
+     * @throws VaultConnectorException on connection error
      */
     private String requestPost(final String path, final Object payload) throws VaultConnectorException {
         /* Initialize post */
@@ -428,10 +593,10 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Execute HTTP request using PUT method.
      *
-     * @param path      URL path (relative to base)
-     * @param payload   Map of payload values (will be converted to JSON)
-     * @return          HTTP response
-     * @throws VaultConnectorException  on connection error
+     * @param path    URL path (relative to base)
+     * @param payload Map of payload values (will be converted to JSON)
+     * @return HTTP response
+     * @throws VaultConnectorException on connection error
      */
     private String requestPut(final String path, final Map<String, String> payload) throws VaultConnectorException {
         /* Initialize put */
@@ -455,9 +620,9 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Execute HTTP request using DELETE method.
      *
-     * @param path      URL path (relative to base)
-     * @return          HTTP response
-     * @throws VaultConnectorException  on connection error
+     * @param path URL path (relative to base)
+     * @return HTTP response
+     * @throws VaultConnectorException on connection error
      */
     private String requestDelete(final String path) throws VaultConnectorException {
         /* Initialize delete */
@@ -472,10 +637,10 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Execute HTTP request using GET method.
      *
-     * @param path      URL path (relative to base)
-     * @param payload   Map of payload values (will be converted to JSON)
+     * @param path    URL path (relative to base)
+     * @param payload Map of payload values (will be converted to JSON)
      * @return HTTP response
-     * @throws VaultConnectorException  on connection error
+     * @throws VaultConnectorException on connection error
      */
     private String requestGet(final String path, final Map<String, String> payload) throws VaultConnectorException, URISyntaxException {
         /* Add parameters to URI */
@@ -495,9 +660,9 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Execute prepared HTTP request and return result.
      *
-     * @param base  Prepares Request
-     * @return      HTTP response
-     * @throws VaultConnectorException  on connection error
+     * @param base Prepares Request
+     * @return HTTP response
+     * @throws VaultConnectorException on connection error
      */
     private String request(HttpRequestBase base) throws VaultConnectorException {
         /* Set JSON Header */
@@ -512,9 +677,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
             switch (response.getStatusLine().getStatusCode()) {
                 case 200:
-                    try(BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
                         return br.lines().collect(Collectors.joining("\n"));
-                    } catch (IOException ignored) { }
+                    } catch (IOException ignored) {
+                    }
                 case 204:
                     return "";
                 case 403:
@@ -537,8 +703,7 @@ public class HTTPVaultConnector implements VaultConnector {
             }
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to read response", e);
-        }
-        finally {
+        } finally {
             if (response != null && response.getEntity() != null)
                 try {
                     EntityUtils.consume(response.getEntity());

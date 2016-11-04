@@ -17,10 +17,10 @@
 package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import de.stklcode.jvault.connector.model.AuthBackend;
-import de.stklcode.jvault.connector.model.Token;
+import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -110,8 +110,33 @@ public interface VaultConnector {
      * @param userID The User ID
      * @return TRUE on success
      * @throws VaultConnectorException on error
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #authAppRole} instead.
      */
+    @Deprecated
     AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException;
+
+    /**
+     * Authorize to Vault using AppRole method without secret ID.
+     *
+     * @param roleID The role ID
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    default AuthResponse authAppRole(final String roleID) throws VaultConnectorException {
+        return authAppRole(roleID, null);
+    }
+
+    /**
+     * Authorize to Vault using AppRole method.
+     *
+     * @param roleID   The role ID
+     * @param secretID The secret ID
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException;
 
     /**
      * Register new App-ID with policy.
@@ -121,8 +146,187 @@ public interface VaultConnector {
      * @param displayName Arbitrary name to display
      * @return TRUE on success
      * @throws VaultConnectorException on error
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #createAppRole} instead.
      */
+    @Deprecated
     boolean registerAppId(final String appID, final String policy, final String displayName) throws VaultConnectorException;
+
+    /**
+     * Register a new AppRole role from given metamodel.
+     *
+     * @param role The role
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    boolean createAppRole(final AppRole role) throws VaultConnectorException;
+
+    /**
+     * Register new AppRole role with default policy.
+     *
+     * @param roleName The role name
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    default boolean createAppRole(final String roleName) throws VaultConnectorException {
+        return createAppRole(roleName, new ArrayList<>());
+    }
+
+    /**
+     * Register new AppRole role with policies.
+     *
+     * @param roleName The role name
+     * @param policies The policies to associate with
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    default boolean createAppRole(final String roleName, final List<String> policies) throws VaultConnectorException {
+        return createAppRole(roleName, policies, null);
+    }
+
+    /**
+     * Register new AppRole role with default policy and custom ID.
+     *
+     * @param roleName The role name
+     * @param roleID   A custom role ID
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    default boolean createAppRole(final String roleName, final String roleID) throws VaultConnectorException {
+        return createAppRole(roleName, new ArrayList<>(), roleID);
+    }
+
+    /**
+     * Register new AppRole role with policies and custom ID.
+     *
+     * @param roleName The role name
+     * @param policies The policies to associate with
+     * @param roleID   A custom role ID
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    default boolean createAppRole(final String roleName, final List<String> policies, final String roleID) throws VaultConnectorException {
+        return createAppRole(new AppRoleBuilder(roleName).withPolicies(policies).withId(roleID).build());
+    }
+
+    /**
+     * Delete AppRole role from Vault.
+     *
+     * @param roleName The role anme
+     * @return TRUE on succevss
+     * @throws VaultConnectorException on error
+     */
+    boolean deleteAppRole(final String roleName) throws VaultConnectorException;
+
+    /**
+     * Lookup an AppRole role.
+     *
+     * @param roleName The role name
+     * @return Result of the lookup
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException;
+
+    /**
+     * Retrieve ID for an AppRole role.
+     *
+     * @param roleName The role name
+     * @return The role ID
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    String getAppRoleID(final String roleName) throws VaultConnectorException;
+
+    /**
+     * Set custom ID for an AppRole role.
+     *
+     * @param roleName The role name
+     * @param roleID   The role ID
+     * @return TRUE on success
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException;
+
+    /**
+     * Register new random generated AppRole secret.
+     *
+     * @param roleName The role name
+     * @return The secret ID
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    default AppRoleSecretResponse createAppRoleSecret(final String roleName) throws VaultConnectorException {
+        return createAppRoleSecret(roleName, new AppRoleSecret());
+    }
+
+    /**
+     * Register new AppRole secret with custom ID.
+     *
+     * @param roleName The role name
+     * @param secretID A custom secret ID
+     * @return The secret ID
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    default AppRoleSecretResponse createAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+        return createAppRoleSecret(roleName, new AppRoleSecret(secretID));
+    }
+
+    /**
+     * Register new AppRole secret with custom ID.
+     *
+     * @param roleName The role name
+     * @param secret   The secret meta object
+     * @return The secret ID
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret) throws VaultConnectorException;
+
+    /**
+     * Lookup an AppRole secret.
+     *
+     * @param roleName The role name
+     * @param secretID The secret ID
+     * @return Result of the lookup
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException;
+
+    /**
+     * Destroy an AppRole secret.
+     *
+     * @param roleName The role name
+     * @param secretID The secret meta object
+     * @return The secret ID
+     * @throws VaultConnectorException on error
+     * @since 0.4.0
+     */
+    boolean destroyAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException;
+
+    /**
+     * List existing (accessible) AppRole roles.
+     *
+     * @return List of roles
+     * @throws VaultConnectorException on error
+     */
+    List<String> listAppRoles() throws VaultConnectorException;
+
+    /**
+     * List existing (accessible) secret IDs for AppRole role.
+     *
+     * @param roleName The role name
+     * @return List of roles
+     * @throws VaultConnectorException on error
+     */
+    List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException;
 
     /**
      * Register User-ID with App-ID
@@ -131,7 +335,9 @@ public interface VaultConnector {
      * @param userID The User-ID
      * @return TRUE on success
      * @throws VaultConnectorException on error
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #createAppRoleSecret} instead.
      */
+    @Deprecated
     boolean registerUserId(final String appID, final String userID) throws VaultConnectorException;
 
     /**
@@ -143,7 +349,9 @@ public interface VaultConnector {
      * @param userID      The User-ID
      * @return TRUE on success
      * @throws VaultConnectorException on error
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
      */
+    @Deprecated
     default boolean registerAppUserId(final String appID, final String policy, final String displayName, final String userID) throws VaultConnectorException {
         return registerAppId(appID, policy, userID) && registerUserId(appID, userID);
     }

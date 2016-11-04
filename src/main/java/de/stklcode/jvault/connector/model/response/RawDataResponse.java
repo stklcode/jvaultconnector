@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package de.stklcode.jvault.connector.model;
+package de.stklcode.jvault.connector.model.response;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.Map;
 
 /**
- * Currently supported authentication backends.
+ * Simple Vault data response.
  *
  * @author  Stefan Kalscheuer
- * @since   0.1
+ * @since   0.4.0
  */
-public enum AuthBackend {
-    TOKEN("token"),
-    APPID("app-id"),
-    APPROLE("approle"),
-    USERPASS("userpass"),
-    UNKNOWN("");
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RawDataResponse extends VaultDataResponse {
+    private Map<String, Object> data;
 
-    private final String type;
-
-    AuthBackend(String type) {
-        this.type = type;
+    @Override
+    public void setData(Map<String, Object> data) {
+        this.data = data;
     }
 
-    public static AuthBackend forType(String type) {
-        for (AuthBackend v : values())
-            if (v.type.equalsIgnoreCase(type))
-                return v;
-        return UNKNOWN;
+    public Map<String, Object> getData() {
+        return data;
     }
 }
