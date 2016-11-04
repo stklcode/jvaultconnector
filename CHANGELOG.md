@@ -1,4 +1,5 @@
 ## 0.4.0 [development]
+* [feature] Option to provide a trusted CA certificate (#2)
 * [feature] Deletion, revocation and renewal of secrets (#3)
 * [feature] Token creation (#4)
 * [feature] AppRole auth backend supported (#5)

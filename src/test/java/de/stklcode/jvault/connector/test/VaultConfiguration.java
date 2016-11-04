@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 /**
  * Vault configuration String using builder pattern.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public class VaultConfiguration {
     private String host;
@@ -31,6 +31,8 @@ public class VaultConfiguration {
     private boolean disableTLS;
     private boolean disableMlock;
     private Path dataLocation;
+    private String certFile;
+    private String keyFile;
 
     public VaultConfiguration() {
         this.disableTLS = true;
@@ -49,6 +51,16 @@ public class VaultConfiguration {
 
     public VaultConfiguration enableTLS() {
         this.disableTLS = false;
+        return this;
+    }
+
+    public VaultConfiguration withCert(String certFile) {
+        this.certFile = certFile;
+        return this;
+    }
+
+    public VaultConfiguration withKey(String keyFile) {
+        this.keyFile = keyFile;
         return this;
     }
 
@@ -80,12 +92,14 @@ public class VaultConfiguration {
 
     @Override
     public String toString() {
-        return  "backend \"file\" {\n" +
+        return "backend \"file\" {\n" +
                 "  path = \"" + dataLocation + "\"\n" +
                 "}\n" +
                 "listener \"tcp\" {\n" +
                 "  address = \"" + host + ":" + port + "\"\n" +
                 ((disableTLS) ? "  tls_disable = 1\n" : "") +
+                ((certFile != null) ? "  tls_cert_file = \"" + certFile + "\"\n" : "") +
+                ((keyFile != null) ? "  tls_key_file = \"" + keyFile + "\"\n" : "") +
                 "}\n" +
                 ((disableMlock) ? "disable_mlock = true" : "");
     }

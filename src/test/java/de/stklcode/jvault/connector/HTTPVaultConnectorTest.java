@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
+import de.stklcode.jvault.connector.factory.HTTPVaultConnectorFactory;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
@@ -27,13 +28,17 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestName;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.*;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -43,8 +48,8 @@ import static org.junit.Assume.*;
 /**
  * JUnit Test for HTTP Vault connector.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public class HTTPVaultConnectorTest {
     private static String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
@@ -66,27 +71,37 @@ public class HTTPVaultConnectorTest {
     private VaultConnector connector;
 
     @Rule
-    public TemporaryFolder tmpDir =  new TemporaryFolder();
+    public TemporaryFolder tmpDir = new TemporaryFolder();
+
+    @Rule
+    public TestName testName = new TestName();
 
     /**
      * Initialize Vault instance with generated configuration and provided file backend.
      * Requires "vault" binary to be in current user's executable path. Not using MLock, so no extended rights required.
      */
     @Before
-    public void setUp() {
+    public void setUp() throws VaultConnectorException {
+        /* Determine, if TLS is required */
+        boolean isTls = testName.getMethodName().equals("tlsConnectionTest");
+
         /* Initialize Vault */
-        VaultConfiguration config = initializeVault();
+        VaultConfiguration config = initializeVault(isTls);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         /* Initialize connector */
-        connector = VaultConnectorFactory.httpFactory()
+        HTTPVaultConnectorFactory factory = VaultConnectorFactory.httpFactory()
                 .withHost(config.getHost())
                 .withPort(config.getPort())
-                .withoutTLS()
-                .build();
+                .withTLS(isTls);
+        if (isTls)
+            factory.withTrustedCA(Paths.get(getClass().getResource("/tls/ca.pem").getPath()));
+        connector = factory.build();
+
         /* Unseal Vault and check result */
         SealResponse sealStatus = connector.unseal(KEY);
         assumeNotNull(sealStatus);
@@ -107,8 +122,7 @@ public class HTTPVaultConnectorTest {
         /* Authenticate as valid user */
         try {
             connector.authToken(TOKEN_ROOT);
-        }
-        catch(VaultConnectorException ignored) {
+        } catch (VaultConnectorException ignored) {
         }
         assumeTrue(connector.isAuthorized());
 
@@ -152,8 +166,7 @@ public class HTTPVaultConnectorTest {
         try {
             connector.authUserPass("foo", "bar");
             fail("Logged in with invalid credentials");
-        }
-        catch(VaultConnectorException ignored) {
+        } catch (VaultConnectorException ignored) {
         }
 
         try {
@@ -177,8 +190,7 @@ public class HTTPVaultConnectorTest {
         try {
             boolean res = connector.registerAppId(APP_ID, "user", "App Name");
             assertThat("Failed to register App-ID", res, is(true));
-        }
-        catch (VaultConnectorException e) {
+        } catch (VaultConnectorException e) {
             fail("Failed to register App-ID: " + e.getMessage());
         }
 
@@ -186,8 +198,7 @@ public class HTTPVaultConnectorTest {
         try {
             boolean res = connector.registerUserId(APP_ID, USER_ID);
             assertThat("Failed to register App-ID", res, is(true));
-        }
-        catch (VaultConnectorException e) {
+        } catch (VaultConnectorException e) {
             fail("Failed to register App-ID: " + e.getMessage());
         }
 
@@ -553,7 +564,7 @@ public class HTTPVaultConnectorTest {
             fail("Successfully read deleted secret.");
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(InvalidResponseException.class)));
-            assertThat(((InvalidResponseException)e).getStatusCode(), is(404));
+            assertThat(((InvalidResponseException) e).getStatusCode(), is(404));
         }
     }
 
@@ -665,19 +676,49 @@ public class HTTPVaultConnectorTest {
     }
 
     /**
+     * Test TLS connection with custom certificate chain.
+     */
+    @Test
+    public void tlsConnectionTest() {
+        TokenResponse res;
+        try {
+            connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6");
+            fail("Logged in with invalid token");
+        } catch (VaultConnectorException ignored) {
+        }
+
+        try {
+            res = connector.authToken(TOKEN_ROOT);
+            assertNotNull("Login failed with valid token", res);
+            assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
+        } catch (VaultConnectorException ignored) {
+            fail("Login failed with valid token");
+        }
+    }
+
+    /**
      * Initialize Vault with resource datastore and generated configuration.
-     * @return  Vault Configuration
+     *
+     * @param tls use TLS
+     * @return Vault Configuration
      * @throws IllegalStateException on error
      */
-    private VaultConfiguration initializeVault() throws IllegalStateException {
+    private VaultConfiguration initializeVault(boolean tls) throws IllegalStateException {
         String dataResource = getClass().getResource("/data_dir").getPath();
 
         /* Generate vault local unencrypted configuration */
         VaultConfiguration config = new VaultConfiguration()
-                .withHost("127.0.0.1")
+                .withHost("localhost")
                 .withPort(getFreePort())
                 .withDataLocation(dataResource)
                 .disableMlock();
+
+        /* Enable TLS with custom certificate and key, if required */
+        if (tls) {
+            config.enableTLS()
+                    .withCert(getClass().getResource("/tls/server.pem").getPath())
+                    .withKey(getClass().getResource("/tls/server.key").getPath());
+        }
 
         /* Write configuration file */
         BufferedWriter bw = null;
@@ -686,17 +727,14 @@ public class HTTPVaultConnectorTest {
             configFile = tmpDir.newFile("vault.conf");
             bw = new BufferedWriter(new FileWriter(configFile));
             bw.write(config.toString());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             throw new IllegalStateException("Unable to generate config file.");
-        }
-        finally {
+        } finally {
             try {
                 if (bw != null)
                     bw.close();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -719,8 +757,7 @@ public class HTTPVaultConnectorTest {
         /* Authenticate as valid user */
         try {
             connector.authToken(TOKEN_ROOT);
-        }
-        catch(VaultConnectorException ignored) {
+        } catch (VaultConnectorException ignored) {
         }
     }
 
@@ -730,14 +767,14 @@ public class HTTPVaultConnectorTest {
     private void authUser() {
         try {
             connector.authUserPass(USER_VALID, PASS_VALID);
-        }
-        catch(VaultConnectorException ignored) {
+        } catch (VaultConnectorException ignored) {
         }
     }
 
     /**
      * Find and return a free TCP port.
-     * @return  port number
+     *
+     * @return port number
      */
     private static Integer getFreePort() {
         ServerSocket socket = null;

@@ -30,10 +30,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import javax.net.ssl.*;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -65,11 +63,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
     private final ObjectMapper jsonMapper;
 
-    private final String baseURL;               /* Base URL of Vault */
+    private final String baseURL;           /* Base URL of Vault */
+    private final SSLContext sslContext;    /* Custom SSLSocketFactory */
 
-    private boolean authorized = false;         /* authorization status */
-    private String token;                       /* current token */
-    private long tokenTTL = 0;                  /* expiration time for current token */
+    private boolean authorized = false;     /* authorization status */
+    private String token;                   /* current token */
+    private long tokenTTL = 0;              /* expiration time for current token */
 
     /**
      * Create connector using hostname and schema.
@@ -93,12 +92,12 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     /**
-     * Create connector using hostname, schame, port and path.
+     * Create connector using hostname, schema, port and path.
      *
      * @param hostname The hostname
      * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
      * @param port     The port
-     * @param prefix   HTTP API prefix (default: /v1/"
+     * @param prefix   HTTP API prefix (default: /v1/)
      */
     public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix) {
         this(((useTLS) ? "https" : "http") +
@@ -108,12 +107,39 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     /**
+     * Create connector using hostname, schema, port, path and trusted certificate.
+     *
+     * @param hostname   The hostname
+     * @param useTLS     If TRUE, use HTTPS, otherwise HTTP
+     * @param port       The port
+     * @param prefix     HTTP API prefix (default: /v1/)
+     * @param sslContext Custom SSL Context
+     */
+    public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix, SSLContext sslContext) {
+        this(((useTLS) ? "https" : "http") +
+                        "://" + hostname +
+                        ((port != null) ? ":" + port : "") +
+                        prefix,
+                sslContext);
+    }
+
+    /**
      * Create connector using full URL.
      *
      * @param baseURL The URL
      */
     public HTTPVaultConnector(String baseURL) {
+        this(baseURL, null);
+    }
+
+    /**
+     * Create connector using full URL and trusted certificate.
+     *
+     * @param baseURL The URL
+     */
+    public HTTPVaultConnector(String baseURL, SSLContext sslContext) {
         this.baseURL = baseURL;
+        this.sslContext = sslContext;
         this.jsonMapper = new ObjectMapper();
     }
 
@@ -669,7 +695,7 @@ public class HTTPVaultConnector implements VaultConnector {
         base.addHeader("accept", "application/json");
 
         HttpResponse response = null;
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().setSSLContext(sslContext).build()) {
             response = httpClient.execute(base);
             /* Check if response is valid */
             if (response == null)
