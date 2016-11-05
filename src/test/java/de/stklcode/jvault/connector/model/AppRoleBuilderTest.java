@@ -50,7 +50,7 @@ public class AppRoleBuilderTest {
     private static final Integer TOKEN_MAX_TTL = 9600;
     private static final Integer PERIOD = 1234;
     private static final String JSON_MIN = "{\"role_name\":\"" + NAME + "\"}";
-    private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"secret_id\":\"%s\",\"bind_secret_id\":%s,\"bound_cidr_list\":[\"%s\"],\"policies\":[\"%s\"],\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"token_ttl\":%d,\"token_max_ttl\":%d,\"period\":%d}",
+    private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"role_id\":\"%s\",\"bind_secret_id\":%s,\"bound_cidr_list\":\"%s\",\"policies\":\"%s\",\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"token_ttl\":%d,\"token_max_ttl\":%d,\"period\":%d}",
             NAME, ID, BIND_SECRET_ID, CIDR_1, POLICY, SECRET_ID_NUM_USES, SECRET_ID_TTL, TOKEN_TTL, TOKEN_MAX_TTL, PERIOD);
 
     @BeforeClass
@@ -128,8 +128,8 @@ public class AppRoleBuilderTest {
         assertThat(role.getBoundCidrList(), hasSize(1));
         assertThat(role.getBoundCidrList(), contains(CIDR_2));
         role = new AppRoleBuilder(NAME)
-                .withPolicies(BOUND_CIDR_LIST)
-                .withPolicy(CIDR_1)
+                .withBoundCidrList(BOUND_CIDR_LIST)
+                .withCidrBlock(CIDR_2)
                 .build();
         assertThat(role.getBoundCidrList(), hasSize(2));
         assertThat(role.getBoundCidrList(), contains(CIDR_1, CIDR_2));

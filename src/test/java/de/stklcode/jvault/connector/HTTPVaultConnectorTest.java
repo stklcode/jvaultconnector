@@ -55,7 +55,7 @@ public class HTTPVaultConnectorTest {
     private static String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
     private static String APPROLE_ROLE_NAME = "testrole1";                          // role with secret ID
     private static String APPROLE_ROLE = "627b6400-90c3-a239-49a9-af65a448ca10";
-    private static String APPROLE_SECRET = "154fe52a-6df2-b4e9-2dbd-d3c5e6539f9b";
+    private static String APPROLE_SECRET = "fa762ca1-53c2-c687-432e-65cc7e988726";
     private static String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";   // role with CIDR subnet
     private static String SECRET_PATH = "userstore";
     private static String SECRET_KEY = "foo";

@@ -103,6 +103,7 @@ public class AppRole {
     }
 
     @JsonGetter("bound_cidr_list")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public String getBoundCidrListString() {
         if (boundCidrList == null || boundCidrList.isEmpty())
             return "";
@@ -119,6 +120,7 @@ public class AppRole {
     }
 
     @JsonGetter("policies")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public String getPoliciesString() {
         if (policies == null || policies.isEmpty())
             return "";
