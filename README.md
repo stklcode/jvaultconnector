@@ -24,7 +24,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 ```java
 // Instanciate using builder pattern style factory
 VaultConnector vault = VaultConnectorFactory.httpFactory()
- .wiithHost("127.0.0.1")
+ .withHost("127.0.0.1")
  .withPort(8200)
  .withTLS()
  .build();
