@@ -16,6 +16,7 @@
 
 package de.stklcode.jvault.connector;
 
+import de.stklcode.jvault.connector.exception.AuthorizationRequiredException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
@@ -412,11 +413,21 @@ public interface VaultConnector {
     /**
      * Renew lease with given ID.
      *
-     * @param leaseID the lase ID
-     * @param seconds number of seconds to extend lease time
+     * @param leaseID   the lase ID
      * @return Renewed lease
      */
-    VaultResponse renew(final String leaseID, final Integer seconds);
+    default SecretResponse renew(final String leaseID) throws VaultConnectorException {
+        return renew(leaseID, null);
+    }
+
+    /**
+     * Renew lease with given ID.
+     *
+     * @param leaseID   the lase ID
+     * @param increment number of seconds to extend lease time
+     * @return Renewed lease
+     */
+    SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException;
 
     /**
      * Create a new token.
@@ -446,4 +457,13 @@ public interface VaultConnector {
      * @throws VaultConnectorException on error
      */
     AuthResponse createToken(final Token token, final String role) throws VaultConnectorException;
+
+    /**
+     * Lookup token information.
+     *
+     * @param token the token
+     * @return the result response
+     * @throws VaultConnectorException on error
+     */
+    TokenResponse lookupToken(final String token) throws VaultConnectorException;
 }

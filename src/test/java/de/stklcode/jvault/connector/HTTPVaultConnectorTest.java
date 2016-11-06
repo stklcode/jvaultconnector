@@ -531,7 +531,7 @@ public class HTTPVaultConnectorTest {
      * Test deletion of secrets.
      */
     @Test
-    public void deleteTest() {
+    public void deleteSecretTest() {
         authUser();
         assumeTrue(connector.isAuthorized());
 

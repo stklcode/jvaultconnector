@@ -50,6 +50,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_SEAL = "sys/seal";
     private static final String PATH_UNSEAL = "sys/unseal";
     private static final String PATH_INIT = "sys/init";
+    private static final String PATH_RENEW = "sys/renew";
     private static final String PATH_AUTH = "sys/auth";
     private static final String PATH_TOKEN = "auth/token";
     private static final String PATH_LOOKUP = "/lookup";
@@ -541,9 +542,22 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public VaultResponse renew(String leaseID, Integer seconds) {
-        /* TODO */
-        return null;
+    public SecretResponse renew(String leaseID, Integer increment) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("lease_id", leaseID);
+        if (increment != null)
+            payload.put("increment", increment.toString());
+
+        /* Request HTTP response and parse Secret */
+        try {
+            String response = requestPut(PATH_RENEW, payload);
+            return jsonMapper.readValue(response, SecretResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        }
     }
 
     @Override
@@ -585,6 +599,23 @@ public class HTTPVaultConnector implements VaultConnector {
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response", e);
         }
+    }
+
+    @Override
+    public TokenResponse lookupToken(final String token) throws VaultConnectorException {
+        if (!isAuthorized())
+            throw new AuthorizationRequiredException();
+        /* Request HTTP response and parse Secret */
+        try {
+            String response = requestGet(PATH_TOKEN + "/lookup/" + token, new HashMap<>());
+            return jsonMapper.readValue(response, TokenResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format.");
+        }
+
     }
 
 
