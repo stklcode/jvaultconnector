@@ -1,8 +1,9 @@
-## 0.4.0 [development]
+## 0.4.0 [2016-11-06]
 * [feature] Option to provide a trusted CA certificate (#2)
 * [feature] Deletion, revocation and renewal of secrets (#3)
 * [feature] Token creation (#4)
 * [feature] AppRole auth backend supported (#5)
+* [improvement] Support for complex secrets
 * [deprecation] App-ID backend marked as deprecated
 
 ## 0.3.0 [2016-10-07]
