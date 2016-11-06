@@ -1,5 +1,8 @@
 ## 0.4.0 [development]
 * [feature] Deletion, revocation and renewal of secrets (#3)
+* [feature] Token creation (#4)
+* [feature] AppRole auth backend supported (#5)
+* [deprecation] App-ID backend marked as deprecated
 
 ## 0.3.0 [2016-10-07]
 * [feature] Retrieval of JSON objects (#1)
