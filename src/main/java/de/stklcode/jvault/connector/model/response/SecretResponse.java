@@ -26,37 +26,77 @@ import java.util.Map;
 /**
  * Vault response for secret request.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretResponse extends VaultDataResponse {
-    private String value;
+    private Map<String, Object> data;
 
     @Override
     public void setData(Map<String, Object> data) throws InvalidResponseException {
-        try {
-            this.value = (String) data.get("value");
-        } catch (ClassCastException e) {
-            throw new InvalidResponseException("Value could not be parsed", e);
-        }
+        this.data = data;
     }
 
+    /**
+     * Get complete data object.
+     *
+     * @return data map
+     * @since 0.4.0
+     */
+    public Map<String, Object> getData() {
+        return data;
+    }
+
+    /**
+     * Get a single value for given key.
+     *
+     * @param key the key
+     * @return the value or NULL if absent
+     * @since 0.4.0
+     */
+    public Object get(String key) {
+        return data.get(key);
+    }
+
+    /**
+     * Get data element for key "value".
+     * Method for backwards compatibility in case of simple secrets.
+     *
+     * @return the value
+     */
     public String getValue() {
-        return value;
+        if (data.get("value") == null)
+            return null;
+        return data.get("value").toString();
     }
 
     /**
      * Get response parsed as JSON
-     * @param type  Class to parse response
-     * @param <T>   Class to parse response
-     * @return      Parsed object
+     *
+     * @param type Class to parse response
+     * @param <T>  Class to parse response
+     * @return Parsed object
      * @throws InvalidResponseException on parsing error
      * @since 0.3
      */
     public <T> T getValue(Class<T> type) throws InvalidResponseException {
+        return get("value", type);
+    }
+
+    /**
+     * Get response parsed as JSON
+     *
+     * @param key the key
+     * @param type Class to parse response
+     * @param <T>  Class to parse response
+     * @return Parsed object
+     * @throws InvalidResponseException on parsing error
+     * @since 0.4.0
+     */
+    public <T> T get(String key, Class<T> type) throws InvalidResponseException {
         try {
-            return new ObjectMapper().readValue(getValue(), type);
+            return new ObjectMapper().readValue(get(key).toString(), type);
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
         }

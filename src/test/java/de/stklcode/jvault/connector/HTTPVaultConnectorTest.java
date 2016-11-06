@@ -64,8 +64,9 @@ public class HTTPVaultConnectorTest {
     private static String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";   // role with CIDR subnet
     private static String SECRET_PATH = "userstore";
     private static String SECRET_KEY = "foo";
-    private static String SECRET_KEY_JSON = "json";
     private static String SECRET_VALUE = "bar";
+    private static String SECRET_KEY_JSON = "json";
+    private static String SECRET_KEY_COMPLEX = "complex";
 
     private Process vaultProcess;
     private VaultConnector connector;
@@ -442,6 +443,7 @@ public class HTTPVaultConnectorTest {
         } catch (VaultConnectorException e) {
             assertThat(e, instanceOf(PermissionDeniedException.class));
         }
+
         /* Try to read accessible path with known value */
         try {
             res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY);
@@ -449,6 +451,7 @@ public class HTTPVaultConnectorTest {
         } catch (VaultConnectorException e) {
             fail("Valid secret path could not be read: " + e.getMessage());
         }
+
         /* Try to read accessible path with JSON value */
         try {
             res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON);
@@ -463,6 +466,33 @@ public class HTTPVaultConnectorTest {
             assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
         } catch (InvalidResponseException e) {
             fail("JSON response could not be parsed: " + e.getMessage());
+        }
+
+        /* Try to read accessible path with JSON value */
+        try {
+            res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON);
+            assertThat("Known secret returned null value.", res.getValue(), notNullValue());
+        } catch (VaultConnectorException e) {
+            fail("Valid secret path could not be read: " + e.getMessage());
+        }
+        try {
+            Credentials parsedRes = res.getValue(Credentials.class);
+            assertThat("JSON response was null", parsedRes, notNullValue());
+            assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
+            assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
+        } catch (InvalidResponseException e) {
+            fail("JSON response could not be parsed: " + e.getMessage());
+        }
+
+        /* Try to read accessible complex secret */
+        try {
+            res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_COMPLEX);
+            assertThat("Known secret returned null value.", res.getData(), notNullValue());
+            assertThat("Unexpected value size", res.getData().keySet(), hasSize(2));
+            assertThat("Unexpected value", res.get("key1"), is("value1"));
+            assertThat("Unexpected value", res.get("key2"), is("value2"));
+        } catch (VaultConnectorException e) {
+            fail("Valid secret path could not be read: " + e.getMessage());
         }
     }
 
