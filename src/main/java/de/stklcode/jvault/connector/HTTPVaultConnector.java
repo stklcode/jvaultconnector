@@ -499,7 +499,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public boolean writeSecret(final String key, final String value) throws VaultConnectorException {
+    public void writeSecret(final String key, final String value) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -508,11 +508,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
         Map<String, String> param = new HashMap<>();
         param.put("value", value);
-        return requestPost(PATH_SECRET + "/" + key, param).equals("");
+        if (!requestPost(PATH_SECRET + "/" + key, param).equals(""))
+            throw new InvalidResponseException("Received response where none was expected.");
     }
 
     @Override
-    public boolean deleteSecret(String key) throws VaultConnectorException {
+    public void deleteSecret(String key) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -521,13 +522,11 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
-
-        return true;
+            throw new InvalidResponseException("Received response where none was expected.");
     }
 
     @Override
-    public boolean revoke(String leaseID) throws VaultConnectorException {
+    public void revoke(String leaseID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -536,9 +535,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
-
-        return true;
+            throw new InvalidResponseException("Received response where none was expected.");
     }
 
     @Override

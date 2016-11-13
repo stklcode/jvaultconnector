@@ -523,29 +523,28 @@ public class HTTPVaultConnectorTest {
 
         /* Try to write to null path */
         try {
-            boolean res = connector.writeSecret(null, "someValue");
+            connector.writeSecret(null, "someValue");
             fail("Secret written to null path.");
         } catch (VaultConnectorException e) {
             assertThat(e, instanceOf(InvalidRequestException.class));
         }
         /* Try to write to invalid path */
         try {
-            boolean res = connector.writeSecret("", "someValue");
+            connector.writeSecret("", "someValue");
             fail("Secret written to invalid path.");
         } catch (VaultConnectorException e) {
             assertThat(e, instanceOf(InvalidRequestException.class));
         }
         /* Try to write to a path the user has no access for */
         try {
-            boolean res = connector.writeSecret("invalid/path", "someValue");
+            connector.writeSecret("invalid/path", "someValue");
             fail("Secret written to inaccessible path.");
         } catch (VaultConnectorException e) {
             assertThat(e, instanceOf(PermissionDeniedException.class));
         }
         /* Perform a valid write/read roundtrip to valid path. Also check UTF8-encoding. */
         try {
-            boolean res = connector.writeSecret(SECRET_PATH + "/temp", "Abc123äöü,!");
-            assertThat("Secret could not be written to valid path.", res, is(true));
+            connector.writeSecret(SECRET_PATH + "/temp", "Abc123äöü,!");
         } catch (VaultConnectorException e) {
             fail("Secret written to inaccessible path.");
         }
@@ -567,8 +566,7 @@ public class HTTPVaultConnectorTest {
 
         /* Write a test secret to vault */
         try {
-            boolean res = connector.writeSecret(SECRET_PATH + "/toDelete", "secret content");
-            assumeThat("Secret could not be written path.", res, is(true));
+            connector.writeSecret(SECRET_PATH + "/toDelete", "secret content");
         } catch (VaultConnectorException e) {
             fail("Secret written to inaccessible path.");
         }
@@ -582,8 +580,7 @@ public class HTTPVaultConnectorTest {
 
         /* Delete secret */
         try {
-            boolean deleted = connector.deleteSecret(SECRET_PATH + "/toDelete");
-            assertThat("Revocation of secret faiked.", deleted, is(true));
+            connector.deleteSecret(SECRET_PATH + "/toDelete");
         } catch (VaultConnectorException e) {
             fail("Revocation threw unexpected exception.");
         }
@@ -608,8 +605,7 @@ public class HTTPVaultConnectorTest {
 
         /* Write a test secret to vault */
         try {
-            boolean res = connector.writeSecret(SECRET_PATH + "/toRevoke", "secret content");
-            assumeThat("Secret could not be written path.", res, is(true));
+            connector.writeSecret(SECRET_PATH + "/toRevoke", "secret content");
         } catch (VaultConnectorException e) {
             fail("Secret written to inaccessible path.");
         }
@@ -623,8 +619,7 @@ public class HTTPVaultConnectorTest {
 
         /* Revoke secret */
         try {
-            boolean revoked = connector.revoke(SECRET_PATH + "/toRevoke");
-            assertThat("Revocation of secret faiked.", revoked, is(true));
+            connector.revoke(SECRET_PATH + "/toRevoke");
         } catch (VaultConnectorException e) {
             fail("Revocation threw unexpected exception.");
         }

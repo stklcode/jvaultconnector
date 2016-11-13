@@ -387,28 +387,25 @@ public interface VaultConnector {
      *
      * @param key   Secret path
      * @param value Secret value
-     * @return TRUE on success
      * @throws VaultConnectorException on error
      */
-    boolean writeSecret(final String key, final String value) throws VaultConnectorException;
+    void writeSecret(final String key, final String value) throws VaultConnectorException;
 
     /**
      * Delete secret from Vault.
      *
      * @param key Secret path
-     * @return TRUE on succevss
      * @throws VaultConnectorException on error
      */
-    boolean deleteSecret(final String key) throws VaultConnectorException;
+    void deleteSecret(final String key) throws VaultConnectorException;
 
     /**
      * Revoke given lease immediately.
      *
      * @param leaseID the lease ID
-     * @return TRUE on success
      * @throws VaultConnectorException on error
      */
-    boolean revoke(final String leaseID) throws VaultConnectorException;
+    void revoke(final String leaseID) throws VaultConnectorException;
 
     /**
      * Renew lease with given ID.
