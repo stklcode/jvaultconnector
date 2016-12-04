@@ -5,17 +5,22 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 **Current available features:**
 
 * HTTP(S) backend connector
+    *  Ability to provide or enforce custom CA certificate
 * Authorization methods:
     * Token
     * Username/Password
-    * AppID (register and authenticate)
+    * AppID (register and authenticate) [_deprecated_]
     * AppRole (register and authenticate)
+* Tokens
+    * Creation and lookup of tokens
+    * TokenBuilder for speaking creation of complex configuraitons
 * Secrets
     * Read secrets
     * Write secrets
     * List secrets
     * Delete secrets
     * Renew/revoke leases
+    * Raw secret content or JSON decoding
 * Connector Factory with builder pattern
 * Tested against Vault 0.6.2
 
