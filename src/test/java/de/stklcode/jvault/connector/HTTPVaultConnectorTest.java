@@ -183,6 +183,7 @@ public class HTTPVaultConnectorTest {
      * App-ID authentication roundtrip.
      */
     @Test
+    @SuppressWarnings("deprecation")
     public void authAppIdTest() {
         authRoot();
         assumeTrue(connector.isAuthorized());

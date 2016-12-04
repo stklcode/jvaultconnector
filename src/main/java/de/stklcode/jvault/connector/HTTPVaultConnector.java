@@ -240,6 +240,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    @Deprecated
     public AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
         final Map<String, String> payload = new HashMap<>();
         payload.put("app_id", appID);
@@ -281,6 +282,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    @Deprecated
     public boolean registerAppId(final String appID, final String policy, final String displayName) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
@@ -296,6 +298,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    @Deprecated
     public boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
