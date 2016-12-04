@@ -49,7 +49,6 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_SEAL_STATUS = "sys/seal-status";
     private static final String PATH_SEAL = "sys/seal";
     private static final String PATH_UNSEAL = "sys/unseal";
-    private static final String PATH_INIT = "sys/init";
     private static final String PATH_RENEW = "sys/renew";
     private static final String PATH_AUTH = "sys/auth";
     private static final String PATH_TOKEN = "auth/token";
@@ -194,12 +193,6 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public boolean isAuthorized() {
         return authorized && (tokenTTL == 0 || tokenTTL >= System.currentTimeMillis());
-    }
-
-    @Override
-    public boolean init() {
-        /* TODO: implement init() */
-        return true;
     }
 
     @Override

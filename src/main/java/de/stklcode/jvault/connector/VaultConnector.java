@@ -33,13 +33,6 @@ import java.util.List;
  */
 public interface VaultConnector {
     /**
-     * Verify that vault connection is initialized.
-     *
-     * @return TRUE if correctly initialized
-     */
-    boolean init();
-
-    /**
      * Reset authorization information.
      */
     void resetAuth();
