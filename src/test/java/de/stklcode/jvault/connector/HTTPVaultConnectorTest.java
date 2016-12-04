@@ -30,10 +30,7 @@ import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -143,10 +140,13 @@ public class HTTPVaultConnectorTest {
     @Test
     public void authTokenTest() {
         TokenResponse res;
+        final String invalidToken = "52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6";
         try {
-            connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6");
+            connector.authToken(invalidToken);
             fail("Logged in with invalid token");
-        } catch (VaultConnectorException ignored) {
+        } catch (VaultConnectorException e) {
+            /* Assert that the exception does not reveal the token */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidToken)));
         }
 
         try {
@@ -164,10 +164,15 @@ public class HTTPVaultConnectorTest {
     @Test
     public void authUserPassTest() {
         AuthResponse res = null;
+        final String invalidUser = "foo";
+        final String invalidPass = "bar";
         try {
-            connector.authUserPass("foo", "bar");
+            connector.authUserPass(invalidUser, invalidPass);
             fail("Logged in with invalid credentials");
-        } catch (VaultConnectorException ignored) {
+        } catch (VaultConnectorException e) {
+            /* Assert that the exception does not reveal credentials */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidUser)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidPass)));
         }
 
         try {
@@ -232,19 +237,27 @@ public class HTTPVaultConnectorTest {
         }
 
         /* Authenticate with valid secret ID against unknown role */
+        final String invalidRole = "foo";
         try {
-            AuthResponse res = connector.authAppRole("foo", APPROLE_SECRET);
+            connector.authAppRole(invalidRole, APPROLE_SECRET);
             fail("Successfully logged in with unknown role");
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(InvalidResponseException.class)));
+            /* Assert that the exception does not reveal role ID or secret */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidRole)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_SECRET)));
         }
 
         /* Authenticate without wrong secret ID */
+        final String invalidSecret = "foo";
         try {
             AuthResponse res = connector.authAppRole(APPROLE_ROLE, "foo");
             fail("Successfully logged in without secret ID");
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(InvalidResponseException.class)));
+            /* Assert that the exception does not reveal role ID or secret */
+            assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_ROLE)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidSecret)));
         }
 
         /* Authenticate without secret ID */
@@ -253,6 +266,8 @@ public class HTTPVaultConnectorTest {
             fail("Successfully logged in without secret ID");
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(InvalidResponseException.class)));
+            /* Assert that the exception does not reveal role ID */
+            assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_ROLE)));
         }
 
         /* Authenticate with secret ID on role with CIDR whitelist */
@@ -438,11 +453,17 @@ public class HTTPVaultConnectorTest {
 
         /* Try to read path user has no permission to read */
         SecretResponse res = null;
+        final String invalidPath = "invalid/path";
         try {
-            res = connector.readSecret("invalid/path");
+            res = connector.readSecret(invalidPath);
             fail("Invalid secret path successfully read.");
         } catch (VaultConnectorException e) {
             assertThat(e, instanceOf(PermissionDeniedException.class));
+            /* Assert that the exception does not reveal secret or credentials */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidPath)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(USER_VALID)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(PASS_VALID)));
+            assertThat(stackTrace(e), not(matchesPattern("[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}")));
         }
 
         /* Try to read accessible path with known value */
@@ -748,7 +769,7 @@ public class HTTPVaultConnectorTest {
 
         /* Write configuration file */
         BufferedWriter bw = null;
-        File configFile = null;
+        File configFile;
         try {
             configFile = tmpDir.newFile("vault.conf");
             bw = new BufferedWriter(new FileWriter(configFile));
@@ -826,5 +847,17 @@ public class HTTPVaultConnectorTest {
             }
         }
         throw new IllegalStateException("Unable to find a free TCP port.");
+    }
+
+    /**
+     * Retrieve StackTrace from throwable as string
+     *
+     * @param th the throwable
+     * @return the stack trace
+     */
+    private static String stackTrace(final Throwable th) {
+        StringWriter sw = new StringWriter();
+        th.printStackTrace(new PrintWriter(sw, true));
+        return sw.getBuffer().toString();
     }
 }
