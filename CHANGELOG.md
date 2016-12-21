@@ -1,3 +1,8 @@
+## 0.4.1 [in progress]
+* [fix] Factory Null-tolerant for trusted certificate (#6)
+* [test] StackTraces testet for secret leaks
+* [test] Tested against Vault 0.6.4
+
 ## 0.4.0 [2016-11-06]
 * [feature] Option to provide a trusted CA certificate (#2)
 * [feature] Deletion, revocation and renewal of secrets (#3)

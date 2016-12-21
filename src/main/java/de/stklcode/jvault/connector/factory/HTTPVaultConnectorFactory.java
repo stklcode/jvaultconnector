@@ -131,7 +131,9 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.4.0
      */
     public HTTPVaultConnectorFactory withTrustedCA(Path cert) throws VaultConnectorException {
-        return withSslContext(createSslContext(cert));
+        if (cert != null)
+            return withSslContext(createSslContext(cert));
+        return this;
     }
 
     /**
