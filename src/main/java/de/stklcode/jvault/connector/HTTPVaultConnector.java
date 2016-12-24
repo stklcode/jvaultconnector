@@ -135,7 +135,8 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using full URL and trusted certificate.
      *
-     * @param baseURL The URL
+     * @param baseURL    The URL
+     * @param sslContext Custom SSL Context
      */
     public HTTPVaultConnector(String baseURL, SSLContext sslContext) {
         this.baseURL = baseURL;

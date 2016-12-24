@@ -405,6 +405,7 @@ public interface VaultConnector {
      *
      * @param leaseID   the lase ID
      * @return Renewed lease
+     * @throws VaultConnectorException on error
      */
     default SecretResponse renew(final String leaseID) throws VaultConnectorException {
         return renew(leaseID, null);
@@ -416,6 +417,7 @@ public interface VaultConnector {
      * @param leaseID   the lase ID
      * @param increment number of seconds to extend lease time
      * @return Renewed lease
+     * @throws VaultConnectorException on error
      */
     SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException;
 

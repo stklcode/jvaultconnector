@@ -128,6 +128,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      *
      * @param cert path to certificate file
      * @return self
+     * @throws VaultConnectorException on error
      * @since 0.4.0
      */
     public HTTPVaultConnectorFactory withTrustedCA(Path cert) throws VaultConnectorException {
