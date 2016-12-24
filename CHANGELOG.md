@@ -1,4 +1,4 @@
-## 0.4.1 [in progress]
+## 0.4.1 [2016-12-24]
 * [fix] Factory Null-tolerant for trusted certificate (#6)
 * [test] StackTraces testet for secret leaks
 * [test] Tested against Vault 0.6.4

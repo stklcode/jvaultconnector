@@ -43,7 +43,8 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
 /**
- * JUnit Test for HTTP Vault connector.
+ * JUnit test for HTTP Vault connector.
+ * This test requires Vault binary in executable Path as it instantiates a real Vault server on given test data.
  *
  * @author Stefan Kalscheuer
  * @since 0.1

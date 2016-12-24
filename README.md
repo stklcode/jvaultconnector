@@ -46,7 +46,7 @@ String secret = vault.readSecret("some/secret/key").getValue();
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>connector</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 ```
 
