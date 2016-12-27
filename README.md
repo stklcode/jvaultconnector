@@ -2,7 +2,7 @@ Java Vault Connector
 =========
 Java Vault Connector is a connector library for [Vault](https://www.vaultproject.io) by [Hashicorp](https://www.hashicorp.com) written in Java. The connector allows simple usage of Vault's secret store in own applications.
 
-**Current available features:**
+**Features:**
 
 * HTTP(S) backend connector
     *  Ability to provide or enforce custom CA certificate
@@ -27,17 +27,17 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 **Usage Example**
 
 ```java
-// Instanciate using builder pattern style factory
+// Instantiate using builder pattern style factory
 VaultConnector vault = VaultConnectorFactory.httpFactory()
  .withHost("127.0.0.1")
  .withPort(8200)
  .withTLS()
  .build();
 
-//authenticate with token
+// Authenticate with token
 vault.authToken("01234567-89ab-cdef-0123-456789abcdef");
 
-// retrieve secret
+// Retrieve secret
 String secret = vault.readSecret("some/secret/key").getValue();
 ```
 
