@@ -2,11 +2,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>jVaultConnector</name>
-
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>connector</artifactId>
     <version>0.4.1</version>
+
+    <packaging>jar</packaging>
+
+    <name>jVaultConnector</name>
+    <description>Connector artifact for Hashicorp's Vault secret management</description>
+    <url>https://jvault.stklcode.de</url>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,7 +37,6 @@
             </plugin>
         </plugins>
     </build>
-    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
