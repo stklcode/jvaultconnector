@@ -1,0 +1,12 @@
+branches:
+  only:
+    - master
+language: java
+jdk:
+  - oraclejdk8
+env:
+  - PATH=$PATH:.
+before_script:
+  - wget https://releases.hashicorp.com/vault/0.6.4/vault_0.6.4_linux_amd64.zip
+  - unzip vault_0.6.4_linux_amd64.zip
+  - rm vault_0.6.4_linux_amd64.zip
