@@ -58,7 +58,6 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH_USERPASS = "auth/userpass/login/";
     private static final String PATH_AUTH_APPID = "auth/app-id/";
     private static final String PATH_AUTH_APPROLE = "auth/approle/";
-    private static final String PATH_SECRET = "secret";
     private static final String PATH_REVOKE = "sys/revoke/";
 
     private final ObjectMapper jsonMapper;
@@ -463,12 +462,12 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public SecretResponse readSecret(final String key) throws VaultConnectorException {
+    public SecretResponse read(final String key) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
         try {
-            String response = requestGet(PATH_SECRET + "/" + key, new HashMap<>());
+            String response = requestGet(key, new HashMap<>());
             return jsonMapper.readValue(response, SecretResponse.class);
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response", e);
@@ -479,12 +478,12 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public List<String> listSecrets(final String path) throws VaultConnectorException {
+    public List<String> list(final String path) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
         try {
-            String response = requestGet(PATH_SECRET + "/" + path + "/?list=true", new HashMap<>());
+            String response = requestGet(path + "/?list=true", new HashMap<>());
             SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
             return secrets.getKeys();
         } catch (IOException e) {
@@ -496,7 +495,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public void writeSecret(final String key, final String value) throws VaultConnectorException {
+    public void write(final String key, final String value) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -505,17 +504,17 @@ public class HTTPVaultConnector implements VaultConnector {
 
         Map<String, String> param = new HashMap<>();
         param.put("value", value);
-        if (!requestPost(PATH_SECRET + "/" + key, param).equals(""))
+        if (!requestPost(key, param).equals(""))
             throw new InvalidResponseException("Received response where none was expected.");
     }
 
     @Override
-    public void deleteSecret(String key) throws VaultConnectorException {
+    public void delete(String key) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
         /* Request HTTP response and expect empty result */
-        String response = requestDelete(PATH_SECRET + "/" + key);
+        String response = requestDelete(key);
 
         /* Response should be code 204 without content */
         if (!response.equals(""))

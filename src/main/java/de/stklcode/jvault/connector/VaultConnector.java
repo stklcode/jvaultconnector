@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.AuthorizationRequiredException;
+import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
@@ -32,6 +33,8 @@ import java.util.List;
  * @since 0.1
  */
 public interface VaultConnector {
+    String PATH_SECRET = "secret";
+
     /**
      * Reset authorization information.
      */
@@ -358,39 +361,93 @@ public interface VaultConnector {
     boolean isAuthorized();
 
     /**
-     * Retrieve secret form Vault.
+     * Retrieve any nodes content from Vault.
+     *
+     * @param key Secret identifier
+     * @return Secret response
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    SecretResponse read(final String key) throws VaultConnectorException;
+
+    /**
+     * Retrieve secret from Vault.
+     * Prefix "secret/" is automatically added to key.
      *
      * @param key Secret identifier
      * @return Secret response
      * @throws VaultConnectorException on error
      */
-    SecretResponse readSecret(final String key) throws VaultConnectorException;
+    default SecretResponse readSecret(final String key) throws VaultConnectorException {
+        return read(PATH_SECRET + "/" + key);
+    }
+
+    /**
+     * List available nodes from Vault.
+     *
+     * @param path Root path to search
+     * @return List of secret keys
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    List<String> list(final String path) throws VaultConnectorException;
 
     /**
      * List available secrets from Vault.
+     * Prefix "secret/" is automatically added to path.
      *
      * @param path Root path to search
      * @return List of secret keys
      * @throws VaultConnectorException on error
      */
-    List<String> listSecrets(final String path) throws VaultConnectorException;
+    default List<String> listSecrets(final String path) throws VaultConnectorException {
+        return list(PATH_SECRET + "/" + path);
+    }
+
+    /**
+     * Write value to Vault.
+     * Prefix "secret/" is automatically added to path.
+     *
+     * @param key   Secret path
+     * @param value Secret value
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    void write(final String key, final String value) throws VaultConnectorException;
 
     /**
      * Write secret to Vault.
+     * Prefix "secret/" is automatically added to path.
      *
      * @param key   Secret path
      * @param value Secret value
      * @throws VaultConnectorException on error
      */
-    void writeSecret(final String key, final String value) throws VaultConnectorException;
+    default void writeSecret(final String key, final String value) throws VaultConnectorException {
+        if (key == null || key.isEmpty())
+            throw new InvalidRequestException("Secret path must not be empty.");
+        write(PATH_SECRET + "/" + key, value);
+    }
+
+    /**
+     * Delete key from Vault.
+     *
+     * @param key Secret path
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    void delete(final String key) throws VaultConnectorException;
 
     /**
      * Delete secret from Vault.
+     * Prefix "secret/" is automatically added to path.
      *
      * @param key Secret path
      * @throws VaultConnectorException on error
      */
-    void deleteSecret(final String key) throws VaultConnectorException;
+    default void deleteSecret(final String key) throws VaultConnectorException {
+        delete(PATH_SECRET + "/" + key);
+    }
 
     /**
      * Revoke given lease immediately.
