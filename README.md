@@ -28,22 +28,6 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 * Connector Factory with builder pattern
 * Tested against Vault 0.6.4
 
-## Usage Example
-
-```java
-// Instantiate using builder pattern style factory
-VaultConnector vault = VaultConnectorFactory.httpFactory()
- .withHost("127.0.0.1")
- .withPort(8200)
- .withTLS()
- .build();
-
-// Authenticate with token
-vault.authToken("01234567-89ab-cdef-0123-456789abcdef");
-
-// Retrieve secret
-String secret = vault.readSecret("some/secret/key").getValue();
-```
 
 ## Maven Artifact
 ```
@@ -52,6 +36,74 @@ String secret = vault.readSecret("some/secret/key").getValue();
     <artifactId>connector</artifactId>
     <version>0.4.1</version>
 </dependency>
+```
+
+## Usage Examples
+
+### Initialization
+
+```java
+// Instantiate using builder pattern style factory (TLS enabled by default)
+VaultConnector vault = VaultConnectorFactory.httpFactory()
+ .withHost("127.0.0.1")
+ .withPort(8200)
+ .withTLS()
+ .build();
+
+// Instantiate with custom SSL context
+VaultConnector vault = VaultConnectorFactory.httpFactory()
+ .withHost("example.com")
+ .withPort(8200)
+ .withTrustedCA(Paths.get("/path/to/CA.pem"))
+ .build();
+```
+
+### Authentication
+
+```java
+// Authenticate with token
+vault.authToken("01234567-89ab-cdef-0123-456789abcdef");
+
+// Authenticate with username and password
+vault.authUserPass("username", "p4ssw0rd");
+
+// Authenticate with AppID (secret - 2nd argument - is optional)
+vault.authAppId("01234567-89ab-cdef-0123-456789abcdef", "fedcba98-7654-3210-fedc-ba9876543210");
+```
+
+### Secret read & write
+
+```java
+// Retrieve secret (prefix "secret/" assumed, use read() to read arbitrary paths)
+String secret = vault.readSecret("some/secret/key").getValue();
+
+// Complex secret
+Map<String, Object> secretData = vault.readSecret("another/secret/key").getData();
+
+// Write simple secret
+vault.writeSecret("new/secret/key", "secret value");
+
+// Write complex data to arbitraty path
+Map<String, Object> map = [...]
+vault.write("any/path/to/write", map);
+
+// Delete secret
+vault.delete("any/path/to/write");
+```
+
+### Token and role creation
+
+```java
+// Create token using TokenBuilder
+Token token = new TokenBuilder().withId("token id")
+                                .withDisplayName("new test token")
+                                .withPolicies("pol1", "pol2")
+                                .build();
+vault.createToken(token);
+
+// Create AppRole credentials
+vault.createAppRole("testrole", policyList);
+AppRoleSecretResponse secret = vault.createAppRoleSecret("testrole");
 ```
 
 ## Links
