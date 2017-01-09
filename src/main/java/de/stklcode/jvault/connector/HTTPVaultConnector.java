@@ -494,17 +494,14 @@ public class HTTPVaultConnector implements VaultConnector {
         }
     }
 
-    @Override
-    public void write(final String key, final String value) throws VaultConnectorException {
+    public void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
         if (key == null || key.isEmpty())
             throw new InvalidRequestException("Secret path must not be empty.");
 
-        Map<String, String> param = new HashMap<>();
-        param.put("value", value);
-        if (!requestPost(key, param).equals(""))
+        if (!requestPost(key, data).equals(""))
             throw new InvalidResponseException("Received response where none was expected.");
     }
 

@@ -16,14 +16,12 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.exception.AuthorizationRequiredException;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Vault Connector interface.
@@ -405,15 +403,28 @@ public interface VaultConnector {
     }
 
     /**
-     * Write value to Vault.
-     * Prefix "secret/" is automatically added to path.
+     * Write simple value to Vault.
      *
      * @param key   Secret path
      * @param value Secret value
      * @throws VaultConnectorException on error
      * @since 0.5.0
      */
-    void write(final String key, final String value) throws VaultConnectorException;
+    default void write(final String key, final String value) throws VaultConnectorException {
+        Map<String, Object> param = new HashMap<>();
+        param.put("value", value);
+        write(key, param);
+    }
+
+    /**
+     * Write value to Vault.
+     *
+     * @param key  Secret path
+     * @param data Secret content. Value must be be JSON serializable.
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    void write(final String key, final Map<String, Object> data) throws VaultConnectorException;
 
     /**
      * Write secret to Vault.
@@ -424,9 +435,24 @@ public interface VaultConnector {
      * @throws VaultConnectorException on error
      */
     default void writeSecret(final String key, final String value) throws VaultConnectorException {
+        Map<String, Object> param = new HashMap<>();
+        param.put("value", value);
+        writeSecret(key, param);
+    }
+
+    /**
+     * Write secret to Vault.
+     * Prefix "secret/" is automatically added to path.
+     *
+     * @param key  Secret path
+     * @param data Secret content. Value must be be JSON serializable.
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    default void writeSecret(final String key, final Map<String, Object> data) throws VaultConnectorException {
         if (key == null || key.isEmpty())
             throw new InvalidRequestException("Secret path must not be empty.");
-        write(PATH_SECRET + "/" + key, value);
+        write(PATH_SECRET + "/" + key, data);
     }
 
     /**
@@ -460,7 +486,7 @@ public interface VaultConnector {
     /**
      * Renew lease with given ID.
      *
-     * @param leaseID   the lase ID
+     * @param leaseID the lase ID
      * @return Renewed lease
      * @throws VaultConnectorException on error
      */
