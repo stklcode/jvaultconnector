@@ -18,10 +18,7 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A builder for vault tokens.
@@ -142,6 +139,19 @@ public class TokenBuilder {
      */
     public TokenBuilder withoutDefaultPolicy() {
         return withNoDefaultPolicy(true);
+    }
+
+    /**
+     * Add given policies
+     *
+     * @param policies the policies
+     * @return self
+     * @since 0.5.0
+     */
+    public TokenBuilder withPolicies(final String... policies) {
+        if (this.policies == null)
+            return withPolicies(Arrays.asList(policies));
+        return this;
     }
 
     /**

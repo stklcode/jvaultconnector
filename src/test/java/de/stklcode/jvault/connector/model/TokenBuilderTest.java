@@ -45,7 +45,8 @@ public class TokenBuilderTest {
     private static final Integer NUM_USES = 4;
     private static final List<String> POLICIES = new ArrayList<>();
     private static final String POLICY = "policy";
-    private static final String POLICY_2 = "policy";
+    private static final String POLICY_2 = "policy2";
+    private static final String POLICY_3 = "policy3";
     private static final Map<String, String> META = new HashMap<>();
     private static final String META_KEY = "key";
     private static final String META_VALUE = "value";
@@ -138,11 +139,11 @@ public class TokenBuilderTest {
         assertThat(token.getPolicies(), hasSize(1));
         assertThat(token.getPolicies(), contains(POLICY_2));
         token = new TokenBuilder()
-                .withPolicies(POLICIES)
-                .withPolicy(POLICY_2)
+                .withPolicies(POLICY, POLICY_2)
+                .withPolicy(POLICY_3)
                 .build();
-        assertThat(token.getPolicies(), hasSize(2));
-        assertThat(token.getPolicies(), contains(POLICY, POLICY_2));
+        assertThat(token.getPolicies(), hasSize(3));
+        assertThat(token.getPolicies(), contains(POLICY, POLICY_2, POLICY_3));
 
         /* Add single metadata */
         token = new TokenBuilder().withMeta(META_KEY_2, META_VALUE_2).build();
