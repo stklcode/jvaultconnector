@@ -149,9 +149,7 @@ public class TokenBuilder {
      * @since 0.5.0
      */
     public TokenBuilder withPolicies(final String... policies) {
-        if (this.policies == null)
-            return withPolicies(Arrays.asList(policies));
-        return this;
+        return withPolicies(Arrays.asList(policies));
     }
 
     /**
