@@ -26,7 +26,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * Renew/revoke leases
     * Raw secret content or JSON decoding
 * Connector Factory with builder pattern
-* Tested against Vault 0.6.4
+* Tested against Vault 0.6.5
 
 
 ## Maven Artifact
