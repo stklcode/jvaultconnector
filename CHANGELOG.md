@@ -1,3 +1,8 @@
+## 0.5.0 [work in progress]
+* [feature] Convenience methods for DB credentials (#7)
+* [fix] Minor bugfix in TokenBuilder
+* [test] Tested against Vault 0.7.0
+
 ## 0.4.1 [2016-12-24]
 * [fix] Factory Null-tolerant for trusted certificate (#6)
 * [test] StackTraces tested for secret leaks

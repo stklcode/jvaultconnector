@@ -541,4 +541,65 @@ public interface VaultConnector {
      * @throws VaultConnectorException on error
      */
     TokenResponse lookupToken(final String token) throws VaultConnectorException;
+
+    /**
+     * Read credentials for MySQL backend at default mount point
+     *
+     * @param role  the role name
+     * @return the credentials response
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    default CredentialsResponse readMySqlCredentials(final String role) throws VaultConnectorException {
+        return readDblCredentials(role, "mysql");
+    }
+
+    /**
+     * Read credentials for PostgreSQL backend at default mount point
+     *
+     * @param role  the role name
+     * @return the credentials response
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    default CredentialsResponse readPostgreSqlCredentials(final String role) throws VaultConnectorException {
+        return readDblCredentials(role, "postgresql");
+    }
+
+    /**
+     * Read credentials for MSSQL backend at default mount point
+     *
+     * @param role  the role name
+     * @return the credentials response
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    default CredentialsResponse readMsSqlCredentials(final String role) throws VaultConnectorException {
+        return readDblCredentials(role, "mssql");
+    }
+
+    /**
+     * Read credentials for MSSQL backend at default mount point
+     *
+     * @param role  the role name
+     * @return the credentials response
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    default CredentialsResponse readMongoDbCredentials(final String role) throws VaultConnectorException {
+        return readDblCredentials(role, "mongodb");
+    }
+
+    /**
+     * Read credentials for SQL backends.
+     *
+     * @param role  the role name
+     * @param mount mount point of the SQL backend
+     * @return the credentials response
+     * @throws VaultConnectorException on error
+     * @since 0.5.0
+     */
+    default CredentialsResponse readDblCredentials(final String role, final String mount) throws VaultConnectorException {
+        return (CredentialsResponse) read(mount + "/creds/" + role);
+    }
 }
