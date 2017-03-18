@@ -64,7 +64,9 @@ public class SecretResponse extends VaultDataResponse {
      * Method for backwards compatibility in case of simple secrets.
      *
      * @return the value
+     * @deprecated Deprecated artifact, will be removed at latest at v1.0.0
      */
+    @Deprecated
     public String getValue() {
         if (data.get("value") == null)
             return null;
@@ -79,7 +81,9 @@ public class SecretResponse extends VaultDataResponse {
      * @return Parsed object
      * @throws InvalidResponseException on parsing error
      * @since 0.3
+     * @deprecated Deprecated artifact, will be removed at latest at v1.0.0
      */
+    @Deprecated
     public <T> T getValue(Class<T> type) throws InvalidResponseException {
         return get("value", type);
     }

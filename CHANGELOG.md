@@ -1,6 +1,7 @@
 ## 0.5.0 [work in progress]
 * [feature] Convenience methods for DB credentials (#7)
 * [fix] Minor bugfix in TokenBuilder
+* [deprecation] `SecretResponse.getValue()` deprecated
 * [test] Tested against Vault 0.7.0
 
 ## 0.4.1 [2016-12-24]
