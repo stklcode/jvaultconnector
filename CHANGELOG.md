@@ -1,4 +1,4 @@
-## 0.5.0 [work in progress]
+## 0.5.0 [2017-03-18]
 * [feature] Convenience methods for DB credentials (#7)
 * [fix] Minor bugfix in TokenBuilder
 * [deprecation] `SecretResponse.getValue()` deprecated
