@@ -16,6 +16,7 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import de.stklcode.jvault.connector.model.AuthBackend;
@@ -28,6 +29,7 @@ import java.util.Map;
  * @author  Stefan Kalscheuer
  * @since   0.1
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthMethod {
     private AuthBackend type;
     private String rawType;
@@ -37,6 +39,9 @@ public class AuthMethod {
 
     @JsonProperty("config")
     private Map<String, String> config;
+
+    @JsonProperty("local")
+    private boolean local;
 
     @JsonSetter("type")
     public void setType(String type) {
@@ -58,5 +63,9 @@ public class AuthMethod {
 
     public Map<String, String> getConfig() {
         return config;
+    }
+
+    public boolean isLocal() {
+        return local;
     }
 }
