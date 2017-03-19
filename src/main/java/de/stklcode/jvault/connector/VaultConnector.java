@@ -551,7 +551,7 @@ public interface VaultConnector {
      * @since 0.5.0
      */
     default CredentialsResponse readMySqlCredentials(final String role) throws VaultConnectorException {
-        return readDblCredentials(role, "mysql");
+        return readDbCredentials(role, "mysql");
     }
 
     /**
@@ -563,7 +563,7 @@ public interface VaultConnector {
      * @since 0.5.0
      */
     default CredentialsResponse readPostgreSqlCredentials(final String role) throws VaultConnectorException {
-        return readDblCredentials(role, "postgresql");
+        return readDbCredentials(role, "postgresql");
     }
 
     /**
@@ -575,7 +575,7 @@ public interface VaultConnector {
      * @since 0.5.0
      */
     default CredentialsResponse readMsSqlCredentials(final String role) throws VaultConnectorException {
-        return readDblCredentials(role, "mssql");
+        return readDbCredentials(role, "mssql");
     }
 
     /**
@@ -587,7 +587,7 @@ public interface VaultConnector {
      * @since 0.5.0
      */
     default CredentialsResponse readMongoDbCredentials(final String role) throws VaultConnectorException {
-        return readDblCredentials(role, "mongodb");
+        return readDbCredentials(role, "mongodb");
     }
 
     /**
@@ -599,7 +599,7 @@ public interface VaultConnector {
      * @throws VaultConnectorException on error
      * @since 0.5.0
      */
-    default CredentialsResponse readDblCredentials(final String role, final String mount) throws VaultConnectorException {
+    default CredentialsResponse readDbCredentials(final String role, final String mount) throws VaultConnectorException {
         return (CredentialsResponse) read(mount + "/creds/" + role);
     }
 }
