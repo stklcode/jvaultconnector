@@ -4,6 +4,7 @@ branches:
 language: java
 jdk:
   - oraclejdk8
+dist: trusty
 env:
   - PATH=$PATH:.
 before_script:
