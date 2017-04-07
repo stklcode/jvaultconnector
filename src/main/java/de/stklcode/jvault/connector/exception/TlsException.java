@@ -23,9 +23,6 @@ package de.stklcode.jvault.connector.exception;
  * @since   0.4.0
  */
 public class TlsException extends VaultConnectorException {
-    private Integer statusCode;
-    private String response;
-
     public TlsException() {
     }
 
@@ -39,13 +36,5 @@ public class TlsException extends VaultConnectorException {
 
     public TlsException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public Integer getStatusCode() {
-        return statusCode;
-    }
-
-    public String getResponse() {
-        return response;
     }
 }
