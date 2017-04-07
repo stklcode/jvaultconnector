@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,6 +46,8 @@ public class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      */
     public Map<String, Object> getData() {
+        if (data == null)
+            return new HashMap<>();
         return data;
     }
 
@@ -56,7 +59,9 @@ public class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      */
     public Object get(String key) {
-        return data.get(key);
+        if (data == null)
+            return null;
+        return getData().get(key);
     }
 
     /**
@@ -68,9 +73,9 @@ public class SecretResponse extends VaultDataResponse {
      */
     @Deprecated
     public String getValue() {
-        if (data.get("value") == null)
+        if (get("value") == null)
             return null;
-        return data.get("value").toString();
+        return get("value").toString();
     }
 
     /**
