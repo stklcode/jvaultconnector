@@ -23,13 +23,14 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
  * Abstract Vault Connector Factory interface.
  * Provides builder pattern style factory for Vault connectors.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public abstract class VaultConnectorFactory {
     /**
      * Get Factory implementation for HTTP Vault Connector
-     * @return  HTTP Connector Factory
+     *
+     * @return HTTP Connector Factory
      */
     public static HTTPVaultConnectorFactory httpFactory() {
         return new HTTPVaultConnectorFactory();
@@ -37,7 +38,16 @@ public abstract class VaultConnectorFactory {
 
     /**
      * Build command, produces connector after initialization.
-     * @return  Vault Connector instance.
+     *
+     * @return Vault Connector instance.
      */
     public abstract VaultConnector build();
+
+    /**
+     * Build connector and authenticate with token set in factory or from environment.
+     *
+     * @return Authenticated Vault connector instance.
+     * @since 0.6.0
+     */
+    public abstract VaultConnector buildAndAuth() throws VaultConnectorException;
 }

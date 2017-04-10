@@ -1,4 +1,6 @@
 ## 0.6.0 [work in progress]
+* [feature] Initialization from environment variables using `fromEnv()` in factory (#8)
+* [feature] Automatic authentication with `buildAndAuth()`
 * [feature] Custom timeout and number of retries (#9)
 * [fix] `SecretResponse` does not throw NPE on `get(key)` and `getData()` 
 

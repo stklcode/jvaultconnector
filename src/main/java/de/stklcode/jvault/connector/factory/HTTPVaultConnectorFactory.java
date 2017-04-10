@@ -17,6 +17,8 @@
 package de.stklcode.jvault.connector.factory;
 
 import de.stklcode.jvault.connector.HTTPVaultConnector;
+import de.stklcode.jvault.connector.VaultConnector;
+import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
@@ -25,8 +27,11 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -39,6 +44,11 @@ import java.security.cert.X509Certificate;
  * @since 0.1
  */
 public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
+    private static final String ENV_VAULT_ADDR = "VAULT_ADDR";
+    private static final String ENV_VAULT_CACERT = "VAULT_CACERT";
+    private static final String ENV_VAULT_TOKEN = "VAULT_TOKEN";
+    private static final String ENV_VAULT_MAX_RETRIES = "VAULT_MAX_RETRIES";
+
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final Integer DEFAULT_PORT = 8200;
     public static final boolean DEFAULT_TLS = true;
@@ -52,6 +62,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     private SSLContext sslContext;
     private int numberOfRetries;
     private Integer timeout;
+    private String token;
 
     /**
      * Default empty constructor.
@@ -155,6 +166,55 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
+     * Set token for automatic authentication, using {@link #buildAndAuth()}.
+     *
+     * @param token Vault token
+     * @return self
+     * @since 0.6.0
+     */
+    public HTTPVaultConnectorFactory withToken(String token) throws VaultConnectorException {
+        this.token = token;
+        return this;
+    }
+
+    /**
+     * Build connector based on the {@code }VAULT_ADDR} and {@code VAULT_CACERT} (optional) environment variables.
+     *
+     * @return self
+     * @since 0.6.0
+     */
+    public HTTPVaultConnectorFactory fromEnv() throws VaultConnectorException {
+        /* Parse URL from environment variable */
+        if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).trim().isEmpty()) {
+            try {
+                URL url = new URL(System.getenv(ENV_VAULT_ADDR));
+                this.host = url.getHost();
+                this.port = url.getPort();
+                this.tls = url.getProtocol().equals("https");
+            } catch (MalformedURLException e) {
+                throw new ConnectionException("URL provided in environment variable malformed", e);
+            }
+        }
+
+        /* Read number of retries */
+        if (System.getenv(ENV_VAULT_MAX_RETRIES) != null) {
+            try {
+                numberOfRetries = Integer.parseInt(System.getenv(ENV_VAULT_MAX_RETRIES));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        /* Read token */
+        token = System.getenv(ENV_VAULT_TOKEN);
+
+        /* Parse certificate, if set */
+        if (System.getenv(ENV_VAULT_CACERT) != null && !System.getenv(ENV_VAULT_CACERT).trim().isEmpty()) {
+            return withTrustedCA(Paths.get(System.getenv(ENV_VAULT_CACERT)));
+        }
+        return this;
+    }
+
+    /**
      * Define the number of retries to attempt on 5xx errors.
      *
      * @param numberOfRetries The number of retries to attempt on 5xx errors (default: 0)
@@ -181,6 +241,15 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     @Override
     public HTTPVaultConnector build() {
         return new HTTPVaultConnector(host, tls, port, prefix, sslContext, numberOfRetries, timeout);
+    }
+
+    @Override
+    public HTTPVaultConnector buildAndAuth() throws VaultConnectorException {
+        if (token == null)
+            throw new ConnectionException("No vault token provided, unable to authenticate.");
+        HTTPVaultConnector con = new HTTPVaultConnector(host, tls, port, prefix, sslContext, numberOfRetries, timeout);
+        con.authToken(token);
+        return con;
     }
 
     /**
