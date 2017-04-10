@@ -23,11 +23,13 @@ import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.*;
@@ -64,6 +66,8 @@ public class HTTPVaultConnector implements VaultConnector {
 
     private final String baseURL;           /* Base URL of Vault */
     private final SSLContext sslContext;    /* Custom SSLSocketFactory */
+    private final int retries;              /* Number of retries on 5xx errors */
+    private final Integer timeout;              /* Timeout in milliseconds */
 
     private boolean authorized = false;     /* authorization status */
     private String token;                   /* current token */
@@ -115,11 +119,26 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param sslContext Custom SSL Context
      */
     public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix, SSLContext sslContext) {
+        this(hostname, useTLS, port, prefix, sslContext, 0, null);
+    }
+
+    /**
+     * Create connector using hostname, schema, port, path and trusted certificate.
+     *
+     * @param hostname   The hostname
+     * @param useTLS     If TRUE, use HTTPS, otherwise HTTP
+     * @param port       The port
+     * @param prefix     HTTP API prefix (default: /v1/)
+     * @param sslContext Custom SSL Context
+     */
+    public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix, SSLContext sslContext, int numberOfRetries, Integer timeout) {
         this(((useTLS) ? "https" : "http") +
                         "://" + hostname +
                         ((port != null) ? ":" + port : "") +
                         prefix,
-                sslContext);
+                sslContext,
+                numberOfRetries,
+                timeout);
     }
 
     /**
@@ -138,8 +157,32 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param sslContext Custom SSL Context
      */
     public HTTPVaultConnector(String baseURL, SSLContext sslContext) {
+        this(baseURL, sslContext, 0, null);
+    }
+
+    /**
+     * Create connector using full URL and trusted certificate.
+     *
+     * @param baseURL         The URL
+     * @param sslContext      Custom SSL Context
+     * @param numberOfRetries number of retries on 5xx errors
+     */
+    public HTTPVaultConnector(String baseURL, SSLContext sslContext, int numberOfRetries) {
+        this(baseURL, sslContext, numberOfRetries, null);
+    }
+
+    /**
+     * Create connector using full URL and trusted certificate.
+     *
+     * @param baseURL         The URL
+     * @param sslContext      Custom SSL Context
+     * @param numberOfRetries number of retries on 5xx errors
+     */
+    public HTTPVaultConnector(String baseURL, SSLContext sslContext, int numberOfRetries, Integer timeout) {
         this.baseURL = baseURL;
         this.sslContext = sslContext;
+        this.retries = numberOfRetries;
+        this.timeout = timeout;
         this.jsonMapper = new ObjectMapper();
     }
 
@@ -634,7 +677,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (token != null)
             post.addHeader("X-Vault-Token", token);
 
-        return request(post);
+        return request(post, retries);
     }
 
     /**
@@ -661,7 +704,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (token != null)
             put.addHeader("X-Vault-Token", token);
 
-        return request(put);
+        return request(put, retries);
     }
 
     /**
@@ -678,7 +721,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (token != null)
             delete.addHeader("X-Vault-Token", token);
 
-        return request(delete);
+        return request(delete, retries);
     }
 
     /**
@@ -701,22 +744,27 @@ public class HTTPVaultConnector implements VaultConnector {
         if (token != null)
             get.addHeader("X-Vault-Token", token);
 
-        return request(get);
+        return request(get, retries);
     }
 
     /**
      * Execute prepared HTTP request and return result.
      *
-     * @param base Prepares Request
+     * @param base    Prepares Request
+     * @param retries number of retries
      * @return HTTP response
      * @throws VaultConnectorException on connection error
      */
-    private String request(HttpRequestBase base) throws VaultConnectorException {
+    private String request(HttpRequestBase base, int retries) throws VaultConnectorException {
         /* Set JSON Header */
         base.addHeader("accept", "application/json");
 
         HttpResponse response = null;
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().setSSLContext(sslContext).build()) {
+            /* Set custom timeout, if defined */
+            if (this.timeout != null)
+                base.setConfig(RequestConfig.copy(RequestConfig.DEFAULT).setConnectTimeout(timeout).build());
+            /* Execute request */
             response = httpClient.execute(base);
             /* Check if response is valid */
             if (response == null)
@@ -733,20 +781,26 @@ public class HTTPVaultConnector implements VaultConnector {
                 case 403:
                     throw new PermissionDeniedException();
                 default:
-                    InvalidResponseException ex = new InvalidResponseException("Invalid response code")
-                            .withStatusCode(response.getStatusLine().getStatusCode());
-                    if (response.getEntity() != null) {
-                        try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
-                            String responseString = br.lines().collect(Collectors.joining("\n"));
-                            ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
-                            /* Check for "permission denied" response */
-                            if (er.getErrors().size() > 0 && er.getErrors().get(0).equals("permission denied"))
-                                throw new PermissionDeniedException();
-                            throw ex.withResponse(er.toString());
-                        } catch (IOException ignored) {
+                    if (response.getStatusLine().getStatusCode() >= 500 && response.getStatusLine().getStatusCode() < 600 && retries > 0) {
+                        /* Retry on 5xx errors */
+                        return request(base, retries - 1);
+                    } else {
+                        /* Fail on different error code and/or no retries left */
+                        InvalidResponseException ex = new InvalidResponseException("Invalid response code")
+                                .withStatusCode(response.getStatusLine().getStatusCode());
+                        if (response.getEntity() != null) {
+                            try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+                                String responseString = br.lines().collect(Collectors.joining("\n"));
+                                ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
+                                /* Check for "permission denied" response */
+                                if (er.getErrors().size() > 0 && er.getErrors().get(0).equals("permission denied"))
+                                    throw new PermissionDeniedException();
+                                throw ex.withResponse(er.toString());
+                            } catch (IOException ignored) {
+                            }
                         }
+                        throw ex;
                     }
-                    throw ex;
             }
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to read response", e);

@@ -43,12 +43,15 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     public static final Integer DEFAULT_PORT = 8200;
     public static final boolean DEFAULT_TLS = true;
     public static final String DEFAULT_PREFIX = "/v1/";
+    public static final int DEFAULT_NUMBER_OF_RETRIES = 0;
 
     private String host;
     private Integer port;
     private boolean tls;
     private String prefix;
     private SSLContext sslContext;
+    private int numberOfRetries;
+    private Integer timeout;
 
     /**
      * Default empty constructor.
@@ -59,6 +62,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
         port = DEFAULT_PORT;
         tls = DEFAULT_TLS;
         prefix = DEFAULT_PREFIX;
+        numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
     }
 
     /**
@@ -150,9 +154,33 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
         return this;
     }
 
+    /**
+     * Define the number of retries to attempt on 5xx errors.
+     *
+     * @param numberOfRetries The number of retries to attempt on 5xx errors (default: 0)
+     * @return self
+     * @since 0.6.0
+     */
+    public HTTPVaultConnectorFactory withNumberOfRetries(int numberOfRetries) {
+        this.numberOfRetries = numberOfRetries;
+        return this;
+    }
+
+    /**
+     * Define a custom timeout for the HTTP connection.
+     *
+     * @param milliseconds Timeout value in milliseconds.
+     * @return self
+     * @since 0.6.0
+     */
+    public HTTPVaultConnectorFactory withTimeout(int milliseconds) {
+        this.timeout = milliseconds;
+        return this;
+    }
+
     @Override
     public HTTPVaultConnector build() {
-        return new HTTPVaultConnector(host, tls, port, prefix, sslContext);
+        return new HTTPVaultConnector(host, tls, port, prefix, sslContext, numberOfRetries, timeout);
     }
 
     /**

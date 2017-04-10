@@ -1,3 +1,7 @@
+## 0.6.0 [work in progress]
+* [feature] Custom timeout and number of retries (#9)
+* [fix] `SecretResponse` does not throw NPE on `get(key)` and `getData()` 
+
 ## 0.5.0 [2017-03-18]
 * [feature] Convenience methods for DB credentials (#7)
 * [fix] Minor bugfix in TokenBuilder
