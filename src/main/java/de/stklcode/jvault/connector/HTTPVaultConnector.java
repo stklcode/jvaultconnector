@@ -67,7 +67,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private final String baseURL;           /* Base URL of Vault */
     private final SSLContext sslContext;    /* Custom SSLSocketFactory */
     private final int retries;              /* Number of retries on 5xx errors */
-    private final Integer timeout;              /* Timeout in milliseconds */
+    private final Integer timeout;          /* Timeout in milliseconds */
 
     private boolean authorized = false;     /* authorization status */
     private String token;                   /* current token */
@@ -608,6 +608,13 @@ public class HTTPVaultConnector implements VaultConnector {
         if (role == null || role.isEmpty())
             throw new InvalidRequestException("No role name specified.");
         return createTokenInternal(token, PATH_TOKEN + PATH_CREATE + "/" + role);
+    }
+
+    @Override
+    public void close() {
+        authorized = false;
+        token = null;
+        tokenTTL = 0;
     }
 
     /**

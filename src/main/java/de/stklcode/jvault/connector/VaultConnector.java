@@ -30,7 +30,7 @@ import java.util.*;
  * @author Stefan Kalscheuer
  * @since 0.1
  */
-public interface VaultConnector {
+public interface VaultConnector extends AutoCloseable {
     String PATH_SECRET = "secret";
 
     /**

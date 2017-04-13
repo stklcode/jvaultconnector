@@ -2,6 +2,7 @@
 * [feature] Initialization from environment variables using `fromEnv()` in factory (#8)
 * [feature] Automatic authentication with `buildAndAuth()`
 * [feature] Custom timeout and number of retries (#9)
+* [feature] Connector implements `AutoCloseable`
 * [fix] `SecretResponse` does not throw NPE on `get(key)` and `getData()` 
 
 ## 0.5.0 [2017-03-18]
