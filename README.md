@@ -27,6 +27,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * Delete secrets
     * Renew/revoke leases
     * Raw secret content or JSON decoding
+    * SQL secret handling
 * Connector Factory with builder pattern
 * Tested against Vault 0.7.0
 
@@ -57,6 +58,11 @@ VaultConnector vault = VaultConnectorFactory.httpFactory()
  .withHost("example.com")
  .withPort(8200)
  .withTrustedCA(Paths.get("/path/to/CA.pem"))
+ .build();
+
+// Initialization from environment variables 
+VaultConnector vault = VaultConnectorFactory.httpFactory()
+ .fromEnv()
  .build();
 ```
 
