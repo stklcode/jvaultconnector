@@ -1,9 +1,10 @@
-## 0.6.0 [work in progress]
+## 0.6.0 [2017-05-12]
 * [feature] Initialization from environment variables using `fromEnv()` in factory (#8)
 * [feature] Automatic authentication with `buildAndAuth()`
 * [feature] Custom timeout and number of retries (#9)
 * [feature] Connector implements `AutoCloseable`
 * [fix] `SecretResponse` does not throw NPE on `get(key)` and `getData()` 
+* [test] Tested against Vault 0.7.2
 
 ## 0.5.0 [2017-03-18]
 * [feature] Convenience methods for DB credentials (#7)
