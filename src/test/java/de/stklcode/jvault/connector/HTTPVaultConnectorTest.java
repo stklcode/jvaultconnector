@@ -696,7 +696,7 @@ public class HTTPVaultConnectorTest {
             fail("Secret written to inaccessible path.");
         }
 
-        /* Overwrite token */
+        /* Overwrite token should fail as of Vault 0.8.0 */
         token = new TokenBuilder()
                 .withId("test-id2")
                 .withDisplayName("test name 3")
@@ -707,19 +707,13 @@ public class HTTPVaultConnectorTest {
                 .withTtl(1234)
                 .build();
         try {
-            AuthResponse res = connector.createToken(token);
-            assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id2"));
-            assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(3));
-            assertThat("Policies not returned as expected.", res.getAuth().getPolicies(), contains("default", "pol1", "pol2"));
-            assertThat("Old policy not overwritten.", res.getAuth().getPolicies(), not(contains("testpolicy")));
-            assertThat("Metadata not given.", res.getAuth().getMetadata(), is(notNullValue()));
-            assertThat("Metadata not correct.", res.getAuth().getMetadata().get("test"), is("success"));
-            assertThat("Metadata not correct.", res.getAuth().getMetadata().get("key"), is("value"));
-            assertThat("Old metadata not overwritten.", res.getAuth().getMetadata().get("foo"), is(nullValue()));
-            assertThat("TTL not set correctly", res.getAuth().getLeaseDuration(), is(1234));
-            assertThat("Token should be renewable", res.getAuth().isRenewable(), is(true));
+            connector.createToken(token);
+            fail("Overwriting token should fail as of Vault 0.8.0");
         } catch (VaultConnectorException e) {
-            fail("Secret written to inaccessible path.");
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
+            assertThat(((InvalidResponseException)e).getStatusCode(), is(400));
+            /* Assert that the exception does not reveal token ID */
+            assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
         }
     }
 
