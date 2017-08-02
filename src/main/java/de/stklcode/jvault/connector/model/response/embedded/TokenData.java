@@ -34,7 +34,7 @@ public final class TokenData {
     private Integer creationTime;
 
     @JsonProperty("creation_ttl")
-    private Integer creatinTtl;
+    private Integer creationTtl;
 
     @JsonProperty("display_name")
     private String name;
@@ -60,46 +60,79 @@ public final class TokenData {
     @JsonProperty("ttl")
     private Integer ttl;
 
+    /**
+     * @return Token accessor
+     */
     public String getAccessor() {
         return accessor;
     }
 
+    /**
+     * @return Creation time
+     */
     public Integer getCreationTime() {
         return creationTime;
     }
 
-    public Integer getCreatinTtl() {
-        return creatinTtl;
+    /**
+     * @return Creation TTL (in seconds)
+     */
+    public Integer getCreationTtl() {
+        return creationTtl;
     }
 
+    /**
+     * @return Token name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return Token ID
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * @return Number of uses
+     */
     public Integer getNumUses() {
         return numUses;
     }
 
+    /**
+     * @return Token is orphan
+     */
     public boolean isOrphan() {
         return orphan;
     }
 
+    /**
+     * @return Token path
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * @return Token role
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     * @return Token TTL (in seconds)
+     */
     public Integer getTtl() {
         return ttl;
     }
 
+    /**
+     * @return Metadata
+     */
     public String getMeta() {
         return meta;
     }
