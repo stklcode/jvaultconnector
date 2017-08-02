@@ -30,7 +30,7 @@ import java.util.Map;
  * @since 0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Token {
+public final class Token {
     @JsonProperty("id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
@@ -67,7 +67,9 @@ public class Token {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean renewable;
 
-    public Token(String id, String displayName, Boolean noParent, Boolean noDefaultPolicy, Integer ttl, Integer numUses, List<String> policies, Map<String, String> meta, Boolean renewable) {
+    public Token(final String id, final String displayName, final Boolean noParent, final Boolean noDefaultPolicy,
+                 final Integer ttl, final Integer numUses, final List<String> policies, final Map<String, String> meta,
+                 final Boolean renewable) {
         this.id = id;
         this.displayName = displayName;
         this.ttl = ttl;

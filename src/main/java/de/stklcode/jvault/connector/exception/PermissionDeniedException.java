@@ -27,15 +27,15 @@ public class PermissionDeniedException extends VaultConnectorException {
         super("Permission denied");
     }
 
-    public PermissionDeniedException(String message) {
+    public PermissionDeniedException(final String message) {
         super(message);
     }
 
-    public PermissionDeniedException(Throwable cause) {
+    public PermissionDeniedException(final Throwable cause) {
         super(cause);
     }
 
-    public PermissionDeniedException(String message, Throwable cause) {
+    public PermissionDeniedException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

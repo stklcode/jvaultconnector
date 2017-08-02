@@ -31,11 +31,11 @@ public enum AuthBackend {
 
     private final String type;
 
-    AuthBackend(String type) {
+    AuthBackend(final String type) {
         this.type = type;
     }
 
-    public static AuthBackend forType(String type) {
+    public static AuthBackend forType(final String type) {
         for (AuthBackend v : values())
             if (v.type.equalsIgnoreCase(type))
                 return v;

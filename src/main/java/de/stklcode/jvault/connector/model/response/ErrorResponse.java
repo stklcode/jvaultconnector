@@ -28,7 +28,7 @@ import java.util.List;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ErrorResponse implements VaultResponse {
+public final class ErrorResponse implements VaultResponse {
     @JsonProperty("errors")
     private List<String> errors;
 

@@ -30,11 +30,11 @@ import java.util.Map;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SecretListResponse extends VaultDataResponse {
+public final class SecretListResponse extends VaultDataResponse {
     private List<String> keys;
 
     @JsonProperty("data")
-    public void setData(Map<String, Object> data) throws InvalidResponseException {
+    public void setData(final Map<String, Object> data) throws InvalidResponseException {
         try {
             this.keys = (List<String>)data.get("keys");
         }

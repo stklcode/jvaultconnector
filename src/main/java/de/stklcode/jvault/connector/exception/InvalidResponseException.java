@@ -23,31 +23,31 @@ package de.stklcode.jvault.connector.exception;
  * @author  Stefan Kalscheuer
  * @since   0.1
  */
-public class InvalidResponseException extends VaultConnectorException {
+public final class InvalidResponseException extends VaultConnectorException {
     private Integer statusCode;
     private String response;
 
     public InvalidResponseException() {
     }
 
-    public InvalidResponseException(String message) {
+    public InvalidResponseException(final String message) {
         super(message);
     }
 
-    public InvalidResponseException(Throwable cause) {
+    public InvalidResponseException(final Throwable cause) {
         super(cause);
     }
 
-    public InvalidResponseException(String message, Throwable cause) {
+    public InvalidResponseException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidResponseException withStatusCode(Integer statusCode) {
+    public InvalidResponseException withStatusCode(final Integer statusCode) {
         this.statusCode = statusCode;
         return this;
     }
 
-    public InvalidResponseException withResponse(String response) {
+    public InvalidResponseException withResponse(final String response) {
         this.response = response;
         return this;
     }

@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TokenData {
+public final class TokenData {
     @JsonProperty("accessor")
     private String accessor;
 

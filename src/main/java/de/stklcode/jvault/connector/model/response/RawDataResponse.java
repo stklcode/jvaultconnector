@@ -27,11 +27,11 @@ import java.util.Map;
  * @since   0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RawDataResponse extends VaultDataResponse {
+public final class RawDataResponse extends VaultDataResponse {
     private Map<String, Object> data;
 
     @Override
-    public void setData(Map<String, Object> data) {
+    public void setData(final Map<String, Object> data) {
         this.data = data;
     }
 

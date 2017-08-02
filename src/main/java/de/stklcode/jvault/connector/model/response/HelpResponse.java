@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HelpResponse implements VaultResponse {
+public final class HelpResponse implements VaultResponse {
     @JsonProperty("help")
     private String help;
 

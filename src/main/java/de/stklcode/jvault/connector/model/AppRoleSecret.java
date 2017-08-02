@@ -29,7 +29,7 @@ import java.util.Map;
  * @since 0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AppRoleSecret {
+public final class AppRoleSecret {
     @JsonProperty("secret_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
@@ -62,11 +62,11 @@ public class AppRoleSecret {
 
     }
 
-    public AppRoleSecret(String id) {
+    public AppRoleSecret(final String id) {
         this.id = id;
     }
 
-    public AppRoleSecret(String id, Map<String, Object> metadata, List<String> cidrList) {
+    public AppRoleSecret(final String id, final Map<String, Object> metadata, final List<String> cidrList) {
         this.id = id;
         this.metadata = metadata;
         this.cidrList = cidrList;
@@ -89,7 +89,7 @@ public class AppRoleSecret {
     }
 
     @JsonSetter("cidr_list")
-    public void setCidrList(List<String> cidrList) {
+    public void setCidrList(final List<String> cidrList) {
         this.cidrList = cidrList;
     }
 

@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SealResponse implements VaultResponse {
+public final class SealResponse implements VaultResponse {
     @JsonProperty("sealed")
     private boolean sealed;
 

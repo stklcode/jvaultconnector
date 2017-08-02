@@ -79,7 +79,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param hostname The hostname
      * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
      */
-    public HTTPVaultConnector(String hostname, boolean useTLS) {
+    public HTTPVaultConnector(final String hostname, final boolean useTLS) {
         this(hostname, useTLS, null);
     }
 
@@ -90,7 +90,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
      * @param port     The port
      */
-    public HTTPVaultConnector(String hostname, boolean useTLS, Integer port) {
+    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port) {
         this(hostname, useTLS, port, PATH_PREFIX);
     }
 
@@ -102,7 +102,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param port     The port
      * @param prefix   HTTP API prefix (default: /v1/)
      */
-    public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix) {
+    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix) {
         this(((useTLS) ? "https" : "http") +
                 "://" + hostname +
                 ((port != null) ? ":" + port : "") +
@@ -118,7 +118,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param prefix     HTTP API prefix (default: /v1/)
      * @param sslContext Custom SSL Context
      */
-    public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix, SSLContext sslContext) {
+    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix, final SSLContext sslContext) {
         this(hostname, useTLS, port, prefix, sslContext, 0, null);
     }
 
@@ -131,7 +131,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param prefix     HTTP API prefix (default: /v1/)
      * @param sslContext Custom SSL Context
      */
-    public HTTPVaultConnector(String hostname, boolean useTLS, Integer port, String prefix, SSLContext sslContext, int numberOfRetries, Integer timeout) {
+    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix, final SSLContext sslContext, final int numberOfRetries, final Integer timeout) {
         this(((useTLS) ? "https" : "http") +
                         "://" + hostname +
                         ((port != null) ? ":" + port : "") +
@@ -146,7 +146,7 @@ public class HTTPVaultConnector implements VaultConnector {
      *
      * @param baseURL The URL
      */
-    public HTTPVaultConnector(String baseURL) {
+    public HTTPVaultConnector(final String baseURL) {
         this(baseURL, null);
     }
 
@@ -156,7 +156,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param baseURL    The URL
      * @param sslContext Custom SSL Context
      */
-    public HTTPVaultConnector(String baseURL, SSLContext sslContext) {
+    public HTTPVaultConnector(final String baseURL, final SSLContext sslContext) {
         this(baseURL, sslContext, 0, null);
     }
 
@@ -167,7 +167,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param sslContext      Custom SSL Context
      * @param numberOfRetries number of retries on 5xx errors
      */
-    public HTTPVaultConnector(String baseURL, SSLContext sslContext, int numberOfRetries) {
+    public HTTPVaultConnector(final String baseURL, final SSLContext sslContext, final int numberOfRetries) {
         this(baseURL, sslContext, numberOfRetries, null);
     }
 
@@ -178,7 +178,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param sslContext      Custom SSL Context
      * @param numberOfRetries number of retries on 5xx errors
      */
-    public HTTPVaultConnector(String baseURL, SSLContext sslContext, int numberOfRetries, Integer timeout) {
+    public HTTPVaultConnector(final String baseURL, final SSLContext sslContext, final int numberOfRetries, final Integer timeout) {
         this.baseURL = baseURL;
         this.sslContext = sslContext;
         this.retries = numberOfRetries;
@@ -187,14 +187,14 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public void resetAuth() {
+    public final void resetAuth() {
         token = null;
         tokenTTL = 0;
         authorized = false;
     }
 
     @Override
-    public SealResponse sealStatus() {
+    public final SealResponse sealStatus() {
         try {
             String response = requestGet(PATH_SEAL_STATUS, new HashMap<>());
             return jsonMapper.readValue(response, SealResponse.class);
@@ -208,7 +208,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public boolean seal() {
+    public final boolean seal() {
         try {
             requestPut(PATH_SEAL, new HashMap<>());
             return true;
@@ -219,7 +219,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public SealResponse unseal(final String key, final Boolean reset) {
+    public final SealResponse unseal(final String key, final Boolean reset) {
         Map<String, String> param = new HashMap<>();
         param.put("key", key);
         if (reset != null)
@@ -234,12 +234,12 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public boolean isAuthorized() {
+    public final boolean isAuthorized() {
         return authorized && (tokenTTL == 0 || tokenTTL >= System.currentTimeMillis());
     }
 
     @Override
-    public List<AuthBackend> getAuthBackends() throws VaultConnectorException {
+    public final List<AuthBackend> getAuthBackends() throws VaultConnectorException {
         try {
             String response = requestGet(PATH_AUTH, new HashMap<>());
             /* Parse response */
@@ -254,7 +254,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public TokenResponse authToken(final String token) throws VaultConnectorException {
+    public final TokenResponse authToken(final String token) throws VaultConnectorException {
         /* set token */
         this.token = token;
         this.tokenTTL = 0;
@@ -269,7 +269,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public AuthResponse authUserPass(final String username, final String password) throws VaultConnectorException {
+    public final AuthResponse authUserPass(final String username, final String password) throws VaultConnectorException {
         final Map<String, String> payload = new HashMap<>();
         payload.put("password", password);
         return queryAuth(PATH_AUTH_USERPASS + username, payload);
@@ -277,7 +277,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     @Deprecated
-    public AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
+    public final AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
         final Map<String, String> payload = new HashMap<>();
         payload.put("app_id", appID);
         payload.put("user_id", userID);
@@ -285,7 +285,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException {
+    public final AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException {
         final Map<String, String> payload = new HashMap<>();
         payload.put("role_id", roleID);
         if (secretID != null)
@@ -319,7 +319,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     @Deprecated
-    public boolean registerAppId(final String appID, final String policy, final String displayName) throws VaultConnectorException {
+    public final boolean registerAppId(final String appID, final String policy, final String displayName) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         Map<String, String> payload = new HashMap<>();
@@ -335,7 +335,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     @Deprecated
-    public boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
+    public final boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         Map<String, String> payload = new HashMap<>();
@@ -349,7 +349,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public boolean createAppRole(final AppRole role) throws VaultConnectorException {
+    public final boolean createAppRole(final AppRole role) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Get response */
@@ -363,7 +363,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException {
+    public final AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
@@ -379,7 +379,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public boolean deleteAppRole(String roleName) throws VaultConnectorException {
+    public final boolean deleteAppRole(final String roleName) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -394,7 +394,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public String getAppRoleID(final String roleName) throws VaultConnectorException {
+    public final String getAppRoleID(final String roleName) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
@@ -410,7 +410,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException {
+    public final boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
@@ -424,7 +424,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret) throws VaultConnectorException {
+    public final AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Get response */
@@ -443,7 +443,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+    public final AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
@@ -456,7 +456,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public boolean destroyAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+    public final boolean destroyAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -471,7 +471,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public List<String> listAppRoles() throws VaultConnectorException {
+    public final List<String> listAppRoles() throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -488,7 +488,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException {
+    public final List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -505,7 +505,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public SecretResponse read(final String key) throws VaultConnectorException {
+    public final SecretResponse read(final String key) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
@@ -521,7 +521,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public List<String> list(final String path) throws VaultConnectorException {
+    public final List<String> list(final String path) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -537,7 +537,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
     }
 
-    public void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
+    public final void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -549,7 +549,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public void delete(String key) throws VaultConnectorException {
+    public final void delete(final String key) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -562,7 +562,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public void revoke(String leaseID) throws VaultConnectorException {
+    public final void revoke(final String leaseID) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -575,7 +575,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public SecretResponse renew(String leaseID, Integer increment) throws VaultConnectorException {
+    public final SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
@@ -594,24 +594,24 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public AuthResponse createToken(final Token token) throws VaultConnectorException {
+    public final AuthResponse createToken(final Token token) throws VaultConnectorException {
         return createTokenInternal(token, PATH_TOKEN + PATH_CREATE);
     }
 
     @Override
-    public AuthResponse createToken(final Token token, boolean orphan) throws VaultConnectorException {
+    public final AuthResponse createToken(final Token token, final boolean orphan) throws VaultConnectorException {
         return createTokenInternal(token, PATH_TOKEN + PATH_CREATE_ORPHAN);
     }
 
     @Override
-    public AuthResponse createToken(final Token token, final String role) throws VaultConnectorException {
+    public final AuthResponse createToken(final Token token, final String role) throws VaultConnectorException {
         if (role == null || role.isEmpty())
             throw new InvalidRequestException("No role name specified.");
         return createTokenInternal(token, PATH_TOKEN + PATH_CREATE + "/" + role);
     }
 
     @Override
-    public void close() {
+    public final void close() {
         authorized = false;
         token = null;
         tokenTTL = 0;
@@ -642,7 +642,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public TokenResponse lookupToken(final String token) throws VaultConnectorException {
+    public final TokenResponse lookupToken(final String token) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
@@ -762,7 +762,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @return HTTP response
      * @throws VaultConnectorException on connection error
      */
-    private String request(HttpRequestBase base, int retries) throws VaultConnectorException {
+    private String request(final HttpRequestBase base, final int retries) throws VaultConnectorException {
         /* Set JSON Header */
         base.addHeader("accept", "application/json");
 

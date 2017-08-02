@@ -33,11 +33,11 @@ import java.util.Map;
  * @since   0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AppRoleSecretResponse extends VaultDataResponse {
+public final class AppRoleSecretResponse extends VaultDataResponse {
     private AppRoleSecret secret;
 
     @Override
-    public void setData(Map<String, Object> data) throws InvalidResponseException {
+    public void setData(final Map<String, Object> data) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             /* null empty strings on list objects */

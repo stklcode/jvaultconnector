@@ -29,7 +29,7 @@ import java.util.Map;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthData {
+public final class AuthData {
     @JsonProperty("client_token")
     private String clientToken;
 

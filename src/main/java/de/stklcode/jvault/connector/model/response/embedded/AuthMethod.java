@@ -30,7 +30,7 @@ import java.util.Map;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthMethod {
+public final class AuthMethod {
     private AuthBackend type;
     private String rawType;
 
@@ -44,7 +44,7 @@ public class AuthMethod {
     private boolean local;
 
     @JsonSetter("type")
-    public void setType(String type) {
+    public void setType(final String type) {
         this.rawType = type;
         this.type = AuthBackend.forType(type);
     }

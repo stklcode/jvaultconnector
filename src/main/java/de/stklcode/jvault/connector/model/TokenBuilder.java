@@ -26,7 +26,7 @@ import java.util.*;
  * @author  Stefan Kalscheuer
  * @since 0.4.0
  */
-public class TokenBuilder {
+public final class TokenBuilder {
     private String id;
     private String displayName;
     private Boolean noParent;

@@ -35,7 +35,7 @@ public class SecretResponse extends VaultDataResponse {
     private Map<String, Object> data;
 
     @Override
-    public void setData(Map<String, Object> data) throws InvalidResponseException {
+    public final void setData(final Map<String, Object> data) throws InvalidResponseException {
         this.data = data;
     }
 
@@ -45,7 +45,7 @@ public class SecretResponse extends VaultDataResponse {
      * @return data map
      * @since 0.4.0
      */
-    public Map<String, Object> getData() {
+    public final Map<String, Object> getData() {
         if (data == null)
             return new HashMap<>();
         return data;
@@ -58,7 +58,7 @@ public class SecretResponse extends VaultDataResponse {
      * @return the value or NULL if absent
      * @since 0.4.0
      */
-    public Object get(String key) {
+    public final Object get(final String key) {
         if (data == null)
             return null;
         return getData().get(key);
@@ -72,7 +72,7 @@ public class SecretResponse extends VaultDataResponse {
      * @deprecated Deprecated artifact, will be removed at latest at v1.0.0
      */
     @Deprecated
-    public String getValue() {
+    public final String getValue() {
         if (get("value") == null)
             return null;
         return get("value").toString();
@@ -89,7 +89,7 @@ public class SecretResponse extends VaultDataResponse {
      * @deprecated Deprecated artifact, will be removed at latest at v1.0.0
      */
     @Deprecated
-    public <T> T getValue(Class<T> type) throws InvalidResponseException {
+    public final <T> T getValue(final Class<T> type) throws InvalidResponseException {
         return get("value", type);
     }
 
@@ -103,7 +103,7 @@ public class SecretResponse extends VaultDataResponse {
      * @throws InvalidResponseException on parsing error
      * @since 0.4.0
      */
-    public <T> T get(String key, Class<T> type) throws InvalidResponseException {
+    public final <T> T get(final String key, final Class<T> type) throws InvalidResponseException {
         try {
             return new ObjectMapper().readValue(get(key).toString(), type);
         } catch (IOException e) {

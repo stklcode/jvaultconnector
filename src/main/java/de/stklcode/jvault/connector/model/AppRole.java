@@ -28,7 +28,7 @@ import java.util.List;
  * @since 0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AppRole {
+public final class AppRole {
     @JsonProperty("role_name")
     private String name;
 
@@ -68,7 +68,9 @@ public class AppRole {
 
     }
 
-    public AppRole(String name, String id, Boolean bindSecretId, List<String> boundCidrList, List<String> policies, Integer secretIdNumUses, Integer secretIdTtl, Integer tokenTtl, Integer tokenMaxTtl, Integer period) {
+    public AppRole(final String name, final String id, final Boolean bindSecretId, final List<String> boundCidrList,
+                   final List<String> policies, final Integer secretIdNumUses, final Integer secretIdTtl,
+                   final Integer tokenTtl, final Integer tokenMaxTtl, final Integer period) {
         this.name = name;
         this.id = id;
         this.bindSecretId = bindSecretId;
@@ -98,7 +100,7 @@ public class AppRole {
     }
 
     @JsonSetter("bound_cidr_list")
-    public void setBoundCidrList(List<String> boundCidrList) {
+    public void setBoundCidrList(final List<String> boundCidrList) {
         this.boundCidrList = boundCidrList;
     }
 
@@ -115,7 +117,7 @@ public class AppRole {
     }
 
     @JsonSetter("policies")
-    public void setPolicies(List<String> policies) {
+    public void setPolicies(final List<String> policies) {
         this.policies = policies;
     }
 

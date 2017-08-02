@@ -26,15 +26,15 @@ public class InvalidRequestException extends VaultConnectorException {
     public InvalidRequestException() {
     }
 
-    public InvalidRequestException(String message) {
+    public InvalidRequestException(final String message) {
         super(message);
     }
 
-    public InvalidRequestException(Throwable cause) {
+    public InvalidRequestException(final Throwable cause) {
         super(cause);
     }
 
-    public InvalidRequestException(String message, Throwable cause) {
+    public InvalidRequestException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

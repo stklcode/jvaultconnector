@@ -26,15 +26,15 @@ public class TlsException extends VaultConnectorException {
     public TlsException() {
     }
 
-    public TlsException(String message) {
+    public TlsException(final String message) {
         super(message);
     }
 
-    public TlsException(Throwable cause) {
+    public TlsException(final Throwable cause) {
         super(cause);
     }
 
-    public TlsException(String message, Throwable cause) {
+    public TlsException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

@@ -32,7 +32,7 @@ import java.util.Map;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthMethodsResponse extends VaultDataResponse {
+public final class AuthMethodsResponse extends VaultDataResponse {
     private Map<String, AuthMethod> supportedMethods;
 
     public AuthMethodsResponse() {
@@ -40,7 +40,7 @@ public class AuthMethodsResponse extends VaultDataResponse {
     }
 
     @Override
-    public void setData(Map<String, Object> data) throws InvalidResponseException {
+    public void setData(final Map<String, Object> data) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
         for (String path : data.keySet()) {
             try {

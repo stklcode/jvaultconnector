@@ -33,11 +33,11 @@ import java.util.stream.Collectors;
  * @since   0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AppRoleResponse extends VaultDataResponse {
+public final class AppRoleResponse extends VaultDataResponse {
     private AppRole role;
 
     @Override
-    public void setData(Map<String, Object> data) throws InvalidResponseException {
+    public void setData(final Map<String, Object> data) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             /* null empty strings on list objects */

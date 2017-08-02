@@ -42,21 +42,21 @@ public abstract class VaultDataResponse implements VaultResponse {
     private List<String> warnings;
 
     @JsonProperty("data")
-    public abstract void setData(Map<String, Object> data) throws InvalidResponseException;
+    public abstract void setData(final Map<String, Object> data) throws InvalidResponseException;
 
-    public String getLeaseId() {
+    public final String getLeaseId() {
         return leaseId;
     }
 
-    public boolean isRenewable() {
+    public final boolean isRenewable() {
         return renewable;
     }
 
-    public Integer getLeaseDuration() {
+    public final Integer getLeaseDuration() {
         return leaseDuration;
     }
 
-    public List<String> getWarnings() {
+    public final List<String> getWarnings() {
         return warnings;
     }
 }

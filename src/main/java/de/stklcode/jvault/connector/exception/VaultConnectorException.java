@@ -26,15 +26,15 @@ public abstract class VaultConnectorException extends Exception {
     public VaultConnectorException() {
     }
 
-    public VaultConnectorException(String message) {
+    public VaultConnectorException(final String message) {
         super(message);
     }
 
-    public VaultConnectorException(Throwable cause) {
+    public VaultConnectorException(final Throwable cause) {
         super(cause);
     }
 
-    public VaultConnectorException(String message, Throwable cause) {
+    public VaultConnectorException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

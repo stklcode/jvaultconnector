@@ -32,13 +32,13 @@ import java.util.Map;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthResponse extends VaultDataResponse {
+public final class AuthResponse extends VaultDataResponse {
     private Map<String, Object> data;
 
     private AuthData auth;
 
     @JsonProperty("auth")
-    public void setAuth(Map<String, Object> auth) throws InvalidResponseException {
+    public void setAuth(final Map<String, Object> auth) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             this.auth = mapper.readValue(mapper.writeValueAsString(auth), AuthData.class);
@@ -49,7 +49,7 @@ public class AuthResponse extends VaultDataResponse {
     }
 
     @Override
-    public void setData(Map<String, Object> data) {
+    public void setData(final Map<String, Object> data) {
         this.data = data;
     }
 

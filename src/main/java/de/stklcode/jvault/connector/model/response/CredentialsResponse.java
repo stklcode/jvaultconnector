@@ -32,7 +32,7 @@ import java.util.Map;
  * @since   0.5.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CredentialsResponse extends SecretResponse {
+public final class CredentialsResponse extends SecretResponse {
 
     public String getUsername() {
         if (get("username") != null)

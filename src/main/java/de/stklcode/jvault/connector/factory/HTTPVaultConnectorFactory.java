@@ -43,7 +43,7 @@ import java.security.cert.X509Certificate;
  * @author Stefan Kalscheuer
  * @since 0.1
  */
-public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
+public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     private static final String ENV_VAULT_ADDR = "VAULT_ADDR";
     private static final String ENV_VAULT_CACERT = "VAULT_CACERT";
     private static final String ENV_VAULT_TOKEN = "VAULT_TOKEN";
@@ -82,7 +82,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @param host Hostname or IP address
      * @return self
      */
-    public HTTPVaultConnectorFactory withHost(String host) {
+    public HTTPVaultConnectorFactory withHost(final String host) {
         this.host = host;
         return this;
     }
@@ -93,7 +93,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @param port Vault TCP port
      * @return self
      */
-    public HTTPVaultConnectorFactory withPort(Integer port) {
+    public HTTPVaultConnectorFactory withPort(final Integer port) {
         this.port = port;
         return this;
     }
@@ -104,7 +104,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @param useTLS use TLS or not
      * @return self
      */
-    public HTTPVaultConnectorFactory withTLS(boolean useTLS) {
+    public HTTPVaultConnectorFactory withTLS(final boolean useTLS) {
         this.tls = useTLS;
         return this;
     }
@@ -133,7 +133,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @param prefix Vault API prefix (default: "/v1/"
      * @return self
      */
-    public HTTPVaultConnectorFactory withPrefix(String prefix) {
+    public HTTPVaultConnectorFactory withPrefix(final String prefix) {
         this.prefix = prefix;
         return this;
     }
@@ -146,7 +146,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
-    public HTTPVaultConnectorFactory withTrustedCA(Path cert) throws VaultConnectorException {
+    public HTTPVaultConnectorFactory withTrustedCA(final Path cert) throws VaultConnectorException {
         if (cert != null)
             return withSslContext(createSslContext(cert));
         return this;
@@ -160,7 +160,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      * @since 0.4.0
      */
-    public HTTPVaultConnectorFactory withSslContext(SSLContext sslContext) {
+    public HTTPVaultConnectorFactory withSslContext(final SSLContext sslContext) {
         this.sslContext = sslContext;
         return this;
     }
@@ -172,7 +172,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      * @since 0.6.0
      */
-    public HTTPVaultConnectorFactory withToken(String token) throws VaultConnectorException {
+    public HTTPVaultConnectorFactory withToken(final String token) throws VaultConnectorException {
         this.token = token;
         return this;
     }
@@ -221,7 +221,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      * @since 0.6.0
      */
-    public HTTPVaultConnectorFactory withNumberOfRetries(int numberOfRetries) {
+    public HTTPVaultConnectorFactory withNumberOfRetries(final int numberOfRetries) {
         this.numberOfRetries = numberOfRetries;
         return this;
     }
@@ -233,7 +233,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      * @since 0.6.0
      */
-    public HTTPVaultConnectorFactory withTimeout(int milliseconds) {
+    public HTTPVaultConnectorFactory withTimeout(final int milliseconds) {
         this.timeout = milliseconds;
         return this;
     }
@@ -260,7 +260,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @throws TlsException on errors
      * @since 0.4.0
      */
-    private SSLContext createSslContext(Path trustedCert) throws TlsException {
+    private SSLContext createSslContext(final Path trustedCert) throws TlsException {
         try {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, createTrustManager(trustedCert), new SecureRandom());
@@ -278,7 +278,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @throws TlsException on error
      * @since 0.4.0
      */
-    private TrustManager[] createTrustManager(Path trustedCert) throws TlsException {
+    private TrustManager[] createTrustManager(final Path trustedCert) throws TlsException {
         try {
             /* Create Keystore with trusted certificate */
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -301,7 +301,7 @@ public class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @throws TlsException on error
      * @since 0.4.0
      */
-    private X509Certificate certificateFromFile(Path certFile) throws TlsException {
+    private X509Certificate certificateFromFile(final Path certFile) throws TlsException {
         try (InputStream is = Files.newInputStream(certFile)) {
             return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
         } catch (IOException | CertificateException e) {

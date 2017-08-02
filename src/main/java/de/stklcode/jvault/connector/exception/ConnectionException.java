@@ -26,15 +26,15 @@ public class ConnectionException extends VaultConnectorException {
     public ConnectionException() {
     }
 
-    public ConnectionException(String message) {
+    public ConnectionException(final String message) {
         super(message);
     }
 
-    public ConnectionException(Throwable cause) {
+    public ConnectionException(final Throwable cause) {
         super(cause);
     }
 
-    public ConnectionException(String message, Throwable cause) {
+    public ConnectionException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

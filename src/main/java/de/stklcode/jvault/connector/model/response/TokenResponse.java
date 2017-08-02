@@ -32,14 +32,14 @@ import java.util.Map;
  * @since   0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TokenResponse extends VaultDataResponse {
+public final class TokenResponse extends VaultDataResponse {
     private TokenData data;
 
     @JsonProperty("auth")
     private Boolean auth;
 
     @Override
-    public void setData(Map<String, Object> data) throws InvalidResponseException {
+    public void setData(final Map<String, Object> data) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             this.data = mapper.readValue(mapper.writeValueAsString(data), TokenData.class);

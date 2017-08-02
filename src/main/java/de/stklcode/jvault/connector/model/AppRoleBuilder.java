@@ -25,7 +25,7 @@ import java.util.List;
  * @author Stefan Kalscheuer
  * @since 0.4.0
  */
-public class AppRoleBuilder {
+public final class AppRoleBuilder {
     private String name;
     private String id;
     private Boolean bindSecretId;
@@ -37,7 +37,7 @@ public class AppRoleBuilder {
     private Integer tokenMaxTtl;
     private Integer period;
 
-    public AppRoleBuilder(String name) {
+    public AppRoleBuilder(final String name) {
         this.name = name;
     }
 
