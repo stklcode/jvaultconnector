@@ -80,8 +80,14 @@ public final class Token {
      * @param meta            Metadata (optional)
      * @param renewable       Is the token renewable (optional)
      */
-    public Token(final String id, final String displayName, final Boolean noParent, final Boolean noDefaultPolicy,
-                 final Integer ttl, final Integer numUses, final List<String> policies, final Map<String, String> meta,
+    public Token(final String id,
+                 final String displayName,
+                 final Boolean noParent,
+                 final Boolean noDefaultPolicy,
+                 final Integer ttl,
+                 final Integer numUses,
+                 final List<String> policies,
+                 final Map<String, String> meta,
                  final Boolean renewable) {
         this.id = id;
         this.displayName = displayName;

@@ -47,7 +47,9 @@ public final class AuthMethodsResponse extends VaultDataResponse {
         ObjectMapper mapper = new ObjectMapper();
         for (String path : data.keySet()) {
             try {
-                this.supportedMethods.put(path, mapper.readValue(mapper.writeValueAsString(data.get(path)), AuthMethod.class));
+                this.supportedMethods.put(
+                        path, mapper.readValue(mapper.writeValueAsString(data.get(path)),
+                        AuthMethod.class));
             } catch (IOException e) {
                 throw new InvalidResponseException();
             }

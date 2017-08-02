@@ -144,7 +144,8 @@ public interface VaultConnector extends AutoCloseable {
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #createAppRole} instead.
      */
     @Deprecated
-    boolean registerAppId(final String appID, final String policy, final String displayName) throws VaultConnectorException;
+    boolean registerAppId(final String appID, final String policy, final String displayName)
+            throws VaultConnectorException;
 
     /**
      * Register a new AppRole role from given metamodel.
@@ -204,7 +205,8 @@ public interface VaultConnector extends AutoCloseable {
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
-    default boolean createAppRole(final String roleName, final List<String> policies, final String roleID) throws VaultConnectorException {
+    default boolean createAppRole(final String roleName, final List<String> policies, final String roleID)
+            throws VaultConnectorException {
         return createAppRole(new AppRoleBuilder(roleName).withPolicies(policies).withId(roleID).build());
     }
 
@@ -269,7 +271,8 @@ public interface VaultConnector extends AutoCloseable {
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
-    default AppRoleSecretResponse createAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+    default AppRoleSecretResponse createAppRoleSecret(final String roleName, final String secretID)
+            throws VaultConnectorException {
         return createAppRoleSecret(roleName, new AppRoleSecret(secretID));
     }
 
@@ -282,7 +285,8 @@ public interface VaultConnector extends AutoCloseable {
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
-    AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret) throws VaultConnectorException;
+    AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret)
+            throws VaultConnectorException;
 
     /**
      * Lookup an AppRole secret.
@@ -293,7 +297,8 @@ public interface VaultConnector extends AutoCloseable {
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
-    AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException;
+    AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID)
+            throws VaultConnectorException;
 
     /**
      * Destroy an AppRole secret.
@@ -330,7 +335,8 @@ public interface VaultConnector extends AutoCloseable {
      * @param userID The User-ID
      * @return TRUE on success
      * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #createAppRoleSecret} instead.
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
+     *             Consider using {@link #createAppRoleSecret} instead.
      */
     @Deprecated
     boolean registerUserId(final String appID, final String userID) throws VaultConnectorException;
@@ -347,7 +353,10 @@ public interface VaultConnector extends AutoCloseable {
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
      */
     @Deprecated
-    default boolean registerAppUserId(final String appID, final String policy, final String displayName, final String userID) throws VaultConnectorException {
+    default boolean registerAppUserId(final String appID,
+                                      final String policy,
+                                      final String displayName,
+                                      final String userID) throws VaultConnectorException {
         return registerAppId(appID, policy, userID) && registerUserId(appID, userID);
     }
 
@@ -599,7 +608,8 @@ public interface VaultConnector extends AutoCloseable {
      * @throws VaultConnectorException on error
      * @since 0.5.0
      */
-    default CredentialsResponse readDbCredentials(final String role, final String mount) throws VaultConnectorException {
+    default CredentialsResponse readDbCredentials(final String role, final String mount)
+            throws VaultConnectorException {
         return (CredentialsResponse) read(mount + "/creds/" + role);
     }
 }

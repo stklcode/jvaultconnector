@@ -17,13 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
-import de.stklcode.jvault.connector.model.response.embedded.TokenData;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Vault response from credentials lookup. Simple wrapper for data objects containing username and password fields.

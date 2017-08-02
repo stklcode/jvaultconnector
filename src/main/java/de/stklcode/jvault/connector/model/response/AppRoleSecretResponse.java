@@ -19,7 +19,6 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
-import de.stklcode.jvault.connector.model.AppRole;
 import de.stklcode.jvault.connector.model.AppRoleSecret;
 
 import java.io.IOException;
@@ -29,8 +28,8 @@ import java.util.Map;
 /**
  * Vault response for AppRole lookup.
  *
- * @author  Stefan Kalscheuer
- * @since   0.4.0
+ * @author Stefan Kalscheuer
+ * @since 0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRoleSecretResponse extends VaultDataResponse {
@@ -42,7 +41,9 @@ public final class AppRoleSecretResponse extends VaultDataResponse {
         try {
             /* null empty strings on list objects */
             Map<String, Object> filteredData = new HashMap<>();
-            data.forEach((k,v) -> { if (!(v instanceof String && ((String) v).isEmpty())) filteredData.put(k,v); });
+            data.forEach((k, v) -> {
+                if (!(v instanceof String && ((String) v).isEmpty())) filteredData.put(k, v);
+            });
             this.secret = mapper.readValue(mapper.writeValueAsString(filteredData), AppRoleSecret.class);
         } catch (IOException e) {
             e.printStackTrace();

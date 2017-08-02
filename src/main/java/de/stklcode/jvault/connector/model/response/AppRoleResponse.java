@@ -24,13 +24,12 @@ import de.stklcode.jvault.connector.model.AppRole;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Vault response for AppRole lookup.
  *
- * @author  Stefan Kalscheuer
- * @since   0.4.0
+ * @author Stefan Kalscheuer
+ * @since 0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRoleResponse extends VaultDataResponse {
@@ -42,7 +41,9 @@ public final class AppRoleResponse extends VaultDataResponse {
         try {
             /* null empty strings on list objects */
             Map<String, Object> filteredData = new HashMap<>();
-            data.forEach((k,v) -> { if (!(v instanceof String && ((String) v).isEmpty())) filteredData.put(k,v); });
+            data.forEach((k, v) -> {
+                if (!(v instanceof String && ((String) v).isEmpty())) filteredData.put(k, v);
+            });
             this.role = mapper.readValue(mapper.writeValueAsString(filteredData), AppRole.class);
         } catch (IOException e) {
             e.printStackTrace();

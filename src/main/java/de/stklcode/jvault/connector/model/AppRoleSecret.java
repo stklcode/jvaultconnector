@@ -18,7 +18,6 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

@@ -29,7 +29,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.*;
@@ -38,7 +37,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 /**
  * Vault Connector implementatin using Vault's HTTP API.
@@ -103,10 +101,10 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param prefix   HTTP API prefix (default: /v1/)
      */
     public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix) {
-        this(((useTLS) ? "https" : "http") +
-                "://" + hostname +
-                ((port != null) ? ":" + port : "") +
-                prefix);
+        this(((useTLS) ? "https" : "http")
+                + "://" + hostname
+                + ((port != null) ? ":" + port : "")
+                + prefix);
     }
 
     /**
@@ -118,7 +116,11 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param prefix     HTTP API prefix (default: /v1/)
      * @param sslContext Custom SSL Context
      */
-    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix, final SSLContext sslContext) {
+    public HTTPVaultConnector(final String hostname,
+                              final boolean useTLS,
+                              final Integer port,
+                              final String prefix,
+                              final SSLContext sslContext) {
         this(hostname, useTLS, port, prefix, sslContext, 0, null);
     }
 
@@ -133,11 +135,17 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param numberOfRetries Number of retries on 5xx errors
      * @param timeout         Timeout for HTTP requests (milliseconds)
      */
-    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix, final SSLContext sslContext, final int numberOfRetries, final Integer timeout) {
-        this(((useTLS) ? "https" : "http") +
-                        "://" + hostname +
-                        ((port != null) ? ":" + port : "") +
-                        prefix,
+    public HTTPVaultConnector(final String hostname,
+                              final boolean useTLS,
+                              final Integer port,
+                              final String prefix,
+                              final SSLContext sslContext,
+                              final int numberOfRetries,
+                              final Integer timeout) {
+        this(((useTLS) ? "https" : "http")
+                        + "://" + hostname
+                        + ((port != null) ? ":" + port : "")
+                        + prefix,
                 sslContext,
                 numberOfRetries,
                 timeout);
@@ -181,7 +189,10 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param numberOfRetries Number of retries on 5xx errors
      * @param timeout         Timeout for HTTP requests (milliseconds)
      */
-    public HTTPVaultConnector(final String baseURL, final SSLContext sslContext, final int numberOfRetries, final Integer timeout) {
+    public HTTPVaultConnector(final String baseURL,
+                              final SSLContext sslContext,
+                              final int numberOfRetries,
+                              final Integer timeout) {
         this.baseURL = baseURL;
         this.sslContext = sslContext;
         this.retries = numberOfRetries;
@@ -272,7 +283,8 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final AuthResponse authUserPass(final String username, final String password) throws VaultConnectorException {
+    public final AuthResponse authUserPass(final String username, final String password)
+            throws VaultConnectorException {
         final Map<String, String> payload = new HashMap<>();
         payload.put("password", password);
         return queryAuth(PATH_AUTH_USERPASS + username, payload);
@@ -304,7 +316,8 @@ public class HTTPVaultConnector implements VaultConnector {
      * @return The AuthResponse
      * @throws VaultConnectorException on errors
      */
-    private AuthResponse queryAuth(final String path, final Map<String, String> payload) throws VaultConnectorException {
+    private AuthResponse queryAuth(final String path, final Map<String, String> payload)
+            throws VaultConnectorException {
         try {
             /* Get response */
             String response = requestPost(path, payload);
@@ -322,7 +335,8 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     @Deprecated
-    public final boolean registerAppId(final String appID, final String policy, final String displayName) throws VaultConnectorException {
+    public final boolean registerAppId(final String appID, final String policy, final String displayName)
+            throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         Map<String, String> payload = new HashMap<>();
@@ -427,7 +441,8 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret) throws VaultConnectorException {
+    public final AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret)
+            throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Get response */
@@ -446,12 +461,15 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+    public final AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID)
+            throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
         try {
-            String response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/lookup", new AppRoleSecret(secretID));
+            String response = requestPost(
+                    PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/lookup",
+                    new AppRoleSecret(secretID));
             return jsonMapper.readValue(response, AppRoleSecretResponse.class);
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response", e);
@@ -459,12 +477,15 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final boolean destroyAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException {
+    public final boolean destroyAppRoleSecret(final String roleName, final String secretID)
+            throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
         /* Request HTTP response and expect empty result */
-        String response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/destroy", new AppRoleSecret(secretID));
+        String response = requestPost(
+                PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/destroy",
+                new AppRoleSecret(secretID));
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
@@ -496,7 +517,9 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new AuthorizationRequiredException();
 
         try {
-            String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id?list=true", new HashMap<>());
+            String response = requestGet(
+                    PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id?list=true",
+                    new HashMap<>());
             SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
             return secrets.getKeys();
         } catch (IOException e) {
@@ -744,7 +767,8 @@ public class HTTPVaultConnector implements VaultConnector {
      * @throws VaultConnectorException on connection error
      * @throws URISyntaxException      on invalid URI syntax
      */
-    private String requestGet(final String path, final Map<String, String> payload) throws VaultConnectorException, URISyntaxException {
+    private String requestGet(final String path, final Map<String, String> payload)
+            throws VaultConnectorException, URISyntaxException {
         /* Add parameters to URI */
         URIBuilder uriBuilder = new URIBuilder(baseURL + path);
         payload.forEach(uriBuilder::addParameter);
@@ -784,7 +808,8 @@ public class HTTPVaultConnector implements VaultConnector {
 
             switch (response.getStatusLine().getStatusCode()) {
                 case 200:
-                    try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+                    try (BufferedReader br = new BufferedReader(
+                            new InputStreamReader(response.getEntity().getContent()))) {
                         return br.lines().collect(Collectors.joining("\n"));
                     } catch (IOException ignored) {
                     }
@@ -793,7 +818,8 @@ public class HTTPVaultConnector implements VaultConnector {
                 case 403:
                     throw new PermissionDeniedException();
                 default:
-                    if (response.getStatusLine().getStatusCode() >= 500 && response.getStatusLine().getStatusCode() < 600 && retries > 0) {
+                    if (response.getStatusLine().getStatusCode() >= 500
+                            && response.getStatusLine().getStatusCode() < 600 && retries > 0) {
                         /* Retry on 5xx errors */
                         return request(base, retries - 1);
                     } else {
@@ -801,7 +827,8 @@ public class HTTPVaultConnector implements VaultConnector {
                         InvalidResponseException ex = new InvalidResponseException("Invalid response code")
                                 .withStatusCode(response.getStatusLine().getStatusCode());
                         if (response.getEntity() != null) {
-                            try (BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+                            try (BufferedReader br = new BufferedReader(
+                                    new InputStreamReader(response.getEntity().getContent()))) {
                                 String responseString = br.lines().collect(Collectors.joining("\n"));
                                 ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
                                 /* Check for "permission denied" response */

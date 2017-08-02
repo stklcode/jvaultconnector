@@ -35,7 +35,7 @@ public final class ErrorResponse implements VaultResponse {
     /**
      * @return List of errors
      */
-    public List<String > getErrors() {
+    public List<String> getErrors() {
         return errors;
     }
 }

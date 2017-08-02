@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.factory;
 
 import de.stklcode.jvault.connector.HTTPVaultConnector;
-import de.stklcode.jvault.connector.VaultConnector;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;

@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 
