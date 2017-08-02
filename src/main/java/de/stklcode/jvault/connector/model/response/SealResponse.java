@@ -39,18 +39,30 @@ public final class SealResponse implements VaultResponse {
     @JsonProperty("progress")
     private Integer progress;
 
+    /**
+     * @return Seal status
+     */
     public boolean isSealed() {
         return sealed;
     }
 
+    /**
+     * @return Required threshold of secret shares
+     */
     public Integer getThreshold() {
         return threshold;
     }
 
+    /**
+     * @return Number of secret shares
+     */
     public Integer getNumberOfShares() {
         return numberOfShares;
     }
 
+    /**
+     * @return Current unseal progress (remaining required shares)
+     */
     public Integer getProgress() {
         return progress;
     }

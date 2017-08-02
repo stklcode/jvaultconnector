@@ -35,6 +35,9 @@ public final class RawDataResponse extends VaultDataResponse {
         this.data = data;
     }
 
+    /**
+     * @return Raw data {@link Map}
+     */
     public Map<String, Object> getData() {
         return data;
     }

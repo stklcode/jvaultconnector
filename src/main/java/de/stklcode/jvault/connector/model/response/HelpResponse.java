@@ -30,6 +30,9 @@ public final class HelpResponse implements VaultResponse {
     @JsonProperty("help")
     private String help;
 
+    /**
+     * @return Help text
+     */
     public String getHelp() {
         return help;
     }

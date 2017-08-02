@@ -58,41 +58,73 @@ public final class AppRoleSecret {
     @JsonProperty(value = "secret_id_ttl", access = JsonProperty.Access.WRITE_ONLY)
     private Integer ttl;
 
+    /**
+     * Construct empty {@link AppRoleSecret} object.
+     */
     public AppRoleSecret() {
-
     }
 
+    /**
+     * Construct {@link AppRoleSecret} with secret ID.
+     *
+     * @param id Secret ID
+     */
     public AppRoleSecret(final String id) {
         this.id = id;
     }
 
+    /**
+     * Construct {@link AppRoleSecret} with ID and metadata.
+     *
+     * @param id       Secret ID
+     * @param metadata Secret metadata
+     * @param cidrList List of subnets in CIDR notation, the role is bound to
+     */
     public AppRoleSecret(final String id, final Map<String, Object> metadata, final List<String> cidrList) {
         this.id = id;
         this.metadata = metadata;
         this.cidrList = cidrList;
     }
 
+    /**
+     * @return Secret ID
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * @return Secret accessor
+     */
     public String getAccessor() {
         return accessor;
     }
 
+    /**
+     * @return Secret metadata
+     */
     public Map<String, Object> getMetadata() {
         return metadata;
     }
 
+    /**
+     * @return List of bound subnets in CIDR notation
+     */
     public List<String> getCidrList() {
         return cidrList;
     }
 
+    /**
+     * @param cidrList List of subnets in CIDR notation
+     */
     @JsonSetter("cidr_list")
     public void setCidrList(final List<String> cidrList) {
         this.cidrList = cidrList;
     }
 
+    /**
+     * @return List of bound subnets in CIDR notation as comma-separated {@link String}
+     */
     @JsonGetter("cidr_list")
     public String getCidrListString() {
         if (cidrList == null || cidrList.isEmpty())
@@ -100,22 +132,37 @@ public final class AppRoleSecret {
         return String.join(",", cidrList);
     }
 
+    /**
+     * @return Creation time
+     */
     public String getCreationTime() {
         return creationTime;
     }
 
+    /**
+     * @return Expiration time
+     */
     public String getExpirationTime() {
         return expirationTime;
     }
 
+    /**
+     * @return Time of last update
+     */
     public String getLastUpdatedTime() {
         return lastUpdatedTime;
     }
 
+    /**
+     * @return Number of uses
+     */
     public Integer getNumUses() {
         return numUses;
     }
 
+    /**
+     * @return Time-to-live
+     */
     public Integer getTtl() {
         return ttl;
     }

@@ -67,6 +67,19 @@ public final class Token {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean renewable;
 
+    /**
+     * Construct complete {@link Token} object.
+     *
+     * @param id              Token ID (optional)
+     * @param displayName     Token display name (optional)
+     * @param noParent        Token has no parent (optional)
+     * @param noDefaultPolicy Do not add default policy (optional)
+     * @param ttl             Token TTL in seconds (optional)
+     * @param numUses         Number of uses (optional)
+     * @param policies        List of policies (optional)
+     * @param meta            Metadata (optional)
+     * @param renewable       Is the token renewable (optional)
+     */
     public Token(final String id, final String displayName, final Boolean noParent, final Boolean noDefaultPolicy,
                  final Integer ttl, final Integer numUses, final List<String> policies, final Map<String, String> meta,
                  final Boolean renewable) {
@@ -81,38 +94,65 @@ public final class Token {
         this.renewable = renewable;
     }
 
+    /**
+     * @return Token ID
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * @return Token display name
+     */
     public String getDisplayName() {
         return displayName;
     }
 
+    /**
+     * @return Token has no parent
+     */
     public Boolean getNoParent() {
         return noParent;
     }
 
+    /**
+     * @return Token has no default policy
+     */
     public Boolean getNoDefaultPolicy() {
         return noDefaultPolicy;
     }
 
+    /**
+     * @return Time-to-live in seconds
+     */
     public Integer getTtl() {
         return ttl;
     }
 
+    /**
+     * @return Number of uses
+     */
     public Integer getNumUses() {
         return numUses;
     }
 
+    /**
+     * @return List of policies
+     */
     public List<String> getPolicies() {
         return policies;
     }
 
+    /**
+     * @return Metadata
+     */
     public Map<String, String> getMeta() {
         return meta;
     }
 
+    /**
+     * @return Token is renewable
+     */
     public Boolean isRenewable() {
         return renewable;
     }

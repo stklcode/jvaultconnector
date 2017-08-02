@@ -20,42 +20,83 @@ package de.stklcode.jvault.connector.exception;
  * Exception thrown when response from vault returned with erroneous status code or payload could not be parsed
  * to entity class.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public final class InvalidResponseException extends VaultConnectorException {
     private Integer statusCode;
     private String response;
 
+    /**
+     * Constructs a new empty exception.
+     */
     public InvalidResponseException() {
     }
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message the detail message
+     */
     public InvalidResponseException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new exception with the specified cause.
+     *
+     * @param cause the cause
+     */
     public InvalidResponseException(final Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param message the detail message
+     * @param cause   the cause
+     */
     public InvalidResponseException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Specify the HTTP status code. Can be retrieved by {@link #getStatusCode()} later.
+     *
+     * @param statusCode the status code
+     * @return self
+     */
     public InvalidResponseException withStatusCode(final Integer statusCode) {
         this.statusCode = statusCode;
         return this;
     }
 
+    /**
+     * Specify the response string. Can be retrieved by {@link #getResponse()} later.
+     *
+     * @param response response text
+     * @return self
+     */
     public InvalidResponseException withResponse(final String response) {
         this.response = response;
         return this;
     }
 
+    /**
+     * Retrieve the HTTP status code.
+     *
+     * @return the status code or {@code null} if none specified.
+     */
     public Integer getStatusCode() {
         return statusCode;
     }
 
+    /**
+     * Retrieve the response text.
+     *
+     * @return the response text or {@code null} if none specified.
+     */
     public String getResponse() {
         return response;
     }

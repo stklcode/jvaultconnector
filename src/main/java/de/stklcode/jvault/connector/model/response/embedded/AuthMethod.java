@@ -43,28 +43,46 @@ public final class AuthMethod {
     @JsonProperty("local")
     private boolean local;
 
+    /**
+     * @param type Backend type, passed to {@link AuthBackend#forType(String)}
+     */
     @JsonSetter("type")
     public void setType(final String type) {
         this.rawType = type;
         this.type = AuthBackend.forType(type);
     }
 
+    /**
+     * @return Backend type
+     */
     public AuthBackend getType() {
         return type;
     }
 
+    /**
+     * @return Raw backend type string
+     */
     public String getRawType() {
         return rawType;
     }
 
+    /**
+     * @return Description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * @return Configuration data
+     */
     public Map<String, String> getConfig() {
         return config;
     }
 
+    /**
+     * @return Is local backend
+     */
     public boolean isLocal() {
         return local;
     }

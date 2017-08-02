@@ -28,8 +28,8 @@ import java.util.Map;
 /**
  * Vault response from token lookup providing Token information in {@link TokenData} field.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenResponse extends VaultDataResponse {
@@ -38,6 +38,12 @@ public final class TokenResponse extends VaultDataResponse {
     @JsonProperty("auth")
     private Boolean auth;
 
+    /**
+     * Set data. Parses response data map to {@link TokenData}.
+     *
+     * @param data Raw response data
+     * @throws InvalidResponseException on parsing errors
+     */
     @Override
     public void setData(final Map<String, Object> data) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
@@ -49,6 +55,9 @@ public final class TokenResponse extends VaultDataResponse {
         }
     }
 
+    /**
+     * @return Token data
+     */
     public TokenData getData() {
         return data;
     }

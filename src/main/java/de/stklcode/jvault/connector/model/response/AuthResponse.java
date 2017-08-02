@@ -28,8 +28,8 @@ import java.util.Map;
 /**
  * Vault response for authentication providing auth info in {@link AuthData} field.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthResponse extends VaultDataResponse {
@@ -37,6 +37,12 @@ public final class AuthResponse extends VaultDataResponse {
 
     private AuthData auth;
 
+    /**
+     * Set authentication data. The input will be mapped to the {@link AuthData} model.
+     *
+     * @param auth Raw authentication data
+     * @throws InvalidResponseException on mapping errors
+     */
     @JsonProperty("auth")
     public void setAuth(final Map<String, Object> auth) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
@@ -53,10 +59,16 @@ public final class AuthResponse extends VaultDataResponse {
         this.data = data;
     }
 
+    /**
+     * @return Raw data
+     */
     public Map<String, Object> getData() {
         return data;
     }
 
+    /**
+     * @return Authentication data
+     */
     public AuthData getAuth() {
         return auth;
     }

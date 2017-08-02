@@ -125,11 +125,13 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using hostname, schema, port, path and trusted certificate.
      *
-     * @param hostname   The hostname
-     * @param useTLS     If TRUE, use HTTPS, otherwise HTTP
-     * @param port       The port
-     * @param prefix     HTTP API prefix (default: /v1/)
-     * @param sslContext Custom SSL Context
+     * @param hostname        The hostname
+     * @param useTLS          If TRUE, use HTTPS, otherwise HTTP
+     * @param port            The port
+     * @param prefix          HTTP API prefix (default: /v1/)
+     * @param sslContext      Custom SSL Context
+     * @param numberOfRetries Number of retries on 5xx errors
+     * @param timeout         Timeout for HTTP requests (milliseconds)
      */
     public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix, final SSLContext sslContext, final int numberOfRetries, final Integer timeout) {
         this(((useTLS) ? "https" : "http") +
@@ -165,7 +167,7 @@ public class HTTPVaultConnector implements VaultConnector {
      *
      * @param baseURL         The URL
      * @param sslContext      Custom SSL Context
-     * @param numberOfRetries number of retries on 5xx errors
+     * @param numberOfRetries Number of retries on 5xx errors
      */
     public HTTPVaultConnector(final String baseURL, final SSLContext sslContext, final int numberOfRetries) {
         this(baseURL, sslContext, numberOfRetries, null);
@@ -176,7 +178,8 @@ public class HTTPVaultConnector implements VaultConnector {
      *
      * @param baseURL         The URL
      * @param sslContext      Custom SSL Context
-     * @param numberOfRetries number of retries on 5xx errors
+     * @param numberOfRetries Number of retries on 5xx errors
+     * @param timeout         Timeout for HTTP requests (milliseconds)
      */
     public HTTPVaultConnector(final String baseURL, final SSLContext sslContext, final int numberOfRetries, final Integer timeout) {
         this.baseURL = baseURL;
@@ -294,7 +297,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     /**
-     * Query authorization request to given backend
+     * Query authorization request to given backend.
      *
      * @param path    The path to request
      * @param payload Payload (credentials)
@@ -537,6 +540,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
     }
 
+    @Override
     public final void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
@@ -738,6 +742,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param payload Map of payload values (will be converted to JSON)
      * @return HTTP response
      * @throws VaultConnectorException on connection error
+     * @throws URISyntaxException      on invalid URI syntax
      */
     private String requestGet(final String path, final Map<String, String> payload) throws VaultConnectorException, URISyntaxException {
         /* Add parameters to URI */

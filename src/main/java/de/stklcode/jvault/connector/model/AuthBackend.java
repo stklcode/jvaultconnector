@@ -19,8 +19,8 @@ package de.stklcode.jvault.connector.model;
 /**
  * Currently supported authentication backends.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public enum AuthBackend {
     TOKEN("token"),
@@ -31,10 +31,21 @@ public enum AuthBackend {
 
     private final String type;
 
+    /**
+     * Construct {@link AuthBackend} of given type.
+     *
+     * @param type Backend type
+     */
     AuthBackend(final String type) {
         this.type = type;
     }
 
+    /**
+     * Retrieve {@link AuthBackend} value for given type string.
+     *
+     * @param type Type string
+     * @return Auth backend value
+     */
     public static AuthBackend forType(final String type) {
         for (AuthBackend v : values())
             if (v.type.equalsIgnoreCase(type))

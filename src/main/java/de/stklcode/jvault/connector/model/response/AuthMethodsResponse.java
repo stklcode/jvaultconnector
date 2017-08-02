@@ -35,6 +35,9 @@ import java.util.Map;
 public final class AuthMethodsResponse extends VaultDataResponse {
     private Map<String, AuthMethod> supportedMethods;
 
+    /**
+     * Construct empty {@link AuthMethodsResponse} object.
+     */
     public AuthMethodsResponse() {
         this.supportedMethods = new HashMap<>();
     }
@@ -51,6 +54,9 @@ public final class AuthMethodsResponse extends VaultDataResponse {
         }
     }
 
+    /**
+     * @return Supported authentication methods
+     */
     public Map<String, AuthMethod> getSupportedMethods() {
         return supportedMethods;
     }

@@ -26,23 +26,31 @@ import java.util.Map;
 /**
  * Vault response for secret list request.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretListResponse extends VaultDataResponse {
     private List<String> keys;
 
+    /**
+     * Set data. Extracts list of keys from raw response data.
+     *
+     * @param data Raw data
+     * @throws InvalidResponseException on parsing errors
+     */
     @JsonProperty("data")
     public void setData(final Map<String, Object> data) throws InvalidResponseException {
         try {
-            this.keys = (List<String>)data.get("keys");
-        }
-        catch (ClassCastException e) {
+            this.keys = (List<String>) data.get("keys");
+        } catch (ClassCastException e) {
             throw new InvalidResponseException("Keys could not be parsed from data.", e);
         }
     }
 
+    /**
+     * @return List of secret keys
+     */
     public List<String> getKeys() {
         return keys;
     }

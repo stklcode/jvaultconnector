@@ -19,21 +19,40 @@ package de.stklcode.jvault.connector.exception;
 /**
  * Exception thrown on problems with connection to Vault backend.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public class ConnectionException extends VaultConnectorException {
+    /**
+     * Constructs a new empty exception.
+     */
     public ConnectionException() {
     }
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message the detail message
+     */
     public ConnectionException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new exception with the specified cause.
+     *
+     * @param cause the cause
+     */
     public ConnectionException(final Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param message the detail message
+     * @param cause   the cause
+     */
     public ConnectionException(final String message, final Throwable cause) {
         super(message, cause);
     }

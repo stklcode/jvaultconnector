@@ -79,7 +79,7 @@ public class SecretResponse extends VaultDataResponse {
     }
 
     /**
-     * Get response parsed as JSON
+     * Get response parsed as JSON.
      *
      * @param type Class to parse response
      * @param <T>  Class to parse response
@@ -94,7 +94,7 @@ public class SecretResponse extends VaultDataResponse {
     }
 
     /**
-     * Get response parsed as JSON
+     * Get response parsed as JSON.
      *
      * @param key the key
      * @param type Class to parse response

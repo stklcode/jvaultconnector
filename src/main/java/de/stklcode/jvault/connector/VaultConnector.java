@@ -324,7 +324,7 @@ public interface VaultConnector extends AutoCloseable {
     List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException;
 
     /**
-     * Register User-ID with App-ID
+     * Register User-ID with App-ID.
      *
      * @param appID  The App-ID
      * @param userID The User-ID
@@ -352,7 +352,7 @@ public interface VaultConnector extends AutoCloseable {
     }
 
     /**
-     * Get authorization status
+     * Get authorization status.
      *
      * @return TRUE, if successfully authorized
      */
@@ -543,7 +543,7 @@ public interface VaultConnector extends AutoCloseable {
     TokenResponse lookupToken(final String token) throws VaultConnectorException;
 
     /**
-     * Read credentials for MySQL backend at default mount point
+     * Read credentials for MySQL backend at default mount point.
      *
      * @param role  the role name
      * @return the credentials response
@@ -555,7 +555,7 @@ public interface VaultConnector extends AutoCloseable {
     }
 
     /**
-     * Read credentials for PostgreSQL backend at default mount point
+     * Read credentials for PostgreSQL backend at default mount point.
      *
      * @param role  the role name
      * @return the credentials response
@@ -567,7 +567,7 @@ public interface VaultConnector extends AutoCloseable {
     }
 
     /**
-     * Read credentials for MSSQL backend at default mount point
+     * Read credentials for MSSQL backend at default mount point.
      *
      * @param role  the role name
      * @return the credentials response
@@ -579,7 +579,7 @@ public interface VaultConnector extends AutoCloseable {
     }
 
     /**
-     * Read credentials for MSSQL backend at default mount point
+     * Read credentials for MSSQL backend at default mount point.
      *
      * @param role  the role name
      * @return the credentials response

@@ -23,17 +23,36 @@ package de.stklcode.jvault.connector.exception;
  * @since   0.4.0
  */
 public class TlsException extends VaultConnectorException {
+    /**
+     * Constructs a new empty exception.
+     */
     public TlsException() {
     }
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message the detail message
+     */
     public TlsException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new exception with the specified cause.
+     *
+     * @param cause the cause
+     */
     public TlsException(final Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param message the detail message
+     * @param cause   the cause
+     */
     public TlsException(final String message, final Throwable cause) {
         super(message, cause);
     }

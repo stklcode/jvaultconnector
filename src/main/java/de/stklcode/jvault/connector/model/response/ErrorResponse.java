@@ -32,6 +32,9 @@ public final class ErrorResponse implements VaultResponse {
     @JsonProperty("errors")
     private List<String> errors;
 
+    /**
+     * @return List of errors
+     */
     public List<String > getErrors() {
         return errors;
     }

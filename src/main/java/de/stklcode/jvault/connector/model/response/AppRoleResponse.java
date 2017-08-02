@@ -50,6 +50,9 @@ public final class AppRoleResponse extends VaultDataResponse {
         }
     }
 
+    /**
+     * @return The role
+     */
     public AppRole getRole() {
         return role;
     }

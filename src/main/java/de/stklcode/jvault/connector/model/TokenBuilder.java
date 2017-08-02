@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * A builder for vault tokens.
  *
- * @author  Stefan Kalscheuer
+ * @author Stefan Kalscheuer
  * @since 0.4.0
  */
 public final class TokenBuilder {
@@ -38,7 +38,7 @@ public final class TokenBuilder {
     private Boolean renewable;
 
     /**
-     * Add token ID (optional)
+     * Add token ID. (optional)
      *
      * @param id the ID
      * @return self
@@ -49,7 +49,7 @@ public final class TokenBuilder {
     }
 
     /**
-     * Add display name
+     * Add display name.
      *
      * @param displayName the display name
      * @return self
@@ -61,6 +61,7 @@ public final class TokenBuilder {
 
     /**
      * Set desired time to live.
+     *
      * @param ttl the ttl
      * @return self
      */
@@ -71,6 +72,7 @@ public final class TokenBuilder {
 
     /**
      * Set desired number of uses.
+     *
      * @param numUses the number of uses
      * @return self
      */
@@ -80,7 +82,7 @@ public final class TokenBuilder {
     }
 
     /**
-     * Set TRUE if the token should be created without parent
+     * Set TRUE if the token should be created without parent.
      *
      * @param noParent if TRUE, token is created as orphan
      * @return self
@@ -142,7 +144,7 @@ public final class TokenBuilder {
     }
 
     /**
-     * Add given policies
+     * Add given policies.
      *
      * @param policies the policies
      * @return self
@@ -153,7 +155,7 @@ public final class TokenBuilder {
     }
 
     /**
-     * Add given policies
+     * Add given policies.
      *
      * @param policies the policies
      * @return self

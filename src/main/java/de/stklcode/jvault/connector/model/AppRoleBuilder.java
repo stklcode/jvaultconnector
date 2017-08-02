@@ -37,12 +37,17 @@ public final class AppRoleBuilder {
     private Integer tokenMaxTtl;
     private Integer period;
 
+    /**
+     * Construct {@link AppRoleBuilder} with only the role name set.
+     *
+     * @param name Role name
+     */
     public AppRoleBuilder(final String name) {
         this.name = name;
     }
 
     /**
-     * Add custom role ID (optional)
+     * Add custom role ID. (optional)
      *
      * @param id the ID
      * @return self
@@ -53,7 +58,7 @@ public final class AppRoleBuilder {
     }
 
     /**
-     * Set if role is bound to secret ID
+     * Set if role is bound to secret ID.
      *
      * @param bindSecretId the display name
      * @return self
@@ -108,7 +113,7 @@ public final class AppRoleBuilder {
     }
 
     /**
-     * Add given policies
+     * Add given policies.
      *
      * @param policies the policies
      * @return self

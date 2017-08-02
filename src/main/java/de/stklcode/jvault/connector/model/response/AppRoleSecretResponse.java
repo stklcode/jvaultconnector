@@ -50,6 +50,9 @@ public final class AppRoleSecretResponse extends VaultDataResponse {
         }
     }
 
+    /**
+     * @return The secret
+     */
     public AppRoleSecret getSecret() {
         return secret;
     }

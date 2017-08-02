@@ -25,8 +25,8 @@ import java.util.Map;
 /**
  * Abstract Vault response with default payload fields.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public abstract class VaultDataResponse implements VaultResponse {
     @JsonProperty("lease_id")
@@ -41,21 +41,39 @@ public abstract class VaultDataResponse implements VaultResponse {
     @JsonProperty("warnings")
     private List<String> warnings;
 
+    /**
+     * Set data. To be implemented in the specific subclasses, as data can be of arbitrary structure.
+     *
+     * @param data Raw response data
+     * @throws InvalidResponseException on parsing errors
+     */
     @JsonProperty("data")
     public abstract void setData(final Map<String, Object> data) throws InvalidResponseException;
 
+    /**
+     * @return Lease ID
+     */
     public final String getLeaseId() {
         return leaseId;
     }
 
+    /**
+     * @return Lease is renewable
+     */
     public final boolean isRenewable() {
         return renewable;
     }
 
+    /**
+     * @return Lease duration
+     */
     public final Integer getLeaseDuration() {
         return leaseDuration;
     }
 
+    /**
+     * @return List of warnings
+     */
     public final List<String> getWarnings() {
         return warnings;
     }

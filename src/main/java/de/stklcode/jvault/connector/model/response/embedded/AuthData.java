@@ -48,26 +48,44 @@ public final class AuthData {
     @JsonProperty("renewable")
     private boolean renewable;
 
+    /**
+     * @return Client token
+     */
     public String getClientToken() {
         return clientToken;
     }
 
+    /**
+     * @return Token accessor
+     */
     public String getAccessor() {
         return accessor;
     }
 
+    /**
+     * @return List of policies
+     */
     public List<String> getPolicies() {
         return policies;
     }
 
+    /**
+     * @return Metadata
+     */
     public Map<String, Object> getMetadata() {
         return metadata;
     }
 
+    /**
+     * @return Lease duration
+     */
     public Integer getLeaseDuration() {
         return leaseDuration;
     }
 
+    /**
+     * @return Lease is renewable
+     */
     public boolean isRenewable() {
         return renewable;
     }

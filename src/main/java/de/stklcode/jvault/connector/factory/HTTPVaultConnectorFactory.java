@@ -77,7 +77,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Set hostname (default: 127.0.0.1)
+     * Set hostname (default: 127.0.0.1).
      *
      * @param host Hostname or IP address
      * @return self
@@ -88,7 +88,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Set port (default: 8200)
+     * Set port (default: 8200).
      *
      * @param port Vault TCP port
      * @return self
@@ -99,7 +99,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Set TLS usage (default: TRUE)
+     * Set TLS usage (default: TRUE).
      *
      * @param useTLS use TLS or not
      * @return self
@@ -110,7 +110,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Convenience Method for TLS usage (enabled by default)
+     * Convenience Method for TLS usage (enabled by default).
      *
      * @return self
      */
@@ -119,7 +119,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Convenience Method for NOT using TLS
+     * Convenience Method for NOT using TLS.
      *
      * @return self
      */
@@ -172,7 +172,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      * @since 0.6.0
      */
-    public HTTPVaultConnectorFactory withToken(final String token) throws VaultConnectorException {
+    public HTTPVaultConnectorFactory withToken(final String token) {
         this.token = token;
         return this;
     }
@@ -181,6 +181,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * Build connector based on the {@code }VAULT_ADDR} and {@code VAULT_CACERT} (optional) environment variables.
      *
      * @return self
+     * @throws VaultConnectorException if Vault address from environment variables is malformed
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory fromEnv() throws VaultConnectorException {

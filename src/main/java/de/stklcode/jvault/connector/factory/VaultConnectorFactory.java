@@ -28,7 +28,7 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
  */
 public abstract class VaultConnectorFactory {
     /**
-     * Get Factory implementation for HTTP Vault Connector
+     * Get Factory implementation for HTTP Vault Connector.
      *
      * @return HTTP Connector Factory
      */
@@ -47,6 +47,7 @@ public abstract class VaultConnectorFactory {
      * Build connector and authenticate with token set in factory or from environment.
      *
      * @return Authenticated Vault connector instance.
+     * @throws VaultConnectorException if authentication failed
      * @since 0.6.0
      */
     public abstract VaultConnector buildAndAuth() throws VaultConnectorException;
