@@ -34,15 +34,23 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class CredentialsResponse extends SecretResponse {
 
+    /**
+     * @return Username
+     */
     public String getUsername() {
-        if (get("username") != null)
-            return get("username").toString();
+        Object username = get("username");
+        if (username != null)
+            return username.toString();
         return null;
     }
 
+    /**
+     * @return Password
+     */
     public String getPassword() {
-        if (get("username") != null)
-            return get("username").toString();
+        Object password = get("password");
+        if (password != null)
+            return password.toString();
         return null;
     }
 }
