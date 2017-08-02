@@ -1,3 +1,9 @@
+## 0.6.1 [2017-08-02]
+* [fix] `TokenModel.getPassword()` returned username instead of password
+* [fix]  `TokenModel.getUsername()` and `getPassword()` could produce NPE in multithreaded environments
+* [fix] `TokenData.getCreatinTtl()` renamed to `getCreationTtl()` (typo fix)
+* [test] Tested against Vault 0.7.3
+
 ## 0.6.0 [2017-05-12]
 * [feature] Initialization from environment variables using `fromEnv()` in factory (#8)
 * [feature] Automatic authentication with `buildAndAuth()`
