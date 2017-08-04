@@ -697,24 +697,24 @@ public class HTTPVaultConnectorTest {
         }
 
         /* Overwrite token should fail as of Vault 0.8.0 */
-//        token = new TokenBuilder()
-//                .withId("test-id2")
-//                .withDisplayName("test name 3")
-//                .withPolicies(Arrays.asList("pol1", "pol2"))
-//                .withDefaultPolicy()
-//                .withMeta("test", "success")
-//                .withMeta("key", "value")
-//                .withTtl(1234)
-//                .build();
-//        try {
-//            connector.createToken(token);
-//            fail("Overwriting token should fail as of Vault 0.8.0");
-//        } catch (VaultConnectorException e) {
-//            assertThat(e, is(instanceOf(InvalidResponseException.class)));
-//            assertThat(((InvalidResponseException)e).getStatusCode(), is(400));
-//            /* Assert that the exception does not reveal token ID */
-//            assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
-//        }
+        token = new TokenBuilder()
+                .withId("test-id2")
+                .withDisplayName("test name 3")
+                .withPolicies(Arrays.asList("pol1", "pol2"))
+                .withDefaultPolicy()
+                .withMeta("test", "success")
+                .withMeta("key", "value")
+                .withTtl(1234)
+                .build();
+        try {
+            connector.createToken(token);
+            fail("Overwriting token should fail as of Vault 0.8.0");
+        } catch (VaultConnectorException e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
+            assertThat(((InvalidResponseException)e).getStatusCode(), is(400));
+            /* Assert that the exception does not reveal token ID */
+            assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
+        }
     }
 
     /**
