@@ -8,6 +8,6 @@ dist: trusty
 env:
   - PATH=$PATH:.
 before_script:
-  - wget https://releases.hashicorp.com/vault/0.8.0-rc1/vault_0.8.0-rc1_linux_amd64.zip
-  - unzip vault_0.8.0-rc1_linux_amd64.zip
-  - rm vault_0.8.0-rc1_linux_amd64.zip
+  - wget https://releases.hashicorp.com/vault/0.8.0/vault_0.8.0_linux_amd64.zip
+  - unzip vault_0.8.0_linux_amd64.zip
+  - rm vault_0.8.0_linux_amd64.zip
