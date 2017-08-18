@@ -49,8 +49,7 @@ public final class AuthResponse extends VaultDataResponse {
         try {
             this.auth = mapper.readValue(mapper.writeValueAsString(auth), AuthData.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new InvalidResponseException();
+            throw new InvalidResponseException("Failed deserializing response", e);
         }
     }
 

@@ -46,8 +46,7 @@ public final class AppRoleResponse extends VaultDataResponse {
             });
             this.role = mapper.readValue(mapper.writeValueAsString(filteredData), AppRole.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new InvalidResponseException();
+            throw new InvalidResponseException("Failed deserializing response", e);
         }
     }
 

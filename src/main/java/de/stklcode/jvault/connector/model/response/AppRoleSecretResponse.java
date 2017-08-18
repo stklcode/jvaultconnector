@@ -46,8 +46,7 @@ public final class AppRoleSecretResponse extends VaultDataResponse {
             });
             this.secret = mapper.readValue(mapper.writeValueAsString(filteredData), AppRoleSecret.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new InvalidResponseException();
+            throw new InvalidResponseException("Failed deserializing response", e);
         }
     }
 

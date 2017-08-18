@@ -2,6 +2,7 @@
 * [fix] Prevent potential NPE on SecretResponse getter
 * [fix] Fields of InvalidResposneException made final
 * [fix] Fix typo in method name `listAppRoleSecrets()` (#14)
+* [fix] Removed stack traces on PUT request and response deserialization (#13)
 * [text] Tested against Vault 0.8.1, increased coverage
 
 ## 0.6.1 [2017-08-02]

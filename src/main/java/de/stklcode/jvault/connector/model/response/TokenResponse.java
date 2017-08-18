@@ -50,8 +50,7 @@ public final class TokenResponse extends VaultDataResponse {
         try {
             this.data = mapper.readValue(mapper.writeValueAsString(data), TokenData.class);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new InvalidResponseException();
+            throw new InvalidResponseException("Failed deserializing response", e);
         }
     }
 
