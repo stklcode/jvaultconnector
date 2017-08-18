@@ -55,7 +55,7 @@ public class SecretResponse extends VaultDataResponse {
      * Get a single value for given key.
      *
      * @param key the key
-     * @return the value or NULL if absent
+     * @return the value or {@code null} if absent
      * @since 0.4.0
      */
     public final Object get(final String key) {
@@ -73,9 +73,10 @@ public class SecretResponse extends VaultDataResponse {
      */
     @Deprecated
     public final String getValue() {
-        if (get("value") == null)
+        Object value = get("value");
+        if (value == null)
             return null;
-        return get("value").toString();
+        return value.toString();
     }
 
     /**
@@ -99,13 +100,16 @@ public class SecretResponse extends VaultDataResponse {
      * @param key the key
      * @param type Class to parse response
      * @param <T>  Class to parse response
-     * @return Parsed object
+     * @return Parsed object or {@code null} if absent
      * @throws InvalidResponseException on parsing error
      * @since 0.4.0
      */
     public final <T> T get(final String key, final Class<T> type) throws InvalidResponseException {
         try {
-            return new ObjectMapper().readValue(get(key).toString(), type);
+            Object rawValue = get(key);
+            if (rawValue == null)
+                return null;
+            return new ObjectMapper().readValue(rawValue.toString(), type);
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
         }
