@@ -5,9 +5,21 @@ language: java
 jdk:
   - oraclejdk8
 dist: trusty
+install: true
+addons:
+  sonarcloud:
+    organization: "stklcode-github"
+    token:
+      secure: "sM9OfX5jW764pn9cb2LSXArnXucKMws+eGeg5NnZxHRcGYt4hpBKLSregBSsBNzUoWVj0zNzPCpnh+UQvgxQzUerOqwEdjTBpy3SNPaxSn7UpoSg+Wz3aUmL9ugmx01b51/wMG4UCHEwTZt2tpgTPVtw8K6uSO78e0dSICCBHDnRcdQwOjMEQHIJJ/qHVRwuy/MzLCAP3W1JPZlsphZg9QsFyhB4hW97dE90joZezfocQIv2xI/r6k+BLz0pY6MxYCul0RiDumaiaej0CPvEJI/uSu//BAQjUdHw+mQgnKUYIbrn2ONOviwNfwdr94JyoZEN2B6zASUmNLjPf4AbIojDeyS+CrpQpm17EVm/Qk/Ds+Xra4PPPIcsZhiWzV0KoDUz9xLfXuRJ526VT5tDPiaeI7oETf0+8l+JIS1b399FyqHi7smzjpvC6GuKflQrbuHK4MuKzDh7WTHiqokGG4SS0wOQIaaHB3dfdwwQzPh6IM24e8CETxh3DjMeqUTU4DWmv5po55jZ934TtxVQvVN78bTG9O0zS9u+JmRY04OZ+OaXuFam6MfMUFQi0EPZzdGul/oWSibGUu3bNfVEBp60CnJwYNM/dKG6U7pJthLHvSwiQFOdKzHZ+l1jZJ4gPaXaIGqpwqVGr28ntqA/El1rytPixr2driE6bYMt5jw="
 env:
   - PATH=$PATH:.
 before_script:
   - wget https://releases.hashicorp.com/vault/0.8.1/vault_0.8.1_linux_amd64.zip
   - unzip vault_0.8.1_linux_amd64.zip
   - rm vault_0.8.1_linux_amd64.zip
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
