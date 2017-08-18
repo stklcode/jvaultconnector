@@ -325,8 +325,21 @@ public interface VaultConnector extends AutoCloseable {
      * @param roleName The role name
      * @return List of roles
      * @throws VaultConnectorException on error
+     * @deprecated Use {@link #listAppRoleSecrets(String)}}. Will be removed in 0.7.0!
      */
-    List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException;
+    @Deprecated
+    default List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException {
+        return listAppRoleSecrets(roleName);
+    }
+
+    /**
+     * List existing (accessible) secret IDs for AppRole role.
+     *
+     * @param roleName The role name
+     * @return List of roles
+     * @throws VaultConnectorException on error
+     */
+    List<String> listAppRoleSecrets(final String roleName) throws VaultConnectorException;
 
     /**
      * Register User-ID with App-ID.

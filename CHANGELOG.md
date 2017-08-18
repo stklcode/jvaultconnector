@@ -1,3 +1,9 @@
+## 0.6.2 [work in progress]
+* [fix] Prevent potential NPE on SecretResponse getter
+* [fix] Fields of InvalidResposneException made final
+* [fix] Fix typo in method name `listAppRoleSecrets()` (#14)
+* [text] Tested against Vault 0.8.1, increased coverage
+
 ## 0.6.1 [2017-08-02]
 * [fix] `TokenModel.getPassword()` returned username instead of password
 * [fix]  `TokenModel.getUsername()` and `getPassword()` could produce NPE in multithreaded environments

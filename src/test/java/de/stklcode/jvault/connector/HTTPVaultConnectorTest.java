@@ -559,7 +559,7 @@ public class HTTPVaultConnectorTest {
         }
 
         try {
-            connector.listAppRoleSecretss("");
+            connector.listAppRoleSecrets("");
             fail("Expected exception not thrown");
         } catch (Exception e) {
             assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
@@ -580,7 +580,7 @@ public class HTTPVaultConnectorTest {
 
         /* Check secret IDs */
         try {
-            List<String> res = connector.listAppRoleSecretss(APPROLE_ROLE_NAME);
+            List<String> res = connector.listAppRoleSecrets(APPROLE_ROLE_NAME);
             assertThat("Unexpected number of AppRole secrets", res, hasSize(1));
             assertThat("Pre-configured AppRole secret not listed", res, contains(APPROLE_SECRET_ACCESSOR));
         } catch (VaultConnectorException e) {

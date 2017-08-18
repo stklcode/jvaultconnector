@@ -514,7 +514,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final List<String> listAppRoleSecretss(final String roleName) throws VaultConnectorException {
+    public final List<String> listAppRoleSecrets(final String roleName) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
 
