@@ -814,7 +814,7 @@ public class HTTPVaultConnector implements VaultConnector {
                             new InputStreamReader(response.getEntity().getContent()))) {
                         return br.lines().collect(Collectors.joining("\n"));
                     } catch (IOException ignored) {
-                        throw new InvalidResponseException("Could not parse response body").withStatusCode(200);
+                        throw new InvalidResponseException("Could not parse response body", 200);
                     }
                 case 204:
                     return "";
@@ -827,8 +827,6 @@ public class HTTPVaultConnector implements VaultConnector {
                         return request(base, retries - 1);
                     } else {
                         /* Fail on different error code and/or no retries left */
-                        InvalidResponseException ex = new InvalidResponseException("Invalid response code")
-                                .withStatusCode(response.getStatusLine().getStatusCode());
                         if (response.getEntity() != null) {
                             try (BufferedReader br = new BufferedReader(
                                     new InputStreamReader(response.getEntity().getContent()))) {
@@ -837,12 +835,14 @@ public class HTTPVaultConnector implements VaultConnector {
                                 /* Check for "permission denied" response */
                                 if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
                                     throw new PermissionDeniedException();
-                                throw ex.withResponse(er.toString());
+                                throw new InvalidResponseException("Invalid response code",
+                                        response.getStatusLine().getStatusCode(), er.toString());
                             } catch (IOException ignored) {
                                 // Exception ignored.
                             }
                         }
-                        throw ex;
+                        throw new InvalidResponseException("Invalid response code",
+                                response.getStatusLine().getStatusCode());
                     }
             }
         } catch (IOException e) {

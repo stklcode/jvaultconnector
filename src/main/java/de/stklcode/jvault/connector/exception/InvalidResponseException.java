@@ -24,13 +24,15 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public final class InvalidResponseException extends VaultConnectorException {
-    private Integer statusCode;
-    private String response;
+    private final Integer statusCode;
+    private final String response;
 
     /**
      * Constructs a new empty exception.
      */
     public InvalidResponseException() {
+        this.statusCode = null;
+        this.response = null;
     }
 
     /**
@@ -40,6 +42,8 @@ public final class InvalidResponseException extends VaultConnectorException {
      */
     public InvalidResponseException(final String message) {
         super(message);
+        this.statusCode = null;
+        this.response = null;
     }
 
     /**
@@ -49,6 +53,8 @@ public final class InvalidResponseException extends VaultConnectorException {
      */
     public InvalidResponseException(final Throwable cause) {
         super(cause);
+        this.statusCode = null;
+        this.response = null;
     }
 
     /**
@@ -59,6 +65,75 @@ public final class InvalidResponseException extends VaultConnectorException {
      */
     public InvalidResponseException(final String message, final Throwable cause) {
         super(message, cause);
+        this.statusCode = null;
+        this.response = null;
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message and status code.
+     * <p>
+     * The HTTP status code can be retrieved by {@link #getStatusCode()} later.
+     *
+     * @param message    the detail message
+     * @param statusCode status code of the HTTP response
+     * @since 0.6.2
+     */
+    public InvalidResponseException(final String message, final Integer statusCode) {
+        super(message);
+        this.statusCode = statusCode;
+        this.response = null;
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message, cause and status code.
+     * <p>
+     * The HTTP status code can be retrieved by {@link #getStatusCode()} later.
+     *
+     * @param message    the detail message
+     * @param statusCode status code of the HTTP response
+     * @param cause      the cause
+     * @since 0.6.2
+     */
+    public InvalidResponseException(final String message, final Integer statusCode, final Throwable cause) {
+        this(message, statusCode, null, cause);
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message, cause and status code.
+     * <p>
+     * The HTTP status code can be retrieved by {@link #getStatusCode()} later.
+     *
+     * @param message    the detail message
+     * @param statusCode status code of the HTTP response
+     * @param response   HTTP response string
+     * @since 0.6.2
+     */
+    public InvalidResponseException(final String message,
+                                    final Integer statusCode,
+                                    final String response) {
+        super(message);
+        this.statusCode = statusCode;
+        this.response = response;
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message, cause and status code.
+     * <p>
+     * The HTTP status code can be retrieved by {@link #getStatusCode()} later.
+     *
+     * @param message    the detail message
+     * @param statusCode status code of the HTTP response
+     * @param response   HTTP response string
+     * @param cause      the cause
+     * @since 0.6.2
+     */
+    public InvalidResponseException(final String message,
+                                    final Integer statusCode,
+                                    final String response,
+                                    final Throwable cause) {
+        super(message, cause);
+        this.statusCode = statusCode;
+        this.response = response;
     }
 
     /**
@@ -66,10 +141,11 @@ public final class InvalidResponseException extends VaultConnectorException {
      *
      * @param statusCode the status code
      * @return self
+     * @deprecated as of 0.6.2, use constructor with status code argument instead
      */
+    @Deprecated
     public InvalidResponseException withStatusCode(final Integer statusCode) {
-        this.statusCode = statusCode;
-        return this;
+        return new InvalidResponseException(getMessage(), statusCode, getResponse(), getCause());
     }
 
     /**
@@ -77,10 +153,11 @@ public final class InvalidResponseException extends VaultConnectorException {
      *
      * @param response response text
      * @return self
+     * @deprecated use constructor with response argument instead
      */
+    @Deprecated
     public InvalidResponseException withResponse(final String response) {
-        this.response = response;
-        return this;
+        return new InvalidResponseException(getMessage(), getStatusCode(), response, getCause());
     }
 
     /**
