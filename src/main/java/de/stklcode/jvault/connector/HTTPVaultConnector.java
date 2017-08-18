@@ -732,7 +732,7 @@ public class HTTPVaultConnector implements VaultConnector {
         try {
             entity = new StringEntity(jsonMapper.writeValueAsString(payload));
         } catch (UnsupportedEncodingException | JsonProcessingException e) {
-            e.printStackTrace();
+            throw new InvalidRequestException("Payload serialization failed", e);
         }
         /* Parse parameters */
         put.setEntity(entity);
