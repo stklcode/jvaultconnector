@@ -16,21 +16,19 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.factory.HTTPVaultConnectorFactory;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
-import de.stklcode.jvault.connector.exception.InvalidRequestException;
-import de.stklcode.jvault.connector.exception.PermissionDeniedException;
-import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -59,7 +57,9 @@ public class HTTPVaultConnectorTest {
     private static String APPROLE_ROLE_NAME = "testrole1";                          // role with secret ID
     private static String APPROLE_ROLE = "627b6400-90c3-a239-49a9-af65a448ca10";
     private static String APPROLE_SECRET = "5e8b0e99-d906-27f5-f043-ccb9bb53b5e8";
-    private static String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";   // role with CIDR subnet
+    private static String APPROLE_SECRET_ACCESSOR = "071e2e9d-742a-fc3c-3fd3-1f4004b0420a";
+    private static String APPROLE_ROLE2_NAME = "testrole2";                         // role with CIDR subnet
+    private static String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";
     private static String SECRET_PATH = "userstore";
     private static String SECRET_KEY = "foo";
     private static String SECRET_VALUE = "bar";
@@ -111,6 +111,28 @@ public class HTTPVaultConnectorTest {
     public void tearDown() {
         if (vaultProcess != null && vaultProcess.isAlive())
             vaultProcess.destroy();
+    }
+
+    /**
+     * Test sealing and unsealing Vault.
+     */
+    @Test
+    public void sealTest() {
+        SealResponse sealStatus = connector.sealStatus();
+        assumeFalse(sealStatus.isSealed());
+
+        /* Unauthorized sealing should fail */
+        assertThat("Unauthorized sealing succeeded", connector.seal(), is(false));
+        assertThat("Vault sealed, although sealing failed", sealStatus.isSealed(), is(false));
+
+        /* Root user should be able to seal */
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+        assertThat("Sealing failed", connector.seal(), is(true));
+        sealStatus = connector.sealStatus();
+        assertThat("Vault not sealed", sealStatus.isSealed(), is(true));
+        sealStatus = connector.unseal(KEY);
+        assertThat("Vault not unsealed", sealStatus.isSealed(), is(false));
     }
 
     /**
@@ -191,6 +213,23 @@ public class HTTPVaultConnectorTest {
     @Test
     @SuppressWarnings("deprecation")
     public void authAppIdTest() {
+        /* Try unauthorized access first. */
+        assumeFalse(connector.isAuthorized());
+
+        try {
+            connector.registerAppId("", "", "");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+        try {
+            connector.registerUserId("", "");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        /* Authorize. */
         authRoot();
         assumeTrue(connector.isAuthorized());
 
@@ -285,6 +324,65 @@ public class HTTPVaultConnectorTest {
      */
     @Test
     public void createAppRoleTest() {
+        /* Try unauthorized access first. */
+        assumeFalse(connector.isAuthorized());
+        try {
+            connector.createAppRole(new AppRole());
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.lookupAppRole("");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.deleteAppRole("");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.getAppRoleID("");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.setAppRoleID("", "");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.createAppRoleSecret("", "");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.lookupAppRoleSecret("", "");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.destroyAppRoleSecret("", "");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        /* Authorize. */
         authRoot();
         assumeTrue(connector.isAuthorized());
 
@@ -310,15 +408,16 @@ public class HTTPVaultConnectorTest {
         }
 
         /* Lookup role ID */
+        String roleID = "";
         try {
-            String res = connector.getAppRoleID(roleName);
-            assertThat("Role ID lookup returned empty ID.", res, is(not(emptyString())));
+            roleID = connector.getAppRoleID(roleName);
+            assertThat("Role ID lookup returned empty ID.", roleID, is(not(emptyString())));
         } catch (VaultConnectorException e) {
             fail("Role ID lookup failed.");
         }
 
         /* Set custom role ID */
-        String roleID = "custom-role-id";
+        roleID = "custom-role-id";
         try {
             connector.setAppRoleID(roleName, roleID);
         } catch (VaultConnectorException e) {
@@ -441,6 +540,51 @@ public class HTTPVaultConnectorTest {
             fail("Destroyed AppRole secret successfully read.");
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(InvalidResponseException.class)));
+        }
+    }
+
+    /**
+     * Test listing of AppRole roles and secrets.
+     */
+    @Test
+    public void listAppRoleTest() {
+        /* Try unauthorized access first. */
+        assumeFalse(connector.isAuthorized());
+
+        try {
+            connector.listAppRoles();
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        try {
+            connector.listAppRoleSecretss("");
+            fail("Expected exception not thrown");
+        } catch (Exception e) {
+            assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
+        }
+
+        /* Authorize. */
+        authRoot();
+        assumeTrue(connector.isAuthorized());
+
+        /* Verify pre-existing rules */
+        try {
+            List<String> res = connector.listAppRoles();
+            assertThat("Unexpected number of AppRoles", res, hasSize(2));
+            assertThat("Pre-configured roles not listed", res, containsInAnyOrder(APPROLE_ROLE_NAME, APPROLE_ROLE2_NAME));
+        } catch (VaultConnectorException e) {
+            fail("Role listing failed.");
+        }
+
+        /* Check secret IDs */
+        try {
+            List<String> res = connector.listAppRoleSecretss(APPROLE_ROLE_NAME);
+            assertThat("Unexpected number of AppRole secrets", res, hasSize(1));
+            assertThat("Pre-configured AppRole secret not listed", res, contains(APPROLE_SECRET_ACCESSOR));
+        } catch (VaultConnectorException e) {
+            fail("AppRole secret listing failed.");
         }
     }
 
@@ -735,6 +879,27 @@ public class HTTPVaultConnectorTest {
             assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
         } catch (VaultConnectorException ignored) {
             fail("Login failed with valid token");
+        }
+    }
+
+    /**
+     * Test closing the connector.
+     */
+    @Test
+    public void closeTest() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        try {
+            connector.close();
+            assertThat("Not unauthorized after close().", connector.isAuthorized(), is(false));
+
+            /* Verify that (private) token has indeed been removed */
+            Field tokenField = HTTPVaultConnector.class.getDeclaredField("token");
+            tokenField.setAccessible(true);
+            assertThat("Token not removed after close().", tokenField.get(connector), is(nullValue()));
+        } catch (Exception e) {
+            fail("Closing the connector failed: " + e.getMessage());
         }
     }
 
