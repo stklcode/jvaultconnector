@@ -60,6 +60,8 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH_APPROLE = "auth/approle/";
     private static final String PATH_REVOKE = "sys/revoke/";
 
+    private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";
+
     private final ObjectMapper jsonMapper;
 
     private final String baseURL;           /* Base URL of Vault */
@@ -709,7 +711,7 @@ public class HTTPVaultConnector implements VaultConnector {
         post.setEntity(input);
         /* Set X-Vault-Token header */
         if (token != null)
-            post.addHeader("X-Vault-Token", token);
+            post.addHeader(HEADER_VAULT_TOKEN, token);
 
         return request(post, retries);
     }
@@ -736,7 +738,7 @@ public class HTTPVaultConnector implements VaultConnector {
         put.setEntity(entity);
         /* Set X-Vault-Token header */
         if (token != null)
-            put.addHeader("X-Vault-Token", token);
+            put.addHeader(HEADER_VAULT_TOKEN, token);
 
         return request(put, retries);
     }
@@ -753,7 +755,7 @@ public class HTTPVaultConnector implements VaultConnector {
         HttpDelete delete = new HttpDelete(baseURL + path);
         /* Set X-Vault-Token header */
         if (token != null)
-            delete.addHeader("X-Vault-Token", token);
+            delete.addHeader(HEADER_VAULT_TOKEN, token);
 
         return request(delete, retries);
     }
@@ -778,7 +780,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Set X-Vault-Token header */
         if (token != null)
-            get.addHeader("X-Vault-Token", token);
+            get.addHeader(HEADER_VAULT_TOKEN, token);
 
         return request(get, retries);
     }
@@ -812,6 +814,7 @@ public class HTTPVaultConnector implements VaultConnector {
                             new InputStreamReader(response.getEntity().getContent()))) {
                         return br.lines().collect(Collectors.joining("\n"));
                     } catch (IOException ignored) {
+                        throw new InvalidResponseException("Could not parse response body").withStatusCode(200);
                     }
                 case 204:
                     return "";
@@ -832,10 +835,11 @@ public class HTTPVaultConnector implements VaultConnector {
                                 String responseString = br.lines().collect(Collectors.joining("\n"));
                                 ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
                                 /* Check for "permission denied" response */
-                                if (er.getErrors().size() > 0 && er.getErrors().get(0).equals("permission denied"))
+                                if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
                                     throw new PermissionDeniedException();
                                 throw ex.withResponse(er.toString());
                             } catch (IOException ignored) {
+                                // Exception ignored.
                             }
                         }
                         throw ex;
@@ -848,6 +852,7 @@ public class HTTPVaultConnector implements VaultConnector {
                 try {
                     EntityUtils.consume(response.getEntity());
                 } catch (IOException ignored) {
+                    // Exception ignored.
                 }
         }
     }
