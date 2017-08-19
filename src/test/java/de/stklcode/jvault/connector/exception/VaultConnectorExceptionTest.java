@@ -27,6 +27,7 @@ import static org.junit.Assert.assertThat;
  * Common JUnit test for Exceptions extending {@link VaultConnectorException}.
  *
  * @author Stefan Kalscheuer
+ * @since 0.6.2
  */
 public class VaultConnectorExceptionTest {
     private static final String MSG = "This is a test exception!";
