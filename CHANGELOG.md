@@ -1,9 +1,9 @@
-## 0.6.2 [work in progress]
+## 0.6.2 [2017-08-19]
 * [fix] Prevent potential NPE on SecretResponse getter
-* [fix] Fields of InvalidResposneException made final
-* [fix] Fix typo in method name `listAppRoleSecrets()` (#14)
 * [fix] Removed stack traces on PUT request and response deserialization (#13)
-* [text] Tested against Vault 0.8.1, increased coverage
+* [improvement] Fields of InvalidResposneException made final
+* [deprecation] `listAppRoleSecretss()` in favor of `listAppRoleSecrets()` (#14)
+* [test] Tested against Vault 0.8.1, increased coverage
 
 ## 0.6.1 [2017-08-02]
 * [fix] `TokenModel.getPassword()` returned username instead of password
