@@ -27,6 +27,7 @@ public enum AuthBackend {
     APPID("app-id"),
     APPROLE("approle"),
     USERPASS("userpass"),
+    GITHUB("github"),   // Not supported yet.
     UNKNOWN("");
 
     private final String type;

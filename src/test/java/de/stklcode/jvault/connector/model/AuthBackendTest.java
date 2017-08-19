@@ -37,6 +37,7 @@ public class AuthBackendTest {
         assertThat(AuthBackend.forType("token"), is(AuthBackend.TOKEN));
         assertThat(AuthBackend.forType("app-id"), is(AuthBackend.APPID));
         assertThat(AuthBackend.forType("userpass"), is(AuthBackend.USERPASS));
+        assertThat(AuthBackend.forType("github"), is(AuthBackend.GITHUB));
         assertThat(AuthBackend.forType(""), is(AuthBackend.UNKNOWN));
         assertThat(AuthBackend.forType("foobar"), is(AuthBackend.UNKNOWN));
     }

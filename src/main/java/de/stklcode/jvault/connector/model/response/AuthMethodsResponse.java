@@ -45,11 +45,10 @@ public final class AuthMethodsResponse extends VaultDataResponse {
     @Override
     public void setData(final Map<String, Object> data) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
-        for (String path : data.keySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
             try {
-                this.supportedMethods.put(
-                        path, mapper.readValue(mapper.writeValueAsString(data.get(path)),
-                        AuthMethod.class));
+                this.supportedMethods.put(entry.getKey(),
+                        mapper.readValue(mapper.writeValueAsString(entry.getValue()), AuthMethod.class));
             } catch (IOException e) {
                 throw new InvalidResponseException();
             }
