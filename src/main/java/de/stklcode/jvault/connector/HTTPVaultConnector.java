@@ -211,32 +211,25 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final SealResponse sealStatus() {
+    public final SealResponse sealStatus() throws VaultConnectorException {
         try {
             String response = requestGet(PATH_SEAL_STATUS, new HashMap<>());
             return jsonMapper.readValue(response, SealResponse.class);
-        } catch (VaultConnectorException | IOException e) {
-            e.printStackTrace();
-            return null;
+        } catch (IOException e) {
+            throw new InvalidRequestException("Unable to parse response", e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            return null;
+            throw new InvalidRequestException("Invalid URI format");
         }
     }
 
     @Override
-    public final boolean seal() {
-        try {
-            requestPut(PATH_SEAL, new HashMap<>());
-            return true;
-        } catch (VaultConnectorException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public final void seal() throws VaultConnectorException {
+        requestPut(PATH_SEAL, new HashMap<>());
     }
 
     @Override
-    public final SealResponse unseal(final String key, final Boolean reset) {
+    public final SealResponse unseal(final String key, final Boolean reset) throws VaultConnectorException {
         Map<String, String> param = new HashMap<>();
         param.put("key", key);
         if (reset != null)
@@ -244,9 +237,8 @@ public class HTTPVaultConnector implements VaultConnector {
         try {
             String response = requestPut(PATH_UNSEAL, param);
             return jsonMapper.readValue(response, SealResponse.class);
-        } catch (VaultConnectorException | IOException e) {
-            e.printStackTrace();
-            return null;
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
         }
     }
 

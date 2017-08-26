@@ -118,22 +118,30 @@ public class HTTPVaultConnectorTest {
      * Test sealing and unsealing Vault.
      */
     @Test
-    public void sealTest() {
+    public void sealTest() throws VaultConnectorException {
         SealResponse sealStatus = connector.sealStatus();
         assumeFalse(sealStatus.isSealed());
 
         /* Unauthorized sealing should fail */
-        assertThat("Unauthorized sealing succeeded", connector.seal(), is(false));
-        assertThat("Vault sealed, although sealing failed", sealStatus.isSealed(), is(false));
+        try {
+            connector.seal();
+            fail("Unauthorized sealing succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Vault sealed, although sealing failed", sealStatus.isSealed(), is(false));
+        }
 
         /* Root user should be able to seal */
         authRoot();
         assumeTrue(connector.isAuthorized());
-        assertThat("Sealing failed", connector.seal(), is(true));
-        sealStatus = connector.sealStatus();
-        assertThat("Vault not sealed", sealStatus.isSealed(), is(true));
-        sealStatus = connector.unseal(KEY);
-        assertThat("Vault not unsealed", sealStatus.isSealed(), is(false));
+        try {
+            connector.seal();
+            sealStatus = connector.sealStatus();
+            assertThat("Vault not sealed", sealStatus.isSealed(), is(true));
+            sealStatus = connector.unseal(KEY);
+            assertThat("Vault not unsealed", sealStatus.isSealed(), is(false));
+        } catch (VaultConnectorException e) {
+            fail("Sealing failed");
+        }
     }
 
     /**
@@ -155,9 +163,13 @@ public class HTTPVaultConnectorTest {
 
         // No seal vault and verify correct status.
         authRoot();
-        connector.seal();
-        assumeTrue(connector.sealStatus().isSealed());
-        connector.resetAuth();  // SHould work unauthenticated
+        try {
+            connector.seal();
+            assumeTrue(connector.sealStatus().isSealed());
+            connector.resetAuth();  // SHould work unauthenticated
+        } catch (VaultConnectorException e) {
+            fail("Unexpected exception on sealing: " + e.getMessage());
+        }
         try {
             res = connector.getHealth();
         } catch (VaultConnectorException e) {

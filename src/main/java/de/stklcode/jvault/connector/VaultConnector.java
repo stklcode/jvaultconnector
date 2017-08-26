@@ -42,32 +42,35 @@ public interface VaultConnector extends AutoCloseable {
      * Retrieve status of vault seal.
      *
      * @return Seal status
+     * @throws VaultConnectorException on error
      */
-    SealResponse sealStatus();
+    SealResponse sealStatus() throws VaultConnectorException;
 
     /**
      * Seal vault.
      *
-     * @return TRUE on success
+     * @throws VaultConnectorException on error
      */
-    boolean seal();
+    void seal() throws VaultConnectorException;
 
     /**
      * Unseal vault.
      *
      * @param key   A single master share key
      * @param reset Discard previously provided keys (optional)
-     * @return TRUE on success
+     * @return Response with seal status
+     * @throws VaultConnectorException on error
      */
-    SealResponse unseal(final String key, final Boolean reset);
+    SealResponse unseal(final String key, final Boolean reset) throws VaultConnectorException;
 
     /**
      * Unseal vault.
      *
      * @param key A single master share key
-     * @return TRUE on success
+     * @return Response with seal status
+     * @throws VaultConnectorException on error
      */
-    default SealResponse unseal(final String key) {
+    default SealResponse unseal(final String key) throws VaultConnectorException {
         return unseal(key, null);
     }
 
