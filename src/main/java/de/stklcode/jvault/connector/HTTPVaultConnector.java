@@ -216,10 +216,10 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestGet(PATH_SEAL_STATUS, new HashMap<>());
             return jsonMapper.readValue(response, SealResponse.class);
         } catch (IOException e) {
-            throw new InvalidRequestException("Unable to parse response", e);
+            throw new InvalidRequestException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -238,7 +238,7 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestPut(PATH_UNSEAL, param);
             return jsonMapper.readValue(response, SealResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
 
@@ -254,10 +254,10 @@ public class HTTPVaultConnector implements VaultConnector {
             /* Parse response */
             return jsonMapper.readValue(response, HealthResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException e) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -274,10 +274,10 @@ public class HTTPVaultConnector implements VaultConnector {
             AuthMethodsResponse amr = jsonMapper.readValue(response, AuthMethodsResponse.class);
             return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -292,7 +292,7 @@ public class HTTPVaultConnector implements VaultConnector {
             authorized = true;
             return res;
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
 
@@ -343,7 +343,7 @@ public class HTTPVaultConnector implements VaultConnector {
             this.authorized = true;
             return auth;
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
 
@@ -360,7 +360,7 @@ public class HTTPVaultConnector implements VaultConnector {
         String response = requestPost(PATH_AUTH_APPID + "map/app-id/" + appID, payload);
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         return true;
     }
 
@@ -375,7 +375,7 @@ public class HTTPVaultConnector implements VaultConnector {
         String response = requestPost(PATH_AUTH_APPID + "map/user-id/" + userID, payload);
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         return true;
     }
 
@@ -387,7 +387,7 @@ public class HTTPVaultConnector implements VaultConnector {
         String response = requestPost(PATH_AUTH_APPROLE + "role/" + role.getName(), role);
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
 
         /* Set custom ID if provided */
         return !(role.getId() != null && !role.getId().isEmpty()) || setAppRoleID(role.getName(), role.getId());
@@ -402,10 +402,10 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName, new HashMap<>());
             return jsonMapper.readValue(response, AppRoleResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -419,7 +419,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
 
         return true;
     }
@@ -433,10 +433,10 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName + "/role-id", new HashMap<>());
             return jsonMapper.readValue(response, RawDataResponse.class).getData().get("role_id").toString();
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -450,7 +450,7 @@ public class HTTPVaultConnector implements VaultConnector {
         String response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/role-id", payload);
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         return true;
     }
 
@@ -470,7 +470,7 @@ public class HTTPVaultConnector implements VaultConnector {
             /* Extract the secret ID from response */
             return jsonMapper.readValue(response, AppRoleSecretResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response.");
+            throw new InvalidResponseException(Error.PARSE_RESPONSE);
         }
     }
 
@@ -486,7 +486,7 @@ public class HTTPVaultConnector implements VaultConnector {
                     new AppRoleSecret(secretID));
             return jsonMapper.readValue(response, AppRoleSecretResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
 
@@ -503,7 +503,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where non was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
 
         return true;
     }
@@ -518,10 +518,10 @@ public class HTTPVaultConnector implements VaultConnector {
             SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
             return secrets.getKeys();
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -537,10 +537,10 @@ public class HTTPVaultConnector implements VaultConnector {
             SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
             return secrets.getKeys();
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -553,10 +553,10 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestGet(key, new HashMap<>());
             return jsonMapper.readValue(response, SecretResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -570,10 +570,10 @@ public class HTTPVaultConnector implements VaultConnector {
             SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
             return secrets.getKeys();
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
     }
 
@@ -586,7 +586,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new InvalidRequestException("Secret path must not be empty.");
 
         if (!requestPost(key, data).equals(""))
-            throw new InvalidResponseException("Received response where none was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
     }
 
     @Override
@@ -599,7 +599,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where none was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
     }
 
     @Override
@@ -612,7 +612,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
-            throw new InvalidResponseException("Received response where none was expected.");
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
     }
 
     @Override
@@ -630,7 +630,7 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestPut(PATH_RENEW, payload);
             return jsonMapper.readValue(response, SecretResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
 
@@ -678,7 +678,7 @@ public class HTTPVaultConnector implements VaultConnector {
         try {
             return jsonMapper.readValue(response, AuthResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
 
@@ -691,10 +691,10 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestGet(PATH_TOKEN + "/lookup/" + token, new HashMap<>());
             return jsonMapper.readValue(response, TokenResponse.class);
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to parse response", e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException("Invalid URI format.");
+            throw new InvalidRequestException(Error.URI_FORMAT);
         }
 
     }
@@ -716,7 +716,7 @@ public class HTTPVaultConnector implements VaultConnector {
         try {
             input = new StringEntity(jsonMapper.writeValueAsString(payload), StandardCharsets.UTF_8);
         } catch (JsonProcessingException e) {
-            throw new InvalidRequestException("Unable to parse response", e);
+            throw new InvalidRequestException(Error.PARSE_RESPONSE, e);
         }
         input.setContentEncoding("UTF-8");
         input.setContentType("application/json");
@@ -826,7 +826,7 @@ public class HTTPVaultConnector implements VaultConnector {
                             new InputStreamReader(response.getEntity().getContent()))) {
                         return br.lines().collect(Collectors.joining("\n"));
                     } catch (IOException ignored) {
-                        throw new InvalidResponseException("Could not parse response body", 200);
+                        throw new InvalidResponseException(Error.PARSE_RESPONSE, 200);
                     }
                 case 204:
                     return "";
@@ -847,13 +847,13 @@ public class HTTPVaultConnector implements VaultConnector {
                                 /* Check for "permission denied" response */
                                 if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
                                     throw new PermissionDeniedException();
-                                throw new InvalidResponseException("Invalid response code",
+                                throw new InvalidResponseException(Error.RESPONSE_CODE,
                                         response.getStatusLine().getStatusCode(), er.toString());
                             } catch (IOException ignored) {
                                 // Exception ignored.
                             }
                         }
-                        throw new InvalidResponseException("Invalid response code",
+                        throw new InvalidResponseException(Error.RESPONSE_CODE,
                                 response.getStatusLine().getStatusCode());
                     }
             }
@@ -866,6 +866,22 @@ public class HTTPVaultConnector implements VaultConnector {
                 } catch (IOException ignored) {
                     // Exception ignored.
                 }
+        }
+    }
+
+    /**
+     * Inner class to bundle common error messages.
+     */
+    private static final class Error {
+        private static final String PARSE_RESPONSE = "Unable to parse response";
+        private static final String UNEXPECTED_RESPONSE = "Received response where none was expected";
+        private static final String URI_FORMAT = "Invalid URI format";
+        private static final String RESPONSE_CODE = "Invalid response code";
+
+        /**
+         * Constructor hidden, this class should not be instantiated.
+         */
+        private Error() {
         }
     }
 }
