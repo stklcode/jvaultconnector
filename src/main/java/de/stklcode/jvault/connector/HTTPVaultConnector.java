@@ -58,6 +58,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH_USERPASS = "auth/userpass/login/";
     private static final String PATH_AUTH_APPID = "auth/app-id/";
     private static final String PATH_AUTH_APPROLE = "auth/approle/";
+    private static final String PATH_AUTH_APPROLE_ROLE = "auth/approle/role/%s%s";
     private static final String PATH_REVOKE = "sys/revoke/";
     private static final String PATH_HEALTH = "sys/health";
 
@@ -384,7 +385,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
         /* Get response */
-        String response = requestPost(PATH_AUTH_APPROLE + "role/" + role.getName(), role);
+        String response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, role.getName(), ""), role);
         /* Response should be code 204 without content */
         if (!response.equals(""))
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
@@ -399,7 +400,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
         try {
-            String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName, new HashMap<>());
+            String response = requestGet(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), new HashMap<>());
             return jsonMapper.readValue(response, AppRoleResponse.class);
         } catch (IOException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
@@ -415,7 +416,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new AuthorizationRequiredException();
 
         /* Request HTTP response and expect empty result */
-        String response = requestDelete(PATH_AUTH_APPROLE + "role/" + roleName);
+        String response = requestDelete(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""));
 
         /* Response should be code 204 without content */
         if (!response.equals(""))
@@ -430,7 +431,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new AuthorizationRequiredException();
         /* Request HTTP response and parse Secret */
         try {
-            String response = requestGet(PATH_AUTH_APPROLE + "role/" + roleName + "/role-id", new HashMap<>());
+            String response = requestGet(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), new HashMap<>());
             return jsonMapper.readValue(response, RawDataResponse.class).getData().get("role_id").toString();
         } catch (IOException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
@@ -447,7 +448,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Request HTTP response and parse Secret */
         Map<String, String> payload = new HashMap<>();
         payload.put("role_id", roleID);
-        String response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/role-id", payload);
+        String response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), payload);
         /* Response should be code 204 without content */
         if (!response.equals(""))
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
@@ -462,9 +463,9 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Get response */
         String response;
         if (secret.getId() != null && !secret.getId().isEmpty())
-            response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/custom-secret-id", secret);
+            response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/custom-secret-id"), secret);
         else
-            response = requestPost(PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id", secret);
+            response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id"), secret);
 
         try {
             /* Extract the secret ID from response */
@@ -482,7 +483,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Request HTTP response and parse Secret */
         try {
             String response = requestPost(
-                    PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/lookup",
+                    String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id/lookup"),
                     new AppRoleSecret(secretID));
             return jsonMapper.readValue(response, AppRoleSecretResponse.class);
         } catch (IOException e) {
@@ -498,7 +499,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Request HTTP response and expect empty result */
         String response = requestPost(
-                PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id/destroy",
+                String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id/destroy"),
                 new AppRoleSecret(secretID));
 
         /* Response should be code 204 without content */
@@ -532,7 +533,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         try {
             String response = requestGet(
-                    PATH_AUTH_APPROLE + "role/" + roleName + "/secret-id?list=true",
+                    String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id?list=true"),
                     new HashMap<>());
             SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
             return secrets.getKeys();
