@@ -59,6 +59,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH_APPID = "auth/app-id/";
     private static final String PATH_AUTH_APPROLE = "auth/approle/";
     private static final String PATH_REVOKE = "sys/revoke/";
+    private static final String PATH_HEALTH = "sys/health";
 
     private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";
 
@@ -246,6 +247,25 @@ public class HTTPVaultConnector implements VaultConnector {
         } catch (VaultConnectorException | IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public HealthResponse getHealth() throws VaultConnectorException {
+        /* Force status code to be 200, so we don't need to modify the request sequence. */
+        Map<String, String> param = new HashMap<>();
+        param.put("standbycode", "200");    // Default: 429.
+        param.put("sealedcode", "200");     // Default: 503.
+        param.put("uninitcode", "200");     // Default: 501.
+        try {
+            String response = requestGet(PATH_HEALTH, param);
+            /* Parse response */
+            return jsonMapper.readValue(response, HealthResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException("Unable to parse response", e);
+        } catch (URISyntaxException e) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException("Invalid URI format");
         }
     }
 

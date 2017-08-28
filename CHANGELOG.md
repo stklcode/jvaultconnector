@@ -1,3 +1,6 @@
+## 0.7.0 [work in progress]
+* [feature] Retrieval of health status via `getHealth()`
+
 ## 0.6.2 [2017-08-19]
 * [fix] Prevent potential NPE on SecretResponse getter
 * [fix] Removed stack traces on PUT request and response deserialization (#13)

@@ -48,6 +48,7 @@ import static org.junit.Assume.*;
  * @since 0.1
  */
 public class HTTPVaultConnectorTest {
+    private static String VAULT_VERISON = "0.8.1";  // the vault version this test is supposed to run against
     private static String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
     private static String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
     private static String USER_VALID = "validUser";
@@ -133,6 +134,36 @@ public class HTTPVaultConnectorTest {
         assertThat("Vault not sealed", sealStatus.isSealed(), is(true));
         sealStatus = connector.unseal(KEY);
         assertThat("Vault not unsealed", sealStatus.isSealed(), is(false));
+    }
+
+    /**
+     * Test health status
+     */
+    @Test
+    public void healthTest() {
+        HealthResponse res = null;
+        try {
+            res = connector.getHealth();
+        } catch (VaultConnectorException e) {
+            fail("Retrieving health status failed: " + e.getMessage());
+        }
+        assertThat("Health response should be set", res, is(notNullValue()));
+        assertThat("Unexpected version", res.getVersion(), is(VAULT_VERISON));
+        assertThat("Unexpected init status", res.isInitialized(), is(true));
+        assertThat("Unexpected seal status", res.isSealed(), is(false));
+        assertThat("Unexpected standby status", res.isStandby(), is(false));
+
+        // No seal vault and verify correct status.
+        authRoot();
+        connector.seal();
+        assumeTrue(connector.sealStatus().isSealed());
+        connector.resetAuth();  // SHould work unauthenticated
+        try {
+            res = connector.getHealth();
+        } catch (VaultConnectorException e) {
+            fail("Retrieving health status failed when sealed: " + e.getMessage());
+        }
+        assertThat("Unexpected seal status", res.isSealed(), is(true));
     }
 
     /**

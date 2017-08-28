@@ -72,6 +72,15 @@ public interface VaultConnector extends AutoCloseable {
     }
 
     /**
+     * Query server health information.
+     *
+     * @return Health information.
+     * @throws VaultConnectorException on error
+     * @since 0.7.0
+     */
+    HealthResponse getHealth() throws VaultConnectorException;
+
+    /**
      * Get all availale authentication backends.
      *
      * @return List of backends
