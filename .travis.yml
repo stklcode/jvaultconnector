@@ -23,3 +23,6 @@ cache:
     - '$HOME/.sonar/cache'
 script:
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+notifications:
+  slack:
+    secure: "YyE5GePOLkCVTtCy8j507BRmQrtrWhtvmUt4kY0Z2/ptf0LzfuDEJQ4ZbCxO5ri5IDJrrvyPAedjft818+bMzdFfxvi1oviIL+LZNhyev8gfeIBF/U2pvSLGKCRX4g4aZ6NKN3Untjdm8lmiVTltOyZ59JizQVwXzAl3LiOpnJugyBqbhOx4EIqBzwW3gaYAofMqY2LczW5W/M+99HJCst8Mb8H06GstCPEHCizAq7VRaUS68PstlxQMV0Q6bsSYMLFbLWmhuXs96WHqOrT+nNsl07ikr3N8c4HafhFutt2Jyc1+8gXO417+eSvVM0iBpHGwTmfGFfCqx/4Pf62DTJuvh8dR4fLgLDiqEeDrBEcRRDOs9cvXVOO22NN1HuBBJY8VRiFcwNAvuVMXCtnC+1RJRAZB2zubsANiFe+ygk/ywj37cVXY+NpqlBwcSph6jPHo2hD6cIl2rTWn1EnZH519Rh38xTSv6MRzAO9kWNVrAlX+UtvYS8Sk7Owrc0tET9Lc4zj6aI5tsA1wYbN3Jk6EbMhsF6K/XF2npt2qg09pxkj8wmxoUoR6/rGuSv55aSxTdLDmH+en4ahEm3uc4h1lYoVCk0yrZoTAas3zS4WpBCKnl+mweuKNxaejyy0Wv6NR9ZCTaS3yFgibNOjvDpxZxTAPdNBL7hn+k4LwgN4="
