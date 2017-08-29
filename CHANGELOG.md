@@ -1,6 +1,7 @@
 ## 0.7.0 [work in progress]
 * [feature] Retrieval of health status via `getHealth()` (#15)
 * [improvement] `seal()`, `unseal()` are now `void` and throw Exception on error (#12)
+* [deletion] Removed deprecated `listAppRoleSecretss()` (use `listAppRoleSecrets()`) (#14)
 
 ## 0.6.2 [2017-08-19]
 * [fix] Prevent potential NPE on SecretResponse getter
