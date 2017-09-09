@@ -48,24 +48,24 @@ import static org.junit.Assume.*;
  * @since 0.1
  */
 public class HTTPVaultConnectorTest {
-    private static String VAULT_VERISON = "0.8.2";  // the vault version this test is supposed to run against
-    private static String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
-    private static String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
-    private static String USER_VALID = "validUser";
-    private static String PASS_VALID = "validPass";
-    private static String APP_ID = "152AEA38-85FB-47A8-9CBD-612D645BFACA";
-    private static String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
-    private static String APPROLE_ROLE_NAME = "testrole1";                          // role with secret ID
-    private static String APPROLE_ROLE = "627b6400-90c3-a239-49a9-af65a448ca10";
-    private static String APPROLE_SECRET = "5e8b0e99-d906-27f5-f043-ccb9bb53b5e8";
-    private static String APPROLE_SECRET_ACCESSOR = "071e2e9d-742a-fc3c-3fd3-1f4004b0420a";
-    private static String APPROLE_ROLE2_NAME = "testrole2";                         // role with CIDR subnet
-    private static String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";
-    private static String SECRET_PATH = "userstore";
-    private static String SECRET_KEY = "foo";
-    private static String SECRET_VALUE = "bar";
-    private static String SECRET_KEY_JSON = "json";
-    private static String SECRET_KEY_COMPLEX = "complex";
+    private static final String VAULT_VERISON = "0.8.2";  // the vault version this test is supposed to run against
+    private static final String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
+    private static final String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
+    private static final String USER_VALID = "validUser";
+    private static final String PASS_VALID = "validPass";
+    private static final String APP_ID = "152AEA38-85FB-47A8-9CBD-612D645BFACA";
+    private static final String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
+    private static final String APPROLE_ROLE_NAME = "testrole1";                          // role with secret ID
+    private static final String APPROLE_ROLE = "627b6400-90c3-a239-49a9-af65a448ca10";
+    private static final String APPROLE_SECRET = "5e8b0e99-d906-27f5-f043-ccb9bb53b5e8";
+    private static final String APPROLE_SECRET_ACCESSOR = "071e2e9d-742a-fc3c-3fd3-1f4004b0420a";
+    private static final String APPROLE_ROLE2_NAME = "testrole2";                         // role with CIDR subnet
+    private static final String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";
+    private static final String SECRET_PATH = "userstore";
+    private static final String SECRET_KEY = "foo";
+    private static final String SECRET_VALUE = "bar";
+    private static final String SECRET_KEY_JSON = "json";
+    private static final String SECRET_KEY_COMPLEX = "complex";
 
     private Process vaultProcess;
     private VaultConnector connector;
