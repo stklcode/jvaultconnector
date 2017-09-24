@@ -49,7 +49,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_SEAL_STATUS = "sys/seal-status";
     private static final String PATH_SEAL = "sys/seal";
     private static final String PATH_UNSEAL = "sys/unseal";
-    private static final String PATH_RENEW = "sys/renew";
+    private static final String PATH_RENEW = "sys/leases/renew";
     private static final String PATH_AUTH = "sys/auth";
     private static final String PATH_TOKEN = "auth/token";
     private static final String PATH_LOOKUP = "/lookup";
@@ -59,7 +59,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH_APPID = "auth/app-id/";
     private static final String PATH_AUTH_APPROLE = "auth/approle/";
     private static final String PATH_AUTH_APPROLE_ROLE = "auth/approle/role/%s%s";
-    private static final String PATH_REVOKE = "sys/revoke/";
+    private static final String PATH_REVOKE = "sys/leases/revoke/";
     private static final String PATH_HEALTH = "sys/health";
 
     private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";

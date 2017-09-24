@@ -1,6 +1,7 @@
 ## 0.7.0 [work in progress]
 * [feature] Retrieval of health status via `getHealth()` (#15)
 * [improvement] `seal()`, `unseal()` are now `void` and throw Exception on error (#12)
+* [compatibility] Adaptation to Vault 0.8 endpoints for `renew` and `revoke`, **breaking** 0.7 compatibility (#11)
 * [deletion] Removed deprecated `listAppRoleSecretss()` (use `listAppRoleSecrets()`) (#14)
 * [test] Tested against Vault 0.8.3
 
