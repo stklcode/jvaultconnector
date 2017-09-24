@@ -859,7 +859,7 @@ public class HTTPVaultConnector implements VaultConnector {
                     }
             }
         } catch (IOException e) {
-            throw new InvalidResponseException("Unable to read response", e);
+            throw new InvalidResponseException(Error.READ_RESPONSE, e);
         } finally {
             if (response != null && response.getEntity() != null)
                 try {
@@ -874,6 +874,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * Inner class to bundle common error messages.
      */
     private static final class Error {
+        private static final String READ_RESPONSE = "Unable to read response";
         private static final String PARSE_RESPONSE = "Unable to parse response";
         private static final String UNEXPECTED_RESPONSE = "Received response where none was expected";
         private static final String URI_FORMAT = "Invalid URI format";
