@@ -217,7 +217,7 @@ public class HTTPVaultConnector implements VaultConnector {
             String response = requestGet(PATH_SEAL_STATUS, new HashMap<>());
             return jsonMapper.readValue(response, SealResponse.class);
         } catch (IOException e) {
-            throw new InvalidRequestException(Error.PARSE_RESPONSE, e);
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         } catch (URISyntaxException ignored) {
             /* this should never occur and may leak sensible information */
             throw new InvalidRequestException(Error.URI_FORMAT);
@@ -849,7 +849,7 @@ public class HTTPVaultConnector implements VaultConnector {
                                 if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
                                     throw new PermissionDeniedException();
                                 throw new InvalidResponseException(Error.RESPONSE_CODE,
-                                        response.getStatusLine().getStatusCode(), er.toString());
+                                        response.getStatusLine().getStatusCode(), er.getErrors().get(0));
                             } catch (IOException ignored) {
                                 // Exception ignored.
                             }
