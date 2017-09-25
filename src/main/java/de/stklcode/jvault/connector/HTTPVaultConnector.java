@@ -849,7 +849,7 @@ public class HTTPVaultConnector implements VaultConnector {
                                 if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
                                     throw new PermissionDeniedException();
                                 throw new InvalidResponseException(Error.RESPONSE_CODE,
-                                        response.getStatusLine().getStatusCode(), er.getErrors().get(0));
+                                        response.getStatusLine().getStatusCode(), er.toString());
                             } catch (IOException ignored) {
                                 // Exception ignored.
                             }

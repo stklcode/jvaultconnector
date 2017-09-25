@@ -38,4 +38,13 @@ public final class ErrorResponse implements VaultResponse {
     public List<String> getErrors() {
         return errors;
     }
+
+    @Override
+    public String toString() {
+        if (errors == null || errors.isEmpty()) {
+            return "error response";
+        } else {
+            return errors.get(0);
+        }
+    }
 }
