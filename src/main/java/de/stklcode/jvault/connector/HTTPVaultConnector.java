@@ -360,7 +360,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Get response */
         String response = requestPost(PATH_AUTH_APPID + "map/app-id/" + appID, payload);
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         return true;
     }
@@ -375,7 +375,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Get response */
         String response = requestPost(PATH_AUTH_APPID + "map/user-id/" + userID, payload);
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         return true;
     }
@@ -387,7 +387,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Get response */
         String response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, role.getName(), ""), role);
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
 
         /* Set custom ID if provided */
@@ -419,7 +419,7 @@ public class HTTPVaultConnector implements VaultConnector {
         String response = requestDelete(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""));
 
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
 
         return true;
@@ -450,7 +450,7 @@ public class HTTPVaultConnector implements VaultConnector {
         payload.put("role_id", roleID);
         String response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), payload);
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         return true;
     }
@@ -503,7 +503,7 @@ public class HTTPVaultConnector implements VaultConnector {
                 new AppRoleSecret(secretID));
 
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
 
         return true;
@@ -586,7 +586,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (key == null || key.isEmpty())
             throw new InvalidRequestException("Secret path must not be empty.");
 
-        if (!requestPost(key, data).equals(""))
+        if (!requestPost(key, data).isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
     }
 
@@ -599,7 +599,7 @@ public class HTTPVaultConnector implements VaultConnector {
         String response = requestDelete(key);
 
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
     }
 
@@ -612,7 +612,7 @@ public class HTTPVaultConnector implements VaultConnector {
         String response = requestPut(PATH_REVOKE + leaseID, new HashMap<>());
 
         /* Response should be code 204 without content */
-        if (!response.equals(""))
+        if (!response.isEmpty())
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
     }
 

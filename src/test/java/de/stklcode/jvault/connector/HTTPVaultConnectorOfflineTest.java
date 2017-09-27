@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
+import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ContentType;
@@ -37,6 +38,7 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -242,6 +244,83 @@ public class HTTPVaultConnectorOfflineTest {
         }
     }
 
+    /**
+     * Test requests that expect an empty response with code 204, but receive a 200 body.
+     */
+    @Test
+    public void nonEmpty204ResponseTest() throws IOException {
+        HTTPVaultConnector connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        // Mock authorization.
+        setPrivate(connector, "authorized", true);
+        // Mock response.
+        initHttpMock();
+        mockResponse(200, "{}", ContentType.APPLICATION_JSON);
+
+        // Now test the methods expecting a 204.
+        try {
+            connector.registerAppId("appID", "policy", "displayName");
+            fail("registerAppId() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.registerUserId("appID", "userID");
+            fail("registerUserId() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.createAppRole("appID", Collections.singletonList("policy"));
+            fail("createAppRole() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.deleteAppRole("roleName");
+            fail("deleteAppRole() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.setAppRoleID("roleName", "roleID");
+            fail("setAppRoleID() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.destroyAppRoleSecret("roleName", "secretID");
+            fail("destroyAppRoleSecret() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.destroyAppRoleSecret("roleName", "secretUD");
+            fail("destroyAppRoleSecret() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.delete("key");
+            fail("delete() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+
+        try {
+            connector.revoke("leaseID");
+            fail("destroyAppRoleSecret() with 200 response succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
+        }
+    }
+
     private Object getPrivate(Object target, String fieldName) {
         try {
             Field field = target.getClass().getDeclaredField(fieldName);
@@ -253,6 +332,18 @@ public class HTTPVaultConnectorOfflineTest {
             return value;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             return null;
+        }
+    }
+
+    private void setPrivate(Object target, String fieldName, Object value) {
+        try {
+            Field field = target.getClass().getDeclaredField(fieldName);
+            boolean accessible =field.isAccessible();
+            field.setAccessible(true);
+            field.set(target, value);
+            field.setAccessible(accessible);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Should not occur, to be taken care of in test code.
         }
     }
 
