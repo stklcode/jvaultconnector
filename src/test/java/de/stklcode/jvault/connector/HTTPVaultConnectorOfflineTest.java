@@ -195,16 +195,6 @@ public class HTTPVaultConnectorOfflineTest {
             assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
             assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
         }
-
-        // Simulate un-mappable response.
-        mockResponse(200, "", ContentType.APPLICATION_JSON);
-        try {
-            connector.sealStatus();
-            fail("Querying seal status succeeded on invalid instance");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Unable to parse response"));
-        }
     }
 
     /**
@@ -232,16 +222,130 @@ public class HTTPVaultConnectorOfflineTest {
             assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
             assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
         }
+    }
 
-        // Simulate un-mappable response.
-        mockResponse(200, "", ContentType.APPLICATION_JSON);
+    /**
+     * Test behavior on unparsable responses.
+     */
+    @Test
+    public void parseExceptionTest() throws IOException {
+        HTTPVaultConnector connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        // Mock authorization.
+        setPrivate(connector, "authorized", true);
+        // Mock response.
+        initHttpMock();
+        mockResponse(200, "invalid", ContentType.APPLICATION_JSON);
+
+        // Now test the methods.
+        try {
+            connector.sealStatus();
+            fail("sealStatus() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.unseal("key");
+            fail("unseal() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
         try {
             connector.getHealth();
-            fail("Querying health status succeeded on invalid instance");
+            fail("getHealth() succeeded on invalid instance");
         } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Unable to parse response"));
+            assertParseError(e);
         }
+
+        try {
+            connector.getAuthBackends();
+            fail("getAuthBackends() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.authToken("token");
+            fail("authToken() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.lookupAppRole("roleName");
+            fail("lookupAppRole() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.getAppRoleID("roleName");
+            fail("getAppRoleID() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.createAppRoleSecret("roleName");
+            fail("createAppRoleSecret() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.lookupAppRoleSecret("roleName", "secretID");
+            fail("lookupAppRoleSecret() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.listAppRoles();
+            fail("listAppRoles() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.listAppRoleSecrets("roleName");
+            fail("listAppRoleSecrets() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.read("key");
+            fail("read() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.list("path");
+            fail("list() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.renew("leaseID");
+            fail("renew() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+
+        try {
+            connector.lookupToken("token");
+            fail("lookupToken() succeeded on invalid instance");
+        } catch (Exception e) {
+            assertParseError(e);
+        }
+    }
+
+    private void assertParseError(Exception e) {
+        assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
+        assertThat("Unexpected exception message", e.getMessage(), is("Unable to parse response"));
     }
 
     /**
