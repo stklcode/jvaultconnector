@@ -35,11 +35,11 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 
 
 ## Maven Artifact
-```
+```xml
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>connector</artifactId>
-    <version>0.6.2</version>
+    <version>0.7.0</version>
 </dependency>
 ```
 

@@ -1,4 +1,4 @@
-## 0.7.0 [work in progress]
+## 0.7.0 [2017-10-03]
 * [feature] Retrieval of health status via `getHealth()` (#15)
 * [improvement] `seal()`, `unseal()` are now `void` and throw Exception on error (#12)
 * [compatibility] Adaptation to Vault 0.8 endpoints for `renew` and `revoke`, **breaking** 0.7 compatibility (#11)
