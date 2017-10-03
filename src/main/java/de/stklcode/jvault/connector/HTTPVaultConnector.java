@@ -831,12 +831,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
             switch (response.getStatusLine().getStatusCode()) {
                 case 200:
-                    try (BufferedReader br = new BufferedReader(
-                            new InputStreamReader(response.getEntity().getContent()))) {
-                        return br.lines().collect(Collectors.joining("\n"));
-                    } catch (IOException ignored) {
-                        throw new InvalidResponseException(Error.PARSE_RESPONSE, 200);
-                    }
+                    return handleResult(response);
                 case 204:
                     return "";
                 case 403:
@@ -848,20 +843,9 @@ public class HTTPVaultConnector implements VaultConnector {
                         return request(base, retries - 1);
                     } else {
                         /* Fail on different error code and/or no retries left */
-                        if (response.getEntity() != null) {
-                            try (BufferedReader br = new BufferedReader(
-                                    new InputStreamReader(response.getEntity().getContent()))) {
-                                String responseString = br.lines().collect(Collectors.joining("\n"));
-                                ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
-                                /* Check for "permission denied" response */
-                                if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
-                                    throw new PermissionDeniedException();
-                                throw new InvalidResponseException(Error.RESPONSE_CODE,
-                                        response.getStatusLine().getStatusCode(), er.toString());
-                            } catch (IOException ignored) {
-                                // Exception ignored.
-                            }
-                        }
+                        handleError(response);
+
+                        /* Throw exception withoud details, if response entity is empty. */
                         throw new InvalidResponseException(Error.RESPONSE_CODE,
                                 response.getStatusLine().getStatusCode());
                     }
@@ -875,6 +859,45 @@ public class HTTPVaultConnector implements VaultConnector {
                 } catch (IOException ignored) {
                     // Exception ignored.
                 }
+        }
+    }
+
+    /**
+     * Handle successful result.
+     *
+     * @param response The raw HTTP response (assuming status code 200)
+     * @return Complete response body as String
+     * @throws InvalidResponseException on reading errors
+     */
+    private String handleResult(final HttpResponse response) throws InvalidResponseException {
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(response.getEntity().getContent()))) {
+            return br.lines().collect(Collectors.joining("\n"));
+        } catch (IOException ignored) {
+            throw new InvalidResponseException(Error.READ_RESPONSE, 200);
+        }
+    }
+
+    /**
+     * Handle unsuccessful response. Throw detailed exception if possible.
+     *
+     * @param response The raw HTTP response (assuming status code 5xx)
+     * @throws VaultConnectorException Expected exception with details to throw
+     */
+    private void handleError(final HttpResponse response) throws VaultConnectorException {
+        if (response.getEntity() != null) {
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(response.getEntity().getContent()))) {
+                String responseString = br.lines().collect(Collectors.joining("\n"));
+                ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
+                            /* Check for "permission denied" response */
+                if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
+                    throw new PermissionDeniedException();
+                throw new InvalidResponseException(Error.RESPONSE_CODE,
+                        response.getStatusLine().getStatusCode(), er.toString());
+            } catch (IOException ignored) {
+                // Exception ignored.
+            }
         }
     }
 
