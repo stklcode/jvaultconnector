@@ -21,7 +21,10 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Vault Connector interface.
@@ -31,6 +34,9 @@ import java.util.*;
  * @since 0.1
  */
 public interface VaultConnector extends AutoCloseable {
+    /**
+     * Default sub-path for Vault secrets.
+     */
     String PATH_SECRET = "secret";
 
     /**
@@ -115,7 +121,7 @@ public interface VaultConnector extends AutoCloseable {
      *
      * @param appID  The App ID
      * @param userID The User ID
-     * @return TRUE on success
+     * @return The {@link AuthResponse}
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #authAppRole} instead.
      */
@@ -126,7 +132,7 @@ public interface VaultConnector extends AutoCloseable {
      * Authorize to Vault using AppRole method without secret ID.
      *
      * @param roleID The role ID
-     * @return TRUE on success
+     * @return The {@link AuthResponse}
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -139,7 +145,7 @@ public interface VaultConnector extends AutoCloseable {
      *
      * @param roleID   The role ID
      * @param secretID The secret ID
-     * @return TRUE on success
+     * @return The {@link AuthResponse}
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -151,7 +157,7 @@ public interface VaultConnector extends AutoCloseable {
      * @param appID       The unique App-ID
      * @param policy      The policy to associate with
      * @param displayName Arbitrary name to display
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #createAppRole} instead.
      */
@@ -163,7 +169,7 @@ public interface VaultConnector extends AutoCloseable {
      * Register a new AppRole role from given metamodel.
      *
      * @param role The role
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -173,7 +179,7 @@ public interface VaultConnector extends AutoCloseable {
      * Register new AppRole role with default policy.
      *
      * @param roleName The role name
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -186,7 +192,7 @@ public interface VaultConnector extends AutoCloseable {
      *
      * @param roleName The role name
      * @param policies The policies to associate with
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -199,7 +205,7 @@ public interface VaultConnector extends AutoCloseable {
      *
      * @param roleName The role name
      * @param roleID   A custom role ID
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -213,7 +219,7 @@ public interface VaultConnector extends AutoCloseable {
      * @param roleName The role name
      * @param policies The policies to associate with
      * @param roleID   A custom role ID
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -226,7 +232,7 @@ public interface VaultConnector extends AutoCloseable {
      * Delete AppRole role from Vault.
      *
      * @param roleName The role anme
-     * @return TRUE on succevss
+     * @return {@code true} on succevss
      * @throws VaultConnectorException on error
      */
     boolean deleteAppRole(final String roleName) throws VaultConnectorException;
@@ -256,7 +262,7 @@ public interface VaultConnector extends AutoCloseable {
      *
      * @param roleName The role name
      * @param roleID   The role ID
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @since 0.4.0
      */
@@ -345,7 +351,7 @@ public interface VaultConnector extends AutoCloseable {
      *
      * @param appID  The App-ID
      * @param userID The User-ID
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
      *             Consider using {@link #createAppRoleSecret} instead.
@@ -360,7 +366,7 @@ public interface VaultConnector extends AutoCloseable {
      * @param policy      The policy to associate with
      * @param displayName Arbitrary name to display
      * @param userID      The User-ID
-     * @return TRUE on success
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
      */
@@ -471,8 +477,9 @@ public interface VaultConnector extends AutoCloseable {
      * @since 0.5.0
      */
     default void writeSecret(final String key, final Map<String, Object> data) throws VaultConnectorException {
-        if (key == null || key.isEmpty())
+        if (key == null || key.isEmpty()) {
             throw new InvalidRequestException("Secret path must not be empty.");
+        }
         write(PATH_SECRET + "/" + key, data);
     }
 

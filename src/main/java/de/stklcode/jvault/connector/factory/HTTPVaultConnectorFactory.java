@@ -201,6 +201,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
             try {
                 numberOfRetries = Integer.parseInt(System.getenv(ENV_VAULT_MAX_RETRIES));
             } catch (NumberFormatException ignored) {
+                /* Ignore malformed values. */
             }
         }
 
