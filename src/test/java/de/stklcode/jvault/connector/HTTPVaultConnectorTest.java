@@ -48,7 +48,7 @@ import static org.junit.Assume.*;
  * @since 0.1
  */
 public class HTTPVaultConnectorTest {
-    private static final String VAULT_VERISON = "0.8.3";  // the vault version this test is supposed to run against
+    private static final String VAULT_VERISON = "0.9.0";  // the vault version this test is supposed to run against
     private static final String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
     private static final String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
     private static final String USER_VALID = "validUser";
