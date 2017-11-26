@@ -18,16 +18,16 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
 /**
  * JUnit Test for Token Builder.
@@ -55,7 +55,7 @@ public class TokenBuilderTest {
     private static final Boolean RENEWABLE = true;
     private static final String JSON_FULL = "{\"id\":\"test-id\",\"display_name\":\"display-name\",\"no_parent\":false,\"no_default_policy\":false,\"ttl\":123,\"num_uses\":4,\"policies\":[\"policy\"],\"meta\":{\"key\":\"value\"},\"renewable\":true}";
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         POLICIES.add(POLICY);
         META.put(META_KEY, META_VALUE);

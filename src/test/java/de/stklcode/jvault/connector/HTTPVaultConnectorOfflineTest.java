@@ -20,6 +20,9 @@ import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.agent.ByteBuddyAgent;
+import net.bytebuddy.dynamic.loading.ClassReloadingStrategy;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ContentType;
@@ -27,12 +30,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicStatusLine;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -40,15 +40,15 @@ import java.lang.reflect.Field;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 
+import static net.bytebuddy.implementation.MethodDelegation.to;
+import static net.bytebuddy.matcher.ElementMatchers.named;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.mockito.Mockito.*;
 
 /**
  * JUnit test for HTTP Vault connector.
@@ -57,20 +57,46 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * @author Stefan Kalscheuer
  * @since 0.7.0
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({HttpClientBuilder.class})
-@PowerMockIgnore({"javax.net.ssl.*"})
 public class HTTPVaultConnectorOfflineTest {
     private static final String INVALID_URL = "foo:/\\1nv4l1d_UrL";
 
-    @Mock
-    private HttpClientBuilder httpMockBuilder;
+    private static HttpClientBuilder httpMockBuilder = mock(HttpClientBuilder.class);
+    private static CloseableHttpClient httpMock = mock(CloseableHttpClient.class);
+    private CloseableHttpResponse responseMock = mock(CloseableHttpResponse.class);
 
-    @Mock
-    private CloseableHttpClient httpMock;
+    @BeforeAll
+    public static void initByteBuddy() {
+        // Install ByteBuddy Agent.
+        ByteBuddyAgent.install();
+    }
 
-    @Mock
-    private CloseableHttpResponse responseMock;
+    /**
+     * Helper method for redefinition of {@link HttpClientBuilder#create()} from {@link #initHttpMock()}.
+     *
+     * @return Mocked HTTP client builder.
+     */
+    public static HttpClientBuilder create() {
+        return httpMockBuilder;
+    }
+
+    @BeforeEach
+    public void initHttpMock() {
+        // Redefine static method to return Mock on HttpClientBuilder creation.
+        new ByteBuddy().redefine(HttpClientBuilder.class)
+                .method(named("create"))
+                .intercept(to(HTTPVaultConnectorOfflineTest.class))
+                .make()
+                .load(HttpClientBuilder.class.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
+
+        // Ignore SSL context settings.
+        when(httpMockBuilder.setSSLContext(null)).thenReturn(httpMockBuilder);
+
+        // Re-initialize HTTP mock to ensure fresh (empty) results.
+        httpMock = mock(CloseableHttpClient.class);
+
+        // Mock actual client creation.
+        when(httpMockBuilder.build()).thenReturn(httpMock);
+    }
 
     /**
      * Test exceptions thrown during request.
@@ -80,7 +106,6 @@ public class HTTPVaultConnectorOfflineTest {
         HTTPVaultConnector connector = new HTTPVaultConnector("http://127.0.0.1", null, 0, 250);
 
         // Test invalid response code.
-        initHttpMock();
         final int responseCode = 400;
         mockResponse(responseCode, "", ContentType.APPLICATION_JSON);
         try {
@@ -189,7 +214,7 @@ public class HTTPVaultConnectorOfflineTest {
         connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
 
         // Simulate NULL response (mock not supplied with data).
-        initHttpMock();
+
         try {
             connector.sealStatus();
             fail("Querying seal status succeeded on invalid instance");
@@ -216,7 +241,6 @@ public class HTTPVaultConnectorOfflineTest {
         connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
 
         // Simulate NULL response (mock not supplied with data).
-        initHttpMock();
         try {
             connector.getHealth();
             fail("Querying health status succeeded on invalid instance");
@@ -235,7 +259,6 @@ public class HTTPVaultConnectorOfflineTest {
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
-        initHttpMock();
         mockResponse(200, "invalid", ContentType.APPLICATION_JSON);
 
         // Now test the methods.
@@ -359,7 +382,6 @@ public class HTTPVaultConnectorOfflineTest {
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
-        initHttpMock();
         mockResponse(200, "{}", ContentType.APPLICATION_JSON);
 
         // Now test the methods expecting a 204.
@@ -451,13 +473,6 @@ public class HTTPVaultConnectorOfflineTest {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             // Should not occur, to be taken care of in test code.
         }
-    }
-
-    private void initHttpMock() {
-        mockStatic(HttpClientBuilder.class);
-        when(HttpClientBuilder.create()).thenReturn(httpMockBuilder);
-        when(httpMockBuilder.setSSLContext(null)).thenReturn(httpMockBuilder);
-        when(httpMockBuilder.build()).thenReturn(httpMock);
     }
 
     private void mockResponse(int status, String body, ContentType type) throws IOException {

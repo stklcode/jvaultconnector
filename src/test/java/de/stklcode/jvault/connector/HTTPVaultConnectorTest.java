@@ -17,15 +17,16 @@
 package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.*;
+import de.stklcode.jvault.connector.factory.HTTPVaultConnectorFactory;
+import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
-import de.stklcode.jvault.connector.factory.HTTPVaultConnectorFactory;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
-import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestName;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -35,10 +36,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
+import static org.hamcrest.junit.MatcherAssume.assumeThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * JUnit test for HTTP Vault connector.
@@ -47,6 +52,7 @@ import static org.junit.Assume.*;
  * @author Stefan Kalscheuer
  * @since 0.1
  */
+@EnableRuleMigrationSupport
 public class HTTPVaultConnectorTest {
     private static final String VAULT_VERISON = "0.9.0";  // the vault version this test is supposed to run against
     private static final String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
@@ -73,17 +79,14 @@ public class HTTPVaultConnectorTest {
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
 
-    @Rule
-    public TestName testName = new TestName();
-
     /**
      * Initialize Vault instance with generated configuration and provided file backend.
      * Requires "vault" binary to be in current user's executable path. Not using MLock, so no extended rights required.
      */
-    @Before
-    public void setUp() throws VaultConnectorException {
+    @BeforeEach
+    public void setUp(TestInfo testInfo) throws VaultConnectorException {
         /* Determine, if TLS is required */
-        boolean isTls = testName.getMethodName().equals("tlsConnectionTest");
+        boolean isTls = testInfo.getTags().contains("tls");
 
         /* Initialize Vault */
         VaultConfiguration config = initializeVault(isTls);
@@ -104,11 +107,11 @@ public class HTTPVaultConnectorTest {
 
         /* Unseal Vault and check result */
         SealResponse sealStatus = connector.unseal(KEY);
-        assumeNotNull(sealStatus);
+        assumeTrue(sealStatus != null);
         assumeFalse(sealStatus.isSealed());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (vaultProcess != null && vaultProcess.isAlive())
             vaultProcess.destroy();
@@ -217,7 +220,7 @@ public class HTTPVaultConnectorTest {
 
         try {
             res = connector.authToken(TOKEN_ROOT);
-            assertNotNull("Login failed with valid token", res);
+            assertNotNull(res, "Login failed with valid token");
             assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
         } catch (VaultConnectorException ignored) {
             fail("Login failed with valid token");
@@ -246,7 +249,7 @@ public class HTTPVaultConnectorTest {
         } catch (VaultConnectorException ignored) {
             fail("Login failed with valid credentials: Exception thrown");
         }
-        assertNotNull("Login failed with valid credentials: Response not available", res.getAuth());
+        assertNotNull(res.getAuth(), "Login failed with valid credentials: Response not available");
         assertThat("Login failed with valid credentials: Connector not authorized", connector.isAuthorized(), is(true));
     }
 
@@ -636,6 +639,7 @@ public class HTTPVaultConnectorTest {
      * Test reading of secrets.
      */
     @Test
+    @SuppressWarnings("deprecation")
     public void readSecretTest() {
         authUser();
         assumeTrue(connector.isAuthorized());
@@ -728,6 +732,7 @@ public class HTTPVaultConnectorTest {
      * Test writing secrets.
      */
     @Test
+    @SuppressWarnings("deprecation")
     public void writeSecretTest() {
         authUser();
         assumeTrue(connector.isAuthorized());
@@ -909,6 +914,7 @@ public class HTTPVaultConnectorTest {
      * Test TLS connection with custom certificate chain.
      */
     @Test
+    @Tag("tls")
     public void tlsConnectionTest() {
         TokenResponse res;
         try {
@@ -919,7 +925,7 @@ public class HTTPVaultConnectorTest {
 
         try {
             res = connector.authToken(TOKEN_ROOT);
-            assertNotNull("Login failed with valid token", res);
+            assertNotNull(res, "Login failed with valid token");
             assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
         } catch (VaultConnectorException ignored) {
             fail("Login failed with valid token");

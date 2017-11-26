@@ -18,13 +18,14 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
 /**
  * JUnit Test for AppRole Builder.
@@ -53,7 +54,7 @@ public class AppRoleBuilderTest {
     private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"role_id\":\"%s\",\"bind_secret_id\":%s,\"bound_cidr_list\":\"%s\",\"policies\":\"%s\",\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"token_ttl\":%d,\"token_max_ttl\":%d,\"period\":%d}",
             NAME, ID, BIND_SECRET_ID, CIDR_1, POLICY, SECRET_ID_NUM_USES, SECRET_ID_TTL, TOKEN_TTL, TOKEN_MAX_TTL, PERIOD);
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         BOUND_CIDR_LIST.add(CIDR_1);
         POLICIES.add(POLICY);

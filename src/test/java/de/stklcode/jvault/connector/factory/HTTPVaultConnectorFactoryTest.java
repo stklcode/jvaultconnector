@@ -19,10 +19,10 @@ package de.stklcode.jvault.connector.factory;
 import de.stklcode.jvault.connector.HTTPVaultConnector;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
@@ -30,7 +30,8 @@ import java.lang.reflect.Field;
 import java.nio.file.NoSuchFileException;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * JUnit test for HTTP Vault connector factory
@@ -38,6 +39,7 @@ import static org.junit.Assert.*;
  * @author Stefan Kalscheuer
  * @since 0.6.0
  */
+@EnableRuleMigrationSupport
 public class HTTPVaultConnectorFactoryTest {
     private static String VAULT_ADDR = "https://localhost:8201";
     private static Integer VAULT_MAX_RETRIES = 13;
