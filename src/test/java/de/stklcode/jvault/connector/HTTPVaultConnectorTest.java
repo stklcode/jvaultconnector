@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -84,7 +85,7 @@ public class HTTPVaultConnectorTest {
      * Requires "vault" binary to be in current user's executable path. Not using MLock, so no extended rights required.
      */
     @BeforeEach
-    public void setUp(TestInfo testInfo) throws VaultConnectorException {
+    public void setUp(TestInfo testInfo) throws VaultConnectorException, IOException {
         /* Determine, if TLS is required */
         boolean isTls = testInfo.getTags().contains("tls");
 
@@ -960,14 +961,15 @@ public class HTTPVaultConnectorTest {
      * @return Vault Configuration
      * @throws IllegalStateException on error
      */
-    private VaultConfiguration initializeVault(boolean tls) throws IllegalStateException {
-        String dataResource = getClass().getResource("/data_dir").getPath();
+    private VaultConfiguration initializeVault(boolean tls) throws IllegalStateException, IOException {
+        File dataDir = tmpDir.newFolder();
+        copyDirectory(new File(getClass().getResource("/data_dir").getPath()), dataDir);
 
         /* Generate vault local unencrypted configuration */
         VaultConfiguration config = new VaultConfiguration()
                 .withHost("localhost")
                 .withPort(getFreePort())
-                .withDataLocation(dataResource)
+                .withDataLocation(dataDir.toPath())
                 .disableMlock();
 
         /* Enable TLS with custom certificate and key, if required */
