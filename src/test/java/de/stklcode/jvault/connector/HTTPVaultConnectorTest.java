@@ -35,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -92,7 +93,7 @@ public class HTTPVaultConnectorTest {
         /* Initialize Vault */
         VaultConfiguration config = initializeVault(isTls);
         try {
-            Thread.sleep(1000);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -905,7 +906,7 @@ public class HTTPVaultConnectorTest {
             fail("Overwriting token should fail as of Vault 0.8.0");
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(InvalidResponseException.class)));
-            assertThat(((InvalidResponseException)e).getStatusCode(), is(400));
+            assertThat(((InvalidResponseException) e).getStatusCode(), is(400));
             /* Assert that the exception does not reveal token ID */
             assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
         }
