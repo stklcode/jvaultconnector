@@ -1,3 +1,8 @@
+## 0.7.1 [unreleased]
+* [improvement] Added automatic module name for JPMS compatibility
+* [improvement] Minor dependency updates
+* [test] Tested against Vault 0.9.5
+
 ## 0.7.0 [2017-10-03]
 * [feature] Retrieval of health status via `getHealth()` (#15)
 * [improvement] `seal()`, `unseal()` are now `void` and throw Exception on error (#12)
