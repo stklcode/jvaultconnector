@@ -1,6 +1,6 @@
-## 0.7.1 [unreleased]
+## 0.7.1 [2018-03-17]
 * [improvement] Added automatic module name for JPMS compatibility
-* [improvement] Minor dependency updates
+* [dependencies] Minor dependency updates
 * [test] Tested against Vault 0.9.5
 
 ## 0.7.0 [2017-10-03]
