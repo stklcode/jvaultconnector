@@ -14,10 +14,10 @@ addons:
 env:
   - PATH=$PATH:.
 before_script:
-  - wget https://releases.hashicorp.com/vault/0.9.5/vault_0.9.5_linux_amd64.zip
-  - wget -q -O - https://releases.hashicorp.com/vault/0.9.5/vault_0.9.5_SHA256SUMS | grep linux_amd64 | sha256sum -c
-  - unzip vault_0.9.5_linux_amd64.zip
-  - rm vault_0.9.5_linux_amd64.zip
+  - wget https://releases.hashicorp.com/vault/0.9.6/vault_0.9.6_linux_amd64.zip
+  - wget -q -O - https://releases.hashicorp.com/vault/0.9.6/vault_0.9.6_SHA256SUMS | grep linux_amd64 | sha256sum -c
+  - unzip vault_0.9.6_linux_amd64.zip
+  - rm vault_0.9.6_linux_amd64.zip
 cache:
   directories:
     - '$HOME/.m2/repository'
