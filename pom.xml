@@ -11,6 +11,7 @@
     <name>jVaultConnector</name>
     <description>Connector artifact for Hashicorp's Vault secret management</description>
     <url>https://jvault.stklcode.de</url>
+    <inceptionYear>2016</inceptionYear>
 
     <licenses>
         <license>
@@ -23,6 +24,25 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <developers>
+        <developer>
+            <name>Stefan Kalscheuer</name>
+            <email>stefan@stklcode.de</email>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/stklcode/jvaultconnector.git</connection>
+        <developerConnection>scm:git:git@github.com:stklcode/jvaultconnector.git</developerConnection>
+        <url>https://github.com/stklcode/jvaultconnector</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/stklcode/jvaultconnector/issues</url>
+    </issueManagement>
 
     <build>
         <plugins>
