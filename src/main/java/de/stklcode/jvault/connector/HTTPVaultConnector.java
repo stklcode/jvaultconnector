@@ -29,18 +29,23 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,14 +79,14 @@ public class HTTPVaultConnector implements VaultConnector {
 
     private final ObjectMapper jsonMapper;
 
-    private final String baseURL;           /* Base URL of Vault */
-    private final SSLContext sslContext;    /* Custom SSLSocketFactory */
-    private final int retries;              /* Number of retries on 5xx errors */
-    private final Integer timeout;          /* Timeout in milliseconds */
+    private final String baseURL;                   // Base URL of Vault.
+    private final X509Certificate trustedCaCert;    // Trusted CA certificate.
+    private final int retries;                      // Number of retries on 5xx errors.
+    private final Integer timeout;                  // Timeout in milliseconds.
 
-    private boolean authorized = false;     /* authorization status */
-    private String token;                   /* current token */
-    private long tokenTTL = 0;              /* expiration time for current token */
+    private boolean authorized = false;             // Authorization status.
+    private String token;                           // Current token.
+    private long tokenTTL = 0;                      // Expiration time for current token.
 
     /**
      * Create connector using hostname and schema.
@@ -122,18 +127,18 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using hostname, schema, port, path and trusted certificate.
      *
-     * @param hostname   The hostname
-     * @param useTLS     If TRUE, use HTTPS, otherwise HTTP
-     * @param port       The port
-     * @param prefix     HTTP API prefix (default: /v1/)
-     * @param sslContext Custom SSL Context
+     * @param hostname      The hostname
+     * @param useTLS        If TRUE, use HTTPS, otherwise HTTP
+     * @param port          The port
+     * @param prefix        HTTP API prefix (default: /v1/)
+     * @param trustedCaCert Trusted CA certificate
      */
     public HTTPVaultConnector(final String hostname,
                               final boolean useTLS,
                               final Integer port,
                               final String prefix,
-                              final SSLContext sslContext) {
-        this(hostname, useTLS, port, prefix, sslContext, 0, null);
+                              final X509Certificate trustedCaCert) {
+        this(hostname, useTLS, port, prefix, trustedCaCert, 0, null);
     }
 
     /**
@@ -143,7 +148,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @param useTLS          If TRUE, use HTTPS, otherwise HTTP
      * @param port            The port
      * @param prefix          HTTP API prefix (default: /v1/)
-     * @param sslContext      Custom SSL Context
+     * @param trustedCaCert   Trusted CA certificate
      * @param numberOfRetries Number of retries on 5xx errors
      * @param timeout         Timeout for HTTP requests (milliseconds)
      */
@@ -151,14 +156,14 @@ public class HTTPVaultConnector implements VaultConnector {
                               final boolean useTLS,
                               final Integer port,
                               final String prefix,
-                              final SSLContext sslContext,
+                              final X509Certificate trustedCaCert,
                               final int numberOfRetries,
                               final Integer timeout) {
         this(((useTLS) ? "https" : "http")
                         + "://" + hostname
                         + ((port != null) ? ":" + port : "")
                         + prefix,
-                sslContext,
+                trustedCaCert,
                 numberOfRetries,
                 timeout);
     }
@@ -175,38 +180,38 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using full URL and trusted certificate.
      *
-     * @param baseURL    The URL
-     * @param sslContext Custom SSL Context
+     * @param baseURL       The URL
+     * @param trustedCaCert Trusted CA certificate
      */
-    public HTTPVaultConnector(final String baseURL, final SSLContext sslContext) {
-        this(baseURL, sslContext, 0, null);
+    public HTTPVaultConnector(final String baseURL, final X509Certificate trustedCaCert) {
+        this(baseURL, trustedCaCert, 0, null);
     }
 
     /**
      * Create connector using full URL and trusted certificate.
      *
      * @param baseURL         The URL
-     * @param sslContext      Custom SSL Context
+     * @param trustedCaCert   Trusted CA certificate
      * @param numberOfRetries Number of retries on 5xx errors
      */
-    public HTTPVaultConnector(final String baseURL, final SSLContext sslContext, final int numberOfRetries) {
-        this(baseURL, sslContext, numberOfRetries, null);
+    public HTTPVaultConnector(final String baseURL, final X509Certificate trustedCaCert, final int numberOfRetries) {
+        this(baseURL, trustedCaCert, numberOfRetries, null);
     }
 
     /**
      * Create connector using full URL and trusted certificate.
      *
      * @param baseURL         The URL
-     * @param sslContext      Custom SSL Context
+     * @param trustedCaCert   Trusted CA certificate
      * @param numberOfRetries Number of retries on 5xx errors
      * @param timeout         Timeout for HTTP requests (milliseconds)
      */
     public HTTPVaultConnector(final String baseURL,
-                              final SSLContext sslContext,
+                              final X509Certificate trustedCaCert,
                               final int numberOfRetries,
                               final Integer timeout) {
         this.baseURL = baseURL;
-        this.sslContext = sslContext;
+        this.trustedCaCert = trustedCaCert;
         this.retries = numberOfRetries;
         this.timeout = timeout;
         this.jsonMapper = new ObjectMapper();
@@ -818,8 +823,11 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Set JSON Header */
         base.addHeader("accept", "application/json");
 
-        HttpResponse response = null;
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().setSSLContext(sslContext).build()) {
+        CloseableHttpResponse response = null;
+
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create()
+                .setSSLSocketFactory(createSSLSocketFactory())
+                .build()) {
             /* Set custom timeout, if defined */
             if (this.timeout != null)
                 base.setConfig(RequestConfig.copy(RequestConfig.DEFAULT).setConnectTimeout(timeout).build());
@@ -890,7 +898,7 @@ public class HTTPVaultConnector implements VaultConnector {
                     new InputStreamReader(response.getEntity().getContent()))) {
                 String responseString = br.lines().collect(Collectors.joining("\n"));
                 ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
-                            /* Check for "permission denied" response */
+                /* Check for "permission denied" response */
                 if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
                     throw new PermissionDeniedException();
                 throw new InvalidResponseException(Error.RESPONSE_CODE,
@@ -898,6 +906,39 @@ public class HTTPVaultConnector implements VaultConnector {
             } catch (IOException ignored) {
                 // Exception ignored.
             }
+        }
+    }
+
+    /**
+     * Create a custom socket factory from trusted CA certificate.
+     *
+     * @return The factory.
+     * @throws TlsException An error occured during initialization of the SSL context.
+     * @since 0.8.0
+     */
+    private SSLConnectionSocketFactory createSSLSocketFactory() throws TlsException {
+        try {
+            // Create Keystore with trusted certificate.
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("trustedCert", trustedCaCert);
+
+            // Initialize TrustManager.
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(keyStore);
+
+            // Create context usint this TrustManager.
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, tmf.getTrustManagers(), new SecureRandom());
+
+            return new SSLConnectionSocketFactory(
+                    context,
+                    null,
+                    null,
+                    SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+            );
+        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException | KeyManagementException e) {
+            throw new TlsException(Error.INIT_SSL_CONTEXT, e);
         }
     }
 
@@ -910,6 +951,7 @@ public class HTTPVaultConnector implements VaultConnector {
         private static final String UNEXPECTED_RESPONSE = "Received response where none was expected";
         private static final String URI_FORMAT = "Invalid URI format";
         private static final String RESPONSE_CODE = "Invalid response code";
+        private static final String INIT_SSL_CONTEXT = "Unable to intialize SSLContext";
 
         /**
          * Constructor hidden, this class should not be instantiated.

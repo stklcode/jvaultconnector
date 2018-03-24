@@ -34,10 +34,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 
 import static net.bytebuddy.implementation.MethodDelegation.to;
@@ -89,7 +91,7 @@ public class HTTPVaultConnectorOfflineTest {
                 .load(HttpClientBuilder.class.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
 
         // Ignore SSL context settings.
-        when(httpMockBuilder.setSSLContext(null)).thenReturn(httpMockBuilder);
+        when(httpMockBuilder.setSSLSocketFactory(any())).thenReturn(httpMockBuilder);
 
         // Re-initialize HTTP mock to ensure fresh (empty) results.
         httpMock = mock(CloseableHttpClient.class);
@@ -159,7 +161,7 @@ public class HTTPVaultConnectorOfflineTest {
      * Test constductors of the {@link HTTPVaultConnector} class.
      */
     @Test
-    public void constructorTest() throws NoSuchAlgorithmException {
+    public void constructorTest() throws IOException, CertificateException {
         final String url = "https://vault.example.net/test/";
         final String hostname = "vault.example.com";
         final Integer port = 1337;
@@ -168,7 +170,11 @@ public class HTTPVaultConnectorOfflineTest {
         final String expectedNoTls = "http://" + hostname + "/v1/";
         final String expectedCustomPort = "https://" + hostname + ":" + port + "/v1/";
         final String expectedCustomPrefix = "https://" + hostname + ":" + port + prefix;
-        final SSLContext sslContext = SSLContext.getInstance("TLS");
+        X509Certificate trustedCaCert = null;
+
+        try (InputStream is = getClass().getResourceAsStream("/tls/ca.pem")) {
+            trustedCaCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
+        }
 
         // Most basic constructor expects complete URL.
         HTTPVaultConnector connector = new HTTPVaultConnector(url);
@@ -185,15 +191,15 @@ public class HTTPVaultConnectorOfflineTest {
         // Specify custom prefix.
         connector = new HTTPVaultConnector(hostname, true, port, prefix);
         assertThat("Unexpected base URL with custom prefix", getPrivate(connector, "baseURL"), is(expectedCustomPrefix));
-        assertThat("SSL context set, but not specified", getPrivate(connector, "sslContext"), is(nullValue()));
+        assertThat("Trusted CA cert set, but not specified", getPrivate(connector, "trustedCaCert"), is(nullValue()));
 
         // Provide custom SSL context.
-        connector = new HTTPVaultConnector(hostname, true, port, prefix, sslContext);
+        connector = new HTTPVaultConnector(hostname, true, port, prefix, trustedCaCert);
         assertThat("Unexpected base URL with custom prefix", getPrivate(connector, "baseURL"), is(expectedCustomPrefix));
-        assertThat("SSL context not filled correctly", getPrivate(connector, "sslContext"), is(sslContext));
+        assertThat("Trusted CA cert not filled correctly", getPrivate(connector, "trustedCaCert"), is(trustedCaCert));
 
         // Specify number of retries.
-        connector = new HTTPVaultConnector(url, sslContext, retries);
+        connector = new HTTPVaultConnector(url, trustedCaCert, retries);
         assertThat("Number of retries not set correctly", getPrivate(connector, "retries"), is(retries));
     }
 
@@ -466,7 +472,7 @@ public class HTTPVaultConnectorOfflineTest {
     private void setPrivate(Object target, String fieldName, Object value) {
         try {
             Field field = target.getClass().getDeclaredField(fieldName);
-            boolean accessible =field.isAccessible();
+            boolean accessible = field.isAccessible();
             field.setAccessible(true);
             field.set(target, value);
             field.setAccessible(accessible);

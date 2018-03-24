@@ -22,8 +22,6 @@ import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -31,7 +29,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -58,7 +55,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     private Integer port;
     private boolean tls;
     private String prefix;
-    private SSLContext sslContext;
+    private X509Certificate trustedCA;
     private int numberOfRetries;
     private Integer timeout;
     private String token;
@@ -146,8 +143,23 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.4.0
      */
     public HTTPVaultConnectorFactory withTrustedCA(final Path cert) throws VaultConnectorException {
-        if (cert != null)
-            return withSslContext(createSslContext(cert));
+        if (cert != null) {
+            return withTrustedCA(certificateFromFile(cert));
+        } else {
+            this.trustedCA = null;
+        }
+        return this;
+    }
+
+    /**
+     * Add a trusted CA certifiate for HTTPS connections.
+     *
+     * @param cert path to certificate file
+     * @return self
+     * @since 0.8.0
+     */
+    public HTTPVaultConnectorFactory withTrustedCA(final X509Certificate cert) {
+        this.trustedCA = cert;
         return this;
     }
 
@@ -158,10 +170,10 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @param sslContext the SSL context
      * @return self
      * @since 0.4.0
+     * @deprecated As of 0.8.0 this is no longer supported, please use {@link #withTrustedCA(Path)} or {@link #withTrustedCA(X509Certificate)}.
      */
     public HTTPVaultConnectorFactory withSslContext(final SSLContext sslContext) {
-        this.sslContext = sslContext;
-        return this;
+        throw new UnsupportedOperationException("Use of deprecated method, please switch to withTrustedCA()");
     }
 
     /**
@@ -241,57 +253,16 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
 
     @Override
     public HTTPVaultConnector build() {
-        return new HTTPVaultConnector(host, tls, port, prefix, sslContext, numberOfRetries, timeout);
+        return new HTTPVaultConnector(host, tls, port, prefix, trustedCA, numberOfRetries, timeout);
     }
 
     @Override
     public HTTPVaultConnector buildAndAuth() throws VaultConnectorException {
         if (token == null)
             throw new ConnectionException("No vault token provided, unable to authenticate.");
-        HTTPVaultConnector con = new HTTPVaultConnector(host, tls, port, prefix, sslContext, numberOfRetries, timeout);
+        HTTPVaultConnector con = new HTTPVaultConnector(host, tls, port, prefix, trustedCA, numberOfRetries, timeout);
         con.authToken(token);
         return con;
-    }
-
-    /**
-     * Create SSL Context trusting only provided certificate.
-     *
-     * @param trustedCert Path to trusted CA certificate
-     * @return SSL context
-     * @throws TlsException on errors
-     * @since 0.4.0
-     */
-    private SSLContext createSslContext(final Path trustedCert) throws TlsException {
-        try {
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, createTrustManager(trustedCert), new SecureRandom());
-            return context;
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new TlsException("Unable to intialize SSLContext", e);
-        }
-    }
-
-    /**
-     * Create a custom TrustManager for given CA certificate file.
-     *
-     * @param trustedCert Path to trusted CA certificate
-     * @return TrustManger
-     * @throws TlsException on error
-     * @since 0.4.0
-     */
-    private TrustManager[] createTrustManager(final Path trustedCert) throws TlsException {
-        try {
-            /* Create Keystore with trusted certificate */
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("trustedCert", certificateFromFile(trustedCert));
-            /* Initialize TrustManager */
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keyStore);
-            return tmf.getTrustManagers();
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
-            throw new TlsException("Unable to initialize TrustManager", e);
-        }
     }
 
     /**

@@ -69,7 +69,7 @@ public class HTTPVaultConnectorFactoryTest {
         connector = factory.build();
 
         assertThat("URL nor set correctly", getPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-        assertThat("SSL context set when no cert provided", getPrivate(connector, "sslContext"), is(nullValue()));
+        assertThat("Trusted CA cert set when no cert provided", getPrivate(connector, "trustedCaCert"), is(nullValue()));
         assertThat("Non-default number of retries, when none set", getPrivate(connector, "retries"), is(0));
 
         /* Provide address and number of retries */
@@ -83,7 +83,7 @@ public class HTTPVaultConnectorFactoryTest {
         connector = factory.build();
 
         assertThat("URL nor set correctly", getPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-        assertThat("SSL context set when no cert provided", getPrivate(connector, "sslContext"), is(nullValue()));
+        assertThat("Trusted CA cert set when no cert provided", getPrivate(connector, "trustedCaCert"), is(nullValue()));
         assertThat("Number of retries not set correctly", getPrivate(connector, "retries"), is(VAULT_MAX_RETRIES));
 
         /* Provide CA certificate */
