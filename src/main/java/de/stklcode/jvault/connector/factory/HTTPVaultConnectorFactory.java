@@ -17,20 +17,11 @@
 package de.stklcode.jvault.connector.factory;
 
 import de.stklcode.jvault.connector.HTTPVaultConnector;
-import de.stklcode.jvault.connector.exception.ConnectionException;
-import de.stklcode.jvault.connector.exception.TlsException;
+import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 /**
@@ -38,38 +29,19 @@ import java.security.cert.X509Certificate;
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @deprecated As of 0.8.0 please refer to {@link de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder} with identical API.
  */
+@Deprecated
 public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
-    private static final String ENV_VAULT_ADDR = "VAULT_ADDR";
-    private static final String ENV_VAULT_CACERT = "VAULT_CACERT";
-    private static final String ENV_VAULT_TOKEN = "VAULT_TOKEN";
-    private static final String ENV_VAULT_MAX_RETRIES = "VAULT_MAX_RETRIES";
 
-    public static final String DEFAULT_HOST = "127.0.0.1";
-    public static final Integer DEFAULT_PORT = 8200;
-    public static final boolean DEFAULT_TLS = true;
-    public static final String DEFAULT_PREFIX = "/v1/";
-    public static final int DEFAULT_NUMBER_OF_RETRIES = 0;
-
-    private String host;
-    private Integer port;
-    private boolean tls;
-    private String prefix;
-    private X509Certificate trustedCA;
-    private int numberOfRetries;
-    private Integer timeout;
-    private String token;
+    private final HTTPVaultConnectorBuilder delegate;
 
     /**
      * Default empty constructor.
      * Initializes factory with default values.
      */
     public HTTPVaultConnectorFactory() {
-        host = DEFAULT_HOST;
-        port = DEFAULT_PORT;
-        tls = DEFAULT_TLS;
-        prefix = DEFAULT_PREFIX;
-        numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
+        delegate = new HTTPVaultConnectorBuilder();
     }
 
     /**
@@ -79,7 +51,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withHost(final String host) {
-        this.host = host;
+        delegate.withHost(host);
         return this;
     }
 
@@ -90,7 +62,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withPort(final Integer port) {
-        this.port = port;
+        delegate.withPort(port);
         return this;
     }
 
@@ -101,7 +73,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withTLS(final boolean useTLS) {
-        this.tls = useTLS;
+        delegate.withTLS(useTLS);
         return this;
     }
 
@@ -130,7 +102,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withPrefix(final String prefix) {
-        this.prefix = prefix;
+        delegate.withPrefix(prefix);
         return this;
     }
 
@@ -143,11 +115,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.4.0
      */
     public HTTPVaultConnectorFactory withTrustedCA(final Path cert) throws VaultConnectorException {
-        if (cert != null) {
-            return withTrustedCA(certificateFromFile(cert));
-        } else {
-            this.trustedCA = null;
-        }
+        delegate.withTrustedCA(cert);
         return this;
     }
 
@@ -159,7 +127,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.8.0
      */
     public HTTPVaultConnectorFactory withTrustedCA(final X509Certificate cert) {
-        this.trustedCA = cert;
+        delegate.withTrustedCA(cert);
         return this;
     }
 
@@ -184,7 +152,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory withToken(final String token) {
-        this.token = token;
+        delegate.withToken(token);
         return this;
     }
 
@@ -196,34 +164,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory fromEnv() throws VaultConnectorException {
-        /* Parse URL from environment variable */
-        if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).trim().isEmpty()) {
-            try {
-                URL url = new URL(System.getenv(ENV_VAULT_ADDR));
-                this.host = url.getHost();
-                this.port = url.getPort();
-                this.tls = url.getProtocol().equals("https");
-            } catch (MalformedURLException e) {
-                throw new ConnectionException("URL provided in environment variable malformed", e);
-            }
-        }
-
-        /* Read number of retries */
-        if (System.getenv(ENV_VAULT_MAX_RETRIES) != null) {
-            try {
-                numberOfRetries = Integer.parseInt(System.getenv(ENV_VAULT_MAX_RETRIES));
-            } catch (NumberFormatException ignored) {
-                /* Ignore malformed values. */
-            }
-        }
-
-        /* Read token */
-        token = System.getenv(ENV_VAULT_TOKEN);
-
-        /* Parse certificate, if set */
-        if (System.getenv(ENV_VAULT_CACERT) != null && !System.getenv(ENV_VAULT_CACERT).trim().isEmpty()) {
-            return withTrustedCA(Paths.get(System.getenv(ENV_VAULT_CACERT)));
-        }
+        delegate.fromEnv();
         return this;
     }
 
@@ -235,7 +176,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory withNumberOfRetries(final int numberOfRetries) {
-        this.numberOfRetries = numberOfRetries;
+        delegate.withNumberOfRetries(numberOfRetries);
         return this;
     }
 
@@ -247,37 +188,17 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory withTimeout(final int milliseconds) {
-        this.timeout = milliseconds;
+        delegate.withTimeout(milliseconds);
         return this;
     }
 
     @Override
     public HTTPVaultConnector build() {
-        return new HTTPVaultConnector(host, tls, port, prefix, trustedCA, numberOfRetries, timeout);
+        return delegate.build();
     }
 
     @Override
     public HTTPVaultConnector buildAndAuth() throws VaultConnectorException {
-        if (token == null)
-            throw new ConnectionException("No vault token provided, unable to authenticate.");
-        HTTPVaultConnector con = new HTTPVaultConnector(host, tls, port, prefix, trustedCA, numberOfRetries, timeout);
-        con.authToken(token);
-        return con;
-    }
-
-    /**
-     * Read given certificate file to X.509 certificate.
-     *
-     * @param certFile Path to certificate file
-     * @return X.509 Certificate object
-     * @throws TlsException on error
-     * @since 0.4.0
-     */
-    private X509Certificate certificateFromFile(final Path certFile) throws TlsException {
-        try (InputStream is = Files.newInputStream(certFile)) {
-            return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
-        } catch (IOException | CertificateException e) {
-            throw new TlsException("Unable to read certificate.", e);
-        }
+        return delegate.buildAndAuth();
     }
 }

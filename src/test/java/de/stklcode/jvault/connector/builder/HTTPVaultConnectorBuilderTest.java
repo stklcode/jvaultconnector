@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package de.stklcode.jvault.connector.factory;
+package de.stklcode.jvault.connector.builder;
 
 import de.stklcode.jvault.connector.HTTPVaultConnector;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
+import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.jupiter.api.Test;
@@ -37,10 +38,10 @@ import static org.junit.jupiter.api.Assertions.fail;
  * JUnit test for HTTP Vault connector factory
  *
  * @author Stefan Kalscheuer
- * @since 0.6.0
+ * @since 0.8.0
  */
 @EnableRuleMigrationSupport
-public class HTTPVaultConnectorFactoryTest {
+public class HTTPVaultConnectorBuilderTest {
     private static String VAULT_ADDR = "https://localhost:8201";
     private static Integer VAULT_MAX_RETRIES = 13;
     private static String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";
@@ -59,10 +60,10 @@ public class HTTPVaultConnectorFactoryTest {
         /* Provide address only should be enough */
         setenv(VAULT_ADDR, null, null, null);
 
-        HTTPVaultConnectorFactory factory = null;
+        HTTPVaultConnectorBuilder factory = null;
         HTTPVaultConnector connector;
         try {
-            factory = VaultConnectorFactory.httpFactory().fromEnv();
+            factory = VaultConnectorBuilder.http().fromEnv();
         } catch (VaultConnectorException e) {
             fail("Factory creation from minimal environment failed");
         }
@@ -76,7 +77,7 @@ public class HTTPVaultConnectorFactoryTest {
         setenv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), null);
 
         try {
-            factory = VaultConnectorFactory.httpFactory().fromEnv();
+            factory = VaultConnectorBuilder.http().fromEnv();
         } catch (VaultConnectorException e) {
             fail("Factory creation from environment failed");
         }
@@ -96,18 +97,18 @@ public class HTTPVaultConnectorFactoryTest {
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(TlsException.class)));
             assertThat(e.getCause(), is(instanceOf(NoSuchFileException.class)));
-            assertThat(((NoSuchFileException)e.getCause()).getFile(), is(VAULT_CACERT));
+            assertThat(((NoSuchFileException) e.getCause()).getFile(), is(VAULT_CACERT));
         }
 
         /* Automatic authentication */
         setenv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN);
 
         try {
-            factory = VaultConnectorFactory.httpFactory().fromEnv();
+            factory = VaultConnectorBuilder.http().fromEnv();
         } catch (VaultConnectorException e) {
             fail("Factory creation from minimal environment failed");
         }
-        assertThat("Token nor set correctly", getPrivate(getPrivate(factory, "delegate"), "token"), is(equalTo(VAULT_TOKEN)));
+        assertThat("Token nor set correctly", getPrivate(factory, "token"), is(equalTo(VAULT_TOKEN)));
     }
 
     private void setenv(String vault_addr, String vault_cacert, String vault_max_retries, String vault_token) {

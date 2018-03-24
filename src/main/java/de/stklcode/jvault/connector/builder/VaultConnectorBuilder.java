@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package de.stklcode.jvault.connector.factory;
+package de.stklcode.jvault.connector.builder;
 
 import de.stklcode.jvault.connector.VaultConnector;
-import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 /**
- * Abstract Vault Connector Factory interface.
- * Provides builder pattern style factory for Vault connectors.
+ * Abstract Vault Connector Builder interface.
+ * Provides builder style for Vault connectors.
  *
  * @author Stefan Kalscheuer
- * @since 0.1
- * @deprecated As of 0.8.0 please refer to {@link VaultConnectorBuilder} with identical API.
+ * @since 0.8.0
  */
-@Deprecated
-public abstract class VaultConnectorFactory implements VaultConnectorBuilder {
+public interface VaultConnectorBuilder {
     /**
      * Get Factory implementation for HTTP Vault Connector.
      *
      * @return HTTP Connector Factory
-     * @deprecated As of 0.8.0 please refer to {@link VaultConnectorBuilder#http()}.
      */
-    @Deprecated
-    public static HTTPVaultConnectorFactory httpFactory() {
-        return new HTTPVaultConnectorFactory();
+    static HTTPVaultConnectorBuilder http() {
+        return new HTTPVaultConnectorBuilder();
     }
 
     /**
@@ -46,7 +41,7 @@ public abstract class VaultConnectorFactory implements VaultConnectorBuilder {
      *
      * @return Vault Connector instance.
      */
-    public abstract VaultConnector build();
+    VaultConnector build();
 
     /**
      * Build connector and authenticate with token set in factory or from environment.
@@ -55,5 +50,5 @@ public abstract class VaultConnectorFactory implements VaultConnectorBuilder {
      * @throws VaultConnectorException if authentication failed
      * @since 0.6.0
      */
-    public abstract VaultConnector buildAndAuth() throws VaultConnectorException;
+    VaultConnector buildAndAuth() throws VaultConnectorException;
 }
