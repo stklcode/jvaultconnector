@@ -2,11 +2,11 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
     <path d="M4,12 l60,104 l60,-104 z" stroke="none" fill="#000000" />
-    <circle cx="78" cy="24" r="6" stroke="none" fill="#00a9c7" />
-    <circle cx="78" cy="38" r="6" stroke="none" fill="#00a9c7" />
-    <circle cx="78" cy="52" r="6" stroke="none" fill="#00a9c7" />
-    <circle cx="78" cy="66" r="6" stroke="none" fill="#00a9c7" />
-    <circle cx="72" cy="78" r="6" stroke="none" fill="#00a9c7" />
-    <circle cx="58" cy="78" r="6" stroke="none" fill="#00a9c7" />
-    <circle cx="52" cy="66" r="6" stroke="none" fill="#00a9c7" />
+    <rect x="74" y="20" width="8" height="8" stroke="none" fill="#00abe0" />
+    <rect x="74" y="34" width="8" height="8" stroke="none" fill="#00abe0" />
+    <rect x="74" y="48" width="8" height="8" stroke="none" fill="#00abe0" />
+    <rect x="74" y="62" width="8" height="8" stroke="none" fill="#00abe0" />
+    <rect x="68" y="74" width="8" height="8" stroke="none" fill="#00abe0" />
+    <rect x="54" y="74" width="8" height="8" stroke="none" fill="#00abe0" />
+    <rect x="48" y="62" width="8" height="8" stroke="none" fill="#00abe0" />
 </svg>
