@@ -20,9 +20,7 @@ import de.stklcode.jvault.connector.HTTPVaultConnector;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -38,9 +36,9 @@ import java.security.cert.X509Certificate;
  * Vault Connector Factory implementation for HTTP Vault connectors.
  *
  * @author Stefan Kalscheuer
- * @since 0.1
+ * @since 0.8.0
  */
-public final class HTTPVaultConnectorBuilder extends VaultConnectorFactory {
+public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     private static final String ENV_VAULT_ADDR = "VAULT_ADDR";
     private static final String ENV_VAULT_CACERT = "VAULT_CACERT";
     private static final String ENV_VAULT_TOKEN = "VAULT_TOKEN";
@@ -162,19 +160,6 @@ public final class HTTPVaultConnectorBuilder extends VaultConnectorFactory {
     public HTTPVaultConnectorBuilder withTrustedCA(final X509Certificate cert) {
         this.trustedCA = cert;
         return this;
-    }
-
-    /**
-     * Add a custom SSL context.
-     * Overwrites certificates set by {@link #withTrustedCA}.
-     *
-     * @param sslContext the SSL context
-     * @return self
-     * @since 0.4.0
-     * @deprecated As of 0.8.0 this is no longer supported, please use {@link #withTrustedCA(Path)} or {@link #withTrustedCA(X509Certificate)}.
-     */
-    public HTTPVaultConnectorBuilder withSslContext(final SSLContext sslContext) {
-        throw new UnsupportedOperationException("Use of deprecated method, please switch to withTrustedCA()");
     }
 
     /**
