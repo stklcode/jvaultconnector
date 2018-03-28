@@ -60,7 +60,6 @@ import static org.mockito.Mockito.*;
 public class HTTPVaultConnectorOfflineTest {
     private static final String INVALID_URL = "foo:/\\1nv4l1d_UrL";
 
-    private static HttpClientBuilder httpMockBuilder = mock(HttpClientBuilder.class);
     private static CloseableHttpClient httpMock = mock(CloseableHttpClient.class);
     private CloseableHttpResponse responseMock = mock(CloseableHttpResponse.class);
 
@@ -76,7 +75,7 @@ public class HTTPVaultConnectorOfflineTest {
      * @return Mocked HTTP client builder.
      */
     public static HttpClientBuilder create() {
-        return httpMockBuilder;
+        return new MockedHttpClientBuilder();
     }
 
     @BeforeEach
@@ -88,14 +87,8 @@ public class HTTPVaultConnectorOfflineTest {
                 .make()
                 .load(HttpClientBuilder.class.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
 
-        // Ignore SSL context settings.
-        when(httpMockBuilder.setSSLContext(null)).thenReturn(httpMockBuilder);
-
         // Re-initialize HTTP mock to ensure fresh (empty) results.
         httpMock = mock(CloseableHttpClient.class);
-
-        // Mock actual client creation.
-        when(httpMockBuilder.build()).thenReturn(httpMock);
     }
 
     /**
@@ -466,7 +459,7 @@ public class HTTPVaultConnectorOfflineTest {
     private void setPrivate(Object target, String fieldName, Object value) {
         try {
             Field field = target.getClass().getDeclaredField(fieldName);
-            boolean accessible =field.isAccessible();
+            boolean accessible = field.isAccessible();
             field.setAccessible(true);
             field.set(target, value);
             field.setAccessible(accessible);
@@ -480,4 +473,15 @@ public class HTTPVaultConnectorOfflineTest {
         when(responseMock.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), status, ""));
         when(responseMock.getEntity()).thenReturn(new StringEntity(body, type));
     }
+
+    /**
+     * Mocked {@link HttpClientBuilder} that always returns the mocked client.
+     */
+    private static class MockedHttpClientBuilder extends HttpClientBuilder {
+        @Override
+        public CloseableHttpClient build() {
+            return httpMock;
+        }
+    }
+
 }
