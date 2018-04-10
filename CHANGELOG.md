@@ -1,8 +1,8 @@
 ## 0.8.0 [unreleased]
 * **[breaking]** Removed support for `HTTPVaultConnectorFactory#withSslContext()` in favor of `#withTrustedCA()` due to 
-refactoring of the internal SSL handling.
-* [improvement] `VaultConnector` extends `java.io.Serializable`
-* [deprecation] `VaultConnectorFactory` is deprecated in favor of `VaultConnectorBuilder` with identical API.
+refactoring of the internal SSL handling (#17)
+* [improvement] `VaultConnector` extends `java.io.Serializable` (#19)
+* [deprecation] `VaultConnectorFactory` is deprecated in favor of `VaultConnectorBuilder` with identical API (#18)
 
 ## 0.7.1 [2018-03-17]
 * [improvement] Added automatic module name for JPMS compatibility
