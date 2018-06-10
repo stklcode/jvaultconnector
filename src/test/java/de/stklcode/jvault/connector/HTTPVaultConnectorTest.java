@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 @EnableRuleMigrationSupport
 public class HTTPVaultConnectorTest {
-    private static final String VAULT_VERISON = "0.10.1";  // the vault version this test is supposed to run against
+    private static final String VAULT_VERISON = "0.10.2";  // the vault version this test is supposed to run against
     private static final String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
     private static final String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
     private static final String USER_VALID = "validUser";
