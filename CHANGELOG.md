@@ -1,3 +1,7 @@
+## 0.7.2 [unreleased]
+* [dependencies] Updated dependencies to fix vulnerabilities (i.e. CVE-2018-7489)
+* [improvement] Build environment and tests now compatible with Java 10
+
 ## 0.7.1 [2018-03-17]
 * [improvement] Added automatic module name for JPMS compatibility
 * [dependencies] Minor dependency updates
