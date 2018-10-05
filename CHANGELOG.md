@@ -2,6 +2,7 @@
 * **[breaking]** Removed support for `HTTPVaultConnectorFactory#withSslContext()` in favor of `#withTrustedCA()` due to 
 refactoring of the internal SSL handling (#17)
 * [improvement] `VaultConnector` extends `java.io.Serializable` (#19)
+* [improvement] Added missing flags to `SealResponse` (#20)
 * [improvement] Build environment and tests now compatible with Java 10
 * [dependencies] Updated dependencies to fix vulnerabilities (i.e. CVE-2018-7489)
 * [deprecation] `VaultConnectorFactory` is deprecated in favor of `VaultConnectorBuilder` with identical API (#18)

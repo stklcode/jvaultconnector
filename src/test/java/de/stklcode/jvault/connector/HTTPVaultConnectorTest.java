@@ -111,6 +111,7 @@ public class HTTPVaultConnectorTest {
         SealResponse sealStatus = connector.unseal(KEY);
         assumeTrue(sealStatus != null);
         assumeFalse(sealStatus.isSealed());
+        assumeTrue(sealStatus.isInitialized()); // Initialized flag of Vault 0.11.2 (#20).
     }
 
     @AfterEach
