@@ -47,12 +47,14 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final Integer DEFAULT_PORT = 8200;
     public static final boolean DEFAULT_TLS = true;
+    public static final String DEFAULT_TLS_VERSION = "TLSv1.2";
     public static final String DEFAULT_PREFIX = "/v1/";
     public static final int DEFAULT_NUMBER_OF_RETRIES = 0;
 
     private String host;
     private Integer port;
     private boolean tls;
+    private String tlsVersion;
     private String prefix;
     private X509Certificate trustedCA;
     private int numberOfRetries;
@@ -67,6 +69,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
         host = DEFAULT_HOST;
         port = DEFAULT_PORT;
         tls = DEFAULT_TLS;
+        tlsVersion = DEFAULT_TLS_VERSION;
         prefix = DEFAULT_PREFIX;
         numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
     }
@@ -102,6 +105,31 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     public HTTPVaultConnectorBuilder withTLS(final boolean useTLS) {
         this.tls = useTLS;
         return this;
+    }
+
+    /**
+     * Set TLS usage (default: TRUE).
+     *
+     * @param useTLS  Use TLS or not.
+     * @param version Supported TLS version ({@code TLSv1.2}, {@code TLSv1.1}, {@code TLSv1.0}, {@code TLS}).
+     * @return self
+     * @since 0.8 Added version parameter (#22).
+     */
+    public HTTPVaultConnectorBuilder withTLS(final boolean useTLS, final String version) {
+        this.tls = useTLS;
+        this.tlsVersion = version;
+        return this;
+    }
+
+    /**
+     * Convenience Method for TLS usage (enabled by default).
+     *
+     * @param version Supported TLS version ({@code TLSv1.2}, {@code TLSv1.1}, {@code TLSv1.0}, {@code TLS}).
+     * @return self
+     * @since 0.8 Added version parameter (#22).
+     */
+    public HTTPVaultConnectorBuilder withTLS(final String version) {
+        return withTLS(true, version);
     }
 
     /**
@@ -239,14 +267,15 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
 
     @Override
     public HTTPVaultConnector build() {
-        return new HTTPVaultConnector(host, tls, port, prefix, trustedCA, numberOfRetries, timeout);
+        return new HTTPVaultConnector(host, tls, tlsVersion, port, prefix, trustedCA, numberOfRetries, timeout);
     }
 
     @Override
     public HTTPVaultConnector buildAndAuth() throws VaultConnectorException {
-        if (token == null)
+        if (token == null) {
             throw new ConnectionException("No vault token provided, unable to authenticate.");
-        HTTPVaultConnector con = new HTTPVaultConnector(host, tls, port, prefix, trustedCA, numberOfRetries, timeout);
+        }
+        HTTPVaultConnector con = build();
         con.authToken(token);
         return con;
     }

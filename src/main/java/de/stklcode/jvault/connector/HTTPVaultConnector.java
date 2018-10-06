@@ -77,9 +77,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
     private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";
 
+    public static final String DEFAULT_TLS_VERSION = "TLSv1.2";
+
     private final ObjectMapper jsonMapper;
 
     private final String baseURL;                   // Base URL of Vault.
+    private final String tlsVersion;                // TLS version (#22).
     private final X509Certificate trustedCaCert;    // Trusted CA certificate.
     private final int retries;                      // Number of retries on 5xx errors.
     private final Integer timeout;                  // Timeout in milliseconds.
@@ -138,7 +141,7 @@ public class HTTPVaultConnector implements VaultConnector {
                               final Integer port,
                               final String prefix,
                               final X509Certificate trustedCaCert) {
-        this(hostname, useTLS, port, prefix, trustedCaCert, 0, null);
+        this(hostname, useTLS, DEFAULT_TLS_VERSION, port, prefix, trustedCaCert, 0, null);
     }
 
     /**
@@ -146,6 +149,7 @@ public class HTTPVaultConnector implements VaultConnector {
      *
      * @param hostname        The hostname
      * @param useTLS          If TRUE, use HTTPS, otherwise HTTP
+     * @param tlsVersion      TLS version
      * @param port            The port
      * @param prefix          HTTP API prefix (default: /v1/)
      * @param trustedCaCert   Trusted CA certificate
@@ -154,6 +158,7 @@ public class HTTPVaultConnector implements VaultConnector {
      */
     public HTTPVaultConnector(final String hostname,
                               final boolean useTLS,
+                              final String tlsVersion,
                               final Integer port,
                               final String prefix,
                               final X509Certificate trustedCaCert,
@@ -165,7 +170,8 @@ public class HTTPVaultConnector implements VaultConnector {
                         + prefix,
                 trustedCaCert,
                 numberOfRetries,
-                timeout);
+                timeout,
+                tlsVersion);
     }
 
     /**
@@ -210,10 +216,28 @@ public class HTTPVaultConnector implements VaultConnector {
                               final X509Certificate trustedCaCert,
                               final int numberOfRetries,
                               final Integer timeout) {
+        this(baseURL, trustedCaCert, numberOfRetries, timeout, DEFAULT_TLS_VERSION);
+    }
+
+    /**
+     * Create connector using full URL and trusted certificate.
+     *
+     * @param baseURL         The URL
+     * @param trustedCaCert   Trusted CA certificate
+     * @param numberOfRetries Number of retries on 5xx errors
+     * @param timeout         Timeout for HTTP requests (milliseconds)
+     * @param tlsVersion      TLS Version.
+     */
+    public HTTPVaultConnector(final String baseURL,
+                              final X509Certificate trustedCaCert,
+                              final int numberOfRetries,
+                              final Integer timeout,
+                              final String tlsVersion) {
         this.baseURL = baseURL;
         this.trustedCaCert = trustedCaCert;
         this.retries = numberOfRetries;
         this.timeout = timeout;
+        this.tlsVersion = tlsVersion;
         this.jsonMapper = new ObjectMapper();
     }
 
@@ -928,7 +952,7 @@ public class HTTPVaultConnector implements VaultConnector {
             tmf.init(keyStore);
 
             // Create context usint this TrustManager.
-            SSLContext context = SSLContext.getInstance("TLS");
+            SSLContext context = SSLContext.getInstance(tlsVersion);
             context.init(null, tmf.getTrustManagers(), new SecureRandom());
 
             return new SSLConnectionSocketFactory(

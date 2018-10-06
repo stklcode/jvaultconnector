@@ -163,7 +163,7 @@ public class HTTPVaultConnectorOfflineTest {
         final String expectedNoTls = "http://" + hostname + "/v1/";
         final String expectedCustomPort = "https://" + hostname + ":" + port + "/v1/";
         final String expectedCustomPrefix = "https://" + hostname + ":" + port + prefix;
-        X509Certificate trustedCaCert = null;
+        X509Certificate trustedCaCert;
 
         try (InputStream is = getClass().getResourceAsStream("/tls/ca.pem")) {
             trustedCaCert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
@@ -194,6 +194,12 @@ public class HTTPVaultConnectorOfflineTest {
         // Specify number of retries.
         connector = new HTTPVaultConnector(url, trustedCaCert, retries);
         assertThat("Number of retries not set correctly", getPrivate(connector, "retries"), is(retries));
+
+        // Test TLS version (#22).
+        assertThat("TLS version should be 1.2 if not specified", getPrivate(connector, "tlsVersion"), is("TLSv1.2"));
+        // Now override.
+        connector = new HTTPVaultConnector(url, trustedCaCert, retries, null, "TLSv1.1");
+        assertThat("Overridden TLS version 1.1 not correct", getPrivate(connector, "tlsVersion"), is("TLSv1.1"));
     }
 
     /**
