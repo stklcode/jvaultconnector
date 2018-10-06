@@ -41,19 +41,4 @@ public abstract class VaultConnectorFactory implements VaultConnectorBuilder {
         return new HTTPVaultConnectorFactory();
     }
 
-    /**
-     * Build command, produces connector after initialization.
-     *
-     * @return Vault Connector instance.
-     */
-    public abstract VaultConnector build();
-
-    /**
-     * Build connector and authenticate with token set in factory or from environment.
-     *
-     * @return Authenticated Vault connector instance.
-     * @throws VaultConnectorException if authentication failed
-     * @since 0.6.0
-     */
-    public abstract VaultConnector buildAndAuth() throws VaultConnectorException;
 }
