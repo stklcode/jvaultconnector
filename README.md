@@ -71,13 +71,13 @@ VaultConnector vault = VaultConnectorFactory.httpFactory()
 ### Authentication
 
 ```java
-// Authenticate with token
+// Authenticate with token.
 vault.authToken("01234567-89ab-cdef-0123-456789abcdef");
 
-// Authenticate with username and password
+// Authenticate with username and password.
 vault.authUserPass("username", "p4ssw0rd");
 
-// Authenticate with AppID (secret - 2nd argument - is optional)
+// Authenticate with AppRole (secret - 2nd argument - is optional).
 vault.authAppId("01234567-89ab-cdef-0123-456789abcdef", "fedcba98-7654-3210-fedc-ba9876543210");
 ```
 
@@ -87,17 +87,17 @@ vault.authAppId("01234567-89ab-cdef-0123-456789abcdef", "fedcba98-7654-3210-fedc
 // Retrieve secret (prefix "secret/" assumed, use read() to read arbitrary paths)
 String secret = vault.readSecret("some/secret/key").getValue();
 
-// Complex secret
+// Complex secret.
 Map<String, Object> secretData = vault.readSecret("another/secret/key").getData();
 
-// Write simple secret
+// Write simple secret.
 vault.writeSecret("new/secret/key", "secret value");
 
-// Write complex data to arbitraty path
+// Write complex data to arbitraty path.
 Map<String, Object> map = [...]
 vault.write("any/path/to/write", map);
 
-// Delete secret
+// Delete secret.
 vault.delete("any/path/to/write");
 ```
 

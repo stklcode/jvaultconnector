@@ -35,11 +35,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class HealthResponseTest {
     private static final String CLUSTER_ID = "c9abceea-4f46-4dab-a688-5ce55f89e228";
     private static final String CLUSTER_NAME = "vault-cluster-5515c810";
-    private static final String VERSION = "0.6.2";
+    private static final String VERSION = "0.9.2";
     private static final Long SERVER_TIME_UTC = 1469555798L;
     private static final Boolean STANDBY = false;
     private static final Boolean SEALED = false;
     private static final Boolean INITIALIZED = true;
+    private static final Boolean PERF_STANDBY = false;
+    private static final String REPL_PERF_MODE = "disabled";
+    private static final String REPL_DR_MODE = "disabled";
 
     private static final String RES_JSON = "{\n" +
             "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
@@ -48,7 +51,10 @@ public class HealthResponseTest {
             "  \"server_time_utc\": " + SERVER_TIME_UTC + ",\n" +
             "  \"standby\": " + STANDBY + ",\n" +
             "  \"sealed\": " + SEALED + ",\n" +
-            "  \"initialized\": " + INITIALIZED + "\n" +
+            "  \"initialized\": " + INITIALIZED + ",\n" +
+            "  \"replication_perf_mode\": \"" + REPL_PERF_MODE + "\",\n" +
+            "  \"replication_dr_mode\": \"" + REPL_DR_MODE + "\",\n" +
+            "  \"performance_standby\": " + PERF_STANDBY + "\n" +
             "}";
     /**
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
@@ -65,6 +71,9 @@ public class HealthResponseTest {
             assertThat("Incorrect standby state", res.isStandby(), is(STANDBY));
             assertThat("Incorrect seal state", res.isSealed(), is(SEALED));
             assertThat("Incorrect initialization state", res.isInitialized(), is(INITIALIZED));
+            assertThat("Incorrect performance standby state", res.isPerformanceStandby(), is(PERF_STANDBY));
+            assertThat("Incorrect replication perf mode", res.getReplicationPerfMode(), is(REPL_PERF_MODE));
+            assertThat("Incorrect replication DR mode", res.getReplicationDrMode(), is(REPL_DR_MODE));
         } catch (IOException e) {
             fail("Health deserialization failed: " + e.getMessage());
         }

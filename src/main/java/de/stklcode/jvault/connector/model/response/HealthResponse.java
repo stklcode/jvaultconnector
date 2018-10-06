@@ -48,6 +48,15 @@ public final class HealthResponse implements VaultResponse {
     @JsonProperty("initialized")
     private Boolean initialized;
 
+    @JsonProperty("replication_perf_mode")
+    private String replicationPerfMode;
+
+    @JsonProperty("replication_dr_mode")
+    private String replicationDrMode;
+
+    @JsonProperty("performance_standby")
+    private Boolean performanceStandby;
+
     /**
      * @return The Cluster ID.
      */
@@ -95,5 +104,29 @@ public final class HealthResponse implements VaultResponse {
      */
     public Boolean isInitialized() {
         return initialized;
+    }
+
+    /**
+     * @return Replication performance mode of the active node (since Vault 0.9.2).
+     * @since 0.8 (#21)
+     */
+    public String getReplicationPerfMode() {
+        return replicationPerfMode;
+    }
+
+    /**
+     * @return Replication DR mode of the active node (since Vault 0.9.2).
+     * @since 0.8 (#21)
+     */
+    public String getReplicationDrMode() {
+        return replicationDrMode;
+    }
+
+    /**
+     * @return Performance standby status.
+     * @since 0.8 (#21)
+     */
+    public Boolean isPerformanceStandby() {
+        return performanceStandby;
     }
 }
