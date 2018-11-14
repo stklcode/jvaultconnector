@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 @EnableRuleMigrationSupport
 public class HTTPVaultConnectorTest {
-    private static final String VAULT_VERISON = "0.11.5";  // the vault version this test is supposed to run against
+    private static String VAULT_VERSION = "0.11.5";  // the vault version this test is supposed to run against
     private static final String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
     private static final String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
     private static final String USER_VALID = "validUser";
@@ -80,6 +80,15 @@ public class HTTPVaultConnectorTest {
 
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
+
+    @BeforeAll
+    public static void init() {
+        // Override vault version if defined in sysenv.
+        if (System.getenv("VAULT_VERSION") != null) {
+            VAULT_VERSION = System.getenv("VAULT_VERSION");
+            System.out.println("Vault version set to " + VAULT_VERSION);
+        }
+    }
 
     /**
      * Initialize Vault instance with generated configuration and provided file backend.
@@ -162,7 +171,7 @@ public class HTTPVaultConnectorTest {
             fail("Retrieving health status failed: " + e.getMessage());
         }
         assertThat("Health response should be set", res, is(notNullValue()));
-        assertThat("Unexpected version", res.getVersion(), is(VAULT_VERISON));
+        assertThat("Unexpected version", res.getVersion(), is(VAULT_VERSION));
         assertThat("Unexpected init status", res.isInitialized(), is(true));
         assertThat("Unexpected seal status", res.isSealed(), is(false));
         assertThat("Unexpected standby status", res.isStandby(), is(false));
