@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 @EnableRuleMigrationSupport
 public class HTTPVaultConnectorTest {
-    private static String VAULT_VERSION = "0.11.5";  // the vault version this test is supposed to run against
+    private static String VAULT_VERSION = "0.11.5"; // the vault version this test is supposed to run against
     private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
     private static final String KEY2 = "O5OHwDleY3IiPdgw61cgHlhsrEm6tVJkrxhF6QAnILd1";
     private static final String KEY3 = "mw7Bm3nbt/UWa/juDjjL2EPQ04kiJ0saC5JEXwJvXYsB";
@@ -878,12 +878,18 @@ public class HTTPVaultConnectorTest {
         try {
             AuthResponse res = connector.createToken(token);
             assertThat("No result given.", res, is(notNullValue()));
-            assertThat("Token creation returned warnings.", res.getWarnings(), is(nullValue()));
             assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id"));
             assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
             assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("root"));
             assertThat("Metadata unexpected.", res.getAuth().getMetadata(), is(nullValue()));
             assertThat("Root token should not be renewable", res.getAuth().isRenewable(), is(false));
+
+            // Starting with Vault 1.0 a warning "cusotm ID uses weaker SHA1..." is given.
+            if (VAULT_VERSION.startsWith("1.")) {
+                assertThat("Token creation did not return expected warning.", res.getWarnings(), hasSize(1));
+            } else {
+                assertThat("Token creation returned warnings.", res.getWarnings(), is(nullValue()));
+            }
         } catch (VaultConnectorException e) {
             fail("Secret written to inaccessible path.");
         }
