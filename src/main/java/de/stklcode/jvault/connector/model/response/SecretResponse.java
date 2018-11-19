@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,10 +34,25 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretResponse extends VaultDataResponse {
     private Map<String, Object> data;
+    private VersionMetadata metadata;
 
     @Override
     public final void setData(final Map<String, Object> data) throws InvalidResponseException {
-        this.data = data;
+        if (data.size() == 2
+                && data.containsKey("data") && data.get("data") instanceof Map
+                && data.containsKey("metadata") && data.get("metadata") instanceof Map) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                // This is apparently a KV v2 value.
+                this.data = (Map<String, Object>) data.get("data");
+                this.metadata = mapper.readValue(mapper.writeValueAsString(data.get("metadata")), VersionMetadata.class);
+            } catch (ClassCastException | IOException e) {
+                throw new InvalidResponseException("Failed deserializing response", e);
+            }
+        } else {
+            // For KV v1 without metadata just store the data map.
+            this.data = data;
+        }
     }
 
     /**
@@ -46,9 +62,20 @@ public class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      */
     public final Map<String, Object> getData() {
-        if (data == null)
+        if (data == null) {
             return new HashMap<>();
+        }
         return data;
+    }
+
+    /**
+     * Get secret metadata. This is only available for KV v2 secrets.
+     *
+     * @return Metadata of the secret.
+     * @since 0.8
+     */
+    public final VersionMetadata getMetadata() {
+        return metadata;
     }
 
     /**
@@ -59,8 +86,9 @@ public class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      */
     public final Object get(final String key) {
-        if (data == null)
+        if (data == null) {
             return null;
+        }
         return getData().get(key);
     }
 
@@ -74,8 +102,9 @@ public class SecretResponse extends VaultDataResponse {
     @Deprecated
     public final String getValue() {
         Object value = get("value");
-        if (value == null)
+        if (value == null) {
             return null;
+        }
         return value.toString();
     }
 
@@ -97,7 +126,7 @@ public class SecretResponse extends VaultDataResponse {
     /**
      * Get response parsed as JSON.
      *
-     * @param key the key
+     * @param key  the key
      * @param type Class to parse response
      * @param <T>  Class to parse response
      * @return Parsed object or {@code null} if absent
@@ -107,8 +136,9 @@ public class SecretResponse extends VaultDataResponse {
     public final <T> T get(final String key, final Class<T> type) throws InvalidResponseException {
         try {
             Object rawValue = get(key);
-            if (rawValue == null)
+            if (rawValue == null) {
                 return null;
+            }
             return new ObjectMapper().readValue(rawValue.toString(), type);
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
