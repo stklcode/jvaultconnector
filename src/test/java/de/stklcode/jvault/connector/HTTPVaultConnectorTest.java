@@ -57,18 +57,20 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @EnableRuleMigrationSupport
 public class HTTPVaultConnectorTest {
     private static String VAULT_VERSION = "0.11.5";  // the vault version this test is supposed to run against
-    private static final String KEY = "81011a8061e5c028bd0d9503eeba40bd9054b9af0408d080cb24f57405c27a61";
-    private static final String TOKEN_ROOT = "d1bd50e2-587b-6e68-d80b-a9a507625cb7";
+    private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
+    private static final String KEY2 = "O5OHwDleY3IiPdgw61cgHlhsrEm6tVJkrxhF6QAnILd1";
+    private static final String KEY3 = "mw7Bm3nbt/UWa/juDjjL2EPQ04kiJ0saC5JEXwJvXYsB";
+    private static final String TOKEN_ROOT = "30ug6wfy2wvlhhe5h7x0pbkx";
     private static final String USER_VALID = "validUser";
     private static final String PASS_VALID = "validPass";
     private static final String APP_ID = "152AEA38-85FB-47A8-9CBD-612D645BFACA";
     private static final String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
     private static final String APPROLE_ROLE_NAME = "testrole1";                          // role with secret ID
-    private static final String APPROLE_ROLE = "627b6400-90c3-a239-49a9-af65a448ca10";
-    private static final String APPROLE_SECRET = "5e8b0e99-d906-27f5-f043-ccb9bb53b5e8";
-    private static final String APPROLE_SECRET_ACCESSOR = "071e2e9d-742a-fc3c-3fd3-1f4004b0420a";
+    private static final String APPROLE_ROLE = "06eae026-7d4b-e4f8-0ec4-4107eb483975";
+    private static final String APPROLE_SECRET = "20320293-c1c1-3b22-20f8-e5c960da0b5b";
+    private static final String APPROLE_SECRET_ACCESSOR = "3b45a7c2-8d1c-abcf-c732-ecf6db16a8e1";
     private static final String APPROLE_ROLE2_NAME = "testrole2";                         // role with CIDR subnet
-    private static final String APPROLE_ROLE2 = "35b7bf43-9644-588a-e68f-2e8313bb23b7";
+    private static final String APPROLE_ROLE2 = "40224890-1563-5193-be4b-0b4f9f573b7f";
     private static final String SECRET_PATH = "userstore";
     private static final String SECRET_KEY = "foo";
     private static final String SECRET_VALUE = "bar";
@@ -117,7 +119,10 @@ public class HTTPVaultConnectorTest {
         connector = factory.build();
 
         /* Unseal Vault and check result */
-        SealResponse sealStatus = connector.unseal(KEY);
+        SealResponse sealStatus = connector.unseal(KEY1);
+        assumeTrue(sealStatus != null);
+        assumeTrue(sealStatus.isSealed());
+        sealStatus = connector.unseal(KEY2);
         assumeTrue(sealStatus != null);
         assumeFalse(sealStatus.isSealed());
         assumeTrue(sealStatus.isInitialized()); // Initialized flag of Vault 0.11.2 (#20).
@@ -152,7 +157,9 @@ public class HTTPVaultConnectorTest {
             connector.seal();
             sealStatus = connector.sealStatus();
             assertThat("Vault not sealed", sealStatus.isSealed(), is(true));
-            sealStatus = connector.unseal(KEY);
+            sealStatus = connector.unseal(KEY2);
+            assertThat("Vault unsealed with only 1 key", sealStatus.isSealed(), is(true));
+            sealStatus = connector.unseal(KEY3);
             assertThat("Vault not unsealed", sealStatus.isSealed(), is(false));
         } catch (VaultConnectorException e) {
             fail("Sealing failed");
