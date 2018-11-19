@@ -409,6 +409,28 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
+     * Retrieve secret data Vault.
+     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param key Secret identifier
+     * @return Metadata response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    SecretResponse readSecretData(final String key) throws VaultConnectorException;
+
+    /**
+     * Retrieve secret metadata from Vault.
+     * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param key Secret identifier
+     * @return Metadata response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException;
+
+    /**
      * List available nodes from Vault.
      *
      * @param path Root path to search

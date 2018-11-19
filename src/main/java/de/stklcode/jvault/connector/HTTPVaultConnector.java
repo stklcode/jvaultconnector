@@ -599,6 +599,40 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public final SecretResponse readSecretData(final String key) throws VaultConnectorException {
+        if (!isAuthorized()) {
+            throw new AuthorizationRequiredException();
+        }
+        /* Request HTTP response and parse secret metadata */
+        try {
+            String response = requestGet(PATH_SECRET + "data/" + key, new HashMap<>());
+            return jsonMapper.readValue(response, SecretResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException(Error.URI_FORMAT);
+        }
+    }
+
+    @Override
+    public final MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException {
+        if (!isAuthorized()) {
+            throw new AuthorizationRequiredException();
+        }
+        /* Request HTTP response and parse secret metadata */
+        try {
+            String response = requestGet(PATH_SECRET + "metadata/" + key, new HashMap<>());
+            return jsonMapper.readValue(response, MetadataResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException(Error.URI_FORMAT);
+        }
+    }
+
+    @Override
     public final List<String> list(final String path) throws VaultConnectorException {
         if (!isAuthorized())
             throw new AuthorizationRequiredException();
