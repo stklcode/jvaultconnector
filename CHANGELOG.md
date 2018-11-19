@@ -8,6 +8,7 @@ refactoring of the internal SSL handling (#17)
 * [improvement] Build environment and tests now compatible with Java 10
 * [dependencies] Updated dependencies to fix vulnerabilities (i.e. CVE-2018-7489)
 * [deprecation] `VaultConnectorFactory` is deprecated in favor of `VaultConnectorBuilder` with identical API (#18)
+* [deprecation] `AppRoleBuilder#withBoundCidrList(List)` is deprecated in favor of `AppRoleBuilder#withSecretIdBoundCidrs(List)` (#24)
 
 ## 0.7.1 [2018-03-17]
 * [improvement] Added automatic module name for JPMS compatibility

@@ -51,8 +51,8 @@ public class AppRoleBuilderTest {
     private static final Integer TOKEN_MAX_TTL = 9600;
     private static final Integer PERIOD = 1234;
     private static final String JSON_MIN = "{\"role_name\":\"" + NAME + "\"}";
-    private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"role_id\":\"%s\",\"bind_secret_id\":%s,\"bound_cidr_list\":\"%s\",\"policies\":\"%s\",\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"token_ttl\":%d,\"token_max_ttl\":%d,\"period\":%d}",
-            NAME, ID, BIND_SECRET_ID, CIDR_1, POLICY, SECRET_ID_NUM_USES, SECRET_ID_TTL, TOKEN_TTL, TOKEN_MAX_TTL, PERIOD);
+    private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"role_id\":\"%s\",\"bind_secret_id\":%s,\"bound_cidr_list\":\"%s\",\"secret_id_bound_cidrs\":\"%s\",\"policies\":\"%s\",\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"token_ttl\":%d,\"token_max_ttl\":%d,\"period\":%d}",
+            NAME, ID, BIND_SECRET_ID, CIDR_1, CIDR_1, POLICY, SECRET_ID_NUM_USES, SECRET_ID_TTL, TOKEN_TTL, TOKEN_MAX_TTL, PERIOD);
 
     @BeforeAll
     public static void init() {
@@ -69,6 +69,7 @@ public class AppRoleBuilderTest {
         assertThat(role.getId(), is(nullValue()));
         assertThat(role.getBindSecretId(), is(nullValue()));
         assertThat(role.getBoundCidrList(), is(nullValue()));
+        assertThat(role.getSecretIdBoundCidrs(), is(nullValue()));
         assertThat(role.getPolicies(), is(nullValue()));
         assertThat(role.getSecretIdNumUses(), is(nullValue()));
         assertThat(role.getSecretIdTtl(), is(nullValue()));
@@ -89,6 +90,7 @@ public class AppRoleBuilderTest {
                 .withId(ID)
                 .withBindSecretID(BIND_SECRET_ID)
                 .withBoundCidrList(BOUND_CIDR_LIST)
+                .withSecretIdBoundCidrs(BOUND_CIDR_LIST)
                 .withPolicies(POLICIES)
                 .withSecretIdNumUses(SECRET_ID_NUM_USES)
                 .withSecretIdTtl(SECRET_ID_TTL)
@@ -100,6 +102,7 @@ public class AppRoleBuilderTest {
         assertThat(role.getId(), is(ID));
         assertThat(role.getBindSecretId(), is(BIND_SECRET_ID));
         assertThat(role.getBoundCidrList(), is(BOUND_CIDR_LIST));
+        assertThat(role.getSecretIdBoundCidrs(), is(BOUND_CIDR_LIST));
         assertThat(role.getPolicies(), is(POLICIES));
         assertThat(role.getSecretIdNumUses(), is(SECRET_ID_NUM_USES));
         assertThat(role.getSecretIdTtl(), is(SECRET_ID_TTL));
@@ -128,12 +131,16 @@ public class AppRoleBuilderTest {
         role = new AppRoleBuilder(NAME).withCidrBlock(CIDR_2).build();
         assertThat(role.getBoundCidrList(), hasSize(1));
         assertThat(role.getBoundCidrList(), contains(CIDR_2));
+        assertThat(role.getSecretIdBoundCidrs(), hasSize(1));
+        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_2));
         role = new AppRoleBuilder(NAME)
-                .withBoundCidrList(BOUND_CIDR_LIST)
+                .withSecretIdBoundCidrs(BOUND_CIDR_LIST)
                 .withCidrBlock(CIDR_2)
                 .build();
-        assertThat(role.getBoundCidrList(), hasSize(2));
-        assertThat(role.getBoundCidrList(), contains(CIDR_1, CIDR_2));
+        assertThat(role.getBoundCidrList(), hasSize(1));
+        assertThat(role.getBoundCidrList(), contains(CIDR_2));
+        assertThat(role.getSecretIdBoundCidrs(), hasSize(2));
+        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_1, CIDR_2));
 
         /* Add single policy */
         role = new AppRoleBuilder(NAME).withPolicy(POLICY_2).build();
