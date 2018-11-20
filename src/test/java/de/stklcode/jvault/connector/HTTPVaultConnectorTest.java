@@ -77,6 +77,12 @@ public class HTTPVaultConnectorTest {
     private static final String SECRET_KEY_JSON = "json";
     private static final String SECRET_KEY_COMPLEX = "complex";
 
+    // KV v2 secret with 2 versions.
+    private static final String PATH_KV2 = "kv/";
+    private static final String SECRET2_KEY = "foo2";
+    private static final String SECRET2_VALUE1 = "bar2";
+    private static final String SECRET2_VALUE2 = "bar3";
+
     private Process vaultProcess;
     private VaultConnector connector;
 
@@ -727,6 +733,123 @@ public class HTTPVaultConnectorTest {
             assertThat("Unexpected value", res.get("key2"), is("value2"));
         } catch (VaultConnectorException e) {
             fail("Valid secret path could not be read: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test reading of secrets from KV v2 store.
+     */
+    @Test
+    public void readSecretV2Test() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        // Try to read accessible path with known value.
+        SecretResponse res;
+        try {
+            res = connector.readSecretData(SECRET2_KEY);
+            assertThat("Metadata not populated for KV v2 secret", res.getMetadata(), is(notNullValue()));
+            assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(2));
+            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE2));
+        } catch (VaultConnectorException e) {
+            fail("Valid secret path could not be read: " + e.getMessage());
+        }
+
+        // Try to read different version of same secret.
+        try {
+            res = connector.readSecretVersion(SECRET2_KEY, 1);
+            assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(1));
+            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE1));
+        } catch (VaultConnectorException e) {
+            fail("Valid secret version could not be read: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test reading of secret metadata from KV v2 store.
+     */
+    @Test
+    public void readSecretMetadataTest() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        // Try to read accessible path with known value.
+        try {
+            MetadataResponse res = connector.readSecretMetadata(SECRET2_KEY);
+            assertThat("Metadata not populated for KV v2 secret", res.getMetadata(), is(notNullValue()));
+            assertThat("Unexpected secret version", res.getMetadata().getCurrentVersion(), is(2));
+            assertThat("Unexpected number of secret versions", res.getMetadata().getVersions().size(), is(2));
+            assertThat("Creation date should be present", res.getMetadata().getCreatedTime(), is(notNullValue()));
+            assertThat("Update date should be present", res.getMetadata().getUpdatedTime(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Valid secret path could not be read: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test deleting specific secret versions from KV v2 store.
+     */
+    @Test
+    public void handleSecretVersionsTest() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        // Try to delete inexisting versions.
+        MetadataResponse meta;
+        try {
+            connector.deleteSecretVersions(SECRET2_KEY, 5, 42);
+            meta = connector.readSecretMetadata(SECRET2_KEY);
+        } catch (VaultConnectorException e) {
+            fail("Revealed non-existence of secret versions");
+        }
+
+        // Now delete existing version and verify.
+        try {
+            connector.deleteSecretVersions(SECRET2_KEY, 1);
+            meta = connector.readSecretMetadata(SECRET2_KEY);
+            assertThat("Expected deletion time for secret 1", meta.getMetadata().getVersions().get(1).getDeletionTime(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Deleting existing version failed");
+        }
+
+        // Undelete the just deleted version.
+        try {
+            connector.undeleteSecretVersions(SECRET2_KEY, 1);
+            meta = connector.readSecretMetadata(SECRET2_KEY);
+            assertThat("Expected deletion time for secret 1 to be reset", meta.getMetadata().getVersions().get(1).getDeletionTime(), is(nullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Undeleting existing version failed");
+        }
+
+        // Now destroy it.
+        try {
+            connector.destroySecretVersions(SECRET2_KEY, 1);
+            meta = connector.readSecretMetadata(SECRET2_KEY);
+            assertThat("Expected secret 1 to be marked destroyed", meta.getMetadata().getVersions().get(1).isDestroyed(), is(true));
+        } catch (VaultConnectorException e) {
+            fail("Destroying existing version failed");
+        }
+
+        // Delete latest version.
+        try {
+            connector.deleteLatestSecretVersion(SECRET2_KEY);
+            meta = connector.readSecretMetadata(SECRET2_KEY);
+            assertThat("Expected secret 2 to be deleted", meta.getMetadata().getVersions().get(2).getDeletionTime(), is(notNullValue()));
+        } catch (VaultConnectorException e) {
+            fail("Deleting latest version failed");
+        }
+
+        // Delete all versions.
+        try {
+            connector.deleteAllSecretVersions(SECRET2_KEY);
+        } catch (VaultConnectorException e) {
+            fail("Deleting latest version failed: " + e.getMessage());
+        }
+        try {
+            connector.readSecretMetadata(SECRET2_KEY);
+            fail("Reading metadata of deleted secret should not succeed");
+        } catch (Exception e) {
+            assertThat(e, is(instanceOf(InvalidResponseException.class)));
         }
     }
 
