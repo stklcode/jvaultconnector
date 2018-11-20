@@ -69,7 +69,7 @@ public class HTTPVaultConnectorFactoryTest {
         connector = factory.build();
 
         assertThat("URL nor set correctly", getPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-        assertThat("SSL context set when no cert provided", getPrivate(connector, "sslContext"), is(nullValue()));
+        assertThat("Trusted CA cert set when no cert provided", getPrivate(connector, "trustedCaCert"), is(nullValue()));
         assertThat("Non-default number of retries, when none set", getPrivate(connector, "retries"), is(0));
 
         /* Provide address and number of retries */
@@ -83,7 +83,7 @@ public class HTTPVaultConnectorFactoryTest {
         connector = factory.build();
 
         assertThat("URL nor set correctly", getPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-        assertThat("SSL context set when no cert provided", getPrivate(connector, "sslContext"), is(nullValue()));
+        assertThat("Trusted CA cert set when no cert provided", getPrivate(connector, "trustedCaCert"), is(nullValue()));
         assertThat("Number of retries not set correctly", getPrivate(connector, "retries"), is(VAULT_MAX_RETRIES));
 
         /* Provide CA certificate */
@@ -107,7 +107,7 @@ public class HTTPVaultConnectorFactoryTest {
         } catch (VaultConnectorException e) {
             fail("Factory creation from minimal environment failed");
         }
-        assertThat("Token nor set correctly", getPrivate(factory, "token"), is(equalTo(VAULT_TOKEN)));
+        assertThat("Token nor set correctly", getPrivate(getPrivate(factory, "delegate"), "token"), is(equalTo(VAULT_TOKEN)));
     }
 
     private void setenv(String vault_addr, String vault_cacert, String vault_max_retries, String vault_token) {

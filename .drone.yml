@@ -1,0 +1,33 @@
+kind: pipeline
+name: java8
+
+clone:
+  disable: true
+
+steps:
+- name: clone
+  image: plugins/git
+  settings:
+    depth: 10
+    skip_verify: true
+- name: test-online
+  image: maven:3.5-jdk-8-alpine
+  commands:
+  - export VAULT_VERSION=0.11.5
+  - wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip
+  - wget -q -O - https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS | grep linux_amd64 | sha256sum -c
+  - unzip vault_${VAULT_VERSION}_linux_amd64.zip
+  - rm vault_${VAULT_VERSION}_linux_amd64.zip
+  - mv vault /bin/
+  - mvn clean test
+  when:
+    branch:
+    - master
+- name: test-offline
+  image: maven:3.5-jdk-8-alpine
+  commands:
+  - mvn clean test -Dtest='!HTTPVaultConnectorTest'
+  when:
+    branch:
+    - develop
+    - feature/*

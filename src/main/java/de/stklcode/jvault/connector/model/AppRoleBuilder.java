@@ -30,6 +30,7 @@ public final class AppRoleBuilder {
     private String id;
     private Boolean bindSecretId;
     private List<String> boundCidrList;
+    private List<String> secretIdBoundCidrs;
     private List<String> policies;
     private Integer secretIdNumUses;
     private Integer secretIdTtl;
@@ -93,9 +94,23 @@ public final class AppRoleBuilder {
      *
      * @param boundCidrList List of CIDR blocks which can perform login
      * @return self
+     * @deprecated Use {@link #withSecretIdBoundCidrs(List)} instead, as this parameter is deprecated in Vault.
      */
+    @Deprecated
     public AppRoleBuilder withBoundCidrList(final List<String> boundCidrList) {
         this.boundCidrList = boundCidrList;
+        return this;
+    }
+
+    /**
+     * Set bound CIDR blocks.
+     *
+     * @param secretIdBoundCidrs List of CIDR blocks which can perform login
+     * @return self
+     * @since 0.8 replaces {@link #withBoundCidrList(List)}
+     */
+    public AppRoleBuilder withSecretIdBoundCidrs(final List<String> secretIdBoundCidrs) {
+        this.secretIdBoundCidrs = secretIdBoundCidrs;
         return this;
     }
 
@@ -106,9 +121,15 @@ public final class AppRoleBuilder {
      * @return self
      */
     public AppRoleBuilder withCidrBlock(final String cidrBlock) {
-        if (boundCidrList == null)
+        if (boundCidrList == null) {
             boundCidrList = new ArrayList<>();
+        }
         boundCidrList.add(cidrBlock);
+
+        if (secretIdBoundCidrs == null) {
+            secretIdBoundCidrs = new ArrayList<>();
+        }
+        secretIdBoundCidrs.add(cidrBlock);
         return this;
     }
 
@@ -204,6 +225,7 @@ public final class AppRoleBuilder {
                 id,
                 bindSecretId,
                 boundCidrList,
+                secretIdBoundCidrs,
                 policies,
                 secretIdNumUses,
                 secretIdTtl,

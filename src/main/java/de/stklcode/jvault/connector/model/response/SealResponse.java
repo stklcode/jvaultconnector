@@ -22,13 +22,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Vault response for seal status or unseal request.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SealResponse implements VaultResponse {
+    @JsonProperty("type")
+    private String type;
+
     @JsonProperty("sealed")
     private boolean sealed;
+
+    @JsonProperty("initialized")
+    private boolean initialized;
 
     @JsonProperty("t")
     private Integer threshold;
@@ -39,11 +45,39 @@ public final class SealResponse implements VaultResponse {
     @JsonProperty("progress")
     private Integer progress;
 
+    @JsonProperty("version")
+    private String version;
+
+    @JsonProperty("nonce")
+    private String nonce;
+
+    @JsonProperty("cluster_name")
+    private String clusterName;
+
+    @JsonProperty("cluster_id")
+    private String clusterId;
+
+    /**
+     * @return Seal type.
+     * @since 0.8
+     */
+    public String getType() {
+        return type;
+    }
+
     /**
      * @return Seal status
      */
     public boolean isSealed() {
         return sealed;
+    }
+
+    /**
+     * @return Vault initialization status (since Vault 0.11.2).
+     * @since 0.8
+     */
+    public boolean isInitialized() {
+        return initialized;
     }
 
     /**
@@ -65,5 +99,37 @@ public final class SealResponse implements VaultResponse {
      */
     public Integer getProgress() {
         return progress;
+    }
+
+    /**
+     * @return Vault version.
+     * @since 0.8
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * @return A random nonce.
+     * @since 0.8
+     */
+    public String getNonce() {
+        return nonce;
+    }
+
+    /**
+     * @return Vault cluster name (only if unsealed).
+     * @since 0.8
+     */
+    public String getClusterName() {
+        return clusterName;
+    }
+
+    /**
+     * @return Vault cluster ID (only if unsealed).
+     * @since 0.8
+     */
+    public String getClusterId() {
+        return clusterId;
     }
 }

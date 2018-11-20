@@ -17,23 +17,11 @@
 package de.stklcode.jvault.connector.factory;
 
 import de.stklcode.jvault.connector.HTTPVaultConnector;
-import de.stklcode.jvault.connector.exception.ConnectionException;
-import de.stklcode.jvault.connector.exception.TlsException;
+import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 /**
@@ -41,38 +29,19 @@ import java.security.cert.X509Certificate;
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @deprecated As of 0.8.0 please refer to {@link de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder} with identical API.
  */
+@Deprecated
 public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
-    private static final String ENV_VAULT_ADDR = "VAULT_ADDR";
-    private static final String ENV_VAULT_CACERT = "VAULT_CACERT";
-    private static final String ENV_VAULT_TOKEN = "VAULT_TOKEN";
-    private static final String ENV_VAULT_MAX_RETRIES = "VAULT_MAX_RETRIES";
 
-    public static final String DEFAULT_HOST = "127.0.0.1";
-    public static final Integer DEFAULT_PORT = 8200;
-    public static final boolean DEFAULT_TLS = true;
-    public static final String DEFAULT_PREFIX = "/v1/";
-    public static final int DEFAULT_NUMBER_OF_RETRIES = 0;
-
-    private String host;
-    private Integer port;
-    private boolean tls;
-    private String prefix;
-    private SSLContext sslContext;
-    private int numberOfRetries;
-    private Integer timeout;
-    private String token;
+    private final HTTPVaultConnectorBuilder delegate;
 
     /**
      * Default empty constructor.
      * Initializes factory with default values.
      */
     public HTTPVaultConnectorFactory() {
-        host = DEFAULT_HOST;
-        port = DEFAULT_PORT;
-        tls = DEFAULT_TLS;
-        prefix = DEFAULT_PREFIX;
-        numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
+        delegate = new HTTPVaultConnectorBuilder();
     }
 
     /**
@@ -82,7 +51,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withHost(final String host) {
-        this.host = host;
+        delegate.withHost(host);
         return this;
     }
 
@@ -93,7 +62,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withPort(final Integer port) {
-        this.port = port;
+        delegate.withPort(port);
         return this;
     }
 
@@ -104,7 +73,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withTLS(final boolean useTLS) {
-        this.tls = useTLS;
+        delegate.withTLS(useTLS);
         return this;
     }
 
@@ -133,7 +102,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @return self
      */
     public HTTPVaultConnectorFactory withPrefix(final String prefix) {
-        this.prefix = prefix;
+        delegate.withPrefix(prefix);
         return this;
     }
 
@@ -146,8 +115,19 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.4.0
      */
     public HTTPVaultConnectorFactory withTrustedCA(final Path cert) throws VaultConnectorException {
-        if (cert != null)
-            return withSslContext(createSslContext(cert));
+        delegate.withTrustedCA(cert);
+        return this;
+    }
+
+    /**
+     * Add a trusted CA certifiate for HTTPS connections.
+     *
+     * @param cert path to certificate file
+     * @return self
+     * @since 0.8.0
+     */
+    public HTTPVaultConnectorFactory withTrustedCA(final X509Certificate cert) {
+        delegate.withTrustedCA(cert);
         return this;
     }
 
@@ -158,10 +138,10 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @param sslContext the SSL context
      * @return self
      * @since 0.4.0
+     * @deprecated As of 0.8.0 this is no longer supported, please use {@link #withTrustedCA(Path)} or {@link #withTrustedCA(X509Certificate)}.
      */
     public HTTPVaultConnectorFactory withSslContext(final SSLContext sslContext) {
-        this.sslContext = sslContext;
-        return this;
+        throw new UnsupportedOperationException("Use of deprecated method, please switch to withTrustedCA()");
     }
 
     /**
@@ -172,7 +152,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory withToken(final String token) {
-        this.token = token;
+        delegate.withToken(token);
         return this;
     }
 
@@ -184,34 +164,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory fromEnv() throws VaultConnectorException {
-        /* Parse URL from environment variable */
-        if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).trim().isEmpty()) {
-            try {
-                URL url = new URL(System.getenv(ENV_VAULT_ADDR));
-                this.host = url.getHost();
-                this.port = url.getPort();
-                this.tls = url.getProtocol().equals("https");
-            } catch (MalformedURLException e) {
-                throw new ConnectionException("URL provided in environment variable malformed", e);
-            }
-        }
-
-        /* Read number of retries */
-        if (System.getenv(ENV_VAULT_MAX_RETRIES) != null) {
-            try {
-                numberOfRetries = Integer.parseInt(System.getenv(ENV_VAULT_MAX_RETRIES));
-            } catch (NumberFormatException ignored) {
-                /* Ignore malformed values. */
-            }
-        }
-
-        /* Read token */
-        token = System.getenv(ENV_VAULT_TOKEN);
-
-        /* Parse certificate, if set */
-        if (System.getenv(ENV_VAULT_CACERT) != null && !System.getenv(ENV_VAULT_CACERT).trim().isEmpty()) {
-            return withTrustedCA(Paths.get(System.getenv(ENV_VAULT_CACERT)));
-        }
+        delegate.fromEnv();
         return this;
     }
 
@@ -223,7 +176,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory withNumberOfRetries(final int numberOfRetries) {
-        this.numberOfRetries = numberOfRetries;
+        delegate.withNumberOfRetries(numberOfRetries);
         return this;
     }
 
@@ -235,78 +188,17 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
      * @since 0.6.0
      */
     public HTTPVaultConnectorFactory withTimeout(final int milliseconds) {
-        this.timeout = milliseconds;
+        delegate.withTimeout(milliseconds);
         return this;
     }
 
     @Override
     public HTTPVaultConnector build() {
-        return new HTTPVaultConnector(host, tls, port, prefix, sslContext, numberOfRetries, timeout);
+        return delegate.build();
     }
 
     @Override
     public HTTPVaultConnector buildAndAuth() throws VaultConnectorException {
-        if (token == null)
-            throw new ConnectionException("No vault token provided, unable to authenticate.");
-        HTTPVaultConnector con = new HTTPVaultConnector(host, tls, port, prefix, sslContext, numberOfRetries, timeout);
-        con.authToken(token);
-        return con;
-    }
-
-    /**
-     * Create SSL Context trusting only provided certificate.
-     *
-     * @param trustedCert Path to trusted CA certificate
-     * @return SSL context
-     * @throws TlsException on errors
-     * @since 0.4.0
-     */
-    private SSLContext createSslContext(final Path trustedCert) throws TlsException {
-        try {
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, createTrustManager(trustedCert), new SecureRandom());
-            return context;
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new TlsException("Unable to intialize SSLContext", e);
-        }
-    }
-
-    /**
-     * Create a custom TrustManager for given CA certificate file.
-     *
-     * @param trustedCert Path to trusted CA certificate
-     * @return TrustManger
-     * @throws TlsException on error
-     * @since 0.4.0
-     */
-    private TrustManager[] createTrustManager(final Path trustedCert) throws TlsException {
-        try {
-            /* Create Keystore with trusted certificate */
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("trustedCert", certificateFromFile(trustedCert));
-            /* Initialize TrustManager */
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keyStore);
-            return tmf.getTrustManagers();
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
-            throw new TlsException("Unable to initialize TrustManager", e);
-        }
-    }
-
-    /**
-     * Read given certificate file to X.509 certificate.
-     *
-     * @param certFile Path to certificate file
-     * @return X.509 Certificate object
-     * @throws TlsException on error
-     * @since 0.4.0
-     */
-    private X509Certificate certificateFromFile(final Path certFile) throws TlsException {
-        try (InputStream is = Files.newInputStream(certFile)) {
-            return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
-        } catch (IOException | CertificateException e) {
-            throw new TlsException("Unable to read certificate.", e);
-        }
+        return delegate.buildAndAuth();
     }
 }

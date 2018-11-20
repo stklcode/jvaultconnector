@@ -92,7 +92,7 @@ public class VaultConfiguration {
 
     @Override
     public String toString() {
-        return "backend \"file\" {\n" +
+        return "storage \"file\" {\n" +
                 "  path = \"" + dataLocation + "\"\n" +
                 "}\n" +
                 "listener \"tcp\" {\n" +

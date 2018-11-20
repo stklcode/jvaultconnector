@@ -4,13 +4,14 @@
 
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>connector</artifactId>
-    <version>0.7.2-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
     <name>jVaultConnector</name>
     <description>Connector artifact for Hashicorp's Vault secret management</description>
     <url>https://jvault.stklcode.de</url>
+    <inceptionYear>2016</inceptionYear>
 
     <licenses>
         <license>
@@ -23,6 +24,25 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <developers>
+        <developer>
+            <name>Stefan Kalscheuer</name>
+            <email>stefan@stklcode.de</email>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/stklcode/jvaultconnector.git</connection>
+        <developerConnection>scm:git:git@github.com:stklcode/jvaultconnector.git</developerConnection>
+        <url>https://github.com/stklcode/jvaultconnector</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/stklcode/jvaultconnector/issues</url>
+    </issueManagement>
 
     <build>
         <plugins>
@@ -138,4 +158,55 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+
+    <profiles>
+        <profile>
+            <id>sources</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>javadoc</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

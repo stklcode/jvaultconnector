@@ -21,6 +21,7 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.Map;
  * @author Stefan Kalscheuer
  * @since 0.1
  */
-public interface VaultConnector extends AutoCloseable {
+public interface VaultConnector extends AutoCloseable, Serializable {
     /**
      * Default sub-path for Vault secrets.
      */
