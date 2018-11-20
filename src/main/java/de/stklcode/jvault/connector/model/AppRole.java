@@ -103,7 +103,7 @@ public final class AppRole {
 
     /**
      * Construct complete {@link AppRole} object.
-     *
+     * <p>
      * This constructor is used for transition from {@code bound_cidr_list} to {@code secret_id_bound_cidrs} only.
      *
      * @param name               Role name (required)
@@ -119,8 +119,8 @@ public final class AppRole {
      * @param period             Duration in seconds, if set the token is a periodic token (optional)
      */
     AppRole(final String name, final String id, final Boolean bindSecretId, final List<String> boundCidrList,
-                   final List<String> secretIdBoundCidrs, final List<String> policies, final Integer secretIdNumUses,
-                   final Integer secretIdTtl, final Integer tokenTtl, final Integer tokenMaxTtl, final Integer period) {
+            final List<String> secretIdBoundCidrs, final List<String> policies, final Integer secretIdNumUses,
+            final Integer secretIdTtl, final Integer tokenTtl, final Integer tokenMaxTtl, final Integer period) {
         this.name = name;
         this.id = id;
         this.bindSecretId = bindSecretId;
@@ -182,8 +182,9 @@ public final class AppRole {
     @JsonGetter("bound_cidr_list")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public String getBoundCidrListString() {
-        if (boundCidrList == null || boundCidrList.isEmpty())
+        if (boundCidrList == null || boundCidrList.isEmpty()) {
             return "";
+        }
         return String.join(",", boundCidrList);
     }
 
@@ -238,8 +239,9 @@ public final class AppRole {
     @JsonGetter("policies")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public String getPoliciesString() {
-        if (policies == null || policies.isEmpty())
+        if (policies == null || policies.isEmpty()) {
             return "";
+        }
         return String.join(",", policies);
     }
 

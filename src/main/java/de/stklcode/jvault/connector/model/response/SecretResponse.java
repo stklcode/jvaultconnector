@@ -46,8 +46,9 @@ public class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      */
     public final Map<String, Object> getData() {
-        if (data == null)
+        if (data == null) {
             return new HashMap<>();
+        }
         return data;
     }
 
@@ -59,8 +60,9 @@ public class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      */
     public final Object get(final String key) {
-        if (data == null)
+        if (data == null) {
             return null;
+        }
         return getData().get(key);
     }
 
@@ -74,8 +76,9 @@ public class SecretResponse extends VaultDataResponse {
     @Deprecated
     public final String getValue() {
         Object value = get("value");
-        if (value == null)
+        if (value == null) {
             return null;
+        }
         return value.toString();
     }
 
@@ -107,8 +110,9 @@ public class SecretResponse extends VaultDataResponse {
     public final <T> T get(final String key, final Class<T> type) throws InvalidResponseException {
         try {
             Object rawValue = get(key);
-            if (rawValue == null)
+            if (rawValue == null) {
                 return null;
+            }
             return new ObjectMapper().readValue(rawValue.toString(), type);
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());

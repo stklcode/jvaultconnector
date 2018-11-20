@@ -159,8 +159,9 @@ public final class TokenBuilder {
      * @return self
      */
     public TokenBuilder withPolicies(final List<String> policies) {
-        if (this.policies == null)
+        if (this.policies == null) {
             this.policies = new ArrayList<>();
+        }
         this.policies.addAll(policies);
         return this;
     }
@@ -172,8 +173,9 @@ public final class TokenBuilder {
      * @return self
      */
     public TokenBuilder withPolicy(final String policy) {
-        if (this.policies == null)
+        if (this.policies == null) {
             this.policies = new ArrayList<>();
+        }
         policies.add(policy);
         return this;
     }
@@ -185,8 +187,9 @@ public final class TokenBuilder {
      * @return self
      */
     public TokenBuilder withMeta(final Map<String, String> meta) {
-        if (this.meta == null)
+        if (this.meta == null) {
             this.meta = new HashMap<>();
+        }
         this.meta.putAll(meta);
         return this;
     }
@@ -199,8 +202,9 @@ public final class TokenBuilder {
      * @return self
      */
     public TokenBuilder withMeta(final String key, final String value) {
-        if (this.meta == null)
+        if (this.meta == null) {
             this.meta = new HashMap<>();
+        }
         this.meta.put(key, value);
         return this;
     }

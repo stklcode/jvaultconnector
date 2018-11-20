@@ -126,8 +126,9 @@ public final class AppRoleSecret {
      */
     @JsonGetter("cidr_list")
     public String getCidrListString() {
-        if (cidrList == null || cidrList.isEmpty())
+        if (cidrList == null || cidrList.isEmpty()) {
             return "";
+        }
         return String.join(",", cidrList);
     }
 

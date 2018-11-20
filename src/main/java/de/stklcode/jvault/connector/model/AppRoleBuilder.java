@@ -140,8 +140,9 @@ public final class AppRoleBuilder {
      * @return self
      */
     public AppRoleBuilder withPolicies(final List<String> policies) {
-        if (this.policies == null)
+        if (this.policies == null) {
             this.policies = new ArrayList<>();
+        }
         this.policies.addAll(policies);
         return this;
     }
@@ -153,8 +154,9 @@ public final class AppRoleBuilder {
      * @return self
      */
     public AppRoleBuilder withPolicy(final String policy) {
-        if (this.policies == null)
+        if (this.policies == null) {
             this.policies = new ArrayList<>();
+        }
         policies.add(policy);
         return this;
     }

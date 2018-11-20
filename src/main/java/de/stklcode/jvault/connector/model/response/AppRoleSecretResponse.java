@@ -42,7 +42,9 @@ public final class AppRoleSecretResponse extends VaultDataResponse {
             /* null empty strings on list objects */
             Map<String, Object> filteredData = new HashMap<>();
             data.forEach((k, v) -> {
-                if (!(v instanceof String && ((String) v).isEmpty())) filteredData.put(k, v);
+                if (!(v instanceof String && ((String) v).isEmpty())) {
+                    filteredData.put(k, v);
+                }
             });
             this.secret = mapper.readValue(mapper.writeValueAsString(filteredData), AppRoleSecret.class);
         } catch (IOException e) {

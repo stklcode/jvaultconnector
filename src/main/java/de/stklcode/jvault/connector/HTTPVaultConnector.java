@@ -270,8 +270,9 @@ public class HTTPVaultConnector implements VaultConnector {
     public final SealResponse unseal(final String key, final Boolean reset) throws VaultConnectorException {
         Map<String, String> param = new HashMap<>();
         param.put("key", key);
-        if (reset != null)
+        if (reset != null) {
             param.put("reset", reset.toString());
+        }
         try {
             String response = requestPut(PATH_UNSEAL, param);
             return jsonMapper.readValue(response, SealResponse.class);
@@ -355,8 +356,9 @@ public class HTTPVaultConnector implements VaultConnector {
     public final AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException {
         final Map<String, String> payload = new HashMap<>();
         payload.put("role_id", roleID);
-        if (secretID != null)
+        if (secretID != null) {
             payload.put("secret_id", secretID);
+        }
         return queryAuth(PATH_AUTH_APPROLE + "login", payload);
     }
 
@@ -389,43 +391,49 @@ public class HTTPVaultConnector implements VaultConnector {
     @Deprecated
     public final boolean registerAppId(final String appID, final String policy, final String displayName)
             throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         Map<String, String> payload = new HashMap<>();
         payload.put("value", policy);
         payload.put("display_name", displayName);
         /* Get response */
         String response = requestPost(PATH_AUTH_APPID + "map/app-id/" + appID, payload);
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
         return true;
     }
 
     @Override
     @Deprecated
     public final boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         Map<String, String> payload = new HashMap<>();
         payload.put("value", appID);
         /* Get response */
         String response = requestPost(PATH_AUTH_APPID + "map/user-id/" + userID, payload);
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
         return true;
     }
 
     @Override
     public final boolean createAppRole(final AppRole role) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         /* Get response */
         String response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, role.getName(), ""), role);
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
 
         /* Set custom ID if provided */
         return !(role.getId() != null && !role.getId().isEmpty()) || setAppRoleID(role.getName(), role.getId());
@@ -433,8 +441,9 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         /* Request HTTP response and parse Secret */
         try {
             String response = requestGet(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), new HashMap<>());
@@ -449,23 +458,26 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final boolean deleteAppRole(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         /* Request HTTP response and expect empty result */
         String response = requestDelete(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""));
 
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
 
         return true;
     }
 
     @Override
     public final String getAppRoleID(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         /* Request HTTP response and parse Secret */
         try {
             String response = requestGet(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), new HashMap<>());
@@ -480,29 +492,33 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         /* Request HTTP response and parse Secret */
         Map<String, String> payload = new HashMap<>();
         payload.put("role_id", roleID);
         String response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), payload);
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
         return true;
     }
 
     @Override
     public final AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret)
             throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         /* Get response */
         String response;
-        if (secret.getId() != null && !secret.getId().isEmpty())
+        if (secret.getId() != null && !secret.getId().isEmpty()) {
             response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/custom-secret-id"), secret);
-        else
+        } else {
             response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id"), secret);
+        }
 
         try {
             /* Extract the secret ID from response */
@@ -515,8 +531,9 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID)
             throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         /* Request HTTP response and parse Secret */
         try {
             String response = requestPost(
@@ -531,8 +548,9 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final boolean destroyAppRoleSecret(final String roleName, final String secretID)
             throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         /* Request HTTP response and expect empty result */
         String response = requestPost(
@@ -540,16 +558,18 @@ public class HTTPVaultConnector implements VaultConnector {
                 new AppRoleSecret(secretID));
 
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
 
         return true;
     }
 
     @Override
     public final List<String> listAppRoles() throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         try {
             String response = requestGet(PATH_AUTH_APPROLE + "role?list=true", new HashMap<>());
@@ -565,8 +585,9 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final List<String> listAppRoleSecrets(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         try {
             String response = requestGet(
@@ -584,8 +605,9 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SecretResponse read(final String key) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
         /* Request HTTP response and parse Secret */
         try {
             String response = requestGet(key, new HashMap<>());
@@ -600,8 +622,9 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final List<String> list(final String path) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         try {
             String response = requestGet(path + "/?list=true", new HashMap<>());
@@ -617,51 +640,60 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
-        if (key == null || key.isEmpty())
+        if (key == null || key.isEmpty()) {
             throw new InvalidRequestException("Secret path must not be empty.");
+        }
 
-        if (!requestPost(key, data).isEmpty())
+        if (!requestPost(key, data).isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
     }
 
     @Override
     public final void delete(final String key) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         /* Request HTTP response and expect empty result */
         String response = requestDelete(key);
 
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
     }
 
     @Override
     public final void revoke(final String leaseID) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         /* Request HTTP response and expect empty result */
         String response = requestPut(PATH_REVOKE + leaseID, new HashMap<>());
 
         /* Response should be code 204 without content */
-        if (!response.isEmpty())
+        if (!response.isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
     }
 
     @Override
     public final SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
         Map<String, String> payload = new HashMap<>();
         payload.put("lease_id", leaseID);
-        if (increment != null)
+        if (increment != null) {
             payload.put("increment", increment.toString());
+        }
 
         /* Request HTTP response and parse Secret */
         try {
@@ -684,8 +716,9 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final AuthResponse createToken(final Token token, final String role) throws VaultConnectorException {
-        if (role == null || role.isEmpty())
+        if (role == null || role.isEmpty()) {
             throw new InvalidRequestException("No role name specified.");
+        }
         return createTokenInternal(token, PATH_TOKEN + PATH_CREATE + "/" + role);
     }
 
@@ -706,11 +739,13 @@ public class HTTPVaultConnector implements VaultConnector {
      * @throws VaultConnectorException on error
      */
     private AuthResponse createTokenInternal(final Token token, final String path) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
-        if (token == null)
+        if (token == null) {
             throw new InvalidRequestException("Token must be provided.");
+        }
 
         String response = requestPost(path, token);
         try {
@@ -722,8 +757,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final TokenResponse lookupToken(final String token) throws VaultConnectorException {
-        if (!isAuthorized())
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
+
         /* Request HTTP response and parse Secret */
         try {
             String response = requestGet(PATH_TOKEN + "/lookup/" + token, new HashMap<>());
@@ -749,6 +786,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private String requestPost(final String path, final Object payload) throws VaultConnectorException {
         /* Initialize post */
         HttpPost post = new HttpPost(baseURL + path);
+
         /* generate JSON from payload */
         StringEntity input;
         try {
@@ -759,9 +797,11 @@ public class HTTPVaultConnector implements VaultConnector {
         input.setContentEncoding("UTF-8");
         input.setContentType("application/json");
         post.setEntity(input);
+
         /* Set X-Vault-Token header */
-        if (token != null)
+        if (token != null) {
             post.addHeader(HEADER_VAULT_TOKEN, token);
+        }
 
         return request(post, retries);
     }
@@ -777,6 +817,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private String requestPut(final String path, final Map<String, String> payload) throws VaultConnectorException {
         /* Initialize put */
         HttpPut put = new HttpPut(baseURL + path);
+
         /* generate JSON from payload */
         StringEntity entity = null;
         try {
@@ -784,11 +825,14 @@ public class HTTPVaultConnector implements VaultConnector {
         } catch (UnsupportedEncodingException | JsonProcessingException e) {
             throw new InvalidRequestException("Payload serialization failed", e);
         }
+
         /* Parse parameters */
         put.setEntity(entity);
+
         /* Set X-Vault-Token header */
-        if (token != null)
+        if (token != null) {
             put.addHeader(HEADER_VAULT_TOKEN, token);
+        }
 
         return request(put, retries);
     }
@@ -803,9 +847,11 @@ public class HTTPVaultConnector implements VaultConnector {
     private String requestDelete(final String path) throws VaultConnectorException {
         /* Initialize delete */
         HttpDelete delete = new HttpDelete(baseURL + path);
+
         /* Set X-Vault-Token header */
-        if (token != null)
+        if (token != null) {
             delete.addHeader(HEADER_VAULT_TOKEN, token);
+        }
 
         return request(delete, retries);
     }
@@ -829,8 +875,9 @@ public class HTTPVaultConnector implements VaultConnector {
         HttpGet get = new HttpGet(uriBuilder.build());
 
         /* Set X-Vault-Token header */
-        if (token != null)
+        if (token != null) {
             get.addHeader(HEADER_VAULT_TOKEN, token);
+        }
 
         return request(get, retries);
     }
@@ -853,13 +900,17 @@ public class HTTPVaultConnector implements VaultConnector {
                 .setSSLSocketFactory(createSSLSocketFactory())
                 .build()) {
             /* Set custom timeout, if defined */
-            if (this.timeout != null)
+            if (this.timeout != null) {
                 base.setConfig(RequestConfig.copy(RequestConfig.DEFAULT).setConnectTimeout(timeout).build());
+            }
+
             /* Execute request */
             response = httpClient.execute(base);
+
             /* Check if response is valid */
-            if (response == null)
+            if (response == null) {
                 throw new InvalidResponseException("Response unavailable");
+            }
 
             switch (response.getStatusLine().getStatusCode()) {
                 case 200:
@@ -885,12 +936,13 @@ public class HTTPVaultConnector implements VaultConnector {
         } catch (IOException e) {
             throw new InvalidResponseException(Error.READ_RESPONSE, e);
         } finally {
-            if (response != null && response.getEntity() != null)
+            if (response != null && response.getEntity() != null) {
                 try {
                     EntityUtils.consume(response.getEntity());
                 } catch (IOException ignored) {
                     // Exception ignored.
                 }
+            }
         }
     }
 
@@ -923,8 +975,9 @@ public class HTTPVaultConnector implements VaultConnector {
                 String responseString = br.lines().collect(Collectors.joining("\n"));
                 ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
                 /* Check for "permission denied" response */
-                if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied"))
+                if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied")) {
                     throw new PermissionDeniedException();
+                }
                 throw new InvalidResponseException(Error.RESPONSE_CODE,
                         response.getStatusLine().getStatusCode(), er.toString());
             } catch (IOException ignored) {

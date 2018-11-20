@@ -48,9 +48,11 @@ public enum AuthBackend {
      * @return Auth backend value
      */
     public static AuthBackend forType(final String type) {
-        for (AuthBackend v : values())
-            if (v.type.equalsIgnoreCase(type))
+        for (AuthBackend v : values()) {
+            if (v.type.equalsIgnoreCase(type)) {
                 return v;
+            }
+        }
         return UNKNOWN;
     }
 }

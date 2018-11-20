@@ -32,8 +32,9 @@ public final class CredentialsResponse extends SecretResponse {
      */
     public String getUsername() {
         Object username = get("username");
-        if (username != null)
+        if (username != null) {
             return username.toString();
+        }
         return null;
     }
 
@@ -42,8 +43,9 @@ public final class CredentialsResponse extends SecretResponse {
      */
     public String getPassword() {
         Object password = get("password");
-        if (password != null)
+        if (password != null) {
             return password.toString();
+        }
         return null;
     }
 }
