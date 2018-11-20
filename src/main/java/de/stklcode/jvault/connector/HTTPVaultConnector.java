@@ -604,13 +604,17 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final SecretResponse readSecretData(final String key) throws VaultConnectorException {
+    public final SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException {
         if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
         }
         /* Request HTTP response and parse secret metadata */
         try {
-            String response = requestGet(PATH_SECRET + PATH_DATA + key, new HashMap<>());
+            Map<String, String> args = new HashMap<>();
+            if (version != null) {
+                args.put("version", version.toString());
+            }
+            String response = requestGet(PATH_SECRET + PATH_DATA + key, args);
             return jsonMapper.readValue(response, SecretResponse.class);
         } catch (IOException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
