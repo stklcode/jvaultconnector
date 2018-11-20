@@ -474,7 +474,20 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.5.0
      */
-    void write(final String key, final Map<String, Object> data) throws VaultConnectorException;
+    default void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
+        write(key, data, null);
+    }
+
+    /**
+     * Write value to Vault.
+     *
+     * @param key     Secret path
+     * @param data    Secret content. Value must be be JSON serializable.
+     * @param options Secret options (optional).
+     * @throws VaultConnectorException on error
+     * @since 0.8 {@code options} parameter added
+     */
+    void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException;
 
     /**
      * Write secret to Vault.

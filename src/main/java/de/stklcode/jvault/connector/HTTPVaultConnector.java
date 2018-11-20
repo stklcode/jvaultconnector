@@ -650,15 +650,29 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
-        if (!isAuthorized())
+    public final void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException {
+        if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
+        }
 
-        if (key == null || key.isEmpty())
+        if (key == null || key.isEmpty()) {
             throw new InvalidRequestException("Secret path must not be empty.");
+        }
 
-        if (!requestPost(key, data).isEmpty())
+        // By default data is directly passed as payload.
+        Object payload = data;
+
+        // If options are given, split payload in two parts.
+        if (options != null) {
+            Map<String, Object> payloadMap = new HashMap<>();
+            payloadMap.put("data", data);
+            payloadMap.put("options", options);
+            payload = payloadMap;
+        }
+
+        if (!requestPost(key, payload).isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
     }
 
     @Override
