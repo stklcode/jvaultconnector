@@ -540,6 +540,59 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
+     * Delete latest version of a secret from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteLatestSecretVersion(final String key) throws VaultConnectorException;
+
+    /**
+     * Delete latest version of a secret from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteAllSecretVersions(final String key) throws VaultConnectorException;
+
+    /**
+     * Delete secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @param versions Versions of the secret to delete.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException;
+
+    /**
+     * Undelete (restore) secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @param versions Versions of the secret to undelete.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException;
+
+    /**
+     * Destroy secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @param versions Versions of the secret to destroy.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException;
+
+    /**
      * Revoke given lease immediately.
      *
      * @param leaseID the lease ID
