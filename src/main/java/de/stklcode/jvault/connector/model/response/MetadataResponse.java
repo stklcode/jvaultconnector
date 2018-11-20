@@ -49,7 +49,8 @@ public class MetadataResponse extends VaultDataResponse {
 
     /**
      * Get the actual metadata.
-     * @return
+     *
+     * @return Metadata.
      */
     public SecretMetadata getMetadata() {
         return metadata;

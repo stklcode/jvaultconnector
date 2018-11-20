@@ -40,7 +40,7 @@ public final class SecretMetadata {
     @JsonProperty("current_version")
     private Integer currentVersion;
 
-    @JsonProperty("max_version")
+    @JsonProperty("max_versions")
     private Integer maxVersions;
 
     @JsonProperty("oldest_version")
