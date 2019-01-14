@@ -3,7 +3,7 @@ branches:
     - master
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk11
 dist: trusty
 install: true
 addons:
