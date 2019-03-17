@@ -19,7 +19,6 @@ package de.stklcode.jvault.connector.builder;
 import de.stklcode.jvault.connector.HTTPVaultConnector;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.jupiter.api.Test;
@@ -92,7 +91,7 @@ public class HTTPVaultConnectorBuilderTest {
         setenv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null);
 
         try {
-            VaultConnectorFactory.httpFactory().fromEnv();
+            VaultConnectorBuilder.http().fromEnv();
             fail("Creation with unknown cert path failed.");
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(TlsException.class)));

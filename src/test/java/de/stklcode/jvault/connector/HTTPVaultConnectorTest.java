@@ -16,9 +16,9 @@
 
 package de.stklcode.jvault.connector;
 
+import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
+import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.*;
-import de.stklcode.jvault.connector.factory.HTTPVaultConnectorFactory;
-import de.stklcode.jvault.connector.factory.VaultConnectorFactory;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
@@ -110,13 +110,14 @@ public class HTTPVaultConnectorTest {
         }
 
         /* Initialize connector */
-        HTTPVaultConnectorFactory factory = VaultConnectorFactory.httpFactory()
+        HTTPVaultConnectorBuilder builder = VaultConnectorBuilder.http()
                 .withHost(config.getHost())
                 .withPort(config.getPort())
                 .withTLS(isTls);
-        if (isTls)
-            factory.withTrustedCA(Paths.get(getClass().getResource("/tls/ca.pem").getPath()));
-        connector = factory.build();
+        if (isTls) {
+            builder.withTrustedCA(Paths.get(getClass().getResource("/tls/ca.pem").getPath()));
+        }
+        connector = builder.build();
 
         /* Unseal Vault and check result */
         SealResponse sealStatus = connector.unseal(KEY1);
