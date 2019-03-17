@@ -2,6 +2,10 @@
 ### Breaking
 * Removed support for `HTTPVaultConnectorFactory#withSslContext()` in favor of `#withTrustedCA()` due to
 
+### Features
+* Support for KV version 2 secret engine (#16)
+* Ability to pass custom mount point to KV v2 read/write methods (#25)
+
 ### Improvements
 * refactoring of the internal SSL handling (#17)
 * `VaultConnector` extends `java.io.Serializable` (#19)
