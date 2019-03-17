@@ -626,7 +626,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException {
+    public final SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException {
         if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
         }
@@ -636,7 +636,7 @@ public class HTTPVaultConnector implements VaultConnector {
             if (version != null) {
                 args.put("version", version.toString());
             }
-            String response = requestGet(PATH_SECRET + PATH_DATA + key, args);
+            String response = requestGet(mount + PATH_DATA + key, args);
             return jsonMapper.readValue(response, SecretResponse.class);
         } catch (IOException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
@@ -647,13 +647,13 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException {
+    public final MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException {
         if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
         }
         /* Request HTTP response and parse secret metadata */
         try {
-            String response = requestGet(PATH_SECRET + PATH_METADATA + key, new HashMap<>());
+            String response = requestGet(mount + PATH_METADATA + key, new HashMap<>());
             return jsonMapper.readValue(response, MetadataResponse.class);
         } catch (IOException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
@@ -723,40 +723,41 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final void deleteLatestSecretVersion(final String key) throws VaultConnectorException {
-        delete(PATH_SECRET + PATH_DATA + key);
+    public final void deleteLatestSecretVersion(final String mount, final String key) throws VaultConnectorException {
+        delete(mount + PATH_DATA + key);
     }
 
     @Override
-    public final void deleteAllSecretVersions(final String key) throws VaultConnectorException {
-        delete(PATH_SECRET + PATH_METADATA + key);
+    public final void deleteAllSecretVersions(final String mount, final String key) throws VaultConnectorException {
+        delete(mount + PATH_METADATA + key);
     }
 
     @Override
-    public final void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
-        handleSecretVersions(PATH_DELETE, key, versions);
+    public final void deleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException {
+        handleSecretVersions(mount, PATH_DELETE, key, versions);
     }
 
     @Override
-    public final void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
-        handleSecretVersions(PATH_UNDELETE, key, versions);
+    public final void undeleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException {
+        handleSecretVersions(mount, PATH_UNDELETE, key, versions);
     }
 
     @Override
-    public final void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException {
-        handleSecretVersions(PATH_DESTROY, key, versions);
+    public final void destroySecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException {
+        handleSecretVersions(mount, PATH_DESTROY, key, versions);
     }
 
     /**
      * Common method to bundle secret version operations.
      *
+     * @param mount    Secret store mountpoint (without leading or trailing slash).
      * @param pathPart Path part to query.
      * @param key      Secret key.
      * @param versions Versions to handle.
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    private void handleSecretVersions(final String pathPart, final String key, final int... versions) throws VaultConnectorException {
+    private void handleSecretVersions(final String mount, final String pathPart, final String key, final int... versions) throws VaultConnectorException {
         if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
         }
@@ -764,7 +765,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Request HTTP response and expect empty result */
         Map<String, Object> payload = new HashMap<>();
         payload.put("versions", versions);
-        String response = requestPost(PATH_SECRET + pathPart + key, payload);
+        String response = requestPost(mount + pathPart + key, payload);
 
         /* Response should be code 204 without content */
         if (!response.isEmpty()) {

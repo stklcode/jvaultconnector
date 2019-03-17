@@ -355,7 +355,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @return {@code true} on success
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
-     *             Consider using {@link #createAppRoleSecret} instead.
+     * Consider using {@link #createAppRoleSecret} instead.
      */
     @Deprecated
     boolean registerUserId(final String appID, final String userID) throws VaultConnectorException;
@@ -422,6 +422,20 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
+     * Retrieve the latest secret data for specific version from Vault.
+     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param key   Secret identifier
+     * @return Secret response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    default SecretResponse readSecretData(final String mount, final String key) throws VaultConnectorException {
+        return readSecretVersion(mount, key, null);
+    }
+
+    /**
      * Retrieve secret data from Vault.
      * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
      *
@@ -431,7 +445,22 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException;
+    default SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException {
+        return readSecretVersion(PATH_SECRET, key, version);
+    }
+
+    /**
+     * Retrieve secret data from Vault.
+     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param mount   Secret store mountpoint (without leading or trailing slash).
+     * @param key     Secret identifier
+     * @param version Version to read. If {@code null} or zero, the latest version will be returned.
+     * @return Secret response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException;
 
     /**
      * Retrieve secret metadata from Vault.
@@ -442,7 +471,21 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException;
+    default MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException {
+        return readSecretMetadata(PATH_SECRET, key);
+    }
+
+    /**
+     * Retrieve secret metadata from Vault.
+     * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param key   Secret identifier
+     * @return Metadata response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException;
 
     /**
      * List available nodes from Vault.
@@ -557,21 +600,47 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Delete latest version of a secret from Vault.
      * Only available for KV v2 stores.
      *
-     * @param key      Secret path.
+     * @param key Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void deleteLatestSecretVersion(final String key) throws VaultConnectorException;
+    default void deleteLatestSecretVersion(final String key) throws VaultConnectorException {
+        deleteLatestSecretVersion(PATH_SECRET, key);
+    }
 
     /**
      * Delete latest version of a secret from Vault.
      * Only available for KV v2 stores.
      *
-     * @param key      Secret path.
+     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param key   Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void deleteAllSecretVersions(final String key) throws VaultConnectorException;
+    void deleteLatestSecretVersion(final String mount, final String key) throws VaultConnectorException;
+
+    /**
+     * Delete latest version of a secret from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key Secret path.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    default void deleteAllSecretVersions(final String key) throws VaultConnectorException {
+        deleteAllSecretVersions(PATH_SECRET, key);
+    }
+
+    /**
+     * Delete latest version of a secret from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param key Secret path.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteAllSecretVersions(final String mount, final String key) throws VaultConnectorException;
 
     /**
      * Delete secret versions from Vault.
@@ -582,7 +651,21 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException;
+    default void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
+        deleteSecretVersions(PATH_SECRET, key, versions);
+    }
+
+    /**
+     * Delete secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param key      Secret path.
+     * @param versions Versions of the secret to delete.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException;
 
     /**
      * Undelete (restore) secret versions from Vault.
@@ -593,7 +676,21 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException;
+    default void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
+        undeleteSecretVersions(PATH_SECRET, key, versions);
+    }
+
+    /**
+     * Undelete (restore) secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param key      Secret path.
+     * @param versions Versions of the secret to undelete.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void undeleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException;
 
     /**
      * Destroy secret versions from Vault.
@@ -604,7 +701,21 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException;
+    default void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException {
+        destroySecretVersions(PATH_SECRET, key, versions);
+    }
+
+    /**
+     * Destroy secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param key      Secret path.
+     * @param versions Versions of the secret to destroy.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void destroySecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException;
 
     /**
      * Revoke given lease immediately.
@@ -676,7 +787,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     /**
      * Read credentials for MySQL backend at default mount point.
      *
-     * @param role  the role name
+     * @param role the role name
      * @return the credentials response
      * @throws VaultConnectorException on error
      * @since 0.5.0
@@ -688,7 +799,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     /**
      * Read credentials for PostgreSQL backend at default mount point.
      *
-     * @param role  the role name
+     * @param role the role name
      * @return the credentials response
      * @throws VaultConnectorException on error
      * @since 0.5.0
@@ -700,7 +811,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     /**
      * Read credentials for MSSQL backend at default mount point.
      *
-     * @param role  the role name
+     * @param role the role name
      * @return the credentials response
      * @throws VaultConnectorException on error
      * @since 0.5.0
@@ -712,7 +823,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     /**
      * Read credentials for MSSQL backend at default mount point.
      *
-     * @param role  the role name
+     * @param role the role name
      * @return the credentials response
      * @throws VaultConnectorException on error
      * @since 0.5.0
