@@ -20,6 +20,7 @@ import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
+import de.stklcode.jvault.connector.internal.RequestHelper;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.dynamic.loading.ClassReloadingStrategy;
@@ -159,7 +160,7 @@ public class HTTPVaultConnectorOfflineTest {
         final String hostname = "vault.example.com";
         final Integer port = 1337;
         final String prefix = "/custom/prefix/";
-        final Integer retries = 42;
+        final int retries = 42;
         final String expectedNoTls = "http://" + hostname + "/v1/";
         final String expectedCustomPort = "https://" + hostname + ":" + port + "/v1/";
         final String expectedCustomPrefix = "https://" + hostname + ":" + port + prefix;
@@ -171,35 +172,35 @@ public class HTTPVaultConnectorOfflineTest {
 
         // Most basic constructor expects complete URL.
         HTTPVaultConnector connector = new HTTPVaultConnector(url);
-        assertThat("Unexpected base URL", getPrivate(connector, "baseURL"), is(url));
+        assertThat("Unexpected base URL", getRequestHelperPrivate(connector, "baseURL"), is(url));
 
         // Now override TLS usage.
         connector = new HTTPVaultConnector(hostname, false);
-        assertThat("Unexpected base URL with TLS disabled", getPrivate(connector, "baseURL"), is(expectedNoTls));
+        assertThat("Unexpected base URL with TLS disabled", getRequestHelperPrivate(connector, "baseURL"), is(expectedNoTls));
 
         // Specify custom port.
         connector = new HTTPVaultConnector(hostname, true, port);
-        assertThat("Unexpected base URL with custom port", getPrivate(connector, "baseURL"), is(expectedCustomPort));
+        assertThat("Unexpected base URL with custom port", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPort));
 
         // Specify custom prefix.
         connector = new HTTPVaultConnector(hostname, true, port, prefix);
-        assertThat("Unexpected base URL with custom prefix", getPrivate(connector, "baseURL"), is(expectedCustomPrefix));
-        assertThat("Trusted CA cert set, but not specified", getPrivate(connector, "trustedCaCert"), is(nullValue()));
+        assertThat("Unexpected base URL with custom prefix", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPrefix));
+        assertThat("Trusted CA cert set, but not specified", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
 
         // Provide custom SSL context.
         connector = new HTTPVaultConnector(hostname, true, port, prefix, trustedCaCert);
-        assertThat("Unexpected base URL with custom prefix", getPrivate(connector, "baseURL"), is(expectedCustomPrefix));
-        assertThat("Trusted CA cert not filled correctly", getPrivate(connector, "trustedCaCert"), is(trustedCaCert));
+        assertThat("Unexpected base URL with custom prefix", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPrefix));
+        assertThat("Trusted CA cert not filled correctly", getRequestHelperPrivate(connector, "trustedCaCert"), is(trustedCaCert));
 
         // Specify number of retries.
         connector = new HTTPVaultConnector(url, trustedCaCert, retries);
-        assertThat("Number of retries not set correctly", getPrivate(connector, "retries"), is(retries));
+        assertThat("Number of retries not set correctly", getRequestHelperPrivate(connector, "retries"), is(retries));
 
         // Test TLS version (#22).
-        assertThat("TLS version should be 1.2 if not specified", getPrivate(connector, "tlsVersion"), is("TLSv1.2"));
+        assertThat("TLS version should be 1.2 if not specified", getRequestHelperPrivate(connector, "tlsVersion"), is("TLSv1.2"));
         // Now override.
         connector = new HTTPVaultConnector(url, trustedCaCert, retries, null, "TLSv1.1");
-        assertThat("Overridden TLS version 1.1 not correct", getPrivate(connector, "tlsVersion"), is("TLSv1.1"));
+        assertThat("Overridden TLS version 1.1 not correct", getRequestHelperPrivate(connector, "tlsVersion"), is("TLSv1.1"));
     }
 
     /**
@@ -454,18 +455,23 @@ public class HTTPVaultConnectorOfflineTest {
         }
     }
 
-    private Object getPrivate(Object target, String fieldName) {
+    private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName)  {
         try {
-            Field field = target.getClass().getDeclaredField(fieldName);
-            if (field.isAccessible())
-                return field.get(target);
-            field.setAccessible(true);
-            Object value = field.get(target);
-            field.setAccessible(false);
-            return value;
+            return getPrivate(getPrivate(connector, "request"), fieldName);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             return null;
         }
+    }
+
+    private Object getPrivate(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        if (field.isAccessible()) {
+            return field.get(target);
+        }
+        field.setAccessible(true);
+        Object value = field.get(target);
+        field.setAccessible(false);
+        return value;
     }
 
     private void setPrivate(Object target, String fieldName, Object value) {

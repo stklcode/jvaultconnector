@@ -68,9 +68,9 @@ public class HTTPVaultConnectorBuilderTest {
         }
         connector = factory.build();
 
-        assertThat("URL nor set correctly", getPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-        assertThat("Trusted CA cert set when no cert provided", getPrivate(connector, "trustedCaCert"), is(nullValue()));
-        assertThat("Non-default number of retries, when none set", getPrivate(connector, "retries"), is(0));
+        assertThat("URL nor set correctly", getRequestHelperPrivate(connector,  "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
+        assertThat("Trusted CA cert set when no cert provided", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
+        assertThat("Non-default number of retries, when none set", getRequestHelperPrivate(connector, "retries"), is(0));
 
         /* Provide address and number of retries */
         setenv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), null);
@@ -82,9 +82,9 @@ public class HTTPVaultConnectorBuilderTest {
         }
         connector = factory.build();
 
-        assertThat("URL nor set correctly", getPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-        assertThat("Trusted CA cert set when no cert provided", getPrivate(connector, "trustedCaCert"), is(nullValue()));
-        assertThat("Number of retries not set correctly", getPrivate(connector, "retries"), is(VAULT_MAX_RETRIES));
+        assertThat("URL nor set correctly", getRequestHelperPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
+        assertThat("Trusted CA cert set when no cert provided", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
+        assertThat("Number of retries not set correctly", getRequestHelperPrivate(connector, "retries"), is(VAULT_MAX_RETRIES));
 
         /* Provide CA certificate */
         String VAULT_CACERT = tmpDir.newFolder().toString() + "/doesnotexist";
@@ -117,10 +117,15 @@ public class HTTPVaultConnectorBuilderTest {
         environment.set("VAULT_TOKEN", vault_token);
     }
 
+    private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        return getPrivate(getPrivate(connector, "request"), fieldName);
+    }
+
     private Object getPrivate(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException {
         Field field = target.getClass().getDeclaredField(fieldName);
-        if (field.isAccessible())
+        if (field.isAccessible()) {
             return field.get(target);
+        }
         field.setAccessible(true);
         Object value = field.get(target);
         field.setAccessible(false);
