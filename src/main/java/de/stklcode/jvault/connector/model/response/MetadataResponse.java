@@ -17,11 +17,9 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.SecretMetadata;
-import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.IOException;
 import java.util.Map;

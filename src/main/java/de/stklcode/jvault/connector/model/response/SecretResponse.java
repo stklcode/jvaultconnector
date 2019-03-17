@@ -33,19 +33,22 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretResponse extends VaultDataResponse {
+    private static final String KEY_DATA = "data";
+    private static final String KEY_METADATA = "metadata";
+
     private Map<String, Object> data;
     private VersionMetadata metadata;
 
     @Override
     public final void setData(final Map<String, Object> data) throws InvalidResponseException {
         if (data.size() == 2
-                && data.containsKey("data") && data.get("data") instanceof Map
-                && data.containsKey("metadata") && data.get("metadata") instanceof Map) {
+                && data.containsKey(KEY_DATA) && data.get(KEY_DATA) instanceof Map
+                && data.containsKey(KEY_METADATA) && data.get(KEY_METADATA) instanceof Map) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 // This is apparently a KV v2 value.
-                this.data = (Map<String, Object>) data.get("data");
-                this.metadata = mapper.readValue(mapper.writeValueAsString(data.get("metadata")), VersionMetadata.class);
+                this.data = (Map<String, Object>) data.get(KEY_DATA);
+                this.metadata = mapper.readValue(mapper.writeValueAsString(data.get(KEY_METADATA)), VersionMetadata.class);
             } catch (ClassCastException | IOException e) {
                 throw new InvalidResponseException("Failed deserializing response", e);
             }
