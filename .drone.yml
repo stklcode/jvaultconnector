@@ -1,5 +1,5 @@
 kind: pipeline
-name: java8
+name: default
 
 clone:
   disable: true

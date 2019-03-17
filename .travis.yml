@@ -4,7 +4,6 @@ branches:
 language: java
 jdk:
   - openjdk11
-dist: trusty
 install: true
 addons:
   sonarcloud:
