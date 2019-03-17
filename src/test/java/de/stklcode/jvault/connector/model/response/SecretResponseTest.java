@@ -53,6 +53,8 @@ public class SecretResponseTest {
     private static final String SECRET_DATA_V1 = "yes";
     private static final String SECRET_DATA_K2 = "value";
     private static final String SECRET_DATA_V2 = "world";
+    private static final String SECRET_META_CREATED = "2018-03-22T02:24:06.945319214Z";
+    private static final String SECRET_META_DELETED = "2018-03-23T03:25:07.056420325Z";
     private static final List<String> SECRET_WARNINGS = null;
     private static final String SECRET_JSON = "{\n" +
             "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
@@ -62,6 +64,44 @@ public class SecretResponseTest {
             "    \"data\": {\n" +
             "        \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
             "        \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
+            "    },\n" +
+            "    \"warnings\": " + SECRET_WARNINGS + "\n" +
+            "}";
+    private static final String SECRET_JSON_V2 = "{\n" +
+            "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
+            "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
+            "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
+            "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
+            "    \"data\": {\n" +
+            "      \"data\": {\n" +
+            "          \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
+            "          \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
+            "      },\n" +
+            "      \"metadata\": {\n" +
+            "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
+            "          \"deletion_time\": \"\",\n" +
+            "          \"destroyed\": false,\n" +
+            "          \"version\": 1\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"warnings\": " + SECRET_WARNINGS + "\n" +
+            "}";
+    private static final String SECRET_JSON_V2_2 = "{\n" +
+            "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
+            "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
+            "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
+            "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
+            "    \"data\": {\n" +
+            "      \"data\": {\n" +
+            "          \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
+            "          \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
+            "      },\n" +
+            "      \"metadata\": {\n" +
+            "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
+            "          \"deletion_time\": \"" + SECRET_META_DELETED + "\",\n" +
+            "          \"destroyed\": true,\n" +
+            "          \"version\": 2\n" +
+            "      }\n" +
             "    },\n" +
             "    \"warnings\": " + SECRET_WARNINGS + "\n" +
             "}";
@@ -118,16 +158,49 @@ public class SecretResponseTest {
     @Test
     public void jsonRoundtrip() {
         try {
-            SecretResponse res = new ObjectMapper().readValue(SECRET_JSON, SecretResponse.class);
-            assertThat("Parsed response is NULL", res, is(notNullValue()));
-            assertThat("Incorrect lease ID", res.getLeaseId(), is(SECRET_LEASE_ID));
-            assertThat("Incorrect lease duration", res.getLeaseDuration(), is(SECRET_LEASE_DURATION));
-            assertThat("Incorrect renewable status", res.isRenewable(), is(SECRET_RENEWABLE));
-            assertThat("Incorrect warnings", res.getWarnings(), is(SECRET_WARNINGS));
-            assertThat("Response does not contain correct data", res.get(SECRET_DATA_K1), is(SECRET_DATA_V1));
-            assertThat("Response does not contain correct data", res.get(SECRET_DATA_K2), is(SECRET_DATA_V2));
+            assertSecretData(new ObjectMapper().readValue(SECRET_JSON, SecretResponse.class));
         } catch (IOException e) {
             fail("SecretResponse deserialization failed: " + e.getMessage());
         }
+
+        // KV v2 secret.
+        try {
+            SecretResponse res = new ObjectMapper().readValue(SECRET_JSON_V2, SecretResponse.class);
+            assertSecretData(res);
+            assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
+            assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
+            assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
+            assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(emptyString()));
+            assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(nullValue()));
+            assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(false));
+            assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(1));
+        } catch (IOException e) {
+            fail("SecretResponse deserialization failed: " + e.getMessage());
+        }
+
+        // Deleted KV v2 secret.
+        try {
+            SecretResponse res = new ObjectMapper().readValue(SECRET_JSON_V2_2, SecretResponse.class);
+            assertSecretData(res);
+            assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
+            assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
+            assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
+            assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(SECRET_META_DELETED));
+            assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(notNullValue()));
+            assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(true));
+            assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(2));
+        } catch (IOException e) {
+            fail("SecretResponse deserialization failed: " + e.getMessage());
+        }
+    }
+
+    private void assertSecretData(SecretResponse res) {
+        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        assertThat("Incorrect lease ID", res.getLeaseId(), is(SECRET_LEASE_ID));
+        assertThat("Incorrect lease duration", res.getLeaseDuration(), is(SECRET_LEASE_DURATION));
+        assertThat("Incorrect renewable status", res.isRenewable(), is(SECRET_RENEWABLE));
+        assertThat("Incorrect warnings", res.getWarnings(), is(SECRET_WARNINGS));
+        assertThat("Response does not contain correct data", res.get(SECRET_DATA_K1), is(SECRET_DATA_V1));
+        assertThat("Response does not contain correct data", res.get(SECRET_DATA_K2), is(SECRET_DATA_V2));
     }
 }

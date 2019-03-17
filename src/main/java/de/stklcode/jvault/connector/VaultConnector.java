@@ -409,6 +409,42 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
+     * Retrieve the latest secret data for specific version from Vault.
+     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param key Secret identifier
+     * @return Secret response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    default SecretResponse readSecretData(final String key) throws VaultConnectorException {
+        return readSecretVersion(key, null);
+    }
+
+    /**
+     * Retrieve secret data from Vault.
+     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param key     Secret identifier
+     * @param version Version to read. If {@code null} or zero, the latest version will be returned.
+     * @return Secret response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException;
+
+    /**
+     * Retrieve secret metadata from Vault.
+     * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param key Secret identifier
+     * @return Metadata response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException;
+
+    /**
      * List available nodes from Vault.
      *
      * @param path Root path to search
@@ -452,7 +488,20 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.5.0
      */
-    void write(final String key, final Map<String, Object> data) throws VaultConnectorException;
+    default void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
+        write(key, data, null);
+    }
+
+    /**
+     * Write value to Vault.
+     *
+     * @param key     Secret path
+     * @param data    Secret content. Value must be be JSON serializable.
+     * @param options Secret options (optional).
+     * @throws VaultConnectorException on error
+     * @since 0.8 {@code options} parameter added
+     */
+    void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException;
 
     /**
      * Write secret to Vault.
@@ -503,6 +552,59 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     default void deleteSecret(final String key) throws VaultConnectorException {
         delete(PATH_SECRET + "/" + key);
     }
+
+    /**
+     * Delete latest version of a secret from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteLatestSecretVersion(final String key) throws VaultConnectorException;
+
+    /**
+     * Delete latest version of a secret from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteAllSecretVersions(final String key) throws VaultConnectorException;
+
+    /**
+     * Delete secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @param versions Versions of the secret to delete.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException;
+
+    /**
+     * Undelete (restore) secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @param versions Versions of the secret to undelete.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException;
+
+    /**
+     * Destroy secret versions from Vault.
+     * Only available for KV v2 stores.
+     *
+     * @param key      Secret path.
+     * @param versions Versions of the secret to destroy.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException;
 
     /**
      * Revoke given lease immediately.

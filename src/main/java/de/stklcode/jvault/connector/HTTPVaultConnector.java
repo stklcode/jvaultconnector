@@ -74,6 +74,11 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH_APPROLE_ROLE = "auth/approle/role/%s%s";
     private static final String PATH_REVOKE = "sys/leases/revoke/";
     private static final String PATH_HEALTH = "sys/health";
+    private static final String PATH_DATA = "/data/";
+    private static final String PATH_METADATA = "/metadata/";
+    private static final String PATH_DELETE = "/delete/";
+    private static final String PATH_UNDELETE = "/undelete/";
+    private static final String PATH_DESTROY = "/destroy/";
 
     private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";
 
@@ -621,6 +626,44 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public final SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException {
+        if (!isAuthorized()) {
+            throw new AuthorizationRequiredException();
+        }
+        /* Request HTTP response and parse secret metadata */
+        try {
+            Map<String, String> args = new HashMap<>();
+            if (version != null) {
+                args.put("version", version.toString());
+            }
+            String response = requestGet(PATH_SECRET + PATH_DATA + key, args);
+            return jsonMapper.readValue(response, SecretResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException(Error.URI_FORMAT);
+        }
+    }
+
+    @Override
+    public final MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException {
+        if (!isAuthorized()) {
+            throw new AuthorizationRequiredException();
+        }
+        /* Request HTTP response and parse secret metadata */
+        try {
+            String response = requestGet(PATH_SECRET + PATH_METADATA + key, new HashMap<>());
+            return jsonMapper.readValue(response, MetadataResponse.class);
+        } catch (IOException e) {
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
+        } catch (URISyntaxException ignored) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException(Error.URI_FORMAT);
+        }
+    }
+
+    @Override
     public final List<String> list(final String path) throws VaultConnectorException {
         if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
@@ -639,7 +682,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final void write(final String key, final Map<String, Object> data) throws VaultConnectorException {
+    public final void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException {
         if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
         }
@@ -648,7 +691,18 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new InvalidRequestException("Secret path must not be empty.");
         }
 
-        if (!requestPost(key, data).isEmpty()) {
+        // By default data is directly passed as payload.
+        Object payload = data;
+
+        // If options are given, split payload in two parts.
+        if (options != null) {
+            Map<String, Object> payloadMap = new HashMap<>();
+            payloadMap.put("data", data);
+            payloadMap.put("options", options);
+            payload = payloadMap;
+        }
+
+        if (!requestPost(key, payload).isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         }
     }
@@ -661,6 +715,56 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Request HTTP response and expect empty result */
         String response = requestDelete(key);
+
+        /* Response should be code 204 without content */
+        if (!response.isEmpty()) {
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
+    }
+
+    @Override
+    public final void deleteLatestSecretVersion(final String key) throws VaultConnectorException {
+        delete(PATH_SECRET + PATH_DATA + key);
+    }
+
+    @Override
+    public final void deleteAllSecretVersions(final String key) throws VaultConnectorException {
+        delete(PATH_SECRET + PATH_METADATA + key);
+    }
+
+    @Override
+    public final void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
+        handleSecretVersions(PATH_DELETE, key, versions);
+    }
+
+    @Override
+    public final void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
+        handleSecretVersions(PATH_UNDELETE, key, versions);
+    }
+
+    @Override
+    public final void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException {
+        handleSecretVersions(PATH_DESTROY, key, versions);
+    }
+
+    /**
+     * Common method to bundle secret version operations.
+     *
+     * @param pathPart Path part to query.
+     * @param key      Secret key.
+     * @param versions Versions to handle.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    private void handleSecretVersions(final String pathPart, final String key, final int... versions) throws VaultConnectorException {
+        if (!isAuthorized()) {
+            throw new AuthorizationRequiredException();
+        }
+
+        /* Request HTTP response and expect empty result */
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("versions", versions);
+        String response = requestPost(PATH_SECRET + pathPart + key, payload);
 
         /* Response should be code 204 without content */
         if (!response.isEmpty()) {
