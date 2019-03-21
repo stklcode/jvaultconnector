@@ -396,9 +396,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Deprecated
     public final boolean registerAppId(final String appID, final String policy, final String displayName)
             throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         Map<String, String> payload = new HashMap<>();
         payload.put("value", policy);
         payload.put("display_name", displayName);
@@ -414,9 +412,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     @Deprecated
     public final boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         Map<String, String> payload = new HashMap<>();
         payload.put("value", appID);
         /* Get response */
@@ -430,9 +426,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final boolean createAppRole(final AppRole role) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Get response */
         String response = requestPost(String.format(PATH_AUTH_APPROLE_ROLE, role.getName(), ""), role);
         /* Response should be code 204 without content */
@@ -446,9 +440,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Request HTTP response and parse Secret */
         try {
             String response = requestGet(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), new HashMap<>());
@@ -463,9 +455,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final boolean deleteAppRole(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         /* Request HTTP response and expect empty result */
         String response = requestDelete(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""));
@@ -480,9 +470,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final String getAppRoleID(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Request HTTP response and parse Secret */
         try {
             String response = requestGet(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), new HashMap<>());
@@ -497,9 +485,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Request HTTP response and parse Secret */
         Map<String, String> payload = new HashMap<>();
         payload.put("role_id", roleID);
@@ -514,9 +500,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret)
             throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Get response */
         String response;
         if (secret.getId() != null && !secret.getId().isEmpty()) {
@@ -536,9 +520,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID)
             throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Request HTTP response and parse Secret */
         try {
             String response = requestPost(
@@ -553,9 +535,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final boolean destroyAppRoleSecret(final String roleName, final String secretID)
             throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         /* Request HTTP response and expect empty result */
         String response = requestPost(
@@ -572,9 +552,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final List<String> listAppRoles() throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         try {
             String response = requestGet(PATH_AUTH_APPROLE + "role?list=true", new HashMap<>());
@@ -590,9 +568,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final List<String> listAppRoleSecrets(final String roleName) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         try {
             String response = requestGet(
@@ -610,9 +586,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SecretResponse read(final String key) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Request HTTP response and parse Secret */
         try {
             String response = requestGet(key, new HashMap<>());
@@ -627,9 +601,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Request HTTP response and parse secret metadata */
         try {
             Map<String, String> args = new HashMap<>();
@@ -648,9 +620,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
         /* Request HTTP response and parse secret metadata */
         try {
             String response = requestGet(mount + PATH_METADATA + key, new HashMap<>());
@@ -665,9 +635,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final List<String> list(final String path) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         try {
             String response = requestGet(path + "/?list=true", new HashMap<>());
@@ -683,9 +651,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         if (key == null || key.isEmpty()) {
             throw new InvalidRequestException("Secret path must not be empty.");
@@ -709,9 +675,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final void delete(final String key) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         /* Request HTTP response and expect empty result */
         String response = requestDelete(key);
@@ -758,9 +722,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @since 0.8
      */
     private void handleSecretVersions(final String mount, final String pathPart, final String key, final int... versions) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         /* Request HTTP response and expect empty result */
         Map<String, Object> payload = new HashMap<>();
@@ -775,9 +737,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final void revoke(final String leaseID) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         /* Request HTTP response and expect empty result */
         String response = requestPut(PATH_REVOKE + leaseID, new HashMap<>());
@@ -790,9 +750,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         Map<String, String> payload = new HashMap<>();
         payload.put("lease_id", leaseID);
@@ -844,9 +802,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * @throws VaultConnectorException on error
      */
     private AuthResponse createTokenInternal(final Token token, final String path) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         if (token == null) {
             throw new InvalidRequestException("Token must be provided.");
@@ -862,9 +818,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final TokenResponse lookupToken(final String token) throws VaultConnectorException {
-        if (!isAuthorized()) {
-            throw new AuthorizationRequiredException();
-        }
+        requireAuth();
 
         /* Request HTTP response and parse Secret */
         try {
@@ -1121,6 +1075,18 @@ public class HTTPVaultConnector implements VaultConnector {
             );
         } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException | KeyManagementException e) {
             throw new TlsException(Error.INIT_SSL_CONTEXT, e);
+        }
+    }
+
+    /**
+     * Check for required authorization.
+     *
+     * @throws AuthorizationRequiredException Connector is not authorized.
+     * @since 0.8 Bundled in method to reduce repetition.
+     */
+    private void requireAuth() throws AuthorizationRequiredException {
+        if (!isAuthorized()) {
+            throw new AuthorizationRequiredException();
         }
     }
 
