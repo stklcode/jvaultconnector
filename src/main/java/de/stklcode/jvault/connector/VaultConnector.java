@@ -398,7 +398,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Retrieve secret from Vault.
-     * Prefix "secret/" is automatically added to key.
+     * <br>
+     * Prefix {@code secret/} is automatically added to key.
      *
      * @param key Secret identifier
      * @return Secret response
@@ -410,7 +411,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Retrieve the latest secret data for specific version from Vault.
-     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     * <br>
+     * Prefix "secret/data" is automatically added to key.
+     * Only available for KV v2 secrets.
      *
      * @param key Secret identifier
      * @return Secret response
@@ -423,7 +426,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Retrieve the latest secret data for specific version from Vault.
-     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     * <br>
+     * Path {@code <mount>/data/<key>} is read here.
+     * Only available for KV v2 secrets.
      *
      * @param mount Secret store mountpoint (without leading or trailing slash).
      * @param key   Secret identifier
@@ -437,7 +442,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Write secret to Vault.
-     * Prefix "secret/" is automatically added to path. Only available for KV v2 secrets.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path.
+     * Only available for KV v2 secrets.
      *
      * @param key Secret identifier.
      * @param data Secret content. Value must be be JSON serializable.
@@ -451,7 +458,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Write secret to Vault.
-     * Prefix "secret/" is automatically added to path. Only available for KV v2 secrets.
+     * <br>
+     * Path {@code <mount>/data/<key>} is written here.
+     * Only available for KV v2 secrets.
      *
      * @param mount Secret store mountpoint (without leading or trailing slash).
      * @param key Secret identifier
@@ -466,7 +475,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Write secret to Vault.
-     * Prefix "secret/" is automatically added to path. Only available for KV v2 secrets.
+     * <br>
+     * Path {@code <mount>/data/<key>} is written here.
+     * Only available for KV v2 secrets.
      *
      * @param mount Secret store mountpoint (without leading or trailing slash).
      * @param key Secret identifier
@@ -480,7 +491,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Retrieve secret data from Vault.
-     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     * <br>
+     * Path {@code <mount>/data/<key>} is read here.
+     * Only available for KV v2 secrets.
      *
      * @param key     Secret identifier
      * @param version Version to read. If {@code null} or zero, the latest version will be returned.
@@ -494,7 +507,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Retrieve secret data from Vault.
-     * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
+     * <br>
+     * Path {@code <mount>/data/<key>} is read here.
+     * Only available for KV v2 secrets.
      *
      * @param mount   Secret store mountpoint (without leading or trailing slash).
      * @param key     Secret identifier
@@ -507,7 +522,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Retrieve secret metadata from Vault.
-     * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
+     * Path {@code secret/metadata/<key>} is read here.
+     * Only available for KV v2 secrets.
      *
      * @param key Secret identifier
      * @return Metadata response
@@ -519,20 +535,10 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
-     * Retrieve secret metadata from Vault.
-     * Prefix "metadata" is automatically added to key. Only available for KV v2 secrets.
-     *
-     * @param mount Secret store mountpoint (without leading or trailing slash).
-     * @param key   Secret identifier
-     * @return Metadata response
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException;
-
-    /**
      * Update secret metadata.
-     * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
+     * <br>
+     * Path {@code secret/metadata/<key>} is read here.
+     * Only available for KV v2 secrets.
      *
      * @param key Secret identifier
      * @param maxVersions Maximum number of versions (fallback to backend default if {@code null})
@@ -545,8 +551,24 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
+     * Retrieve secret metadata from Vault.
+     * <br>
+     * Path {@code <mount>/metadata/<key>} is read here.
+     * Only available for KV v2 secrets.
+     *
+     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param key   Secret identifier
+     * @return Metadata response
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException;
+
+    /**
      * Update secret metadata.
-     * Prefix "metadata" is automatically added to key. Only available for KV v2 secrets.
+     * <br>
+     * Path {@code <mount>/metadata/<key>} is written here.
+     * Only available for KV v2 secrets.
      *
      * @param mount       Secret store mountpoint (without leading or trailing slash).
      * @param key         Secret identifier
@@ -569,7 +591,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * List available secrets from Vault.
-     * Prefix "secret/" is automatically added to path.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path.
      *
      * @param path Root path to search
      * @return List of secret keys
@@ -618,7 +641,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Write secret to Vault.
-     * Prefix "secret/" is automatically added to path.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path.
      *
      * @param key   Secret path
      * @param value Secret value
@@ -632,7 +656,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Write secret to Vault.
-     * Prefix "secret/" is automatically added to path.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path.
      *
      * @param key  Secret path
      * @param data Secret content. Value must be be JSON serializable.
@@ -657,7 +682,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Delete secret from Vault.
-     * Prefix "secret/" is automatically added to path.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path.
      *
      * @param key Secret path
      * @throws VaultConnectorException on error
@@ -668,7 +694,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Delete latest version of a secret from Vault.
-     * Only available for KV v2 stores.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path. Only available for KV v2 stores.
      *
      * @param key Secret path.
      * @throws VaultConnectorException on error
@@ -680,6 +707,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Delete latest version of a secret from Vault.
+     * <br>
      * Only available for KV v2 stores.
      *
      * @param mount Secret store mountpoint (without leading or trailing slash).
@@ -691,6 +719,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Delete latest version of a secret from Vault.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path.
      * Only available for KV v2 stores.
      *
      * @param key Secret path.
@@ -703,6 +733,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Delete latest version of a secret from Vault.
+     * <br>
+     * Prefix {@code secret/} is automatically added to path.
      * Only available for KV v2 stores.
      *
      * @param mount    Secret store mountpoint (without leading or trailing slash).
@@ -714,6 +746,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Delete secret versions from Vault.
+     * <br>
      * Only available for KV v2 stores.
      *
      * @param key      Secret path.
@@ -727,6 +760,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Delete secret versions from Vault.
+     * <br>
      * Only available for KV v2 stores.
      *
      * @param mount    Secret store mountpoint (without leading or trailing slash).
@@ -853,6 +887,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      */
     TokenResponse lookupToken(final String token) throws VaultConnectorException;
+
+
 
     /**
      * Read credentials for MySQL backend at default mount point.
