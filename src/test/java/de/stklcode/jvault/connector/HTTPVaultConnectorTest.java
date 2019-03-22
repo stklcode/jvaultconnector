@@ -124,12 +124,12 @@ public class HTTPVaultConnectorTest {
 
         /* Unseal Vault and check result */
         SealResponse sealStatus = connector.unseal(KEY1);
-        assumeTrue(sealStatus != null);
-        assumeTrue(sealStatus.isSealed());
+        assumeTrue(sealStatus != null, "Seal status could not be determined after startup");
+        assumeTrue(sealStatus.isSealed(), "Vault is not sealed after startup");
         sealStatus = connector.unseal(KEY2);
-        assumeTrue(sealStatus != null);
-        assumeFalse(sealStatus.isSealed());
-        assumeTrue(sealStatus.isInitialized()); // Initialized flag of Vault 0.11.2 (#20).
+        assumeTrue(sealStatus != null, "Seal status could not be determined");
+        assumeFalse(sealStatus.isSealed(), "Vault is not unsealed");
+        assumeTrue(sealStatus.isInitialized(), "Vault is not initialized"); // Initialized flag of Vault 0.11.2 (#20).
     }
 
     @AfterEach
