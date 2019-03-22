@@ -535,6 +535,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
      *
      * @param key Secret identifier
+     * @param maxVersions Maximum number of versions (fallback to backend default if {@code null})
+     * @param casRequired Specify if Check-And-Set is required for this secret.
      * @throws VaultConnectorException on error
      * @since 0.8
      */

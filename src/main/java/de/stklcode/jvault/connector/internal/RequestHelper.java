@@ -103,6 +103,7 @@ public final class RequestHelper implements Serializable {
      * @param payload Map of payload values (will be converted to JSON).
      * @param token   Vault token (may be {@code null}).
      * @param target  Target class.
+     * @param <T>     Target type.
      * @return HTTP response
      * @throws VaultConnectorException on connection error
      * @since 0.8
@@ -120,8 +121,9 @@ public final class RequestHelper implements Serializable {
     /**
      * Execute HTTP request using POST method and expect empty (204) response.
      *
-     * @param path  URL path (relative to base).
-     * @param token Vault token (may be {@code null}).
+     * @param path    URL path (relative to base).
+     * @param payload Map of payload values (will be converted to JSON).
+     * @param token   Vault token (may be {@code null}).
      * @throws VaultConnectorException on connection error
      * @since 0.8
      */
@@ -171,6 +173,7 @@ public final class RequestHelper implements Serializable {
      * @param payload Map of payload values (will be converted to JSON).
      * @param token   Vault token (may be {@code null}).
      * @param target  Target class.
+     * @param <T>     Target type.
      * @return HTTP response
      * @throws VaultConnectorException on connection error
      * @since 0.8
@@ -276,6 +279,7 @@ public final class RequestHelper implements Serializable {
      * @param payload Map of payload values (will be converted to JSON).
      * @param token   Vault token (may be {@code null}).
      * @param target  Target class.
+     * @param <T>     Target type.
      * @return HTTP response
      * @throws VaultConnectorException on connection error
      * @since 0.8
