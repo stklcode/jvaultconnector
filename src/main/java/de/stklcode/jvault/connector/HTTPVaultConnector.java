@@ -334,7 +334,7 @@ public class HTTPVaultConnector implements VaultConnector {
         payload.put("value", policy);
         payload.put("display_name", displayName);
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(PATH_AUTH_APPID + "map/app-id/" + appID, payload, token);
 
         return true;
@@ -347,7 +347,7 @@ public class HTTPVaultConnector implements VaultConnector {
         Map<String, String> payload = new HashMap<>();
         payload.put("value", appID);
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(PATH_AUTH_APPID + "map/user-id/" + userID, payload, token);
 
         return true;
@@ -357,7 +357,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final boolean createAppRole(final AppRole role) throws VaultConnectorException {
         requireAuth();
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(String.format(PATH_AUTH_APPROLE_ROLE, role.getName(), ""), role, token);
 
         /* Set custom ID if provided */
@@ -375,7 +375,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final boolean deleteAppRole(final String roleName) throws VaultConnectorException {
         requireAuth();
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.deleteWithoutResponse(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), token);
 
         return true;
@@ -400,7 +400,7 @@ public class HTTPVaultConnector implements VaultConnector {
         Map<String, String> payload = new HashMap<>();
         payload.put("role_id", roleID);
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), payload, token);
 
         return true;
@@ -446,7 +446,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throws VaultConnectorException {
         requireAuth();
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(
                 String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id/destroy"),
                 new AppRoleSecret(secretID),
@@ -505,6 +505,28 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public final SecretVersionResponse writeSecretData(final String mount, final String key, final Map<String, Object> data, final Integer cas) throws VaultConnectorException {
+        requireAuth();
+
+        if (key == null || key.isEmpty()) {
+            throw new InvalidRequestException("Secret path must not be empty.");
+        }
+
+        // Add CAS value to options map if present.
+        Map<String, Object> options = new HashMap<>();
+        if (cas != null) {
+            options.put("cas", cas);
+        }
+        
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("data", data);
+        payload.put("options", options);
+
+        /* Issue request and parse metadata response */
+        return request.post(mount + PATH_DATA + key, payload, token, SecretVersionResponse.class);
+    }
+
+    @Override
     public final List<String> list(final String path) throws VaultConnectorException {
         requireAuth();
 
@@ -532,7 +554,7 @@ public class HTTPVaultConnector implements VaultConnector {
             payload = payloadMap;
         }
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(key, payload, token);
     }
 
@@ -540,7 +562,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final void delete(final String key) throws VaultConnectorException {
         requireAuth();
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.deleteWithoutResponse(key, token);
     }
 
@@ -586,7 +608,7 @@ public class HTTPVaultConnector implements VaultConnector {
         Map<String, Object> payload = new HashMap<>();
         payload.put("versions", versions);
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(mount + pathPart + key, payload, token);
     }
 
@@ -594,7 +616,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final void revoke(final String leaseID) throws VaultConnectorException {
         requireAuth();
 
-        /* Issue request anx expect code 204 with empty response */
+        /* Issue request and expect code 204 with empty response */
         request.putWithoutResponse(PATH_REVOKE + leaseID, new HashMap<>(), token);
     }
 

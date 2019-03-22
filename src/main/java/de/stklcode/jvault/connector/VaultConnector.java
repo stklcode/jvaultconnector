@@ -436,6 +436,49 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
+     * Write secret to Vault.
+     * Prefix "secret/" is automatically added to path. Only available for KV v2 secrets.
+     *
+     * @param key Secret identifier.
+     * @param data Secret content. Value must be be JSON serializable.
+     * @return Metadata for the created/updated secret.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    default SecretVersionResponse writeSecretData(final String key, final Map<String, Object> data) throws VaultConnectorException {
+        return writeSecretData(PATH_SECRET, key, data, null);
+    }
+
+    /**
+     * Write secret to Vault.
+     * Prefix "secret/" is automatically added to path. Only available for KV v2 secrets.
+     *
+     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param key Secret identifier
+     * @param data Secret content. Value must be be JSON serializable.
+     * @return Metadata for the created/updated secret.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    default SecretVersionResponse writeSecretData(final String mount, final String key, final Map<String, Object> data) throws VaultConnectorException {
+        return writeSecretData(mount, key, data, null);
+    }
+
+    /**
+     * Write secret to Vault.
+     * Prefix "secret/" is automatically added to path. Only available for KV v2 secrets.
+     *
+     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param key Secret identifier
+     * @param data Secret content. Value must be be JSON serializable.
+     * @param cas  Use Check-And-Set operation, i.e. only allow writing if current version matches this value.
+     * @return Metadata for the created/updated secret.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    SecretVersionResponse writeSecretData(final String mount, final String key, final Map<String, Object> data, final Integer cas) throws VaultConnectorException;
+
+    /**
      * Retrieve secret data from Vault.
      * Prefix "secret/data" is automatically added to key. Only available for KV v2 secrets.
      *
@@ -456,7 +499,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param mount   Secret store mountpoint (without leading or trailing slash).
      * @param key     Secret identifier
      * @param version Version to read. If {@code null} or zero, the latest version will be returned.
-     * @return Secret response
+     * @return Secret responsef
      * @throws VaultConnectorException on error
      * @since 0.8
      */

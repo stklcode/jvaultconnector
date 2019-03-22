@@ -32,9 +32,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
@@ -82,6 +80,8 @@ public class HTTPVaultConnectorTest {
     private static final String SECRET2_KEY = "foo2";
     private static final String SECRET2_VALUE1 = "bar2";
     private static final String SECRET2_VALUE2 = "bar3";
+    private static final String SECRET2_VALUE3 = "bar4";
+    private static final String SECRET2_VALUE4 = "bar4";
 
     private Process vaultProcess;
     private VaultConnector connector;
@@ -763,6 +763,62 @@ public class HTTPVaultConnectorTest {
             assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE1));
         } catch (VaultConnectorException e) {
             fail("Valid secret version could not be read: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test writing of secrets to KV v2 store.
+     */
+    @Test
+    public void writeSecretV2Test() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
+        // First get the current version of the secret.
+        int currentVersion = -1;
+        try {
+            MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
+            currentVersion = res.getMetadata().getCurrentVersion();
+        } catch (VaultConnectorException e) {
+            fail("Reading secret metadata failed: " + e.getMessage());
+        }
+
+        // Now write (update) the data and verify the version.
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("value", SECRET2_VALUE3);
+            SecretVersionResponse res = connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data);
+            assertThat("Version not updated after writing secret", res.getMetadata().getVersion(), is(currentVersion + 1));
+            currentVersion = res.getMetadata().getVersion();
+        } catch (VaultConnectorException e) {
+            fail("Writing secret to KV v2 store failed: " + e.getMessage());
+        }
+
+        // Verify the content.
+        try {
+            SecretResponse res = connector.readSecretData(MOUNT_KV2, SECRET2_KEY);
+            assertThat("Data not updated correctly", res.getValue(), is(SECRET2_VALUE3));
+        } catch (VaultConnectorException e) {
+            fail("Reading secret from KV v2 store failed: " + e.getMessage());
+        }
+
+        // Now try with explicit CAS value (invalid).
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("value", SECRET2_VALUE4);
+            SecretVersionResponse res = connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data, currentVersion - 1);
+            fail("Writing secret to KV v2 with invalid CAS value succeeded");
+        } catch (VaultConnectorException e) {
+            assertThat("Unexpected exception", e, is(instanceOf(InvalidResponseException.class)));
+        }
+
+        // And finally with a correct CAS value.
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("value", SECRET2_VALUE4);
+            SecretVersionResponse res = connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data, currentVersion);
+        } catch (VaultConnectorException e) {
+            fail("Writing secret to KV v2 with correct CAS value failed: " + e.getMessage());
         }
     }
 
