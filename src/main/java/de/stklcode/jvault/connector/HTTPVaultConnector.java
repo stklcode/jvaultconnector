@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.AuthorizationRequiredException;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
@@ -30,8 +29,6 @@ import de.stklcode.jvault.connector.model.Token;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +66,6 @@ public class HTTPVaultConnector implements VaultConnector {
 
     public static final String DEFAULT_TLS_VERSION = "TLSv1.2";
 
-    private final ObjectMapper jsonMapper;
     private final RequestHelper request;
 
     private boolean authorized = false;     // Authorization status.
@@ -219,7 +215,6 @@ public class HTTPVaultConnector implements VaultConnector {
                               final Integer timeout,
                               final String tlsVersion) {
         this.request = new RequestHelper(baseURL, numberOfRetries, timeout, tlsVersion, trustedCaCert);
-        this.jsonMapper = new ObjectMapper();
     }
 
     @Override
@@ -231,15 +226,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SealResponse sealStatus() throws VaultConnectorException {
-        try {
-            String response = request.get(PATH_SEAL_STATUS, new HashMap<>(), token);
-            return jsonMapper.readValue(response, SealResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        return request.get(PATH_SEAL_STATUS, new HashMap<>(), token, SealResponse.class);
     }
 
     @Override
@@ -254,12 +241,8 @@ public class HTTPVaultConnector implements VaultConnector {
         if (reset != null) {
             param.put("reset", reset.toString());
         }
-        try {
-            String response = request.put(PATH_UNSEAL, param, token);
-            return jsonMapper.readValue(response, SealResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        }
+
+        return request.put(PATH_UNSEAL, param, token, SealResponse.class);
     }
 
     @Override
@@ -269,16 +252,8 @@ public class HTTPVaultConnector implements VaultConnector {
         param.put("standbycode", "200");    // Default: 429.
         param.put("sealedcode", "200");     // Default: 503.
         param.put("uninitcode", "200");     // Default: 501.
-        try {
-            String response = request.get(PATH_HEALTH, param, token);
-            /* Parse response */
-            return jsonMapper.readValue(response, HealthResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException e) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+
+        return request.get(PATH_HEALTH, param, token, HealthResponse.class);
     }
 
     @Override
@@ -288,17 +263,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final List<AuthBackend> getAuthBackends() throws VaultConnectorException {
-        try {
-            String response = request.get(PATH_AUTH, new HashMap<>(), token);
-            /* Parse response */
-            AuthMethodsResponse amr = jsonMapper.readValue(response, AuthMethodsResponse.class);
-            return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        /* Issue request and parse response */
+        AuthMethodsResponse amr = request.get(PATH_AUTH, new HashMap<>(), token, AuthMethodsResponse.class);
+
+        return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
     }
 
     @Override
@@ -306,14 +274,10 @@ public class HTTPVaultConnector implements VaultConnector {
         /* set token */
         this.token = token;
         this.tokenTTL = 0;
-        try {
-            String response = request.post(PATH_TOKEN + PATH_LOOKUP, new HashMap<>(), token);
-            TokenResponse res = jsonMapper.readValue(response, TokenResponse.class);
-            authorized = true;
-            return res;
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        }
+        TokenResponse res = request.post(PATH_TOKEN + PATH_LOOKUP, new HashMap<>(), token, TokenResponse.class);
+        authorized = true;
+
+        return res;
     }
 
     @Override
@@ -353,19 +317,14 @@ public class HTTPVaultConnector implements VaultConnector {
      */
     private AuthResponse queryAuth(final String path, final Map<String, String> payload)
             throws VaultConnectorException {
-        try {
-            /* Get response */
-            String response = request.post(path, payload, token);
-            /* Parse response */
-            AuthResponse auth = jsonMapper.readValue(response, AuthResponse.class);
-            /* verify response */
-            this.token = auth.getAuth().getClientToken();
-            this.tokenTTL = System.currentTimeMillis() + auth.getAuth().getLeaseDuration() * 1000L;
-            this.authorized = true;
-            return auth;
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        }
+        /* Issue request and parse response */
+        AuthResponse auth = request.post(path, payload, token, AuthResponse.class);
+        /* verify response */
+        this.token = auth.getAuth().getClientToken();
+        this.tokenTTL = System.currentTimeMillis() + auth.getAuth().getLeaseDuration() * 1000L;
+        this.authorized = true;
+
+        return auth;
     }
 
     @Override
@@ -418,15 +377,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException {
         requireAuth();
         /* Request HTTP response and parse Secret */
-        try {
-            String response = request.get(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), new HashMap<>(), token);
-            return jsonMapper.readValue(response, AppRoleResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        return request.get(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), new HashMap<>(), token, AppRoleResponse.class);
     }
 
     @Override
@@ -447,18 +398,13 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final String getAppRoleID(final String roleName) throws VaultConnectorException {
         requireAuth();
-        /* Request HTTP response and parse Secret */
-        try {
-            String response = request.get(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"),
-                    new HashMap<>(),
-                    token);
-            return jsonMapper.readValue(response, RawDataResponse.class).getData().get("role_id").toString();
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        /* Issue request, parse response and extract Role ID */
+        return request.get(
+                String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"),
+                new HashMap<>(),
+                token,
+                RawDataResponse.class
+        ).getData().get("role_id").toString();
     }
 
     @Override
@@ -479,21 +425,20 @@ public class HTTPVaultConnector implements VaultConnector {
     public final AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret)
             throws VaultConnectorException {
         requireAuth();
-        /* Get response */
-        String response;
-        if (secret.getId() != null && !secret.getId().isEmpty()) {
-            response = request.post(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/custom-secret-id"),
-                    secret,
-                    token);
-        } else {
-            response = request.post(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id"), secret, token);
-        }
 
-        try {
-            /* Extract the secret ID from response */
-            return jsonMapper.readValue(response, AppRoleSecretResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE);
+        if (secret.getId() != null && !secret.getId().isEmpty()) {
+            return request.post(
+                    String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/custom-secret-id"),
+                    secret,
+                    token,
+                    AppRoleSecretResponse.class
+            );
+        } else {
+            return request.post(
+                    String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id"),
+                    secret, token,
+                    AppRoleSecretResponse.class
+            );
         }
     }
 
@@ -501,16 +446,14 @@ public class HTTPVaultConnector implements VaultConnector {
     public final AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID)
             throws VaultConnectorException {
         requireAuth();
-        /* Request HTTP response and parse Secret */
-        try {
-            String response = request.post(
-                    String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id/lookup"),
-                    new AppRoleSecret(secretID),
-                    token);
-            return jsonMapper.readValue(response, AppRoleSecretResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        }
+
+        /* Issue request and parse secret response */
+        return request.post(
+                String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id/lookup"),
+                new AppRoleSecret(secretID),
+                token,
+                AppRoleSecretResponse.class
+        );
     }
 
     @Override
@@ -536,100 +479,58 @@ public class HTTPVaultConnector implements VaultConnector {
     public final List<String> listAppRoles() throws VaultConnectorException {
         requireAuth();
 
-        try {
-            String response = request.get(PATH_AUTH_APPROLE + "role?list=true", new HashMap<>(), token);
-            SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
-            return secrets.getKeys();
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        SecretListResponse secrets = request.get(PATH_AUTH_APPROLE + "role?list=true", new HashMap<>(), token, SecretListResponse.class);
+        return secrets.getKeys();
     }
 
     @Override
     public final List<String> listAppRoleSecrets(final String roleName) throws VaultConnectorException {
         requireAuth();
 
-        try {
-            String response = request.get(
-                    String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id?list=true"),
-                    new HashMap<>(),
-                    token);
-            SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
-            return secrets.getKeys();
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        SecretListResponse secrets = request.get(
+                String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id?list=true"),
+                new HashMap<>(),
+                token,
+                SecretListResponse.class
+        );
+
+        return secrets.getKeys();
     }
 
     @Override
     public final SecretResponse read(final String key) throws VaultConnectorException {
         requireAuth();
-        /* Request HTTP response and parse Secret */
-        try {
-            String response = request.get(key, new HashMap<>(), token);
-            return jsonMapper.readValue(response, SecretResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        /* Issue request and parse secret response */
+        return request.get(key, new HashMap<>(), token, SecretResponse.class);
     }
 
     @Override
     public final SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException {
         requireAuth();
         /* Request HTTP response and parse secret metadata */
-        try {
-            Map<String, String> args = new HashMap<>();
-            if (version != null) {
-                args.put("version", version.toString());
-            }
-            String response = request.get(mount + PATH_DATA + key, args, token);
-            return jsonMapper.readValue(response, SecretResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
+        Map<String, String> args = new HashMap<>();
+        if (version != null) {
+            args.put("version", version.toString());
         }
+
+        return request.get(mount + PATH_DATA + key, args, token, SecretResponse.class);
     }
 
     @Override
     public final MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException {
         requireAuth();
+
         /* Request HTTP response and parse secret metadata */
-        try {
-            String response = request.get(mount + PATH_METADATA + key, new HashMap<>(), token);
-            return jsonMapper.readValue(response, MetadataResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        return request.get(mount + PATH_METADATA + key, new HashMap<>(), token, MetadataResponse.class);
     }
 
     @Override
     public final List<String> list(final String path) throws VaultConnectorException {
         requireAuth();
 
-        try {
-            String response = request.get(path + "/?list=true", new HashMap<>(), token);
-            SecretListResponse secrets = jsonMapper.readValue(response, SecretListResponse.class);
-            return secrets.getKeys();
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        SecretListResponse secrets = request.get(path + "/?list=true", new HashMap<>(), token, SecretListResponse.class);
+
+        return secrets.getKeys();
     }
 
     @Override
@@ -741,13 +642,8 @@ public class HTTPVaultConnector implements VaultConnector {
             payload.put("increment", increment.toString());
         }
 
-        /* Request HTTP response and parse Secret */
-        try {
-            String response = request.put(PATH_RENEW, payload, token);
-            return jsonMapper.readValue(response, SecretResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        }
+        /* Issue request and parse secret response */
+        return request.put(PATH_RENEW, payload, token, SecretResponse.class);
     }
 
     @Override
@@ -791,12 +687,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new InvalidRequestException("Token must be provided.");
         }
 
-        String response = request.post(path, token, this.token);
-        try {
-            return jsonMapper.readValue(response, AuthResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        }
+        return request.post(path, token, this.token, AuthResponse.class);
     }
 
     @Override
@@ -804,15 +695,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Request HTTP response and parse Secret */
-        try {
-            String response = request.get(PATH_TOKEN + "/lookup/" + token, new HashMap<>(), token);
-            return jsonMapper.readValue(response, TokenResponse.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
-        } catch (URISyntaxException ignored) {
-            /* this should never occur and may leak sensible information */
-            throw new InvalidRequestException(Error.URI_FORMAT);
-        }
+        return request.get(PATH_TOKEN + "/lookup/" + token, new HashMap<>(), token, TokenResponse.class);
     }
 
     /**

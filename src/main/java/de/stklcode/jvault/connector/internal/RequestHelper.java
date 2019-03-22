@@ -97,6 +97,27 @@ public final class RequestHelper implements Serializable {
     }
 
     /**
+     * Execute HTTP request using POST method and parse JSON result.
+     *
+     * @param path    URL path (relative to base).
+     * @param payload Map of payload values (will be converted to JSON).
+     * @param token   Vault token (may be {@code null}).
+     * @param target  Target class.
+     * @return HTTP response
+     * @throws VaultConnectorException on connection error
+     * @since 0.8
+     */
+    public <T> T post(final String path, final Object payload, final String token, final Class<T> target)
+            throws VaultConnectorException {
+        try {
+            String response = post(path, payload, token);
+            return jsonMapper.readValue(response, target);
+        } catch (IOException e) {
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
+        }
+    }
+
+    /**
      * Execute HTTP request using PUT method.
      *
      * @param path    URL path (relative to base).
@@ -130,6 +151,27 @@ public final class RequestHelper implements Serializable {
     }
 
     /**
+     * Execute HTTP request using PUT method and parse JSON result.
+     *
+     * @param path    URL path (relative to base).
+     * @param payload Map of payload values (will be converted to JSON).
+     * @param token   Vault token (may be {@code null}).
+     * @param target  Target class.
+     * @return HTTP response
+     * @throws VaultConnectorException on connection error
+     * @since 0.8
+     */
+    public <T> T put(final String path, final Map<String, String> payload, final String token, final Class<T> target)
+            throws VaultConnectorException {
+        try {
+            String response = put(path, payload, token);
+            return jsonMapper.readValue(response, target);
+        } catch (IOException e) {
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
+        }
+    }
+
+    /**
      * Execute HTTP request using DELETE method.
      *
      * @param path  URL path (relative to base).
@@ -158,17 +200,22 @@ public final class RequestHelper implements Serializable {
      * @param token   Vault token (may be {@code null}).
      * @return HTTP response
      * @throws VaultConnectorException on connection error
-     * @throws URISyntaxException      on invalid URI syntax
      * @since 0.8 Added {@code token} parameter.
      */
     public String get(final String path, final Map<String, String> payload, final String token)
-            throws VaultConnectorException, URISyntaxException {
-        /* Add parameters to URI */
-        URIBuilder uriBuilder = new URIBuilder(baseURL + path);
-        payload.forEach(uriBuilder::addParameter);
+            throws VaultConnectorException {
+        HttpGet get;
+        try {
+            /* Add parameters to URI */
+            URIBuilder uriBuilder = new URIBuilder(baseURL + path);
+            payload.forEach(uriBuilder::addParameter);
 
-        /* Initialize request */
-        HttpGet get = new HttpGet(uriBuilder.build());
+            /* Initialize request */
+            get = new HttpGet(uriBuilder.build());
+        } catch (URISyntaxException e) {
+            /* this should never occur and may leak sensible information */
+            throw new InvalidRequestException(Error.URI_FORMAT);
+        }
 
         /* Set X-Vault-Token header */
         if (token != null) {
@@ -176,6 +223,27 @@ public final class RequestHelper implements Serializable {
         }
 
         return request(get, retries);
+    }
+
+    /**
+     * Execute HTTP request using GET method and parse JSON result to target class.
+     *
+     * @param path    URL path (relative to base).
+     * @param payload Map of payload values (will be converted to JSON).
+     * @param token   Vault token (may be {@code null}).
+     * @param target  Target class.
+     * @return HTTP response
+     * @throws VaultConnectorException on connection error
+     * @since 0.8
+     */
+    public <T> T get(final String path, final Map<String, String> payload, final String token, final Class<T> target)
+            throws VaultConnectorException {
+        try {
+            String response = get(path, payload, token);
+            return jsonMapper.readValue(response, target);
+        } catch (IOException e) {
+            throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
+        }
     }
 
     /**
