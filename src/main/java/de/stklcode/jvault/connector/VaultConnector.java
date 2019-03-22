@@ -520,7 +520,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
 
     /**
      * Retrieve secret metadata from Vault.
-     * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
+     * Prefix "metadata" is automatically added to key. Only available for KV v2 secrets.
      *
      * @param mount Secret store mountpoint (without leading or trailing slash).
      * @param key   Secret identifier
@@ -529,6 +529,31 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8
      */
     MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException;
+
+    /**
+     * Update secret metadata.
+     * Prefix "secret/metadata" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param key Secret identifier
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    default void updateSecretMetadata(final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException {
+        updateSecretMetadata(PATH_SECRET, key, maxVersions, casRequired);
+    }
+
+    /**
+     * Update secret metadata.
+     * Prefix "metadata" is automatically added to key. Only available for KV v2 secrets.
+     *
+     * @param mount       Secret store mountpoint (without leading or trailing slash).
+     * @param key         Secret identifier
+     * @param maxVersions Maximum number of versions (fallback to backend default if {@code null})
+     * @param casRequired Specify if Check-And-Set is required for this secret.
+     * @throws VaultConnectorException on error
+     * @since 0.8
+     */
+    void updateSecretMetadata(final String mount, final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException;
 
     /**
      * List available nodes from Vault.

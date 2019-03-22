@@ -505,6 +505,19 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public void updateSecretMetadata(final String mount, final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException {
+        requireAuth();
+
+        Map<String, Object> payload = new HashMap<>();
+        if (maxVersions != null) {
+            payload.put("max_versions", maxVersions);
+        }
+        payload.put("cas_required", casRequired);
+
+        write(mount + PATH_METADATA + key, payload);
+    }
+
+    @Override
     public final SecretVersionResponse writeSecretData(final String mount, final String key, final Map<String, Object> data, final Integer cas) throws VaultConnectorException {
         requireAuth();
 

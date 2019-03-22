@@ -830,6 +830,41 @@ public class HTTPVaultConnectorTest {
         authUser();
         assumeTrue(connector.isAuthorized());
 
+        // Read current metadata first.
+        Integer maxVersions = -1;
+        try {
+            MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
+            maxVersions = res.getMetadata().getMaxVersions();
+            assumeThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(10));
+        } catch (VaultConnectorException e) {
+            fail("Reading secret metadata failed: " + e.getMessage());
+        }
+
+        // Now update the metadata.
+        try {
+            ++maxVersions;
+            connector.updateSecretMetadata(MOUNT_KV2, SECRET2_KEY, maxVersions, true);
+        } catch (VaultConnectorException e) {
+            fail("Updating secret metadata failed: " + e.getMessage());
+        }
+
+        // And verify the result.
+        try {
+            MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
+            assertThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(maxVersions));
+        } catch (VaultConnectorException e) {
+            fail("Reading secret metadata failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test updating secret metadata in KV v2 store.
+     */
+    @Test
+    public void updateSecretMetadataTest() {
+        authUser();
+        assumeTrue(connector.isAuthorized());
+
         // Try to read accessible path with known value.
         try {
             MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
@@ -838,6 +873,7 @@ public class HTTPVaultConnectorTest {
             assertThat("Unexpected number of secret versions", res.getMetadata().getVersions().size(), is(2));
             assertThat("Creation date should be present", res.getMetadata().getCreatedTime(), is(notNullValue()));
             assertThat("Update date should be present", res.getMetadata().getUpdatedTime(), is(notNullValue()));
+            assertThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(10));
         } catch (VaultConnectorException e) {
             fail("Valid secret path could not be read: " + e.getMessage());
         }
