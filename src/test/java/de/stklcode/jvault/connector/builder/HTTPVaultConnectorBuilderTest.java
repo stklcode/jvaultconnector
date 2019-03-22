@@ -22,9 +22,10 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
-import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.NoSuchFileException;
@@ -45,8 +46,8 @@ public class HTTPVaultConnectorBuilderTest {
     private static Integer VAULT_MAX_RETRIES = 13;
     private static String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";
 
-    @Rule
-    public TemporaryFolder tmpDir = new TemporaryFolder();
+    @TempDir
+    File tempDir;
 
     @Rule
     public final EnvironmentVariables environment = new EnvironmentVariables();
@@ -68,7 +69,7 @@ public class HTTPVaultConnectorBuilderTest {
         }
         connector = factory.build();
 
-        assertThat("URL nor set correctly", getRequestHelperPrivate(connector,  "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
+        assertThat("URL nor set correctly", getRequestHelperPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
         assertThat("Trusted CA cert set when no cert provided", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
         assertThat("Non-default number of retries, when none set", getRequestHelperPrivate(connector, "retries"), is(0));
 
@@ -87,7 +88,7 @@ public class HTTPVaultConnectorBuilderTest {
         assertThat("Number of retries not set correctly", getRequestHelperPrivate(connector, "retries"), is(VAULT_MAX_RETRIES));
 
         /* Provide CA certificate */
-        String VAULT_CACERT = tmpDir.newFolder().toString() + "/doesnotexist";
+        String VAULT_CACERT = tempDir.toString() + "/doesnotexist";
         setenv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null);
 
         try {

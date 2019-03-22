@@ -22,9 +22,10 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import org.junit.Rule;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
-import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.NoSuchFileException;
@@ -45,8 +46,8 @@ public class HTTPVaultConnectorFactoryTest {
     private static Integer VAULT_MAX_RETRIES = 13;
     private static String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";
 
-    @Rule
-    public TemporaryFolder tmpDir = new TemporaryFolder();
+    @TempDir
+    File tempDir;
 
     @Rule
     public final EnvironmentVariables environment = new EnvironmentVariables();
@@ -87,7 +88,7 @@ public class HTTPVaultConnectorFactoryTest {
         assertThat("Number of retries not set correctly", getRequestHelperPrivate(connector, "retries"), is(VAULT_MAX_RETRIES));
 
         /* Provide CA certificate */
-        String VAULT_CACERT = tmpDir.newFolder().toString() + "/doesnotexist";
+        String VAULT_CACERT = tempDir.toString() + "/doesnotexist";
         setenv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null);
 
         try {
@@ -96,7 +97,7 @@ public class HTTPVaultConnectorFactoryTest {
         } catch (VaultConnectorException e) {
             assertThat(e, is(instanceOf(TlsException.class)));
             assertThat(e.getCause(), is(instanceOf(NoSuchFileException.class)));
-            assertThat(((NoSuchFileException)e.getCause()).getFile(), is(VAULT_CACERT));
+            assertThat(((NoSuchFileException) e.getCause()).getFile(), is(VAULT_CACERT));
         }
 
         /* Automatic authentication */
@@ -116,7 +117,7 @@ public class HTTPVaultConnectorFactoryTest {
         environment.set("VAULT_MAX_RETRIES", vault_max_retries);
         environment.set("VAULT_TOKEN", vault_token);
     }
-    
+
     private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) throws NoSuchFieldException, IllegalAccessException {
         return getPrivate(getPrivate(connector, "request"), fieldName);
     }

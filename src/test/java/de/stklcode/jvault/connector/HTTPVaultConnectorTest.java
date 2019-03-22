@@ -23,10 +23,8 @@ import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
-import org.junit.Rule;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -52,7 +50,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Stefan Kalscheuer
  * @since 0.1
  */
-@EnableRuleMigrationSupport
 public class HTTPVaultConnectorTest {
     private static String VAULT_VERSION = "1.1.0";  // the vault version this test is supposed to run against
     private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
@@ -86,8 +83,8 @@ public class HTTPVaultConnectorTest {
     private Process vaultProcess;
     private VaultConnector connector;
 
-    @Rule
-    public TemporaryFolder tmpDir = new TemporaryFolder();
+    @TempDir
+    File tempDir;
 
     @BeforeAll
     public static void init() {
@@ -1202,7 +1199,7 @@ public class HTTPVaultConnectorTest {
      * @throws IllegalStateException on error
      */
     private VaultConfiguration initializeVault(boolean tls) throws IllegalStateException, IOException {
-        File dataDir = tmpDir.newFolder();
+        File dataDir = new File(tempDir, "data");
         copyDirectory(new File(getClass().getResource("/data_dir").getPath()), dataDir);
 
         /* Generate vault local unencrypted configuration */
@@ -1223,7 +1220,7 @@ public class HTTPVaultConnectorTest {
         BufferedWriter bw = null;
         File configFile;
         try {
-            configFile = tmpDir.newFile("vault.conf");
+            configFile = new File(tempDir, "vault.conf");
             bw = new BufferedWriter(new FileWriter(configFile));
             bw.write(config.toString());
         } catch (IOException e) {
