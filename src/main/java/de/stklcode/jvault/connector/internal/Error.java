@@ -22,13 +22,13 @@ package de.stklcode.jvault.connector.internal;
  * @author Stefan Kalscheuer
  * @since 0.8 Extracted from static inner class.
  */
-public final class Error {
-    public static final String READ_RESPONSE = "Unable to read response";
-    public static final String PARSE_RESPONSE = "Unable to parse response";
-    public static final String UNEXPECTED_RESPONSE = "Received response where none was expected";
-    public static final String URI_FORMAT = "Invalid URI format";
-    public static final String RESPONSE_CODE = "Invalid response code";
-    public static final String INIT_SSL_CONTEXT = "Unable to intialize SSLContext";
+final class Error {
+    static final String READ_RESPONSE = "Unable to read response";
+    static final String PARSE_RESPONSE = "Unable to parse response";
+    static final String UNEXPECTED_RESPONSE = "Received response where none was expected";
+    static final String URI_FORMAT = "Invalid URI format";
+    static final String RESPONSE_CODE = "Invalid response code";
+    static final String INIT_SSL_CONTEXT = "Unable to intialize SSLContext";
 
     /**
      * Constructor hidden, this class should not be instantiated.

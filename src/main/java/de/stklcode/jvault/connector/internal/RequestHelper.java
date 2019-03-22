@@ -118,6 +118,20 @@ public final class RequestHelper implements Serializable {
     }
 
     /**
+     * Execute HTTP request using POST method and expect empty (204) response.
+     *
+     * @param path  URL path (relative to base).
+     * @param token Vault token (may be {@code null}).
+     * @throws VaultConnectorException on connection error
+     * @since 0.8
+     */
+    public void postWithoutResponse(final String path, final Object payload, final String token) throws VaultConnectorException {
+        if (!post(path, payload, token).isEmpty()) {
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
+    }
+
+    /**
      * Execute HTTP request using PUT method.
      *
      * @param path    URL path (relative to base).
@@ -172,6 +186,22 @@ public final class RequestHelper implements Serializable {
     }
 
     /**
+     * Execute HTTP request using PUT method and expect empty (204) response.
+     *
+     * @param path    URL path (relative to base).
+     * @param payload Map of payload values (will be converted to JSON).
+     * @param token   Vault token (may be {@code null}).
+     * @throws VaultConnectorException on connection error
+     * @since 0.8
+     */
+    public void putWithoutResponse(final String path, final Map<String, String> payload, final String token)
+            throws VaultConnectorException {
+        if (!put(path, payload, token).isEmpty()) {
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
+    }
+
+    /**
      * Execute HTTP request using DELETE method.
      *
      * @param path  URL path (relative to base).
@@ -190,6 +220,20 @@ public final class RequestHelper implements Serializable {
         }
 
         return request(delete, retries);
+    }
+
+    /**
+     * Execute HTTP request using DELETE method and expect empty (204) response.
+     *
+     * @param path  URL path (relative to base).
+     * @param token Vault token (may be {@code null}).
+     * @throws VaultConnectorException on connection error
+     * @since 0.8
+     */
+    public void deleteWithoutResponse(final String path, final String token) throws VaultConnectorException {
+        if (!delete(path, token).isEmpty()) {
+            throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
+        }
     }
 
     /**
