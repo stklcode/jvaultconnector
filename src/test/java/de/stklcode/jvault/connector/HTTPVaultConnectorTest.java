@@ -1035,7 +1035,7 @@ public class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             /* Create token */
-            Token token = new TokenBuilder()
+            Token token = Token.builder()
                     .withId("test-id")
                     .withDisplayName("test name")
                     .build();
@@ -1061,7 +1061,7 @@ public class HTTPVaultConnectorTest {
             }
 
             /* Create token with attributes */
-            token = new TokenBuilder()
+            token = Token.builder()
                     .withId("test-id2")
                     .withDisplayName("test name 2")
                     .withPolicies(Collections.singletonList("testpolicy"))
@@ -1081,7 +1081,7 @@ public class HTTPVaultConnectorTest {
             }
 
             /* Overwrite token should fail as of Vault 0.8.0 */
-            token = new TokenBuilder()
+            token = Token.builder()
                     .withId("test-id2")
                     .withDisplayName("test name 3")
                     .withPolicies(Arrays.asList("pol1", "pol2"))
