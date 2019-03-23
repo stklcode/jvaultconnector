@@ -15,6 +15,7 @@
 * Build environment and tests now compatible with Java 10
 * Updated dependencies to fix vulnerabilities (i.e. CVE-2018-7489)
 * New static method `Token.builder()` to get token builder instance
+* New static method `AppRole.builder()` to get AppRole builder instance
 
 ### Deprecation
 * `VaultConnectorFactory` is deprecated in favor of `VaultConnectorBuilder` with identical API (#18)

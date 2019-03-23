@@ -28,6 +28,17 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRole {
+    /**
+     * Get {@link AppRoleBuilder} instance.
+     *
+     * @param name Role name.
+     * @return AppRole Builder.
+     * @since 0.8
+     */
+    public static AppRoleBuilder builder(final String name) {
+        return new AppRoleBuilder(name);
+    }
+
     @JsonProperty("role_name")
     private String name;
 

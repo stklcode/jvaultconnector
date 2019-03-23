@@ -836,7 +836,7 @@ public class HTTPVaultConnectorTest {
             String roleName = "TestRole";
 
             /* Create role model */
-            AppRole role = new AppRoleBuilder(roleName).build();
+            AppRole role = AppRole.builder(roleName).build();
 
             /* Create role */
             try {
