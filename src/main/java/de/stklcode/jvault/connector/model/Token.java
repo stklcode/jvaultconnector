@@ -31,6 +31,16 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class Token {
+    /**
+     * Get {@link TokenBuilder} instance.
+     *
+     * @return Token Builder.
+     * @since 0.8
+     */
+    public static TokenBuilder builder() {
+        return new TokenBuilder();
+    }
+
     @JsonProperty("id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
