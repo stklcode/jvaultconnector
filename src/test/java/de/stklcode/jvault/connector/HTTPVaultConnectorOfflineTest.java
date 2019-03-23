@@ -20,7 +20,6 @@ import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import de.stklcode.jvault.connector.internal.RequestHelper;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.dynamic.loading.ClassReloadingStrategy;
