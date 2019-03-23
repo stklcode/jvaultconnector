@@ -17,8 +17,8 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 * Authorization methods
     * Token
     * Username/Password
-    * AppID (register and authenticate) [_deprecated_]
     * AppRole (register and authenticate)
+    * AppID (register and authenticate) [_deprecated_]
 * Tokens
     * Creation and lookup of tokens
     * TokenBuilder for speaking creation of complex configuraitons
@@ -30,6 +30,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * Renew/revoke leases
     * Raw secret content or JSON decoding
     * SQL secret handling
+    * KV v1 and v2 support
 * Connector Factory with builder pattern
 * Tested against Vault 1.1.0
 
@@ -49,21 +50,21 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 
 ```java
 // Instantiate using builder pattern style factory (TLS enabled by default)
-VaultConnector vault = VaultConnectorFactory.httpFactory()
+VaultConnector vault = VaultConnectorBuilder.http()
  .withHost("127.0.0.1")
  .withPort(8200)
  .withTLS()
  .build();
 
 // Instantiate with custom SSL context
-VaultConnector vault = VaultConnectorFactory.httpFactory()
+VaultConnector vault = VaultConnectorBuilder.http()
  .withHost("example.com")
  .withPort(8200)
  .withTrustedCA(Paths.get("/path/to/CA.pem"))
  .build();
 
 // Initialization from environment variables 
-VaultConnector vault = VaultConnectorFactory.httpFactory()
+VaultConnector vault = VaultConnectorBuilder.http()
  .fromEnv()
  .build();
 ```
@@ -78,14 +79,14 @@ vault.authToken("01234567-89ab-cdef-0123-456789abcdef");
 vault.authUserPass("username", "p4ssw0rd");
 
 // Authenticate with AppRole (secret - 2nd argument - is optional).
-vault.authAppId("01234567-89ab-cdef-0123-456789abcdef", "fedcba98-7654-3210-fedc-ba9876543210");
+vault.authAppRole("01234567-89ab-cdef-0123-456789abcdef", "fedcba98-7654-3210-fedc-ba9876543210");
 ```
 
 ### Secret read & write
 
 ```java
 // Retrieve secret (prefix "secret/" assumed, use read() to read arbitrary paths)
-String secret = vault.readSecret("some/secret/key").getValue();
+String secret = vault.readSecret("some/secret/key").get("value", String.class);
 
 // Complex secret.
 Map<String, Object> secretData = vault.readSecret("another/secret/key").getData();
@@ -94,7 +95,7 @@ Map<String, Object> secretData = vault.readSecret("another/secret/key").getData(
 vault.writeSecret("new/secret/key", "secret value");
 
 // Write complex data to arbitraty path.
-Map<String, Object> map = [...]
+Map<String, Object> map = ...;
 vault.write("any/path/to/write", map);
 
 // Delete secret.
@@ -105,10 +106,11 @@ vault.delete("any/path/to/write");
 
 ```java
 // Create token using TokenBuilder
-Token token = new TokenBuilder().withId("token id")
-                                .withDisplayName("new test token")
-                                .withPolicies("pol1", "pol2")
-                                .build();
+Token token = Token.builder()
+                   .withId("token id")
+                   .withDisplayName("new test token")
+                   .withPolicies("pol1", "pol2")
+                   .build();
 vault.createToken(token);
 
 // Create AppRole credentials
@@ -121,11 +123,6 @@ AppRoleSecretResponse secret = vault.createAppRoleSecret("testrole");
 [Project Page](http://jvault.stklcode.de)
 
 [JavaDoc API](http://jvault.stklcode.de/apidocs/)
-
-## Planned features
-
-* Creation and modification of policies
-* Implement more authentication methods
 
 ## License
 

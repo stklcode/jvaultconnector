@@ -14,6 +14,7 @@
 * Enforce TLS 1.2 by default with option to override (#22)
 * Build environment and tests now compatible with Java 10
 * Updated dependencies to fix vulnerabilities (i.e. CVE-2018-7489)
+* New static method `Token.builder()` to get token builder instance
 
 ### Deprecation
 * `VaultConnectorFactory` is deprecated in favor of `VaultConnectorBuilder` with identical API (#18)
