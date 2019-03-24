@@ -16,9 +16,7 @@
 
 package de.stklcode.jvault.connector.factory;
 
-import de.stklcode.jvault.connector.VaultConnector;
 import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
-import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 /**
  * Abstract Vault Connector Factory interface.
