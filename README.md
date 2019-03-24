@@ -1,9 +1,9 @@
 # Java Vault Connector 
 
 [![Build Status](https://travis-ci.org/stklcode/jvaultconnector.svg?branch=master)](https://travis-ci.org/stklcode/jvaultconnector)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=de.stklcode.jvault%3Aconnector&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.stklcode.jvault%3Aconnector)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=de.stklcode.jvault%3Ajvault-connector&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.stklcode.jvault%3Aconnector)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/stklcode/jvaultconnector/blob/master/LICENSE.txt) 
-[![Maven Central](https://img.shields.io/maven-central/v/de.stklcode.jvault/connector.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.stklcode.jvault%22%20AND%20a%3A%22connector%22)
+[![Maven Central](https://img.shields.io/maven-central/v/de.stklcode.jvault/jvault-connector.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.stklcode.jvault%22%20AND%20a%3A%22jvault-connector%22)
 
 ![Logo](https://raw.githubusercontent.com/stklcode/jvaultconnector/master/assets/logo.png)
 
@@ -39,8 +39,8 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 ```xml
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
-    <artifactId>connector</artifactId>
-    <version>0.7.1</version>
+    <artifactId>jvault-connector</artifactId>
+    <version>0.8.0</version>
 </dependency>
 ```
 

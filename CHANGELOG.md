@@ -1,4 +1,4 @@
-## 0.8.0 (unreleased)
+## 0.8.0 (2019-03-24)
 ### Breaking
 * Moved Maven artifact to `de.stklcode.jvault:jvault-connector` (#28)
 * Removed support for `HTTPVaultConnectorFactory#withSslContext()` in favor of `#withTrustedCA()` due to
