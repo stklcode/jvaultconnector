@@ -13,7 +13,7 @@ steps:
 - name: test-online
   image: maven:3-jdk-11-slim
   commands:
-  - export VAULT_VERSION=1.1.0
+  - export VAULT_VERSION=1.1.2
   - wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip
   - wget -q -O - https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS | grep linux_amd64 | sha256sum -c
   - unzip vault_${VAULT_VERSION}_linux_amd64.zip
