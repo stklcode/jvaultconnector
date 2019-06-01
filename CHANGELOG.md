@@ -1,3 +1,7 @@
+## unreleased
+### Improvements
+* Updated ependencies
+
 ## 0.8.0 (2019-03-24)
 ### Breaking
 * Moved Maven artifact to `de.stklcode.jvault:jvault-connector` (#28)
