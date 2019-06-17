@@ -42,9 +42,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 @EnableRuleMigrationSupport
 public class HTTPVaultConnectorBuilderTest {
-    private static String VAULT_ADDR = "https://localhost:8201";
-    private static Integer VAULT_MAX_RETRIES = 13;
-    private static String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";
+    private static final String VAULT_ADDR = "https://localhost:8201";
+    private static final Integer VAULT_MAX_RETRIES = 13;
+    private static final String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";
 
     @TempDir
     File tempDir;
@@ -56,7 +56,7 @@ public class HTTPVaultConnectorBuilderTest {
      * Test building from environment variables
      */
     @Test
-    public void testFromEnv() throws NoSuchFieldException, IllegalAccessException, IOException {
+    void testFromEnv() throws NoSuchFieldException, IllegalAccessException, IOException {
         /* Provide address only should be enough */
         setenv(VAULT_ADDR, null, null, null);
 
