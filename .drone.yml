@@ -18,7 +18,7 @@ steps:
   - name: test-offline
     image: maven:3-jdk-11-slim
     commands:
-      - mvn clean test -Dtest='!HTTPVaultConnectorTest'
+      - mvn clean test -P offline-tests
     when:
       branch:
         - develop

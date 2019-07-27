@@ -19,7 +19,9 @@ package de.stklcode.jvault.connector;
 import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.*;
-import de.stklcode.jvault.connector.model.*;
+import de.stklcode.jvault.connector.model.AppRole;
+import de.stklcode.jvault.connector.model.AuthBackend;
+import de.stklcode.jvault.connector.model.Token;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
@@ -50,6 +52,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Stefan Kalscheuer
  * @since 0.1
  */
+@Tag("online")
 public class HTTPVaultConnectorTest {
     private static String VAULT_VERSION = "1.1.3";  // the vault version this test is supposed to run against
     private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
