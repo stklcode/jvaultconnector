@@ -1,6 +1,12 @@
-## unreleased
+## 0.8.1 (unreleased
+### Fixes
+* Removed compile dependency to JUnit library (#30) 
+
 ### Improvements
 * Updated ependencies
+
+### Test
+* Tested against Vault 1.2.2
 
 ## 0.8.0 (2019-03-24)
 ### Breaking
