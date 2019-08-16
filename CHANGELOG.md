@@ -1,4 +1,4 @@
-## 0.8.1 (unreleased
+## 0.8.1 (2019-08-16)
 ### Fixes
 * Removed compile dependency to JUnit library (#30) 
 
