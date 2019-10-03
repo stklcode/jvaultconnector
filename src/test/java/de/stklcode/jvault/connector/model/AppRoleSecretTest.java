@@ -29,8 +29,8 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.junit.MatcherAssume.assumeThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 
 /**
@@ -143,17 +143,17 @@ public class AppRoleSecretTest {
 
         /* Test fields, that should not be written to JSON */
         setPrivateField(secret, "accessor", "TEST_ACCESSOR");
-        assumeThat(secret.getAccessor(), is("TEST_ACCESSOR"));
+        assumeTrue("TEST_ACCESSOR".equals(secret.getAccessor()));
         setPrivateField(secret, "creationTime", "TEST_CREATION");
-        assumeThat(secret.getCreationTime(), is("TEST_CREATION"));
+        assumeTrue("TEST_CREATION".equals(secret.getCreationTime()));
         setPrivateField(secret, "expirationTime", "TEST_EXPIRATION");
-        assumeThat(secret.getExpirationTime(), is("TEST_EXPIRATION"));
+        assumeTrue("TEST_EXPIRATION".equals(secret.getExpirationTime()));
         setPrivateField(secret, "lastUpdatedTime", "TEST_UPDATETIME");
-        assumeThat(secret.getLastUpdatedTime(), is("TEST_UPDATETIME"));
+        assumeTrue("TEST_UPDATETIME".equals(secret.getLastUpdatedTime()));
         setPrivateField(secret, "numUses", 678);
-        assumeThat(secret.getNumUses(), is(678));
+        assumeTrue(secret.getNumUses() == 678);
         setPrivateField(secret, "ttl", 12345);
-        assumeThat(secret.getTtl(), is(12345));
+        assumeTrue(secret.getTtl() == 12345);
         try {
             secretJson = mapper.writeValueAsString(secret);
         } catch (JsonProcessingException e) {

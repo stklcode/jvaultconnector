@@ -39,11 +39,9 @@ import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.junit.MatcherAssume.assumeThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.*;
 
 /**
  * JUnit test for HTTP Vault connector.
@@ -292,7 +290,7 @@ public class HTTPVaultConnectorTest {
             } catch (VaultConnectorException e) {
                 fail("Written secret could not be read.");
             }
-            assumeThat(res, is(notNullValue()));
+            assumeTrue(res != null);
 
             /* Delete secret */
             try {
@@ -333,7 +331,7 @@ public class HTTPVaultConnectorTest {
             } catch (VaultConnectorException e) {
                 fail("Written secret could not be read.");
             }
-            assumeThat(res, is(notNullValue()));
+            assumeTrue(res != null);
 
             /* Revoke secret */
             try {
@@ -460,7 +458,7 @@ public class HTTPVaultConnectorTest {
             try {
                 MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
                 maxVersions = res.getMetadata().getMaxVersions();
-                assumeThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(10));
+                assumeTrue(res.getMetadata().getMaxVersions() == 10, "Unexpected maximum number of versions");
             } catch (VaultConnectorException e) {
                 fail("Reading secret metadata failed: " + e.getMessage());
             }
