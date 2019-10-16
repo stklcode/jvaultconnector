@@ -45,6 +45,10 @@ public final class Token {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
 
+    @JsonProperty("type")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String type;
+
     @JsonProperty("display_name")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String displayName;
@@ -78,6 +82,33 @@ public final class Token {
     private Boolean renewable;
 
     /**
+     * Construct complete {@link Token} object with default type.
+     *
+     * @param id              Token ID (optional)
+     * @param displayName     Token display name (optional)
+     * @param noParent        Token has no parent (optional)
+     * @param noDefaultPolicy Do not add default policy (optional)
+     * @param ttl             Token TTL in seconds (optional)
+     * @param numUses         Number of uses (optional)
+     * @param policies        List of policies (optional)
+     * @param meta            Metadata (optional)
+     * @param renewable       Is the token renewable (optional)
+     * @deprecated As of 0.9, use {@link #Token(String, String, String, Boolean, Boolean, Integer, Integer, List, Map, Boolean)} instead.
+     */
+    @Deprecated
+    public Token(final String id,
+                 final String displayName,
+                 final Boolean noParent,
+                 final Boolean noDefaultPolicy,
+                 final Integer ttl,
+                 final Integer numUses,
+                 final List<String> policies,
+                 final Map<String, String> meta,
+                 final Boolean renewable) {
+        this(id, Type.DEFAULT.value(), displayName, noParent, noDefaultPolicy, ttl, numUses, policies, meta, renewable);
+    }
+
+    /**
      * Construct complete {@link Token} object.
      *
      * @param id              Token ID (optional)
@@ -91,6 +122,7 @@ public final class Token {
      * @param renewable       Is the token renewable (optional)
      */
     public Token(final String id,
+                 final String type,
                  final String displayName,
                  final Boolean noParent,
                  final Boolean noDefaultPolicy,
@@ -100,6 +132,7 @@ public final class Token {
                  final Map<String, String> meta,
                  final Boolean renewable) {
         this.id = id;
+        this.type = type;
         this.displayName = displayName;
         this.ttl = ttl;
         this.numUses = numUses;
@@ -115,6 +148,14 @@ public final class Token {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Token type
+     * @since 0.9
+     */
+    public String getType() {
+        return type;
     }
 
     /**
@@ -171,5 +212,26 @@ public final class Token {
      */
     public Boolean isRenewable() {
         return renewable;
+    }
+
+    /**
+     * Constants for token types.
+     */
+    public enum Type {
+        DEFAULT("default"),
+        BATCH("batch"),
+        SERVICE("service"),
+        DEFAULT_SERVICE("default-service"),
+        DEFAULT_BATCH("default-batch");
+
+        private final String value;
+
+        Type(String value) {
+            this.value = value;
+        }
+
+        public String value() {
+            return value;
+        }
     }
 }

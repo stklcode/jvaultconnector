@@ -53,7 +53,7 @@ public class TokenBuilderTest {
     private static final String META_KEY_2 = "key2";
     private static final String META_VALUE_2 = "value2";
     private static final Boolean RENEWABLE = true;
-    private static final String JSON_FULL = "{\"id\":\"test-id\",\"display_name\":\"display-name\",\"no_parent\":false,\"no_default_policy\":false,\"ttl\":123,\"num_uses\":4,\"policies\":[\"policy\"],\"meta\":{\"key\":\"value\"},\"renewable\":true}";
+    private static final String JSON_FULL = "{\"id\":\"test-id\",\"type\":\"service\",\"display_name\":\"display-name\",\"no_parent\":false,\"no_default_policy\":false,\"ttl\":123,\"num_uses\":4,\"policies\":[\"policy\"],\"meta\":{\"key\":\"value\"},\"renewable\":true}";
 
     @BeforeAll
     public static void init() {
@@ -68,6 +68,7 @@ public class TokenBuilderTest {
     public void buildDefaultTest() throws JsonProcessingException {
         Token token = new TokenBuilder().build();
         assertThat(token.getId(), is(nullValue()));
+        assertThat(token.getType(), is(nullValue()));
         assertThat(token.getDisplayName(), is(nullValue()));
         assertThat(token.getNoParent(), is(nullValue()));
         assertThat(token.getNoDefaultPolicy(), is(nullValue()));
@@ -88,6 +89,7 @@ public class TokenBuilderTest {
     public void buildFullTest() throws JsonProcessingException {
         Token token = new TokenBuilder()
                 .withId(ID)
+                .withType(Token.Type.SERVICE)
                 .withDisplayName(DISPLAY_NAME)
                 .withNoParent(NO_PARENT)
                 .withNoDefaultPolicy(NO_DEFAULT_POLICY)
@@ -98,6 +100,7 @@ public class TokenBuilderTest {
                 .withRenewable(RENEWABLE)
                 .build();
         assertThat(token.getId(), is(ID));
+        assertThat(token.getType(), is(Token.Type.SERVICE.value()));
         assertThat(token.getDisplayName(), is(DISPLAY_NAME));
         assertThat(token.getNoParent(), is(NO_PARENT));
         assertThat(token.getNoDefaultPolicy(), is(NO_DEFAULT_POLICY));

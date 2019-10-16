@@ -1039,6 +1039,7 @@ public class HTTPVaultConnectorTest {
             /* Create token */
             Token token = Token.builder()
                     .withId("test-id")
+                    .withType(Token.Type.SERVICE)
                     .withDisplayName("test name")
                     .build();
 
@@ -1116,6 +1117,7 @@ public class HTTPVaultConnectorTest {
             /* Create token with attributes */
             Token token = Token.builder()
                     .withId("my-token")
+                    .withType(Token.Type.SERVICE)
                     .build();
             try {
                 connector.createToken(token);
@@ -1131,6 +1133,7 @@ public class HTTPVaultConnectorTest {
                 assertThat("Unexpected token ID", res.getData().getId(), is(token.getId()));
                 assertThat("Unexpected number of policies", res.getData().getPolicies(), hasSize(1));
                 assertThat("Unexpected policy", res.getData().getPolicies(), contains("root"));
+                assertThat("Unexpected token type", res.getData().getType(), is(token.getType()));
             } catch (VaultConnectorException e) {
                 fail("Token creation failed.");
             }
