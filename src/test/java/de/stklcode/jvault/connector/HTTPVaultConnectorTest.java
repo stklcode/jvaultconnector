@@ -1026,7 +1026,7 @@ public class HTTPVaultConnectorTest {
         }
 
         /**
-         * Test revocation of secrets.
+         * Test token creation.
          */
         @Test
         @Order(20)
@@ -1099,6 +1099,37 @@ public class HTTPVaultConnectorTest {
                 assertThat(((InvalidResponseException) e).getStatusCode(), is(400));
                 /* Assert that the exception does not reveal token ID */
                 assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
+            }
+        }
+
+        /**
+         * Test token lookuo.
+         */
+        @Test
+        @Order(30)
+        @DisplayName("Lookup token")
+        public void lookupTokenTest() {
+            authRoot();
+            assumeTrue(connector.isAuthorized());
+
+            /* Create token with attributes */
+            Token token = Token.builder()
+                    .withId("my-token")
+                    .build();
+            try {
+                connector.createToken(token);
+            } catch (VaultConnectorException e) {
+                fail("Token creation failed.");
+            }
+
+            authRoot();
+            assumeTrue(connector.isAuthorized());
+
+            try {
+                TokenResponse res = connector.lookupToken("my-token");
+                assertThat("Unexpected token ID", res.getData().getId(), is(token.getId()));
+            } catch (VaultConnectorException e) {
+                fail("Token creation failed.");
             }
         }
     }

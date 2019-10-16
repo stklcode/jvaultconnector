@@ -696,7 +696,9 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Request HTTP response and parse Secret */
-        return request.get(PATH_TOKEN + "/lookup/" + token, new HashMap<>(), token, TokenResponse.class);
+        Map<String, String> param = new HashMap<>();
+        param.put("token", token);
+        return request.get(PATH_TOKEN + PATH_LOOKUP, param, token, TokenResponse.class);
     }
 
     /**
