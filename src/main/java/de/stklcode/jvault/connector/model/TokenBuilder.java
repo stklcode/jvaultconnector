@@ -26,6 +26,7 @@ import java.util.*;
  */
 public final class TokenBuilder {
     private String id;
+    private Token.Type type;
     private String displayName;
     private Boolean noParent;
     private Boolean noDefaultPolicy;
@@ -43,6 +44,18 @@ public final class TokenBuilder {
      */
     public TokenBuilder withId(final String id) {
         this.id = id;
+        return this;
+    }
+
+    /**
+     * Specify token type.
+     *
+     * @param type the type
+     * @return self
+     * @since 0.9
+     */
+    public TokenBuilder withType(final Token.Type type) {
+        this.type = type;
         return this;
     }
 
@@ -247,6 +260,7 @@ public final class TokenBuilder {
      */
     public Token build() {
         return new Token(id,
+                type != null ? type.value() : null,
                 displayName,
                 noParent,
                 noDefaultPolicy,

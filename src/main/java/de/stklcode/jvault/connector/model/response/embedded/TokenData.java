@@ -45,6 +45,9 @@ public final class TokenData {
     @JsonProperty("id")
     private String id;
 
+    @JsonProperty("type")
+    private String type;
+
     @JsonProperty("meta")
     private Map<String, Object> meta;
 
@@ -96,6 +99,14 @@ public final class TokenData {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Token type
+     * @since 0.9
+     */
+    public String getType() {
+        return type;
     }
 
     /**
