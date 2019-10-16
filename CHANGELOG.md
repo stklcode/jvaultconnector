@@ -1,5 +1,8 @@
 ## unreleased
 
+### Fixes
+* Fixed token lookup (#31) 
+
 ### Improvements
 * Updated dependencies
 
