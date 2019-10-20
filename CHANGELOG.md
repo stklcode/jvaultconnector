@@ -1,4 +1,4 @@
-## unreleased
+## 0.8.2 (2019-10-20)
 
 ### Fixes
 * Fixed token lookup (#31) 
