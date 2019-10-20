@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * JUnit Test for {@link SecretListResponse} model.
@@ -50,7 +50,6 @@ public class SecretListResponseTest {
      * @throws InvalidResponseException Should not occur
      */
     @Test
-    @SuppressWarnings("unchecked")
     public void getKeysTest() throws InvalidResponseException {
         // Create empty Object.
         SecretListResponse res = new SecretListResponse();

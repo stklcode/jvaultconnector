@@ -19,11 +19,9 @@ package de.stklcode.jvault.connector.builder;
 import de.stklcode.jvault.connector.HTTPVaultConnector;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import org.junit.Rule;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import de.stklcode.jvault.connector.test.EnvironmentMock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.8.0
  */
-@EnableRuleMigrationSupport
 public class HTTPVaultConnectorBuilderTest {
     private static final String VAULT_ADDR = "https://localhost:8201";
     private static final Integer VAULT_MAX_RETRIES = 13;
@@ -48,9 +45,6 @@ public class HTTPVaultConnectorBuilderTest {
 
     @TempDir
     File tempDir;
-
-    @Rule
-    public final EnvironmentVariables environment = new EnvironmentVariables();
 
     /**
      * Test building from environment variables
@@ -112,10 +106,10 @@ public class HTTPVaultConnectorBuilderTest {
     }
 
     private void setenv(String vault_addr, String vault_cacert, String vault_max_retries, String vault_token) {
-        environment.set("VAULT_ADDR", vault_addr);
-        environment.set("VAULT_CACERT", vault_cacert);
-        environment.set("VAULT_MAX_RETRIES", vault_max_retries);
-        environment.set("VAULT_TOKEN", vault_token);
+        EnvironmentMock.setenv("VAULT_ADDR", vault_addr);
+        EnvironmentMock.setenv("VAULT_CACERT", vault_cacert);
+        EnvironmentMock.setenv("VAULT_MAX_RETRIES", vault_max_retries);
+        EnvironmentMock.setenv("VAULT_TOKEN", vault_token);
     }
 
     private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) throws NoSuchFieldException, IllegalAccessException {
