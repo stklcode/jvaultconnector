@@ -41,7 +41,8 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.*;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * JUnit test for HTTP Vault connector.
@@ -1128,6 +1129,8 @@ public class HTTPVaultConnectorTest {
             try {
                 TokenResponse res = connector.lookupToken("my-token");
                 assertThat("Unexpected token ID", res.getData().getId(), is(token.getId()));
+                assertThat("Unexpected number of policies", res.getData().getPolicies(), hasSize(1));
+                assertThat("Unexpected policy", res.getData().getPolicies(), contains("root"));
             } catch (VaultConnectorException e) {
                 fail("Token creation failed.");
             }

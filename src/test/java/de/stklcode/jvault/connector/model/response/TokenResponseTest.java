@@ -117,8 +117,10 @@ public class TokenResponseTest {
             assertThat("Incorrect token number of uses", data.getNumUses(), is(TOKEN_NUM_USES));
             assertThat("Incorrect token orphan flag", data.isOrphan(), is(TOKEN_ORPHAN));
             assertThat("Incorrect token path", data.getPath(), is(TOKEN_PATH));
-            assertThat("Incorrect auth metadata size", data.getMeta().entrySet(), hasSize(1));
-            assertThat("Incorrect auth metadata", data.getMeta().get(TOKEN_META_KEY), is(TOKEN_META_VALUE));
+            assertThat("Incorrect token metadata size", data.getMeta().entrySet(), hasSize(1));
+            assertThat("Incorrect token metadata", data.getMeta().get(TOKEN_META_KEY), is(TOKEN_META_VALUE));
+            assertThat("Incorrect number of token policies", data.getPolicies(), hasSize(2));
+            assertThat("Incorrect token policies", data.getPolicies(), contains(TOKEN_POLICY_1, TOKEN_POLICY_2));
             assertThat("Incorrect response renewable flag", res.isRenewable(), is(RES_RENEWABLE));
             assertThat("Incorrect response TTL", data.getTtl(), is(RES_TTL));
             assertThat("Incorrect response lease duration", res.getLeaseDuration(), is(RES_LEASE_DURATION));

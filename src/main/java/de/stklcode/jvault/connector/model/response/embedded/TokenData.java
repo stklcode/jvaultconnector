@@ -19,13 +19,14 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * Embedded token information inside Vault response.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenData {
@@ -56,8 +57,8 @@ public final class TokenData {
     @JsonProperty("path")
     private String path;
 
-    @JsonProperty("role")
-    private String role;
+    @JsonProperty("policies")
+    private List<String> policies;
 
     @JsonProperty("ttl")
     private Integer ttl;
@@ -119,10 +120,11 @@ public final class TokenData {
     }
 
     /**
-     * @return Token role
+     * @return Token policies
+     * @since 0.9
      */
-    public String getRole() {
-        return role;
+    public List<String> getPolicies() {
+        return policies;
     }
 
     /**

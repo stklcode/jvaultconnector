@@ -2,6 +2,7 @@
 
 ### Fixes
 * Correctly parse Map field for token metadata (#34)
+* Correctly map token policies on lookup (#35)
 
 ### Improvements
 * Minor dependency updates
