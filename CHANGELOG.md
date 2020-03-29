@@ -4,7 +4,11 @@
 * Correctly parse Map field for token metadata (#34)
 * Correctly map token policies on lookup (#35)
 
+### Features
+* Support for token types (#26)
+
 ### Improvements
+* Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
 * Minor dependency updates
 
 

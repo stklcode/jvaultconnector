@@ -1050,8 +1050,12 @@ public class HTTPVaultConnectorTest {
                 assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id"));
                 assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
                 assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("root"));
+                assertThat("Invalid number of token policies returned.", res.getAuth().getTokenPolicies(), hasSize(1));
+                assertThat("Root policy not inherited for token.", res.getAuth().getTokenPolicies(), contains("root"));
+                assertThat("Unexpected token type.", res.getAuth().getTokenType(), is(Token.Type.SERVICE.value()));
                 assertThat("Metadata unexpected.", res.getAuth().getMetadata(), is(nullValue()));
                 assertThat("Root token should not be renewable", res.getAuth().isRenewable(), is(false));
+                assertThat("Root token should not be orphan", res.getAuth().isOrphan(), is(false));
 
                 // Starting with Vault 1.0 a warning "cusotm ID uses weaker SHA1..." is given.
                 if (VAULT_VERSION.startsWith("1.")) {
@@ -1075,12 +1079,12 @@ public class HTTPVaultConnectorTest {
                 AuthResponse res = connector.createToken(token);
                 assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id2"));
                 assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
-                assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("testpolicy"));
+                assertThat("Custom policy not set.", res.getAuth().getPolicies(), contains("testpolicy"));
                 assertThat("Metadata not given.", res.getAuth().getMetadata(), is(notNullValue()));
                 assertThat("Metadata not correct.", res.getAuth().getMetadata().get("foo"), is("bar"));
                 assertThat("Token should be renewable", res.getAuth().isRenewable(), is(true));
             } catch (VaultConnectorException e) {
-                fail("Secret written to inaccessible path.");
+                fail("Token createion failed: " + e.getMessage());
             }
 
             /* Overwrite token should fail as of Vault 0.8.0 */
@@ -1101,6 +1105,26 @@ public class HTTPVaultConnectorTest {
                 assertThat(((InvalidResponseException) e).getStatusCode(), is(400));
                 /* Assert that the exception does not reveal token ID */
                 assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
+            }
+
+            /* Create token with batch type */
+            token = Token.builder()
+                    .withDisplayName("test name 3")
+                    .withPolicy("batchpolicy")
+                    .withoutDefaultPolicy()
+                    .withType(Token.Type.BATCH)
+                    .build();
+            try {
+                AuthResponse res = connector.createToken(token);
+                assertThat("Unexpected token prefix", res.getAuth().getClientToken(), startsWith("b."));
+                assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
+                assertThat("Custom policy policy not set.", res.getAuth().getPolicies(), contains("batchpolicy"));
+                assertThat("Token should not be renewable", res.getAuth().isRenewable(), is(false));
+                assertThat("Token should not be orphan", res.getAuth().isOrphan(), is(false));
+                assertThat("Specified token Type not set", res.getAuth().getTokenType(), is(Token.Type.BATCH.value()));
+
+            } catch (VaultConnectorException e) {
+                fail("Token createion failed: " + e.getMessage());
             }
         }
 

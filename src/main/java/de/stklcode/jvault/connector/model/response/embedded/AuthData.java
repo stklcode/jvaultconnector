@@ -39,6 +39,9 @@ public final class AuthData {
     @JsonProperty("policies")
     private List<String> policies;
 
+    @JsonProperty("token_policies")
+    private List<String> tokenPolicies;
+
     @JsonProperty("metadata")
     private Map<String, Object> metadata;
 
@@ -48,6 +51,15 @@ public final class AuthData {
     @JsonProperty("renewable")
     private boolean renewable;
 
+    @JsonProperty("entity_id")
+    private String entityId;
+
+    @JsonProperty("token_type")
+    private String tokenType;
+
+    @JsonProperty("orphan")
+    private boolean orphan;
+
     /**
      * @return Client token
      */
@@ -56,10 +68,11 @@ public final class AuthData {
     }
 
     /**
-     * @return Token accessor
+     * @return Token type
+     * @since 0.9
      */
-    public String getAccessor() {
-        return accessor;
+    public String getTokenType() {
+        return tokenType;
     }
 
     /**
@@ -67,6 +80,14 @@ public final class AuthData {
      */
     public List<String> getPolicies() {
         return policies;
+    }
+
+    /**
+     * @return List of policies associated with the ooken
+     * @since 0.9
+     */
+    public List<String> getTokenPolicies() {
+        return tokenPolicies;
     }
 
     /**
@@ -88,5 +109,28 @@ public final class AuthData {
      */
     public boolean isRenewable() {
         return renewable;
+    }
+
+    /**
+     * @return Entity ID
+     * @since 0.9
+     */
+    public String getEntityId() {
+        return entityId;
+    }
+
+    /**
+     * @return Token accessor
+     */
+    public String getAccessor() {
+        return accessor;
+    }
+
+    /**
+     * @return Token is orphan
+     * @since 0.9
+     */
+    public boolean isOrphan() {
+        return orphan;
     }
 }
