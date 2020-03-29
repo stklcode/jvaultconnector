@@ -9,6 +9,7 @@
 
 ### Improvements
 * Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
+* Added `entity_id`, `expire_time`, `explicit_max_ttl`, `issue_time`, `renewable` and `type` flags to token data
 * Minor dependency updates
 
 

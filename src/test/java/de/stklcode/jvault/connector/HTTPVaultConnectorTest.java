@@ -1158,6 +1158,7 @@ public class HTTPVaultConnectorTest {
                 assertThat("Unexpected number of policies", res.getData().getPolicies(), hasSize(1));
                 assertThat("Unexpected policy", res.getData().getPolicies(), contains("root"));
                 assertThat("Unexpected token type", res.getData().getType(), is(token.getType()));
+                assertThat("Issue time expected to be filled", res.getData().getIssueTime(), is(notNullValue()));
             } catch (VaultConnectorException e) {
                 fail("Token creation failed.");
             }
