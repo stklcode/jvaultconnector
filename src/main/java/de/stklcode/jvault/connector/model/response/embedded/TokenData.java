@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -42,11 +43,20 @@ public final class TokenData {
     @JsonProperty("display_name")
     private String name;
 
+    @JsonProperty("entity_id")
+    private String entityId;
+
+    @JsonProperty("expire_time")
+    private String expireTime;
+
+    @JsonProperty("explicit_max_ttl")
+    private Integer explicitMaxTtl;
+
     @JsonProperty("id")
     private String id;
 
-    @JsonProperty("type")
-    private String type;
+    @JsonProperty("issue_time")
+    private String issueTime;
 
     @JsonProperty("meta")
     private Map<String, Object> meta;
@@ -63,8 +73,14 @@ public final class TokenData {
     @JsonProperty("policies")
     private List<String> policies;
 
+    @JsonProperty("renewable")
+    private boolean renewable;
+
     @JsonProperty("ttl")
     private Integer ttl;
+
+    @JsonProperty("type")
+    private String type;
 
     /**
      * @return Token accessor
@@ -95,10 +111,66 @@ public final class TokenData {
     }
 
     /**
+     * @return Entity ID
+     * @since 0.9
+     */
+    public String getEntityId() {
+        return entityId;
+    }
+
+    /**
+     * @return Expire time as raw string value
+     * @since 0.9
+     */
+    public String getExpireTimeString() {
+        return expireTime;
+    }
+
+    /**
+     * @return Expire time (parsed)
+     * @since 0.9
+     */
+    public ZonedDateTime getExpireTime() {
+        if (expireTime == null) {
+            return null;
+        } else {
+            return ZonedDateTime.parse(expireTime);
+        }
+    }
+
+    /**
+     * @return Explicit maximum TTL
+     * @since 0.9
+     */
+    public Integer getExplicitMaxTtl() {
+        return explicitMaxTtl;
+    }
+
+    /**
      * @return Token ID
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Issue time as raw string value
+     * @since 0.9
+     */
+    public String getIssueTimeString() {
+        return issueTime;
+    }
+
+    /**
+     * @return Expire time (parsed)
+     * @since 0.9
+     */
+    public ZonedDateTime getIssueTime() {
+        if (issueTime == null) {
+            return null;
+        } else {
+            return ZonedDateTime.parse(issueTime);
+        }
     }
 
     /**
@@ -136,6 +208,14 @@ public final class TokenData {
      */
     public List<String> getPolicies() {
         return policies;
+    }
+
+    /**
+     * @return Token is renewable
+     * @since 0.9
+     */
+    public boolean isRenewable() {
+        return renewable;
     }
 
     /**
