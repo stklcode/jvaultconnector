@@ -19,6 +19,8 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Map;
+
 /**
  * Embedded token information inside Vault response.
  *
@@ -43,7 +45,7 @@ public final class TokenData {
     private String id;
 
     @JsonProperty("meta")
-    private String meta;
+    private Map<String, Object> meta;
 
     @JsonProperty("num_uses")
     private Integer numUses;
@@ -133,7 +135,7 @@ public final class TokenData {
     /**
      * @return Metadata
      */
-    public String getMeta() {
+    public Map<String, Object> getMeta() {
         return meta;
     }
 }

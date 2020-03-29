@@ -39,6 +39,8 @@ public class TokenResponseTest {
     private static final Integer TOKEN_CREATION_TIME = 1457533232;
     private static final Integer TOKEN_TTL = 2764800;
     private static final String TOKEN_DISPLAY_NAME = "token";
+    private static final String TOKEN_META_KEY = "foo";
+    private static final String TOKEN_META_VALUE = "bar";
     private static final Integer TOKEN_NUM_USES = 0;
     private static final Boolean TOKEN_ORPHAN = false;
     private static final String TOKEN_PATH = "auth/token/create";
@@ -56,7 +58,9 @@ public class TokenResponseTest {
             "    \"creation_time\": " + TOKEN_CREATION_TIME + ",\n" +
             "    \"creation_ttl\": " + TOKEN_TTL + ",\n" +
             "    \"display_name\": \"" + TOKEN_DISPLAY_NAME + "\",\n" +
-            "    \"meta\": null,\n" +
+            "    \"meta\": {\n" +
+            "      \"" + TOKEN_META_KEY + "\": \"" + TOKEN_META_VALUE + "\"\n" +
+            "    },\n" +
             "    \"num_uses\": " + TOKEN_NUM_USES + ",\n" +
             "    \"orphan\": " + TOKEN_ORPHAN + ",\n" +
             "    \"path\": \"" + TOKEN_PATH + "\",\n" +
@@ -113,6 +117,8 @@ public class TokenResponseTest {
             assertThat("Incorrect token number of uses", data.getNumUses(), is(TOKEN_NUM_USES));
             assertThat("Incorrect token orphan flag", data.isOrphan(), is(TOKEN_ORPHAN));
             assertThat("Incorrect token path", data.getPath(), is(TOKEN_PATH));
+            assertThat("Incorrect auth metadata size", data.getMeta().entrySet(), hasSize(1));
+            assertThat("Incorrect auth metadata", data.getMeta().get(TOKEN_META_KEY), is(TOKEN_META_VALUE));
             assertThat("Incorrect response renewable flag", res.isRenewable(), is(RES_RENEWABLE));
             assertThat("Incorrect response TTL", data.getTtl(), is(RES_TTL));
             assertThat("Incorrect response lease duration", res.getLeaseDuration(), is(RES_LEASE_DURATION));
