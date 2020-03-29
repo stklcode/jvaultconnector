@@ -3,6 +3,9 @@
 ### Fixes
 * Correctly parse Map field for token metadata (#34)
 
+### Improvements
+* Minor dependency updates
+
 
 ## 0.8.2 (2019-10-20)
 
