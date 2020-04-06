@@ -233,7 +233,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Delete AppRole role from Vault.
      *
      * @param roleName The role anme
-     * @return {@code true} on succevss
+     * @return {@code true} on success
      * @throws VaultConnectorException on error
      */
     boolean deleteAppRole(final String roleName) throws VaultConnectorException;
@@ -446,7 +446,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Prefix {@code secret/} is automatically added to path.
      * Only available for KV v2 secrets.
      *
-     * @param key Secret identifier.
+     * @param key  Secret identifier.
      * @param data Secret content. Value must be be JSON serializable.
      * @return Metadata for the created/updated secret.
      * @throws VaultConnectorException on error
@@ -463,8 +463,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Only available for KV v2 secrets.
      *
      * @param mount Secret store mountpoint (without leading or trailing slash).
-     * @param key Secret identifier
-     * @param data Secret content. Value must be be JSON serializable.
+     * @param key   Secret identifier
+     * @param data  Secret content. Value must be be JSON serializable.
      * @return Metadata for the created/updated secret.
      * @throws VaultConnectorException on error
      * @since 0.8
@@ -480,9 +480,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Only available for KV v2 secrets.
      *
      * @param mount Secret store mountpoint (without leading or trailing slash).
-     * @param key Secret identifier
-     * @param data Secret content. Value must be be JSON serializable.
-     * @param cas  Use Check-And-Set operation, i.e. only allow writing if current version matches this value.
+     * @param key   Secret identifier
+     * @param data  Secret content. Value must be be JSON serializable.
+     * @param cas   Use Check-And-Set operation, i.e. only allow writing if current version matches this value.
      * @return Metadata for the created/updated secret.
      * @throws VaultConnectorException on error
      * @since 0.8
@@ -540,7 +540,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code secret/metadata/<key>} is read here.
      * Only available for KV v2 secrets.
      *
-     * @param key Secret identifier
+     * @param key         Secret identifier
      * @param maxVersions Maximum number of versions (fallback to backend default if {@code null})
      * @param casRequired Specify if Check-And-Set is required for this secret.
      * @throws VaultConnectorException on error
@@ -737,8 +737,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Prefix {@code secret/} is automatically added to path.
      * Only available for KV v2 stores.
      *
-     * @param mount    Secret store mountpoint (without leading or trailing slash).
-     * @param key Secret path.
+     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param key   Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
      */
@@ -888,7 +888,57 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      */
     TokenResponse lookupToken(final String token) throws VaultConnectorException;
 
+    /**
+     * Create a new or update an existing token role.
+     *
+     * @param role the role entity (name must be set)
+     * @return {@code true} on success
+     * @throws VaultConnectorException on error
+     * @since 0.9
+     */
+    default boolean createOrUpdateTokenRole(final TokenRole role) throws VaultConnectorException {
+        return createOrUpdateTokenRole(role.getName(), role);
+    }
 
+    /**
+     * Create a new or update an existing token role.
+     *
+     * @param name the role name (overrides name possibly set in role entity)
+     * @param role the role entity
+     * @return {@code true} on success
+     * @throws VaultConnectorException on error
+     * @since 0.9
+     */
+    boolean createOrUpdateTokenRole(final String name, final TokenRole role) throws VaultConnectorException;
+
+    /**
+     * Lookup token information.
+     *
+     * @param name the role name
+     * @return the result response
+     * @throws VaultConnectorException on error
+     * @since 0.9
+     */
+    TokenRoleResponse readTokenRole(final String name) throws VaultConnectorException;
+
+    /**
+     * List available token roles from Vault.
+     *
+     * @return List of token roles
+     * @throws VaultConnectorException on error
+     * @since 0.9
+     */
+    List<String> listTokenRoles() throws VaultConnectorException;
+
+    /**
+     * Delete a token role.
+     *
+     * @param name the role name to delete
+     * @return {@code true} on success
+     * @throws VaultConnectorException on error
+     * @since 0.9
+     */
+    boolean deleteTokenRole(final String name) throws VaultConnectorException;
 
     /**
      * Read credentials for MySQL backend at default mount point.

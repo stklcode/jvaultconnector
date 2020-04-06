@@ -33,6 +33,7 @@ import static org.hamcrest.Matchers.*;
  * @since 0.9
  */
 public class TokenRoleBuilderTest {
+    private static final String NAME = "test-role";
     private static final String ALLOWED_POLICY_1 = "apol-1";
     private static final String ALLOWED_POLICY_2 = "apol-2";
     private static final String ALLOWED_POLICY_3 = "apol-3";
@@ -59,6 +60,7 @@ public class TokenRoleBuilderTest {
     private static final Token.Type TOKEN_TYPE = Token.Type.SERVICE;
 
     private static final String JSON_FULL = "{" +
+            "\"name\":\"" + NAME + "\"," +
             "\"allowed_policies\":[\"" + ALLOWED_POLICY_1 + "\",\"" + ALLOWED_POLICY_2 + "\",\"" + ALLOWED_POLICY_3 + "\"]," +
             "\"disallowed_policies\":[\"" + DISALLOWED_POLICY_1 + "\",\"" + DISALLOWED_POLICY_2 + "\",\"" + DISALLOWED_POLICY_3 + "\"]," +
             "\"orphan\":" + ORPHAN + "," +
@@ -100,6 +102,7 @@ public class TokenRoleBuilderTest {
     @Test
     public void buildNullTest() throws JsonProcessingException {
         TokenRole role = TokenRole.builder()
+                .forName(null)
                 .withAllowedPolicies(null)
                 .withAllowedPolicy(null)
                 .withDisallowedPolicy(null)
@@ -140,6 +143,7 @@ public class TokenRoleBuilderTest {
     @Test
     public void buildFullTest() throws JsonProcessingException {
         TokenRole role = TokenRole.builder()
+                .forName(NAME)
                 .withAllowedPolicies(ALLOWED_POLICIES)
                 .withAllowedPolicy(ALLOWED_POLICY_3)
                 .withDisallowedPolicy(DISALLOWED_POLICY_1)
@@ -157,7 +161,7 @@ public class TokenRoleBuilderTest {
                 .withTokenPeriod(TOKEN_PERIOD)
                 .withTokenType(TOKEN_TYPE)
                 .build();
-        assertThat(role.getName(), is(nullValue()));
+        assertThat(role.getName(), is(NAME));
         assertThat(role.getAllowedPolicies(), hasSize(ALLOWED_POLICIES.size() + 1));
         assertThat(role.getAllowedPolicies(), containsInAnyOrder(ALLOWED_POLICY_1, ALLOWED_POLICY_2, ALLOWED_POLICY_3));
         assertThat(role.getDisallowedPolicies(), hasSize(DISALLOWED_POLICIES.size() + 1));

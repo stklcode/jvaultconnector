@@ -22,6 +22,7 @@ import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.AppRole;
 import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.Token;
+import de.stklcode.jvault.connector.model.TokenRole;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
@@ -39,8 +40,7 @@ import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -1162,6 +1162,92 @@ public class HTTPVaultConnectorTest {
             } catch (VaultConnectorException e) {
                 fail("Token creation failed.");
             }
+        }
+
+        /**
+         * Test token role handling.
+         */
+        @Test
+        @Order(40)
+        @DisplayName("Token roles")
+        public void tokenRolesTest() {
+            authRoot();
+            assumeTrue(connector.isAuthorized());
+
+            // Create token role.
+            final String roleName = "test-role";
+            final TokenRole role = TokenRole.builder().build();
+
+            try {
+                assertThat(connector.createOrUpdateTokenRole(roleName, role), is(true));
+            } catch (VaultConnectorException e) {
+                fail("Token role creation failed.");
+            }
+
+            // Read the role.
+            TokenRoleResponse res = null;
+            try {
+                res = connector.readTokenRole(roleName);
+            } catch (VaultConnectorException e) {
+                fail("Reading token role failed.");
+            }
+
+            assertThat("Token role response must not be null", res, is(notNullValue()));
+            assertThat("Token role must not be null", res.getData(), is(notNullValue()));
+            assertThat("Token role name not as expected", res.getData().getName(), is(roleName));
+            assertThat("Token role expected to be renewable by default", res.getData().getRenewable(), is(true));
+            assertThat("Token role not expected to be orphan by default", res.getData().getOrphan(), is(false));
+            assertThat("Unexpected default token type", res.getData().getTokenType(), is(Token.Type.DEFAULT_SERVICE.value()));
+
+            // Update the role, i.e. change some attributes.
+            final TokenRole role2 = TokenRole.builder()
+                    .forName(roleName)
+                    .withPathSuffix("suffix")
+                    .orphan(true)
+                    .renewable(false)
+                    .withTokenNumUses(42)
+                    .build();
+
+            try {
+                assertThat(connector.createOrUpdateTokenRole(role2), is(true));
+            } catch (VaultConnectorException e) {
+                fail("Token role update failed.");
+            }
+
+            try {
+                res = connector.readTokenRole(roleName);
+            } catch (VaultConnectorException e) {
+                fail("Reading token role failed.");
+            }
+
+            assertThat("Token role response must not be null", res, is(notNullValue()));
+            assertThat("Token role must not be null", res.getData(), is(notNullValue()));
+            assertThat("Token role name not as expected", res.getData().getName(), is(roleName));
+            assertThat("Token role not expected to be renewable  after update", res.getData().getRenewable(), is(false));
+            assertThat("Token role expected to be orphan  after update", res.getData().getOrphan(), is(true));
+            assertThat("Unexpected number of token uses after update", res.getData().getTokenNumUses(), is(42));
+
+            // List roles.
+            List<String> listRes = null;
+            try {
+                listRes = connector.listTokenRoles();
+            } catch (VaultConnectorException e) {
+                fail("Listing token roles failed.");
+            }
+
+            assertThat("Token role list must not be null", listRes, is(notNullValue()));
+            assertThat("Unexpected number of token roles", listRes, hasSize(1));
+            assertThat("Unexpected token role in list", listRes, contains(roleName));
+
+            // Delete the role.
+            try {
+                assertThat(connector.deleteTokenRole(roleName), is(true));
+            } catch (VaultConnectorException e) {
+                fail("Token role deletion failed.");
+            }
+
+            assertThrows(InvalidResponseException.class, () -> connector.readTokenRole(roleName), "Reading inexistent token role should fail");
+            assertThrows(InvalidResponseException.class, () -> connector.listTokenRoles(), "Listing inexistent token roles should fail");
         }
     }
 

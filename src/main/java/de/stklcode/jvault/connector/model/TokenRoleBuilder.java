@@ -26,6 +26,7 @@ import java.util.List;
  * @since 0.9
  */
 public final class TokenRoleBuilder {
+    private String name;
     private List<String> allowedPolicies;
     private List<String> disallowedPolicies;
     private Boolean orphan;
@@ -38,6 +39,17 @@ public final class TokenRoleBuilder {
     private Integer tokenNumUses;
     private Integer tokenPeriod;
     private Token.Type tokenType;
+
+    /**
+     * Add token role name.
+     *
+     * @param name role name
+     * @return self
+     */
+    public TokenRoleBuilder forName(final String name) {
+        this.name = name;
+        return this;
+    }
 
     /**
      * Add an allowed policy.
@@ -262,7 +274,7 @@ public final class TokenRoleBuilder {
      */
     public TokenRole build() {
         return new TokenRole(
-                null,
+                name,
                 allowedPolicies,
                 disallowedPolicies,
                 orphan,

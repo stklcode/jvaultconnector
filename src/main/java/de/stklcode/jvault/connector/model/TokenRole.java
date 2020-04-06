@@ -92,6 +92,11 @@ public final class TokenRole {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String tokenType;
 
+    /**
+     * Construct empty {@link TokenRole} object.
+     */
+    public TokenRole() {
+    }
 
     /**
      * Construct complete {@link TokenRole} object.
