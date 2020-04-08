@@ -5,12 +5,12 @@ steps:
   - name: test-online
     image: maven:3-jdk-11
     environment:
-      VAULT_VERSION: 1.4.0-rc1
+      VAULT_VERSION: 1.4.0
     commands:
-      - curl -o vault_1.4.0-rc1_linux_amd64.zip https://releases.hashicorp.com/vault/1.4.0-rc1/vault_1.4.0-rc1_linux_amd64.zip
-      - curl -s https://releases.hashicorp.com/vault/1.4.0-rc1/vault_1.4.0-rc1_SHA256SUMS | grep linux_amd64 | sha256sum -c
-      - unzip vault_1.4.0-rc1_linux_amd64.zip
-      - rm vault_1.4.0-rc1_linux_amd64.zip
+      - curl -o vault_1.4.0_linux_amd64.zip https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_linux_amd64.zip
+      - curl -s https://releases.hashicorp.com/vault/1.4.0/vault_1.4.0_SHA256SUMS | grep linux_amd64 | sha256sum -c
+      - unzip vault_1.4.0_linux_amd64.zip
+      - rm vault_1.4.0_linux_amd64.zip
       - mv vault /bin/
       - mvn clean test
     when:
