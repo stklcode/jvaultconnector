@@ -11,7 +11,16 @@
 ### Improvements
 * Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
 * Added `entity_id`, `expire_time`, `explicit_max_ttl`, `issue_time`, `renewable` and `type` flags to token data
+* Added `enable_local_secret_ids`, `token_bound_cidrs`, `token_explicit_max_ttl`, `token_no_default_policy`, 
+  `token_num_uses`, `token_period` and `token_type` flags to _AppRole_ model
 * Minor dependency updates
+
+### Deprecations
+* `AppRole#getPolicies()` and `#setPolicies()` are deprecated in favor of `#getTokenPolicies()` and `#setTokenPolicies()`
+* `AppRole#getPeriod()` is deprecated in favor of `#getTokenPeriod()`
+
+### Removals
+* Deprecated methods `AppRole#getBoundCidrList()`, `#setBoundCidrList()` and `getBoundCidrListString()` have been removed.
 
 
 ## 0.8.2 (2019-10-20)
