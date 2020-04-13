@@ -6,6 +6,7 @@
 
 ### Features
 * Support for token types (#26)
+* Support for token role handling (#27)
 
 ### Improvements
 * Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
