@@ -881,6 +881,28 @@ public class HTTPVaultConnectorTest {
                 fail("Role ID lookup failed.");
             }
 
+            /* Update role model with custom flags */
+            role = AppRole.builder(roleName)
+                    .wit0hTokenPeriod(321)
+                    .build();
+
+            /* Create role */
+            try {
+                boolean res = connector.createAppRole(role);
+                assertThat("No result given.", res, is(notNullValue()));
+            } catch (VaultConnectorException e) {
+                fail("Role creation failed.");
+            }
+
+            /* Lookup updated role */
+            try {
+                AppRoleResponse res = connector.lookupAppRole(roleName);
+                assertThat("Role lookup returned no role.", res.getRole(), is(notNullValue()));
+                assertThat("Token period not set for role.", res.getRole().getTokenPeriod(), is(321));
+            } catch (VaultConnectorException e) {
+                fail("Role lookup failed.");
+            }
+
             /* Create role by name */
             roleName = "RoleByName";
             try {
