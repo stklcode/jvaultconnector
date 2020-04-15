@@ -112,6 +112,7 @@ public final class Token {
      * Construct complete {@link Token} object.
      *
      * @param id              Token ID (optional)
+     * @param type            Token type (optional)
      * @param displayName     Token display name (optional)
      * @param noParent        Token has no parent (optional)
      * @param noDefaultPolicy Do not add default policy (optional)
