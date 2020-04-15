@@ -20,8 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Vault Token metamodel.
@@ -32,13 +31,13 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class Token {
     /**
-     * Get {@link TokenBuilder} instance.
+     * Get {@link Builder} instance.
      *
      * @return Token Builder.
      * @since 0.8
      */
-    public static TokenBuilder builder() {
-        return new TokenBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
     @JsonProperty("id")
@@ -82,6 +81,12 @@ public final class Token {
     private Boolean renewable;
 
     /**
+     * Construct empty {@link Token} object.
+     */
+    public Token() {
+    }
+
+    /**
      * Construct complete {@link Token} object with default type.
      *
      * @param id              Token ID (optional)
@@ -93,7 +98,7 @@ public final class Token {
      * @param policies        List of policies (optional)
      * @param meta            Metadata (optional)
      * @param renewable       Is the token renewable (optional)
-     * @deprecated As of 0.9, use {@link #Token(String, String, String, Boolean, Boolean, Integer, Integer, List, Map, Boolean)} instead.
+     * @deprecated As of 0.9 in favor of {@link #builder()}. Will be removed with next major release.
      */
     @Deprecated
     public Token(final String id,
@@ -121,7 +126,9 @@ public final class Token {
      * @param policies        List of policies (optional)
      * @param meta            Metadata (optional)
      * @param renewable       Is the token renewable (optional)
+     * @deprecated As of 0.9 in favor of {@link #builder()}. Will be removed with next major release.
      */
+    @Deprecated
     public Token(final String id,
                  final String type,
                  final String displayName,
@@ -142,6 +149,24 @@ public final class Token {
         this.policies = policies;
         this.meta = meta;
         this.renewable = renewable;
+    }
+
+    /**
+     * Construct {@link Token} object from {@link Builder}.
+     *
+     * @param builder Token builder.
+     */
+    public Token(final Builder builder) {
+        this.id = builder.id;
+        this.type = builder.type != null ? builder.type.value() : null;
+        this.displayName = builder.displayName;
+        this.noParent = builder.noParent;
+        this.noDefaultPolicy = builder.noDefaultPolicy;
+        this.ttl = builder.ttl;
+        this.numUses = builder.numUses;
+        this.policies = builder.policies;
+        this.meta = builder.meta;
+        this.renewable = builder.renewable;
     }
 
     /**
@@ -233,6 +258,253 @@ public final class Token {
 
         public String value() {
             return value;
+        }
+    }
+
+
+    /**
+     * A builder for vault tokens.
+     *
+     * @author Stefan Kalscheuer
+     * @since 0.4.0
+     * @since 0.9 Moved into subclass of {@link Token}.
+     */
+    public static final class Builder {
+        private String id;
+        private Type type;
+        private String displayName;
+        private Boolean noParent;
+        private Boolean noDefaultPolicy;
+        private Integer ttl;
+        private Integer numUses;
+        private List<String> policies;
+        private Map<String, String> meta;
+        private Boolean renewable;
+
+        /**
+         * Add token ID. (optional)
+         *
+         * @param id the ID
+         * @return self
+         */
+        public Builder withId(final String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * Specify token type.
+         *
+         * @param type the type
+         * @return self
+         * @since 0.9
+         */
+        public Builder withType(final Token.Type type) {
+            this.type = type;
+            return this;
+        }
+
+        /**
+         * Add display name.
+         *
+         * @param displayName the display name
+         * @return self
+         */
+        public Builder withDisplayName(final String displayName) {
+            this.displayName = displayName;
+            return this;
+        }
+
+        /**
+         * Set desired time to live.
+         *
+         * @param ttl the ttl
+         * @return self
+         */
+        public Builder withTtl(final Integer ttl) {
+            this.ttl = ttl;
+            return this;
+        }
+
+        /**
+         * Set desired number of uses.
+         *
+         * @param numUses the number of uses
+         * @return self
+         */
+        public Builder withNumUses(final Integer numUses) {
+            this.numUses = numUses;
+            return this;
+        }
+
+        /**
+         * Set TRUE if the token should be created without parent.
+         *
+         * @param noParent if TRUE, token is created as orphan
+         * @return self
+         */
+        public Builder withNoParent(final boolean noParent) {
+            this.noParent = noParent;
+            return this;
+        }
+
+        /**
+         * Create token without parent.
+         * Convenience method for withNoParent()
+         *
+         * @return self
+         */
+        public Builder asOrphan() {
+            return withNoParent(true);
+        }
+
+        /**
+         * Create token with parent.
+         * Convenience method for withNoParent()
+         *
+         * @return self
+         */
+        public Builder withParent() {
+            return withNoParent(false);
+        }
+
+        /**
+         * Set TRUE if the default policy should not be part of this token.
+         *
+         * @param noDefaultPolicy if TRUE, default policy is not attached
+         * @return self
+         */
+        public Builder withNoDefaultPolicy(final boolean noDefaultPolicy) {
+            this.noDefaultPolicy = noDefaultPolicy;
+            return this;
+        }
+
+        /**
+         * Attach default policy to token.
+         * Convenience method for withNoDefaultPolicy()
+         *
+         * @return self
+         */
+        public Builder withDefaultPolicy() {
+            return withNoDefaultPolicy(false);
+        }
+
+        /**
+         * Do not attach default policy to token.
+         * Convenience method for withNoDefaultPolicy()
+         *
+         * @return self
+         */
+        public Builder withoutDefaultPolicy() {
+            return withNoDefaultPolicy(true);
+        }
+
+        /**
+         * Add given policies.
+         *
+         * @param policies the policies
+         * @return self
+         * @since 0.5.0
+         */
+        public Builder withPolicies(final String... policies) {
+            return withPolicies(Arrays.asList(policies));
+        }
+
+        /**
+         * Add given policies.
+         *
+         * @param policies the policies
+         * @return self
+         */
+        public Builder withPolicies(final List<String> policies) {
+            if (this.policies == null) {
+                this.policies = new ArrayList<>();
+            }
+            this.policies.addAll(policies);
+            return this;
+        }
+
+        /**
+         * Add a single policy.
+         *
+         * @param policy the policy
+         * @return self
+         */
+        public Builder withPolicy(final String policy) {
+            if (this.policies == null) {
+                this.policies = new ArrayList<>();
+            }
+            policies.add(policy);
+            return this;
+        }
+
+        /**
+         * Add meta data.
+         *
+         * @param meta the metadata
+         * @return self
+         */
+        public Builder withMeta(final Map<String, String> meta) {
+            if (this.meta == null) {
+                this.meta = new HashMap<>();
+            }
+            this.meta.putAll(meta);
+            return this;
+        }
+
+        /**
+         * Add meta data.
+         *
+         * @param key   the key
+         * @param value the value
+         * @return self
+         */
+        public Builder withMeta(final String key, final String value) {
+            if (this.meta == null) {
+                this.meta = new HashMap<>();
+            }
+            this.meta.put(key, value);
+            return this;
+        }
+
+        /**
+         * Set if token is renewable.
+         *
+         * @param renewable TRUE, if renewable
+         * @return self
+         */
+        public Builder withRenewable(final Boolean renewable) {
+            this.renewable = renewable;
+            return this;
+        }
+
+        /**
+         * Set token to be renewable.
+         * Convenience method for withRenewable()
+         *
+         * @return self
+         */
+        public Builder renewable() {
+            return withRenewable(true);
+        }
+
+        /**
+         * Set token to be not renewable.
+         * Convenience method for withRenewable()
+         *
+         * @return self
+         */
+        public Builder notRenewable() {
+            return withRenewable(false);
+        }
+
+        /**
+         * Build the token based on given parameters.
+         *
+         * @return the token
+         */
+        public Token build() {
+            return new Token(this);
         }
     }
 }

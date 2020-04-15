@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,14 +30,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRole {
     /**
-     * Get {@link AppRoleBuilder} instance.
+     * Get {@link Builder} instance.
      *
      * @param name Role name.
      * @return AppRole Builder.
      * @since 0.8
      */
-    public static AppRoleBuilder builder(final String name) {
-        return new AppRoleBuilder(name);
+    public static Builder builder(final String name) {
+        return new Builder(name);
     }
 
     @JsonProperty("role_name")
@@ -102,7 +103,6 @@ public final class AppRole {
      * Construct empty {@link AppRole} object.
      */
     public AppRole() {
-
     }
 
     /**
@@ -126,7 +126,9 @@ public final class AppRole {
      * @param tokenNumUses         Number of uses for tokens (optional)
      * @param tokenPeriod          Duration in seconds, if set the token is a periodic token (optional)
      * @param tokenType            Token type (optional)
+     * @deprecated As of 0.9 in favor of {@link #builder(String)}. Will be removed with next major release.
      */
+    @Deprecated
     AppRole(final String name, final String id, final Boolean bindSecretId, final List<String> secretIdBoundCidrs,
             final Integer secretIdNumUses, final Integer secretIdTtl, final Boolean enableLocalSecretIds,
             final Integer tokenTtl, final Integer tokenMaxTtl, final List<String> tokenPolicies,
@@ -148,6 +150,30 @@ public final class AppRole {
         this.tokenNumUses = tokenNumUses;
         this.tokenPeriod = tokenPeriod;
         this.tokenType = tokenType;
+    }
+
+    /**
+     * Construct {@link AppRole} object from {@link AppRole.Builder}.
+     *
+     * @param builder AppRole builder.
+     */
+    public AppRole(final Builder builder) {
+        this.name = builder.name;
+        this.id = builder.id;
+        this.bindSecretId = builder.bindSecretId;
+        this.secretIdBoundCidrs = builder.secretIdBoundCidrs;
+        this.secretIdNumUses = builder.secretIdNumUses;
+        this.secretIdTtl = builder.secretIdTtl;
+        this.enableLocalSecretIds = builder.enableLocalSecretIds;
+        this.tokenTtl = builder.tokenTtl;
+        this.tokenMaxTtl = builder.tokenMaxTtl;
+        this.tokenPolicies = builder.tokenPolicies;
+        this.tokenBoundCidrs = builder.tokenBoundCidrs;
+        this.tokenExplicitMaxTtl = builder.tokenExplicitMaxTtl;
+        this.tokenNoDefaultPolicy = builder.tokenNoDefaultPolicy;
+        this.tokenNumUses = builder.tokenNumUses;
+        this.tokenPeriod = builder.tokenPeriod;
+        this.tokenType = builder.tokenType != null ? builder.tokenType.value() : null;
     }
 
     /**
@@ -375,5 +401,344 @@ public final class AppRole {
      */
     public String getTokenType() {
         return tokenType;
+    }
+
+
+    /**
+     * A builder for vault AppRole roles..
+     *
+     * @author Stefan Kalscheuer
+     * @since 0.4.0
+     * @since 0.9 Moved into subclass of {@link AppRole}.
+     */
+    public static final class Builder {
+        private String name;
+        private String id;
+        private Boolean bindSecretId;
+        private List<String> secretIdBoundCidrs;
+        private List<String> tokenPolicies;
+        private Integer secretIdNumUses;
+        private Integer secretIdTtl;
+        private Boolean enableLocalSecretIds;
+        private Integer tokenTtl;
+        private Integer tokenMaxTtl;
+        private List<String> tokenBoundCidrs;
+        private Integer tokenExplicitMaxTtl;
+        private Boolean tokenNoDefaultPolicy;
+        private Integer tokenNumUses;
+        private Integer tokenPeriod;
+        private Token.Type tokenType;
+
+        /**
+         * Construct {@link Builder} with only the role name set.
+         *
+         * @param name Role name
+         */
+        public Builder(final String name) {
+            this.name = name;
+        }
+
+        /**
+         * Add role name.
+         *
+         * @param name Role name
+         * @return self
+         */
+        public Builder withName(final String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * Add custom role ID. (optional)
+         *
+         * @param id the ID
+         * @return self
+         */
+        public Builder withId(final String id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * Set if role is bound to secret ID.
+         *
+         * @param bindSecretId the display name
+         * @return self
+         */
+        public Builder withBindSecretID(final Boolean bindSecretId) {
+            this.bindSecretId = bindSecretId;
+            return this;
+        }
+
+        /**
+         * Bind role to secret ID.
+         * Convenience method for {@link #withBindSecretID(Boolean)}
+         *
+         * @return self
+         */
+        public Builder withBindSecretID() {
+            return withBindSecretID(true);
+        }
+
+        /**
+         * Do not bind role to secret ID.
+         * Convenience method for {@link #withBindSecretID(Boolean)}
+         *
+         * @return self
+         */
+        public Builder withoutBindSecretID() {
+            return withBindSecretID(false);
+        }
+
+        /**
+         * Set bound CIDR blocks.
+         *
+         * @param secretIdBoundCidrs List of CIDR blocks which can perform login
+         * @return self
+         * @since 0.8 replaces {@code withBoundCidrList(List)}
+         */
+        public Builder withSecretIdBoundCidrs(final List<String> secretIdBoundCidrs) {
+            if (this.secretIdBoundCidrs == null) {
+                this.secretIdBoundCidrs = new ArrayList<>();
+            }
+            this.secretIdBoundCidrs.addAll(secretIdBoundCidrs);
+            return this;
+        }
+
+        /**
+         * Add a CIDR block to list of bound blocks for secret.
+         *
+         * @param secretBoundCidr the CIDR block
+         * @return self
+         * @since 0.9
+         */
+        public Builder withSecretBoundCidr(final String secretBoundCidr) {
+            if (secretIdBoundCidrs == null) {
+                secretIdBoundCidrs = new ArrayList<>();
+            }
+            secretIdBoundCidrs.add(secretBoundCidr);
+            return this;
+        }
+
+        /**
+         * Add given policies.
+         *
+         * @param tokenPolicies the token policies
+         * @return self
+         * @since 0.9
+         */
+        public Builder withTokenPolicies(final List<String> tokenPolicies) {
+            if (this.tokenPolicies == null) {
+                this.tokenPolicies = new ArrayList<>();
+            }
+            this.tokenPolicies.addAll(tokenPolicies);
+            return this;
+        }
+
+        /**
+         * Add given policies.
+         *
+         * @param policies the policies
+         * @return self
+         * @deprecated Use {@link #withTokenPolicies(List)} instead.
+         */
+        @Deprecated
+        public Builder withPolicies(final List<String> policies) {
+            return withTokenPolicies(policies);
+        }
+
+        /**
+         * Add a single policy.
+         *
+         * @param tokenPolicy the token policy
+         * @return self
+         * @since 0.9
+         */
+        public Builder withTokenPolicy(final String tokenPolicy) {
+            if (this.tokenPolicies == null) {
+                this.tokenPolicies = new ArrayList<>();
+            }
+            tokenPolicies.add(tokenPolicy);
+            return this;
+        }
+
+        /**
+         * Add a single policy.
+         *
+         * @param policy the policy
+         * @return self
+         * @deprecated Use {@link #withTokenPolicy(String)} instead.
+         */
+        @Deprecated
+        public Builder withPolicy(final String policy) {
+            return withTokenPolicy(policy);
+        }
+
+        /**
+         * Set number of uses for sectet IDs.
+         *
+         * @param secredIdNumUses the number of uses
+         * @return self
+         */
+        public Builder withSecretIdNumUses(final Integer secredIdNumUses) {
+            this.secretIdNumUses = secredIdNumUses;
+            return this;
+        }
+
+        /**
+         * Set default sectet ID TTL in seconds.
+         *
+         * @param secredIdTtl the TTL
+         * @return self
+         */
+        public Builder withSecretIdTtl(final Integer secredIdTtl) {
+            this.secretIdTtl = secredIdTtl;
+            return this;
+        }
+
+        /**
+         * Enable or disable local secret IDs.
+         *
+         * @param enableLocalSecretIds Enable local secret IDs?
+         * @return self
+         * @since 0.9
+         */
+        public Builder withEnableLocalSecretIds(final Boolean enableLocalSecretIds) {
+            this.enableLocalSecretIds = enableLocalSecretIds;
+            return this;
+        }
+
+        /**
+         * Set default token TTL in seconds.
+         *
+         * @param tokenTtl the TTL
+         * @return self
+         */
+        public Builder withTokenTtl(final Integer tokenTtl) {
+            this.tokenTtl = tokenTtl;
+            return this;
+        }
+
+        /**
+         * Set maximum token TTL in seconds.
+         *
+         * @param tokenMaxTtl the TTL
+         * @return self
+         */
+        public Builder withTokenMaxTtl(final Integer tokenMaxTtl) {
+            this.tokenMaxTtl = tokenMaxTtl;
+            return this;
+        }
+
+        /**
+         * Set bound CIDR blocks for associated tokens.
+         *
+         * @param tokenBoundCidrs List of CIDR blocks which can perform login
+         * @return self
+         * @since 0.9
+         */
+        public Builder withTokenBoundCidrs(final List<String> tokenBoundCidrs) {
+            if (this.tokenBoundCidrs == null) {
+                this.tokenBoundCidrs = new ArrayList<>();
+            }
+            this.tokenBoundCidrs.addAll(tokenBoundCidrs);
+            return this;
+        }
+
+        /**
+         * Add a CIDR block to list of bound blocks for token.
+         *
+         * @param tokenBoundCidr the CIDR block
+         * @return self
+         * @since 0.9
+         */
+        public Builder withTokenBoundCidr(final String tokenBoundCidr) {
+            if (tokenBoundCidrs == null) {
+                tokenBoundCidrs = new ArrayList<>();
+            }
+            tokenBoundCidrs.add(tokenBoundCidr);
+            return this;
+        }
+
+        /**
+         * Set explicit maximum token TTL in seconds.
+         *
+         * @param tokenExplicitMaxTtl the TTL
+         * @return self
+         */
+        public Builder withTokenExplicitMaxTtl(final Integer tokenExplicitMaxTtl) {
+            this.tokenExplicitMaxTtl = tokenExplicitMaxTtl;
+            return this;
+        }
+
+        /**
+         * Enable or disable default policy for generated token.
+         *
+         * @param tokenNoDefaultPolicy Enable default policy for token?
+         * @return self
+         * @since 0.9
+         */
+        public Builder withTokenNoDefaultPolicy(final Boolean tokenNoDefaultPolicy) {
+            this.tokenNoDefaultPolicy = tokenNoDefaultPolicy;
+            return this;
+        }
+
+        /**
+         * Set number of uses for generated tokens.
+         *
+         * @param tokenNumUses number of uses for tokens
+         * @return self
+         * @since 0.9
+         */
+        public Builder withTokenNumUses(final Integer tokenNumUses) {
+            this.tokenNumUses = tokenNumUses;
+            return this;
+        }
+
+        /**
+         * Set renewal period for generated token in seconds.
+         *
+         * @param tokenPeriod period in seconds
+         * @return self
+         * @since 0.9
+         */
+        public Builder wit0hTokenPeriod(final Integer tokenPeriod) {
+            this.tokenPeriod = tokenPeriod;
+            return this;
+        }
+
+        /**
+         * Set renewal period for generated token in seconds.
+         *
+         * @param period period in seconds
+         * @return self
+         * @deprecated Use {@link #wit0hTokenPeriod(Integer)} instead.
+         */
+        @Deprecated
+        public Builder withPeriod(final Integer period) {
+            return wit0hTokenPeriod(period);
+        }
+
+        /**
+         * Set type of generated token.
+         *
+         * @param tokenType token type
+         * @return self
+         * @since 0.9
+         */
+        public Builder withTokenType(final Token.Type tokenType) {
+            this.tokenType = tokenType;
+            return this;
+        }
+
+        /**
+         * Build the AppRole role based on given parameters.
+         *
+         * @return the role
+         */
+        public AppRole build() {
+            return new AppRole(this);
+        }
     }
 }

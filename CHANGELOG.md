@@ -18,6 +18,8 @@
 ### Deprecations
 * `AppRole#getPolicies()` and `#setPolicies()` are deprecated in favor of `#getTokenPolicies()` and `#setTokenPolicies()`
 * `AppRole#getPeriod()` is deprecated in favor of `#getTokenPeriod()`
+* `AppRoleBuilder` and `TokenBuilder` in favor of `AppRole.Builder` and `Token.Builder`
+* All-arg constructors of `AppRole` and `Token` in favor of `.builder()....build()` introduced in 0.8
 
 ### Removals
 * Deprecated methods `AppRole#getBoundCidrList()`, `#setBoundCidrList()` and `getBoundCidrListString()` have been removed.

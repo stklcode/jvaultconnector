@@ -27,7 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * Unit Test for {@link TokenRoleBuilder}
+ * Unit Test for {@link Token.Builder}
  *
  * @author Stefan Kalscheuer
  * @since 0.9
@@ -79,7 +79,7 @@ public class TokenRoleBuilderTest {
      */
     @Test
     public void buildDefaultTest() throws JsonProcessingException {
-        TokenRole role = new TokenRoleBuilder().build();
+        TokenRole role = TokenRole.builder().build();
         assertThat(role.getAllowedPolicies(), is(nullValue()));
         assertThat(role.getDisallowedPolicies(), is(nullValue()));
         assertThat(role.getOrphan(), is(nullValue()));
