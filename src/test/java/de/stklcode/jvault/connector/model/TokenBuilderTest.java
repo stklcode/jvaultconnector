@@ -66,6 +66,27 @@ public class TokenBuilderTest {
      */
     @Test
     public void buildDefaultTest() throws JsonProcessingException {
+        Token token = Token.builder().build();
+        assertThat(token.getId(), is(nullValue()));
+        assertThat(token.getType(), is(nullValue()));
+        assertThat(token.getDisplayName(), is(nullValue()));
+        assertThat(token.getNoParent(), is(nullValue()));
+        assertThat(token.getNoDefaultPolicy(), is(nullValue()));
+        assertThat(token.getTtl(), is(nullValue()));
+        assertThat(token.getNumUses(), is(nullValue()));
+        assertThat(token.getPolicies(), is(nullValue()));
+        assertThat(token.getMeta(), is(nullValue()));
+        assertThat(token.isRenewable(), is(nullValue()));
+
+        /* optional fields should be ignored, so JSON string should be empty */
+        assertThat(new ObjectMapper().writeValueAsString(token), is("{}"));
+    }
+
+    /**
+     * Build token without any parameters.
+     */
+    @Test
+    public void legadcyBuildDefaultTest() throws JsonProcessingException {
         Token token = new TokenBuilder().build();
         assertThat(token.getId(), is(nullValue()));
         assertThat(token.getType(), is(nullValue()));
@@ -87,6 +108,38 @@ public class TokenBuilderTest {
      */
     @Test
     public void buildFullTest() throws JsonProcessingException {
+        Token token = Token.builder()
+                .withId(ID)
+                .withType(Token.Type.SERVICE)
+                .withDisplayName(DISPLAY_NAME)
+                .withNoParent(NO_PARENT)
+                .withNoDefaultPolicy(NO_DEFAULT_POLICY)
+                .withTtl(TTL)
+                .withNumUses(NUM_USES)
+                .withPolicies(POLICIES)
+                .withMeta(META)
+                .withRenewable(RENEWABLE)
+                .build();
+        assertThat(token.getId(), is(ID));
+        assertThat(token.getType(), is(Token.Type.SERVICE.value()));
+        assertThat(token.getDisplayName(), is(DISPLAY_NAME));
+        assertThat(token.getNoParent(), is(NO_PARENT));
+        assertThat(token.getNoDefaultPolicy(), is(NO_DEFAULT_POLICY));
+        assertThat(token.getTtl(), is(TTL));
+        assertThat(token.getNumUses(), is(NUM_USES));
+        assertThat(token.getPolicies(), is(POLICIES));
+        assertThat(token.getMeta(), is(META));
+        assertThat(token.isRenewable(), is(RENEWABLE));
+
+        /* Verify that all parameters are included in JSON string */
+        assertThat(new ObjectMapper().writeValueAsString(token), is(JSON_FULL));
+    }
+
+    /**
+     * Build token without all parameters set.
+     */
+    @Test
+    public void legacyBuildFullTest() throws JsonProcessingException {
         Token token = new TokenBuilder()
                 .withId(ID)
                 .withType(Token.Type.SERVICE)
@@ -119,6 +172,54 @@ public class TokenBuilderTest {
      */
     @Test
     public void convenienceMethodsTest() {
+        /* Parent */
+        Token token = Token.builder().asOrphan().build();
+        assertThat(token.getNoParent(), is(true));
+        token = Token.builder().withParent().build();
+        assertThat(token.getNoParent(), is(false));
+
+        /* Default policy */
+        token = Token.builder().withDefaultPolicy().build();
+        assertThat(token.getNoDefaultPolicy(), is(false));
+        token = Token.builder().withoutDefaultPolicy().build();
+        assertThat(token.getNoDefaultPolicy(), is(true));
+
+        /* Renewability */
+        token = Token.builder().renewable().build();
+        assertThat(token.isRenewable(), is(true));
+        token = Token.builder().notRenewable().build();
+        assertThat(token.isRenewable(), is(false));
+
+        /* Add single policy */
+        token = Token.builder().withPolicy(POLICY_2).build();
+        assertThat(token.getPolicies(), hasSize(1));
+        assertThat(token.getPolicies(), contains(POLICY_2));
+        token = Token.builder()
+                .withPolicies(POLICY, POLICY_2)
+                .withPolicy(POLICY_3)
+                .build();
+        assertThat(token.getPolicies(), hasSize(3));
+        assertThat(token.getPolicies(), contains(POLICY, POLICY_2, POLICY_3));
+
+        /* Add single metadata */
+        token = Token.builder().withMeta(META_KEY_2, META_VALUE_2).build();
+        assertThat(token.getMeta().size(), is(1));
+        assertThat(token.getMeta().keySet(), contains(META_KEY_2));
+        assertThat(token.getMeta().get(META_KEY_2), is(META_VALUE_2));
+        token = Token.builder()
+                .withMeta(META)
+                .withMeta(META_KEY_2, META_VALUE_2)
+                .build();
+        assertThat(token.getMeta().size(), is(2));
+        assertThat(token.getMeta().get(META_KEY), is(META_VALUE));
+        assertThat(token.getMeta().get(META_KEY_2), is(META_VALUE_2));
+    }
+
+    /**
+     * Test convenience methods
+     */
+    @Test
+    public void legacyConvenienceMethodsTest() {
         /* Parent */
         Token token = new TokenBuilder().asOrphan().build();
         assertThat(token.getNoParent(), is(true));

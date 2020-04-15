@@ -23,7 +23,9 @@ import java.util.*;
  *
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @deprecated As of 0.9 in favor of {@link Token.Builder}.
  */
+@Deprecated
 public final class TokenBuilder {
     private String id;
     private Token.Type type;

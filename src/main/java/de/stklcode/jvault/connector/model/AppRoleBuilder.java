@@ -24,7 +24,9 @@ import java.util.List;
  *
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @deprecated As of 0.9 in favor of {@link AppRole.Builder}.
  */
+@Deprecated
 public final class AppRoleBuilder {
     private String name;
     private String id;

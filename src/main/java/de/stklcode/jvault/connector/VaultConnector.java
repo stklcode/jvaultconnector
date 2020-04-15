@@ -226,7 +226,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      */
     default boolean createAppRole(final String roleName, final List<String> policies, final String roleID)
             throws VaultConnectorException {
-        return createAppRole(new AppRoleBuilder(roleName).withTokenPolicies(policies).withId(roleID).build());
+        return createAppRole(AppRole.builder(roleName).withTokenPolicies(policies).withId(roleID).build());
     }
 
     /**
