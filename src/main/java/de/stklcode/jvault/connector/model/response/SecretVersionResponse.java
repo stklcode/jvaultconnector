@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Vault response for a single secret version metatada, i.e. after update (KV v2).
+ * Vault response for a single secret version metadata, i.e. after update (KV v2).
  *
  * @author Stefan Kalscheuer
  * @since 0.8

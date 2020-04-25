@@ -107,7 +107,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Add a trusted CA certifiate for HTTPS connections.
+     * Add a trusted CA certificate for HTTPS connections.
      *
      * @param cert path to certificate file
      * @return self
@@ -120,7 +120,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Add a trusted CA certifiate for HTTPS connections.
+     * Add a trusted CA certificate for HTTPS connections.
      *
      * @param cert path to certificate file
      * @return self

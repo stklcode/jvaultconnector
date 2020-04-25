@@ -151,7 +151,7 @@ public class HTTPVaultConnectorOfflineTest {
     }
 
     /**
-     * Test constductors of the {@link HTTPVaultConnector} class.
+     * Test constructors of the {@link HTTPVaultConnector} class.
      */
     @Test
     public void constructorTest() throws IOException, CertificateException {

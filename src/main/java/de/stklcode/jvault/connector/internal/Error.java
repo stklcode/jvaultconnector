@@ -28,7 +28,7 @@ final class Error {
     static final String UNEXPECTED_RESPONSE = "Received response where none was expected";
     static final String URI_FORMAT = "Invalid URI format";
     static final String RESPONSE_CODE = "Invalid response code";
-    static final String INIT_SSL_CONTEXT = "Unable to intialize SSLContext";
+    static final String INIT_SSL_CONTEXT = "Unable to initialize SSLContext";
 
     /**
      * Constructor hidden, this class should not be instantiated.

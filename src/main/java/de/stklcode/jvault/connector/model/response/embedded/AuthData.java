@@ -83,7 +83,7 @@ public final class AuthData {
     }
 
     /**
-     * @return List of policies associated with the ooken
+     * @return List of policies associated with the token
      * @since 0.9
      */
     public List<String> getTokenPolicies() {

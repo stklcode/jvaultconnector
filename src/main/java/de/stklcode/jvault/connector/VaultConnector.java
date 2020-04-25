@@ -91,7 +91,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     HealthResponse getHealth() throws VaultConnectorException;
 
     /**
-     * Get all availale authentication backends.
+     * Get all available authentication backends.
      *
      * @return List of backends
      * @throws VaultConnectorException on error
@@ -232,7 +232,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     /**
      * Delete AppRole role from Vault.
      *
-     * @param roleName The role anme
+     * @param roleName The role name
      * @return {@code true} on success
      * @throws VaultConnectorException on error
      */
@@ -430,7 +430,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code <mount>/data/<key>} is read here.
      * Only available for KV v2 secrets.
      *
-     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param mount Secret store mount point (without leading or trailing slash).
      * @param key   Secret identifier
      * @return Secret response
      * @throws VaultConnectorException on error
@@ -462,7 +462,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code <mount>/data/<key>} is written here.
      * Only available for KV v2 secrets.
      *
-     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param mount Secret store mount point (without leading or trailing slash).
      * @param key   Secret identifier
      * @param data  Secret content. Value must be be JSON serializable.
      * @return Metadata for the created/updated secret.
@@ -479,7 +479,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code <mount>/data/<key>} is written here.
      * Only available for KV v2 secrets.
      *
-     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param mount Secret store mount point (without leading or trailing slash).
      * @param key   Secret identifier
      * @param data  Secret content. Value must be be JSON serializable.
      * @param cas   Use Check-And-Set operation, i.e. only allow writing if current version matches this value.
@@ -511,10 +511,10 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code <mount>/data/<key>} is read here.
      * Only available for KV v2 secrets.
      *
-     * @param mount   Secret store mountpoint (without leading or trailing slash).
+     * @param mount   Secret store mount point (without leading or trailing slash).
      * @param key     Secret identifier
      * @param version Version to read. If {@code null} or zero, the latest version will be returned.
-     * @return Secret responsef
+     * @return Secret response.
      * @throws VaultConnectorException on error
      * @since 0.8
      */
@@ -556,7 +556,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code <mount>/metadata/<key>} is read here.
      * Only available for KV v2 secrets.
      *
-     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param mount Secret store mount point (without leading or trailing slash).
      * @param key   Secret identifier
      * @return Metadata response
      * @throws VaultConnectorException on error
@@ -570,7 +570,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code <mount>/metadata/<key>} is written here.
      * Only available for KV v2 secrets.
      *
-     * @param mount       Secret store mountpoint (without leading or trailing slash).
+     * @param mount       Secret store mount point (without leading or trailing slash).
      * @param key         Secret identifier
      * @param maxVersions Maximum number of versions (fallback to backend default if {@code null})
      * @param casRequired Specify if Check-And-Set is required for this secret.
@@ -710,7 +710,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * <br>
      * Only available for KV v2 stores.
      *
-     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param mount Secret store mount point (without leading or trailing slash).
      * @param key   Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
@@ -737,7 +737,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Prefix {@code secret/} is automatically added to path.
      * Only available for KV v2 stores.
      *
-     * @param mount Secret store mountpoint (without leading or trailing slash).
+     * @param mount Secret store mount point (without leading or trailing slash).
      * @param key   Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
@@ -763,7 +763,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * <br>
      * Only available for KV v2 stores.
      *
-     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param mount    Secret store mount point (without leading or trailing slash).
      * @param key      Secret path.
      * @param versions Versions of the secret to delete.
      * @throws VaultConnectorException on error
@@ -788,7 +788,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Undelete (restore) secret versions from Vault.
      * Only available for KV v2 stores.
      *
-     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param mount    Secret store mount point (without leading or trailing slash).
      * @param key      Secret path.
      * @param versions Versions of the secret to undelete.
      * @throws VaultConnectorException on error
@@ -813,7 +813,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Destroy secret versions from Vault.
      * Only available for KV v2 stores.
      *
-     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param mount    Secret store mount point (without leading or trailing slash).
      * @param key      Secret path.
      * @param versions Versions of the secret to destroy.
      * @throws VaultConnectorException on error

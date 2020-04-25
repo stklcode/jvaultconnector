@@ -20,8 +20,8 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * AppRole (register and authenticate)
     * AppID (register and authenticate) [_deprecated_]
 * Tokens
-    * Creation and lookup of tokens
-    * TokenBuilder for speaking creation of complex configuraitons
+    * Creation and lookup of tokens and token roles
+    * TokenBuilder for speaking creation of complex configurations
 * Secrets
     * Read secrets
     * Write secrets

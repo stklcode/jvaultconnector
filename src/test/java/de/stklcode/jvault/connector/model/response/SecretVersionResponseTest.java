@@ -54,7 +54,7 @@ public class SecretVersionResponseTest {
         try {
             SecretVersionResponse res = new ObjectMapper().readValue(META_JSON, SecretVersionResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));
-            assertThat("Parsed metadatra is NULL", res.getMetadata(), is(notNullValue()));
+            assertThat("Parsed metadata is NULL", res.getMetadata(), is(notNullValue()));
             assertThat("Incorrect created time", res.getMetadata().getCreatedTimeString(), is(CREATION_TIME));
             assertThat("Incorrect deletion time", res.getMetadata().getDeletionTimeString(), is(DELETION_TIME));
             assertThat("Incorrect destroyed state", res.getMetadata().isDestroyed(), is(false));

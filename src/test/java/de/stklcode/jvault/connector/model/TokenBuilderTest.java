@@ -86,7 +86,7 @@ public class TokenBuilderTest {
      * Build token without any parameters.
      */
     @Test
-    public void legadcyBuildDefaultTest() throws JsonProcessingException {
+    public void legacyBuildDefaultTest() throws JsonProcessingException {
         Token token = new TokenBuilder().build();
         assertThat(token.getId(), is(nullValue()));
         assertThat(token.getType(), is(nullValue()));

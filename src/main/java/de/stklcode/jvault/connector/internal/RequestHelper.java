@@ -340,7 +340,7 @@ public final class RequestHelper implements Serializable {
                         /* Fail on different error code and/or no retries left */
                         handleError(response);
 
-                        /* Throw exception withoud details, if response entity is empty. */
+                        /* Throw exception without details, if response entity is empty. */
                         throw new InvalidResponseException(Error.RESPONSE_CODE,
                                 response.getStatusLine().getStatusCode());
                     }
@@ -362,7 +362,7 @@ public final class RequestHelper implements Serializable {
      * Create a custom socket factory from trusted CA certificate.
      *
      * @return The factory.
-     * @throws TlsException An error occured during initialization of the SSL context.
+     * @throws TlsException An error occurred during initialization of the SSL context.
      * @since 0.8.0
      */
     private SSLConnectionSocketFactory createSSLSocketFactory() throws TlsException {
@@ -376,7 +376,7 @@ public final class RequestHelper implements Serializable {
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(keyStore);
 
-            // Create context usint this TrustManager.
+            // Create context using this TrustManager.
             SSLContext context = SSLContext.getInstance(tlsVersion);
             context.init(null, tmf.getTrustManagers(), new SecureRandom());
 

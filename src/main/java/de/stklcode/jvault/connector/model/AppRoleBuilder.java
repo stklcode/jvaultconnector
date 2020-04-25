@@ -181,24 +181,24 @@ public final class AppRoleBuilder {
     }
 
     /**
-     * Set number of uses for sectet IDs.
+     * Set number of uses for secret IDs.
      *
-     * @param secredIdNumUses the number of uses
+     * @param secretIdNumUses the number of uses
      * @return self
      */
-    public AppRoleBuilder withSecretIdNumUses(final Integer secredIdNumUses) {
-        this.secretIdNumUses = secredIdNumUses;
+    public AppRoleBuilder withSecretIdNumUses(final Integer secretIdNumUses) {
+        this.secretIdNumUses = secretIdNumUses;
         return this;
     }
 
     /**
-     * Set default sectet ID TTL in seconds.
+     * Set default secret ID TTL in seconds.
      *
-     * @param secredIdTtl the TTL
+     * @param secretIdTtl the TTL
      * @return self
      */
-    public AppRoleBuilder withSecretIdTtl(final Integer secredIdTtl) {
-        this.secretIdTtl = secredIdTtl;
+    public AppRoleBuilder withSecretIdTtl(final Integer secretIdTtl) {
+        this.secretIdTtl = secretIdTtl;
         return this;
     }
 

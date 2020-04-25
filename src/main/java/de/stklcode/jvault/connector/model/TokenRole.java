@@ -136,14 +136,14 @@ public final class TokenRole {
     }
 
     /**
-     * @return Is Roken Role orphan?
+     * @return Is Token Role orphan?
      */
     public Boolean getOrphan() {
         return orphan;
     }
 
     /**
-     * @return Is Roken Role renewable?
+     * @return Is Token Role renewable?
      */
     public Boolean getRenewable() {
         return renewable;

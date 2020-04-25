@@ -198,7 +198,7 @@ public final class AppRole {
     }
 
     /**
-     * @return list of bound CIDR subnets of assiciated tokens
+     * @return list of bound CIDR subnets of associated tokens
      * @since 0.9
      */
     public List<String> getTokenBoundCidrs() {
@@ -578,22 +578,22 @@ public final class AppRole {
         /**
          * Set number of uses for sectet IDs.
          *
-         * @param secredIdNumUses the number of uses
+         * @param secretIdNumUses the number of uses
          * @return self
          */
-        public Builder withSecretIdNumUses(final Integer secredIdNumUses) {
-            this.secretIdNumUses = secredIdNumUses;
+        public Builder withSecretIdNumUses(final Integer secretIdNumUses) {
+            this.secretIdNumUses = secretIdNumUses;
             return this;
         }
 
         /**
          * Set default sectet ID TTL in seconds.
          *
-         * @param secredIdTtl the TTL
+         * @param secretIdTtl the TTL
          * @return self
          */
-        public Builder withSecretIdTtl(final Integer secredIdTtl) {
-            this.secretIdTtl = secredIdTtl;
+        public Builder withSecretIdTtl(final Integer secretIdTtl) {
+            this.secretIdTtl = secretIdTtl;
             return this;
         }
 

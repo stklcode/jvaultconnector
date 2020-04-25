@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Vault Connector implementatin using Vault's HTTP API.
+ * Vault Connector implementation using Vault's HTTP API.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
@@ -605,7 +605,7 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Common method to bundle secret version operations.
      *
-     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param mount    Secret store mount point (without leading or trailing slash).
      * @param pathPart Path part to query.
      * @param key      Secret key.
      * @param versions Versions to handle.
