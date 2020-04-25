@@ -39,7 +39,7 @@ jobs:
     - name: Unit and Integration Tests
       if: branch =~ ^master|(release/.+)$
       script:
-        - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package
+        - mvn -P coverage clean package
     - stage: Analysis
       if: branch = master
       script:
