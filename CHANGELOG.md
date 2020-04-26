@@ -11,6 +11,7 @@
 ### Improvements
 * Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
 * Added `entity_id`, `expire_time`, `explicit_max_ttl`, `issue_time`, `renewable` and `type` flags to token data
+* Added `explicit_max_ttl`, `period` and `entity_alias` flags to _Token_ model (#41)
 * Added `enable_local_secret_ids`, `token_bound_cidrs`, `token_explicit_max_ttl`, `token_no_default_policy`, 
   `token_num_uses`, `token_period` and `token_type` flags to _AppRole_ model
 * Minor dependency updates

@@ -64,6 +64,10 @@ public final class Token {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer ttl;
 
+    @JsonProperty("explicit_max_ttl")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer explicitMaxTtl;
+
     @JsonProperty("num_uses")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer numUses;
@@ -79,6 +83,14 @@ public final class Token {
     @JsonProperty("renewable")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean renewable;
+
+    @JsonProperty("period")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer period;
+
+    @JsonProperty("entity_alias")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String entityAlias;
 
     /**
      * Construct empty {@link Token} object.
@@ -163,10 +175,13 @@ public final class Token {
         this.noParent = builder.noParent;
         this.noDefaultPolicy = builder.noDefaultPolicy;
         this.ttl = builder.ttl;
+        this.explicitMaxTtl = builder.explicitMaxTtl;
         this.numUses = builder.numUses;
         this.policies = builder.policies;
         this.meta = builder.meta;
         this.renewable = builder.renewable;
+        this.period = builder.period;
+        this.entityAlias = builder.entityAlias;
     }
 
     /**
@@ -213,6 +228,14 @@ public final class Token {
     }
 
     /**
+     * @return Explicit maximum time-to-live in seconds
+     * @since 0.9
+     */
+    public Integer getExplicitMaxTtl() {
+        return explicitMaxTtl;
+    }
+
+    /**
      * @return Number of uses
      */
     public Integer getNumUses() {
@@ -238,6 +261,22 @@ public final class Token {
      */
     public Boolean isRenewable() {
         return renewable;
+    }
+
+    /**
+     * @return Token period.
+     * @since 0.9
+     */
+    public Integer getPeriod() {
+        return period;
+    }
+
+    /**
+     * @return Token entity alias.
+     * @since 0.9
+     */
+    public String getEntityAlias() {
+        return entityAlias;
     }
 
     /**
@@ -276,10 +315,13 @@ public final class Token {
         private Boolean noParent;
         private Boolean noDefaultPolicy;
         private Integer ttl;
+        private Integer explicitMaxTtl;
         private Integer numUses;
         private List<String> policies;
         private Map<String, String> meta;
         private Boolean renewable;
+        private Integer period;
+        private String entityAlias;
 
         /**
          * Add token ID. (optional)
@@ -323,6 +365,17 @@ public final class Token {
          */
         public Builder withTtl(final Integer ttl) {
             this.ttl = ttl;
+            return this;
+        }
+
+        /**
+         * Set desired explicit maximum time to live.
+         *
+         * @param explicitMaxTtl the explicit max. TTL
+         * @return self
+         */
+        public Builder withExplicitMaxTtl(final Integer explicitMaxTtl) {
+            this.explicitMaxTtl = explicitMaxTtl;
             return this;
         }
 
@@ -496,6 +549,27 @@ public final class Token {
          */
         public Builder notRenewable() {
             return withRenewable(false);
+        }
+
+        /**
+         * Set token period (former lease time).
+         *
+         * @return self
+         */
+        public Builder withPeriod(final Integer period) {
+            this.period = period;
+            return this;
+        }
+
+        /**
+         * Set entity alias for token.
+         * Only works in combination with an associated token role.
+         *
+         * @return self
+         */
+        public Builder withEntityAlias(final String entityAlias) {
+            this.entityAlias = entityAlias;
+            return this;
         }
 
         /**
