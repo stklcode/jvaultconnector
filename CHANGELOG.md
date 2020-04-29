@@ -1,12 +1,12 @@
-## 0.9.0 (unreleased)
+## 0.9.0 (2020-04-29)
 
 ### Fixes
 * Correctly parse Map field for token metadata (#34)
-* Correctly map token policies on lookup (#35)
+* Correctly map token policies on token lookup (#35)
 
 ### Features
 * Support for token types (#26)
-* Support for token role handling (#27)
+* Support for token role handling (#27) (#37)
 
 ### Improvements
 * Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
@@ -24,6 +24,9 @@
 
 ### Removals
 * Deprecated methods `AppRole#getBoundCidrList()`, `#setBoundCidrList()` and `getBoundCidrListString()` have been removed.
+
+### Test
+* Tested against Vault 1.4.0
 
 
 ## 0.8.2 (2019-10-20)
