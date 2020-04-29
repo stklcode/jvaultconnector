@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@ import de.stklcode.jvault.connector.exception.AuthorizationRequiredException;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.internal.RequestHelper;
-import de.stklcode.jvault.connector.model.AppRole;
-import de.stklcode.jvault.connector.model.AppRoleSecret;
-import de.stklcode.jvault.connector.model.AuthBackend;
-import de.stklcode.jvault.connector.model.Token;
+import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
@@ -34,7 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Vault Connector implementatin using Vault's HTTP API.
+ * Vault Connector implementation using Vault's HTTP API.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
@@ -49,6 +46,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_TOKEN = "auth/token";
     private static final String PATH_LOOKUP = "/lookup";
     private static final String PATH_CREATE = "/create";
+    private static final String PATH_ROLES = "/roles";
     private static final String PATH_CREATE_ORPHAN = "/create-orphan";
     private static final String PATH_AUTH_USERPASS = "auth/userpass/login/";
     private static final String PATH_AUTH_APPID = "auth/app-id/";
@@ -530,7 +528,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (cas != null) {
             options.put("cas", cas);
         }
-        
+
         Map<String, Object> payload = new HashMap<>();
         payload.put("data", data);
         payload.put("options", options);
@@ -607,7 +605,7 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Common method to bundle secret version operations.
      *
-     * @param mount    Secret store mountpoint (without leading or trailing slash).
+     * @param mount    Secret store mount point (without leading or trailing slash).
      * @param pathPart Path part to query.
      * @param key      Secret key.
      * @param versions Versions to handle.
@@ -699,6 +697,51 @@ public class HTTPVaultConnector implements VaultConnector {
         Map<String, String> param = new HashMap<>();
         param.put("token", token);
         return request.get(PATH_TOKEN + PATH_LOOKUP, param, token, TokenResponse.class);
+    }
+
+    @Override
+    public boolean createOrUpdateTokenRole(final String name, final TokenRole role) throws VaultConnectorException {
+        requireAuth();
+
+        if (name == null) {
+            throw new InvalidRequestException("Role name must be provided.");
+        } else if (role == null) {
+            throw new InvalidRequestException("Role must be provided.");
+        }
+
+        // Issue request and expect code 204 with empty response.
+        request.postWithoutResponse(PATH_TOKEN + PATH_ROLES + "/" + name, role, token);
+
+        return true;
+    }
+
+    @Override
+    public TokenRoleResponse readTokenRole(final String name) throws VaultConnectorException {
+        requireAuth();
+
+        // Request HTTP response and parse response.
+        return request.get(PATH_TOKEN + PATH_ROLES + "/" + name, new HashMap<>(), token, TokenRoleResponse.class);
+    }
+
+    @Override
+    public List<String> listTokenRoles() throws VaultConnectorException {
+        requireAuth();
+
+        return list(PATH_TOKEN + PATH_ROLES);
+    }
+
+    @Override
+    public boolean deleteTokenRole(final String name) throws VaultConnectorException {
+        requireAuth();
+
+        if (name == null) {
+            throw new InvalidRequestException("Role name must be provided.");
+        }
+
+        // Issue request and expect code 204 with empty response.
+        request.deleteWithoutResponse(PATH_TOKEN + PATH_ROLES + "/" + name, token);
+
+        return true;
     }
 
     /**

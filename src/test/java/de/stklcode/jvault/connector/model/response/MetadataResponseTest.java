@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public class MetadataResponseTest {
         try {
             MetadataResponse res = new ObjectMapper().readValue(META_JSON, MetadataResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));
-            assertThat("Parsed metadatra is NULL", res.getMetadata(), is(notNullValue()));
+            assertThat("Parsed metadata is NULL", res.getMetadata(), is(notNullValue()));
             assertThat("Incorrect created time", res.getMetadata().getCreatedTimeString(), is(V1_TIME));
             assertThat("Parting created time failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
             assertThat("Incorrect current version", res.getMetadata().getCurrentVersion(), is(CURRENT_VERSION));
@@ -87,14 +87,14 @@ public class MetadataResponseTest {
             assertThat("Parting updated time failed", res.getMetadata().getUpdatedTime(), is(notNullValue()));
             assertThat("Incorrect number of versions", res.getMetadata().getVersions().size(), is(3));
             assertThat("Incorrect version 1 delete time", res.getMetadata().getVersions().get(1).getDeletionTimeString(), is(V2_TIME));
-            assertThat("Parsion version delete time failed", res.getMetadata().getVersions().get(1).getDeletionTime(), is(notNullValue()));
+            assertThat("Parsing version delete time failed", res.getMetadata().getVersions().get(1).getDeletionTime(), is(notNullValue()));
             assertThat("Incorrect version 1 destroyed state", res.getMetadata().getVersions().get(1).isDestroyed(), is(true));
             assertThat("Incorrect version 2 created time", res.getMetadata().getVersions().get(2).getCreatedTimeString(), is(V2_TIME));
-            assertThat("Parsion version created failed", res.getMetadata().getVersions().get(2).getCreatedTime(), is(notNullValue()));
+            assertThat("Parsing version created failed", res.getMetadata().getVersions().get(2).getCreatedTime(), is(notNullValue()));
             assertThat("Incorrect version 3 destroyed state", res.getMetadata().getVersions().get(3).isDestroyed(), is(false));
 
         } catch (IOException e) {
-            fail("MetadataResoponse deserialization failed: " + e.getMessage());
+            fail("MetadataResponse deserialization failed: " + e.getMessage());
         }
     }
 }

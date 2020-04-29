@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,12 @@ import java.util.*;
  *
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @deprecated As of 0.9 in favor of {@link Token.Builder}.
  */
+@Deprecated
 public final class TokenBuilder {
     private String id;
+    private Token.Type type;
     private String displayName;
     private Boolean noParent;
     private Boolean noDefaultPolicy;
@@ -43,6 +46,18 @@ public final class TokenBuilder {
      */
     public TokenBuilder withId(final String id) {
         this.id = id;
+        return this;
+    }
+
+    /**
+     * Specify token type.
+     *
+     * @param type the type
+     * @return self
+     * @since 0.9
+     */
+    public TokenBuilder withType(final Token.Type type) {
+        this.type = type;
         return this;
     }
 
@@ -247,6 +262,7 @@ public final class TokenBuilder {
      */
     public Token build() {
         return new Token(id,
+                type != null ? type.value() : null,
                 displayName,
                 noParent,
                 noDefaultPolicy,

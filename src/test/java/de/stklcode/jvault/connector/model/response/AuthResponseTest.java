@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ public class AuthResponseTest {
     private static final String AUTH_META_VALUE = "armon";
     private static final Integer AUTH_LEASE_DURATION = 3600;
     private static final Boolean AUTH_RENEWABLE = true;
+    private static final String AUTH_ENTITY_ID = "";
+    private static final String AUTH_TOKEN_TYPE = "service";
+    private static final Boolean AUTH_ORPHAN = false;
 
     private static final String RES_JSON = "{\n" +
             "  \"auth\": {\n" +
@@ -53,11 +56,18 @@ public class AuthResponseTest {
             "      \"" + AUTH_POLICY_1 + "\", \n" +
             "      \"" + AUTH_POLICY_2 + "\"\n" +
             "    ],\n" +
+            "    \"token_policies\": [\n" +
+            "      \"" + AUTH_POLICY_2 + "\",\n" +
+            "      \"" + AUTH_POLICY_1 + "\" \n" +
+            "    ],\n" +
             "    \"metadata\": {\n" +
             "      \"" + AUTH_META_KEY + "\": \"" + AUTH_META_VALUE + "\"\n" +
             "    },\n" +
             "    \"lease_duration\": " + AUTH_LEASE_DURATION + ",\n" +
-            "    \"renewable\": " + AUTH_RENEWABLE + "\n" +
+            "    \"renewable\": " + AUTH_RENEWABLE + ",\n" +
+            "    \"entity_id\": \"" + AUTH_ENTITY_ID + "\",\n" +
+            "    \"token_type\": \"" + AUTH_TOKEN_TYPE + "\",\n" +
+            "    \"orphan\": " + AUTH_ORPHAN + "\n" +
             "  }\n" +
             "}";
 
@@ -104,8 +114,16 @@ public class AuthResponseTest {
             assertThat("Incorrect auth client token", data.getClientToken(), is(AUTH_CLIENT_TOKEN));
             assertThat("Incorrect auth lease duration", data.getLeaseDuration(), is(AUTH_LEASE_DURATION));
             assertThat("Incorrect auth renewable flag", data.isRenewable(), is(AUTH_RENEWABLE));
+            assertThat("Incorrect auth orphan flag", data.isOrphan(), is(AUTH_ORPHAN));
+            assertThat("Incorrect auth token type", data.getTokenType(), is(AUTH_TOKEN_TYPE));
+            assertThat("Incorrect auth entity id", data.getEntityId(), is(AUTH_ENTITY_ID));
             assertThat("Incorrect number of policies", data.getPolicies(), hasSize(2));
-            assertThat("Incorrect auth policies", data.getPolicies(), containsInAnyOrder(AUTH_POLICY_1, AUTH_POLICY_2));
+            assertThat("Incorrect auth policies", data.getPolicies(), containsInRelativeOrder(AUTH_POLICY_1, AUTH_POLICY_2));
+            assertThat("Incorrect number of token policies", data.getTokenPolicies(), hasSize(2));
+            assertThat("Incorrect token policies", data.getTokenPolicies(), containsInRelativeOrder(AUTH_POLICY_2, AUTH_POLICY_1));
+            assertThat("Incorrect auth metadata size", data.getMetadata().entrySet(), hasSize(1));
+            assertThat("Incorrect auth metadata", data.getMetadata().get(AUTH_META_KEY), is(AUTH_META_VALUE));
+
         } catch (IOException e) {
             fail("AuthResponse deserialization failed: " + e.getMessage());
         }

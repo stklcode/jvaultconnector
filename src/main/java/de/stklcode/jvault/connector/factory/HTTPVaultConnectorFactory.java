@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Add a trusted CA certifiate for HTTPS connections.
+     * Add a trusted CA certificate for HTTPS connections.
      *
      * @param cert path to certificate file
      * @return self
@@ -120,7 +120,7 @@ public final class HTTPVaultConnectorFactory extends VaultConnectorFactory {
     }
 
     /**
-     * Add a trusted CA certifiate for HTTPS connections.
+     * Add a trusted CA certificate for HTTPS connections.
      *
      * @param cert path to certificate file
      * @return self

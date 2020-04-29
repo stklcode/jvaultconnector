@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,10 @@ public class AppRoleResponseTest {
             "    \"token_max_ttl\": " + ROLE_TOKEN_MAX_TTL + ",\n" +
             "    \"secret_id_ttl\": " + ROLE_SECRET_TTL + ",\n" +
             "    \"secret_id_num_uses\": " + ROLE_SECRET_NUM_USES + ",\n" +
-            "    \"policies\": [\n" +
+            "    \"token_policies\": [\n" +
             "      \"" + ROLE_POLICY + "\"\n" +
             "    ],\n" +
-            "    \"period\": " + ROLE_PERIOD + ",\n" +
+            "    \"token_period\": " + ROLE_PERIOD + ",\n" +
             "    \"bind_secret_id\": " + ROLE_BIND_SECRET + ",\n" +
             "    \"bound_cidr_list\": \"\"\n" +
             "  },\n" +
@@ -68,7 +68,7 @@ public class AppRoleResponseTest {
     private static final Map<String, Object> INVALID_DATA = new HashMap<>();
 
     static {
-        INVALID_DATA.put("policies", "fancy-policy");
+        INVALID_DATA.put("token_policies", "fancy-policy");
     }
 
     /**
@@ -104,12 +104,15 @@ public class AppRoleResponseTest {
             assertThat("Incorrect token max TTL", role.getTokenMaxTtl(), is(ROLE_TOKEN_MAX_TTL));
             assertThat("Incorrect secret ID TTL", role.getSecretIdTtl(), is(ROLE_SECRET_TTL));
             assertThat("Incorrect secret ID umber of uses", role.getSecretIdNumUses(), is(ROLE_SECRET_NUM_USES));
+            assertThat("Incorrect number of policies", role.getTokenPolicies(), hasSize(1));
+            assertThat("Incorrect role policies", role.getTokenPolicies(), contains(ROLE_POLICY));
             assertThat("Incorrect number of policies", role.getPolicies(), hasSize(1));
             assertThat("Incorrect role policies", role.getPolicies(), contains(ROLE_POLICY));
+            assertThat("Incorrect role period", role.getTokenPeriod(), is(ROLE_PERIOD));
             assertThat("Incorrect role period", role.getPeriod(), is(ROLE_PERIOD));
             assertThat("Incorrect role bind secret ID flag", role.getBindSecretId(), is(ROLE_BIND_SECRET));
-            assertThat("Incorrect biund CIDR list", role.getBoundCidrList(), is(nullValue()));
-            assertThat("Incorrect biund CIDR list string", role.getBoundCidrListString(), is(emptyString()));
+            assertThat("Incorrect bound CIDR list", role.getTokenBoundCidrs(), is(nullValue()));
+            assertThat("Incorrect bound CIDR list string", role.getTokenBoundCidrsString(), is(emptyString()));
         } catch (IOException e) {
             fail("AuthResponse deserialization failed: " + e.getMessage());
         }

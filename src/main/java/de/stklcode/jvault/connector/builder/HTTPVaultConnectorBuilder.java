@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 /**
- * Vault Connector Factory implementation for HTTP Vault connectors.
+ * Vault Connector Builder implementation for HTTP Vault connectors.
  *
  * @author Stefan Kalscheuer
  * @since 0.8.0
@@ -162,7 +162,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     }
 
     /**
-     * Add a trusted CA certifiate for HTTPS connections.
+     * Add a trusted CA certificate for HTTPS connections.
      *
      * @param cert path to certificate file
      * @return self
@@ -179,7 +179,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     }
 
     /**
-     * Add a trusted CA certifiate for HTTPS connections.
+     * Add a trusted CA certificate for HTTPS connections.
      *
      * @param cert path to certificate file
      * @return self

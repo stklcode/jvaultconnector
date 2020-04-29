@@ -19,38 +19,42 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
-import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
+import de.stklcode.jvault.connector.model.TokenRole;
+import de.stklcode.jvault.connector.model.response.embedded.TokenData;
 
 import java.io.IOException;
 import java.util.Map;
 
 /**
- * Vault response for a single secret version metadata, i.e. after update (KV v2).
+ * Vault response from token role lookup providing Token information in {@link TokenData} field.
  *
  * @author Stefan Kalscheuer
- * @since 0.8
+ * @since 0.9
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SecretVersionResponse extends VaultDataResponse {
+public final class TokenRoleResponse extends VaultDataResponse {
+    private TokenRole data;
 
-    private VersionMetadata metadata;
-
+    /**
+     * Set data. Parses response data map to {@link TokenRole}.
+     *
+     * @param data Raw response data
+     * @throws InvalidResponseException on parsing errors
+     */
     @Override
-    public final void setData(final Map<String, Object> data) throws InvalidResponseException {
+    public void setData(final Map<String, Object> data) throws InvalidResponseException {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            this.metadata = mapper.readValue(mapper.writeValueAsString(data), VersionMetadata.class);
+            this.data = mapper.readValue(mapper.writeValueAsString(data), TokenRole.class);
         } catch (IOException e) {
             throw new InvalidResponseException("Failed deserializing response", e);
         }
     }
 
     /**
-     * Get the actual metadata.
-     *
-     * @return Metadata.
+     * @return TokenRole data
      */
-    public VersionMetadata getMetadata() {
-        return metadata;
+    public TokenRole getData() {
+        return data;
     }
 }

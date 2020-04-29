@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.AppRole;
 import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.Token;
+import de.stklcode.jvault.connector.model.TokenRole;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
@@ -39,9 +40,9 @@ import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * JUnit test for HTTP Vault connector.
@@ -52,7 +53,7 @@ import static org.junit.jupiter.api.Assumptions.*;
  */
 @Tag("online")
 public class HTTPVaultConnectorTest {
-    private static String VAULT_VERSION = "1.3.0";  // the vault version this test is supposed to run against
+    private static String VAULT_VERSION = "1.4.0";  // the vault version this test is supposed to run against
     private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
     private static final String KEY2 = "O5OHwDleY3IiPdgw61cgHlhsrEm6tVJkrxhF6QAnILd1";
     private static final String KEY3 = "mw7Bm3nbt/UWa/juDjjL2EPQ04kiJ0saC5JEXwJvXYsB";
@@ -880,6 +881,28 @@ public class HTTPVaultConnectorTest {
                 fail("Role ID lookup failed.");
             }
 
+            /* Update role model with custom flags */
+            role = AppRole.builder(roleName)
+                    .wit0hTokenPeriod(321)
+                    .build();
+
+            /* Create role */
+            try {
+                boolean res = connector.createAppRole(role);
+                assertThat("No result given.", res, is(notNullValue()));
+            } catch (VaultConnectorException e) {
+                fail("Role creation failed.");
+            }
+
+            /* Lookup updated role */
+            try {
+                AppRoleResponse res = connector.lookupAppRole(roleName);
+                assertThat("Role lookup returned no role.", res.getRole(), is(notNullValue()));
+                assertThat("Token period not set for role.", res.getRole().getTokenPeriod(), is(321));
+            } catch (VaultConnectorException e) {
+                fail("Role lookup failed.");
+            }
+
             /* Create role by name */
             roleName = "RoleByName";
             try {
@@ -925,8 +948,8 @@ public class HTTPVaultConnectorTest {
             try {
                 AppRoleResponse res = connector.lookupAppRole(roleName);
                 // Note: As of Vault 0.8.3 default policy is not added automatically, so this test should return 1, not 2.
-                assertThat("Role lookuo returned wrong policy count (before Vault 0.8.3 is should be 2)", res.getRole().getPolicies(), hasSize(1));
-                assertThat("Role lookuo returned wrong policies", res.getRole().getPolicies(), hasItem("testpolicy"));
+                assertThat("Role lookup returned wrong policy count (before Vault 0.8.3 is should be 2)", res.getRole().getPolicies(), hasSize(1));
+                assertThat("Role lookup returned wrong policies", res.getRole().getPolicies(), hasItem("testpolicy"));
             } catch (VaultConnectorException e) {
                 fail("Creation of role by name failed.");
             }
@@ -1038,6 +1061,7 @@ public class HTTPVaultConnectorTest {
             /* Create token */
             Token token = Token.builder()
                     .withId("test-id")
+                    .withType(Token.Type.SERVICE)
                     .withDisplayName("test name")
                     .build();
 
@@ -1048,10 +1072,14 @@ public class HTTPVaultConnectorTest {
                 assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id"));
                 assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
                 assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("root"));
+                assertThat("Invalid number of token policies returned.", res.getAuth().getTokenPolicies(), hasSize(1));
+                assertThat("Root policy not inherited for token.", res.getAuth().getTokenPolicies(), contains("root"));
+                assertThat("Unexpected token type.", res.getAuth().getTokenType(), is(Token.Type.SERVICE.value()));
                 assertThat("Metadata unexpected.", res.getAuth().getMetadata(), is(nullValue()));
                 assertThat("Root token should not be renewable", res.getAuth().isRenewable(), is(false));
+                assertThat("Root token should not be orphan", res.getAuth().isOrphan(), is(false));
 
-                // Starting with Vault 1.0 a warning "cusotm ID uses weaker SHA1..." is given.
+                // Starting with Vault 1.0 a warning "custom ID uses weaker SHA1..." is given.
                 if (VAULT_VERSION.startsWith("1.")) {
                     assertThat("Token creation did not return expected warning.", res.getWarnings(), hasSize(1));
                 } else {
@@ -1073,12 +1101,12 @@ public class HTTPVaultConnectorTest {
                 AuthResponse res = connector.createToken(token);
                 assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id2"));
                 assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
-                assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("testpolicy"));
+                assertThat("Custom policy not set.", res.getAuth().getPolicies(), contains("testpolicy"));
                 assertThat("Metadata not given.", res.getAuth().getMetadata(), is(notNullValue()));
                 assertThat("Metadata not correct.", res.getAuth().getMetadata().get("foo"), is("bar"));
                 assertThat("Token should be renewable", res.getAuth().isRenewable(), is(true));
             } catch (VaultConnectorException e) {
-                fail("Secret written to inaccessible path.");
+                fail("Token creation failed: " + e.getMessage());
             }
 
             /* Overwrite token should fail as of Vault 0.8.0 */
@@ -1100,10 +1128,30 @@ public class HTTPVaultConnectorTest {
                 /* Assert that the exception does not reveal token ID */
                 assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
             }
+
+            /* Create token with batch type */
+            token = Token.builder()
+                    .withDisplayName("test name 3")
+                    .withPolicy("batchpolicy")
+                    .withoutDefaultPolicy()
+                    .withType(Token.Type.BATCH)
+                    .build();
+            try {
+                AuthResponse res = connector.createToken(token);
+                assertThat("Unexpected token prefix", res.getAuth().getClientToken(), startsWith("b."));
+                assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
+                assertThat("Custom policy policy not set.", res.getAuth().getPolicies(), contains("batchpolicy"));
+                assertThat("Token should not be renewable", res.getAuth().isRenewable(), is(false));
+                assertThat("Token should not be orphan", res.getAuth().isOrphan(), is(false));
+                assertThat("Specified token Type not set", res.getAuth().getTokenType(), is(Token.Type.BATCH.value()));
+
+            } catch (VaultConnectorException e) {
+                fail("Token creation failed: " + e.getMessage());
+            }
         }
 
         /**
-         * Test token lookuo.
+         * Test token lookup.
          */
         @Test
         @Order(30)
@@ -1115,6 +1163,7 @@ public class HTTPVaultConnectorTest {
             /* Create token with attributes */
             Token token = Token.builder()
                     .withId("my-token")
+                    .withType(Token.Type.SERVICE)
                     .build();
             try {
                 connector.createToken(token);
@@ -1128,9 +1177,99 @@ public class HTTPVaultConnectorTest {
             try {
                 TokenResponse res = connector.lookupToken("my-token");
                 assertThat("Unexpected token ID", res.getData().getId(), is(token.getId()));
+                assertThat("Unexpected number of policies", res.getData().getPolicies(), hasSize(1));
+                assertThat("Unexpected policy", res.getData().getPolicies(), contains("root"));
+                assertThat("Unexpected token type", res.getData().getType(), is(token.getType()));
+                assertThat("Issue time expected to be filled", res.getData().getIssueTime(), is(notNullValue()));
             } catch (VaultConnectorException e) {
                 fail("Token creation failed.");
             }
+        }
+
+        /**
+         * Test token role handling.
+         */
+        @Test
+        @Order(40)
+        @DisplayName("Token roles")
+        public void tokenRolesTest() {
+            authRoot();
+            assumeTrue(connector.isAuthorized());
+
+            // Create token role.
+            final String roleName = "test-role";
+            final TokenRole role = TokenRole.builder().build();
+
+            try {
+                assertThat(connector.createOrUpdateTokenRole(roleName, role), is(true));
+            } catch (VaultConnectorException e) {
+                fail("Token role creation failed.");
+            }
+
+            // Read the role.
+            TokenRoleResponse res = null;
+            try {
+                res = connector.readTokenRole(roleName);
+            } catch (VaultConnectorException e) {
+                fail("Reading token role failed.");
+            }
+
+            assertThat("Token role response must not be null", res, is(notNullValue()));
+            assertThat("Token role must not be null", res.getData(), is(notNullValue()));
+            assertThat("Token role name not as expected", res.getData().getName(), is(roleName));
+            assertThat("Token role expected to be renewable by default", res.getData().getRenewable(), is(true));
+            assertThat("Token role not expected to be orphan by default", res.getData().getOrphan(), is(false));
+            assertThat("Unexpected default token type", res.getData().getTokenType(), is(Token.Type.DEFAULT_SERVICE.value()));
+
+            // Update the role, i.e. change some attributes.
+            final TokenRole role2 = TokenRole.builder()
+                    .forName(roleName)
+                    .withPathSuffix("suffix")
+                    .orphan(true)
+                    .renewable(false)
+                    .withTokenNumUses(42)
+                    .build();
+
+            try {
+                assertThat(connector.createOrUpdateTokenRole(role2), is(true));
+            } catch (VaultConnectorException e) {
+                fail("Token role update failed.");
+            }
+
+            try {
+                res = connector.readTokenRole(roleName);
+            } catch (VaultConnectorException e) {
+                fail("Reading token role failed.");
+            }
+
+            assertThat("Token role response must not be null", res, is(notNullValue()));
+            assertThat("Token role must not be null", res.getData(), is(notNullValue()));
+            assertThat("Token role name not as expected", res.getData().getName(), is(roleName));
+            assertThat("Token role not expected to be renewable  after update", res.getData().getRenewable(), is(false));
+            assertThat("Token role expected to be orphan  after update", res.getData().getOrphan(), is(true));
+            assertThat("Unexpected number of token uses after update", res.getData().getTokenNumUses(), is(42));
+
+            // List roles.
+            List<String> listRes = null;
+            try {
+                listRes = connector.listTokenRoles();
+            } catch (VaultConnectorException e) {
+                fail("Listing token roles failed.");
+            }
+
+            assertThat("Token role list must not be null", listRes, is(notNullValue()));
+            assertThat("Unexpected number of token roles", listRes, hasSize(1));
+            assertThat("Unexpected token role in list", listRes, contains(roleName));
+
+            // Delete the role.
+            try {
+                assertThat(connector.deleteTokenRole(roleName), is(true));
+            } catch (VaultConnectorException e) {
+                fail("Token role deletion failed.");
+            }
+
+            assertThrows(InvalidResponseException.class, () -> connector.readTokenRole(roleName), "Reading nonexistent token role should fail");
+            assertThrows(InvalidResponseException.class, () -> connector.listTokenRoles(), "Listing nonexistent token roles should fail");
         }
     }
 
@@ -1266,7 +1405,7 @@ public class HTTPVaultConnectorTest {
             try {
                 connector.seal();
                 assumeTrue(connector.sealStatus().isSealed());
-                connector.resetAuth();  // SHould work unauthenticated
+                connector.resetAuth();  // Should work unauthenticated
             } catch (VaultConnectorException e) {
                 fail("Unexpected exception on sealing: " + e.getMessage());
             }

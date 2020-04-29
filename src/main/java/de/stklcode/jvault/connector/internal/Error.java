@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 Stefan Kalscheuer
+ * Copyright 2016-2020 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ final class Error {
     static final String UNEXPECTED_RESPONSE = "Received response where none was expected";
     static final String URI_FORMAT = "Invalid URI format";
     static final String RESPONSE_CODE = "Invalid response code";
-    static final String INIT_SSL_CONTEXT = "Unable to intialize SSLContext";
+    static final String INIT_SSL_CONTEXT = "Unable to initialize SSLContext";
 
     /**
      * Constructor hidden, this class should not be instantiated.

@@ -1,3 +1,34 @@
+## 0.9.0 (2020-04-29)
+
+### Fixes
+* Correctly parse Map field for token metadata (#34)
+* Correctly map token policies on token lookup (#35)
+
+### Features
+* Support for token types (#26)
+* Support for token role handling (#27) (#37)
+
+### Improvements
+* Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
+* Added `entity_id`, `expire_time`, `explicit_max_ttl`, `issue_time`, `renewable` and `type` flags to token data
+* Added `explicit_max_ttl`, `period` and `entity_alias` flags to _Token_ model (#41)
+* Added `enable_local_secret_ids`, `token_bound_cidrs`, `token_explicit_max_ttl`, `token_no_default_policy`, 
+  `token_num_uses`, `token_period` and `token_type` flags to _AppRole_ model
+* Minor dependency updates
+
+### Deprecations
+* `AppRole#getPolicies()` and `#setPolicies()` are deprecated in favor of `#getTokenPolicies()` and `#setTokenPolicies()`
+* `AppRole#getPeriod()` is deprecated in favor of `#getTokenPeriod()`
+* `AppRoleBuilder` and `TokenBuilder` in favor of `AppRole.Builder` and `Token.Builder`
+* All-arg constructors of `AppRole` and `Token` in favor of `.builder()....build()` introduced in 0.8
+
+### Removals
+* Deprecated methods `AppRole#getBoundCidrList()`, `#setBoundCidrList()` and `getBoundCidrListString()` have been removed.
+
+### Test
+* Tested against Vault 1.4.0
+
+
 ## 0.8.2 (2019-10-20)
 
 ### Fixes
