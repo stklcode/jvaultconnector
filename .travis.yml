@@ -40,10 +40,8 @@ jobs:
       if: branch =~ ^master|(release/.+)$
       script:
         - mvn -P coverage clean package
-    - stage: Analysis
-      if: branch = master
-      script:
-        - mvn sonar:sonar
+      after_success:
+        - if [ "$TRAVIS_BRANCH" = "master" ]; then mvn sonar:sonar; fi
 
 notifications:
   slack:
