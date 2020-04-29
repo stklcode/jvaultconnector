@@ -554,6 +554,7 @@ public final class Token {
         /**
          * Set token period (former lease time).
          *
+         * @param period Period in seconds.
          * @return self
          */
         public Builder withPeriod(final Integer period) {
@@ -565,6 +566,7 @@ public final class Token {
          * Set entity alias for token.
          * Only works in combination with an associated token role.
          *
+         * @param entityAlias Entity alias.
          * @return self
          */
         public Builder withEntityAlias(final String entityAlias) {
