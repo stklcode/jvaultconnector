@@ -12,7 +12,7 @@ stages:
   - Test
   - Analysis
 env:
-  - PATH=$PATH:. VAULT_VERSION=1.4.0
+  - PATH=$PATH:. VAULT_VERSION=1.5.0
 before_script:
   - |
     if [[ "$TRAVIS_BRANCH" =~ ^master|(release\/.+)$ ]]; then
