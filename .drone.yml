@@ -5,7 +5,7 @@ steps:
   - name: compile
     image: maven:3-jdk-11
     commands:
-      - mvn clean compile
+      - mvn -B clean compile
     when:
       branch:
         - master
@@ -16,7 +16,7 @@ steps:
   - name: unit-tests
     image: maven:3-jdk-11
     commands:
-      - mvn test -P offline-tests
+      - mvn -B resources:testResources compiler:testCompile surefire:test -P offline-tests
     when:
       branch:
         - develop
@@ -32,7 +32,7 @@ steps:
       - unzip vault_1.6.0_linux_amd64.zip
       - rm vault_1.6.0_linux_amd64.zip
       - mv vault /bin/
-      - mvn test
+      - mvn -B resources:testResources compiler:testCompile surefire:test
     when:
       branch:
         - master

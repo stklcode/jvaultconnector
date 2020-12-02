@@ -30,16 +30,16 @@ jobs:
     - stage: Compile
       name: Compile
       script:
-        - mvn clean compile
+        - mvn -B clean compile
     - stage: Test
       name: Unit Tests
       if: NOT branch =~ ^master|(release/.+)$
       script:
-        - mvn test -P offline-tests
+        - mvn -B resources:testResources compiler:testCompile surefire:test -P offline-tests
     - name: Unit and Integration Tests
       if: branch =~ ^master|(release/.+)$
       script:
-        - mvn -P coverage clean package
+        - mvn -B -P coverage clean package
       after_success:
         - if [ "$TRAVIS_BRANCH" = "master" ]; then mvn sonar:sonar; fi
 
