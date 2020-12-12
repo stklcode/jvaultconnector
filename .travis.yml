@@ -1,18 +1,26 @@
 language: java
-jdk:
-  - openjdk11
 install: true
 addons:
   sonarcloud:
     organization: "stklcode-github"
     token:
       secure: "sM9OfX5jW764pn9cb2LSXArnXucKMws+eGeg5NnZxHRcGYt4hpBKLSregBSsBNzUoWVj0zNzPCpnh+UQvgxQzUerOqwEdjTBpy3SNPaxSn7UpoSg+Wz3aUmL9ugmx01b51/wMG4UCHEwTZt2tpgTPVtw8K6uSO78e0dSICCBHDnRcdQwOjMEQHIJJ/qHVRwuy/MzLCAP3W1JPZlsphZg9QsFyhB4hW97dE90joZezfocQIv2xI/r6k+BLz0pY6MxYCul0RiDumaiaej0CPvEJI/uSu//BAQjUdHw+mQgnKUYIbrn2ONOviwNfwdr94JyoZEN2B6zASUmNLjPf4AbIojDeyS+CrpQpm17EVm/Qk/Ds+Xra4PPPIcsZhiWzV0KoDUz9xLfXuRJ526VT5tDPiaeI7oETf0+8l+JIS1b399FyqHi7smzjpvC6GuKflQrbuHK4MuKzDh7WTHiqokGG4SS0wOQIaaHB3dfdwwQzPh6IM24e8CETxh3DjMeqUTU4DWmv5po55jZ934TtxVQvVN78bTG9O0zS9u+JmRY04OZ+OaXuFam6MfMUFQi0EPZzdGul/oWSibGUu3bNfVEBp60CnJwYNM/dKG6U7pJthLHvSwiQFOdKzHZ+l1jZJ4gPaXaIGqpwqVGr28ntqA/El1rytPixr2driE6bYMt5jw="
-stages:
-  - Compile
-  - Test
-  - Analysis
+
 env:
-  - PATH=$PATH:. VAULT_VERSION=1.6.0
+  - PATH=$PATH:. VAULT_VERSION=1.6.0 ANALYSIS=false
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
+
+jobs:
+  include:
+    - jdk: openjdk8
+    - jdk: openjdk11
+      env: PATH=$PATH:. VAULT_VERSION=1.6.0 ANALYSIS=true
+    - jdk: openjdk15
+
 before_script:
   - |
     if [[ "$TRAVIS_BRANCH" =~ ^master|(release\/.+)$ ]]; then
@@ -21,27 +29,18 @@ before_script:
       unzip vault_${VAULT_VERSION}_linux_amd64.zip
       rm vault_${VAULT_VERSION}_linux_amd64.zip
     fi
-cache:
-  directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.sonar/cache'
-jobs:
-  include:
-    - stage: Compile
-      name: Compile
-      script:
-        - mvn -B clean compile
-    - stage: Test
-      name: Unit Tests
-      if: NOT branch =~ ^master|(release/.+)$
-      script:
-        - mvn -B resources:testResources compiler:testCompile surefire:test -P offline-tests
-    - name: Unit and Integration Tests
-      if: branch =~ ^master|(release/.+)$
-      script:
-        - mvn -B -P coverage clean package
-      after_success:
-        - if [ "$TRAVIS_BRANCH" = "master" ]; then mvn sonar:sonar; fi
+
+script:
+  - mvn -B clean compile
+  - |
+    if [[ "$TRAVIS_BRANCH" =~ ^master|(release\/.+)$ ]]; then
+      mvn -B resources:testResources compiler:testCompile surefire:test -P coverage
+    else
+      mvn -B resources:testResources compiler:testCompile surefire:test -P coverage -P offline-tests
+    fi
+
+after_success:
+  - if [ "$ANALYSIS" == "true" ]; then mvn sonar:sonar; fi
 
 notifications:
   slack:
