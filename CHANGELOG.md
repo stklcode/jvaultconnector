@@ -1,4 +1,4 @@
-## unreleased
+## 0.9.1 (2021-01-03)
 
 ### Improvements
 * Dependency updates
