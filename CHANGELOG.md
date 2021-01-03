@@ -3,6 +3,8 @@
 ### Improvements
 * Dependency updates
 
+### Test
+* Tested against Vault 1.6.1
 
 ## 0.9.0 (2020-04-29)
 
