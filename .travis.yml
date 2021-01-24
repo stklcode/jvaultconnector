@@ -16,7 +16,6 @@ cache:
 
 jobs:
   include:
-    - jdk: openjdk8
     - jdk: openjdk11
       env: PATH=$PATH:. VAULT_VERSION=1.7.0 ANALYSIS=true
     - jdk: openjdk16
