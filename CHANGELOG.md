@@ -1,4 +1,4 @@
-## unreleased
+## 0.9.2 (2021-01-24)
 
 ### Fixes
 * Only initialize custom trust managers, if CA certificate is actually provided (#43)
