@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.*;
  * @author Stefan Kalscheuer
  * @since 0.4.0
  */
-public class TokenBuilderTest {
+class TokenBuilderTest {
     private static final String ID = "test-id";
     private static final String DISPLAY_NAME = "display-name";
     private static final Boolean NO_PARENT = false;
@@ -59,7 +59,7 @@ public class TokenBuilderTest {
     private static final String JSON_FULL = "{\"id\":\"test-id\",\"type\":\"service\",\"display_name\":\"display-name\",\"no_parent\":false,\"no_default_policy\":false,\"ttl\":123,\"explicit_max_ttl\":456,\"num_uses\":4,\"policies\":[\"policy\"],\"meta\":{\"key\":\"value\"},\"renewable\":true,\"period\":3600,\"entity_alias\":\"alias-value\"}";
 
     @BeforeAll
-    public static void init() {
+    static void init() {
         POLICIES.add(POLICY);
         META.put(META_KEY, META_VALUE);
     }
@@ -68,7 +68,7 @@ public class TokenBuilderTest {
      * Build token without any parameters.
      */
     @Test
-    public void buildDefaultTest() throws JsonProcessingException {
+    void buildDefaultTest() throws JsonProcessingException {
         Token token = Token.builder().build();
         assertThat(token.getId(), is(nullValue()));
         assertThat(token.getType(), is(nullValue()));
@@ -92,7 +92,7 @@ public class TokenBuilderTest {
      * Build token without any parameters.
      */
     @Test
-    public void legacyBuildDefaultTest() throws JsonProcessingException {
+    void legacyBuildDefaultTest() throws JsonProcessingException {
         Token token = new TokenBuilder().build();
         assertThat(token.getId(), is(nullValue()));
         assertThat(token.getType(), is(nullValue()));
@@ -113,7 +113,7 @@ public class TokenBuilderTest {
      * Build token without all parameters set.
      */
     @Test
-    public void buildFullTest() throws JsonProcessingException {
+    void buildFullTest() throws JsonProcessingException {
         Token token = Token.builder()
                 .withId(ID)
                 .withType(Token.Type.SERVICE)
@@ -150,7 +150,7 @@ public class TokenBuilderTest {
      * Build token without all parameters set.
      */
     @Test
-    public void legacyBuildFullTest() throws JsonProcessingException {
+    void legacyBuildFullTest() throws JsonProcessingException {
         Token token = new TokenBuilder()
                 .withId(ID)
                 .withType(Token.Type.SERVICE)
@@ -182,7 +182,7 @@ public class TokenBuilderTest {
      * Test convenience methods
      */
     @Test
-    public void convenienceMethodsTest() {
+    void convenienceMethodsTest() {
         /* Parent */
         Token token = Token.builder().asOrphan().build();
         assertThat(token.getNoParent(), is(true));
@@ -230,7 +230,7 @@ public class TokenBuilderTest {
      * Test convenience methods
      */
     @Test
-    public void legacyConvenienceMethodsTest() {
+    void legacyConvenienceMethodsTest() {
         /* Parent */
         Token token = new TokenBuilder().asOrphan().build();
         assertThat(token.getNoParent(), is(true));

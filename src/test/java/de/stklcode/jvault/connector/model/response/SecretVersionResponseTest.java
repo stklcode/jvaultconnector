@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-public class SecretVersionResponseTest {
+class SecretVersionResponseTest {
     private static final String CREATION_TIME = "2018-03-22T02:24:06.945319214Z";
     private static final String DELETION_TIME = "2018-03-22T02:36:43.986212308Z";
     private static final Integer VERSION = 42;
@@ -50,7 +50,7 @@ public class SecretVersionResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             SecretVersionResponse res = new ObjectMapper().readValue(META_JSON, SecretVersionResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));

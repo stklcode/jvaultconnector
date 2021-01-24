@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.*;
  * @author Stefan Kalscheuer
  * @since 0.9
  */
-public class TokenRoleBuilderTest {
+class TokenRoleBuilderTest {
     private static final String NAME = "test-role";
     private static final String ALLOWED_POLICY_1 = "apol-1";
     private static final String ALLOWED_POLICY_2 = "apol-2";
@@ -78,7 +78,7 @@ public class TokenRoleBuilderTest {
      * Build token without any parameters.
      */
     @Test
-    public void buildDefaultTest() throws JsonProcessingException {
+    void buildDefaultTest() throws JsonProcessingException {
         TokenRole role = TokenRole.builder().build();
         assertThat(role.getAllowedPolicies(), is(nullValue()));
         assertThat(role.getDisallowedPolicies(), is(nullValue()));
@@ -100,7 +100,7 @@ public class TokenRoleBuilderTest {
      * Build token without all parameters NULL.
      */
     @Test
-    public void buildNullTest() throws JsonProcessingException {
+    void buildNullTest() throws JsonProcessingException {
         TokenRole role = TokenRole.builder()
                 .forName(null)
                 .withAllowedPolicies(null)
@@ -141,7 +141,7 @@ public class TokenRoleBuilderTest {
      * Build token without all parameters set.
      */
     @Test
-    public void buildFullTest() throws JsonProcessingException {
+    void buildFullTest() throws JsonProcessingException {
         TokenRole role = TokenRole.builder()
                 .forName(NAME)
                 .withAllowedPolicies(ALLOWED_POLICIES)

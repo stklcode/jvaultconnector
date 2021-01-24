@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-public class CredentialsResponseTest {
+class CredentialsResponseTest {
     private static final Map<String, Object> DATA = new HashMap<>();
     private static final String VAL_USER = "testUserName";
     private static final String VAL_PASS = "5up3r5ecr3tP455";
@@ -52,7 +52,7 @@ public class CredentialsResponseTest {
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void getCredentialsTest() throws InvalidResponseException {
+    void getCredentialsTest() throws InvalidResponseException {
         // Create empty Object.
         CredentialsResponse res = new CredentialsResponse();
         assertThat("Username not present in data map should not return anything", res.getUsername(), is(nullValue()));

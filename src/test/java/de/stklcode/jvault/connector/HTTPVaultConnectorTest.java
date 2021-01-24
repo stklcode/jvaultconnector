@@ -52,7 +52,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @since 0.1
  */
 @Tag("online")
-public class HTTPVaultConnectorTest {
+class HTTPVaultConnectorTest {
     private static String VAULT_VERSION = "1.6.1";  // the vault version this test is supposed to run against
     private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
     private static final String KEY2 = "O5OHwDleY3IiPdgw61cgHlhsrEm6tVJkrxhF6QAnILd1";
@@ -78,7 +78,7 @@ public class HTTPVaultConnectorTest {
      * Requires "vault" binary to be in current user's executable path. Not using MLock, so no extended rights required.
      */
     @BeforeEach
-    public void setUp(TestInfo testInfo, @TempDir File tempDir) throws VaultConnectorException, IOException {
+    void setUp(TestInfo testInfo, @TempDir File tempDir) throws VaultConnectorException, IOException {
         /* Determine, if TLS is required */
         boolean isTls = testInfo.getTags().contains("tls");
 
@@ -111,7 +111,7 @@ public class HTTPVaultConnectorTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         if (vaultProcess != null && vaultProcess.isAlive())
             vaultProcess.destroy();
     }
@@ -133,7 +133,7 @@ public class HTTPVaultConnectorTest {
         @Order(10)
         @DisplayName("Read secrets")
         @SuppressWarnings("deprecation")
-        public void readSecretTest() {
+        void readSecretTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -210,7 +210,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(20)
         @DisplayName("List secrets")
-        public void listSecretsTest() {
+        void listSecretsTest() {
             authRoot();
             assumeTrue(connector.isAuthorized());
             /* Try to list secrets from valid path */
@@ -230,7 +230,7 @@ public class HTTPVaultConnectorTest {
         @Order(30)
         @DisplayName("Write secrets")
         @SuppressWarnings("deprecation")
-        public void writeSecretTest() {
+        void writeSecretTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -275,7 +275,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(40)
         @DisplayName("Delete secrets")
-        public void deleteSecretTest() {
+        void deleteSecretTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -316,7 +316,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(50)
         @DisplayName("Revoke secrets")
-        public void revokeTest() {
+        void revokeTest() {
             authRoot();
             assumeTrue(connector.isAuthorized());
 
@@ -361,7 +361,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(10)
         @DisplayName("Read v2 secret")
-        public void readSecretTest() {
+        void readSecretTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -392,7 +392,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(20)
         @DisplayName("Write v2 secret")
-        public void writeSecretTest() {
+        void writeSecretTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -450,7 +450,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(30)
         @DisplayName("Read v2 metadata")
-        public void readSecretMetadataTest() {
+        void readSecretMetadataTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -487,7 +487,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(40)
         @DisplayName("Update v2 metadata")
-        public void updateSecretMetadataTest() {
+        void updateSecretMetadataTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -511,7 +511,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(50)
         @DisplayName("Version handling")
-        public void handleSecretVersionsTest() {
+        void handleSecretVersionsTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
@@ -588,7 +588,7 @@ public class HTTPVaultConnectorTest {
         @Order(10)
         @DisplayName("Authenticate with App-ID")
         @SuppressWarnings("deprecation")
-        public void authAppIdTest() {
+        void authAppIdTest() {
             /* Try unauthorized access first. */
             assumeFalse(connector.isAuthorized());
 
@@ -613,7 +613,7 @@ public class HTTPVaultConnectorTest {
         @Order(20)
         @DisplayName("Register App-ID")
         @SuppressWarnings("deprecation")
-        public void registerAppIdTest() {
+        void registerAppIdTest() {
             /* Authorize. */
             authRoot();
             assumeTrue(connector.isAuthorized());
@@ -664,7 +664,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(10)
         @DisplayName("Authenticate with AppRole")
-        public void authAppRole() {
+        void authAppRole() {
             assumeFalse(connector.isAuthorized());
 
             /* Authenticate with correct credentials */
@@ -724,7 +724,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(20)
         @DisplayName("List AppRoles")
-        public void listAppRoleTest() {
+        void listAppRoleTest() {
             /* Try unauthorized access first. */
             assumeFalse(connector.isAuthorized());
 
@@ -772,7 +772,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(30)
         @DisplayName("Create AppRole")
-        public void createAppRoleTest() {
+        void createAppRoleTest() {
             /* Try unauthorized access first. */
             assumeFalse(connector.isAuthorized());
             try {
@@ -974,7 +974,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(40)
         @DisplayName("Create AppRole secrets")
-        public void createAppRoleSecretTest() {
+        void createAppRoleSecretTest() {
             authRoot();
             assumeTrue(connector.isAuthorized());
 
@@ -1028,7 +1028,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(10)
         @DisplayName("Authenticate with token")
-        public void authTokenTest() {
+        void authTokenTest() {
             TokenResponse res;
             final String invalidToken = "52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6";
             try {
@@ -1054,7 +1054,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(20)
         @DisplayName("Create token")
-        public void createTokenTest() {
+        void createTokenTest() {
             authRoot();
             assumeTrue(connector.isAuthorized());
 
@@ -1156,7 +1156,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(30)
         @DisplayName("Lookup token")
-        public void lookupTokenTest() {
+        void lookupTokenTest() {
             authRoot();
             assumeTrue(connector.isAuthorized());
 
@@ -1192,7 +1192,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Order(40)
         @DisplayName("Token roles")
-        public void tokenRolesTest() {
+        void tokenRolesTest() {
             authRoot();
             assumeTrue(connector.isAuthorized());
 
@@ -1281,7 +1281,7 @@ public class HTTPVaultConnectorTest {
          */
         @Test
         @DisplayName("List auth methods")
-        public void authMethodsTest() {
+        void authMethodsTest() {
             /* Authenticate as valid user */
             try {
                 connector.authToken(TOKEN_ROOT);
@@ -1304,7 +1304,7 @@ public class HTTPVaultConnectorTest {
          */
         @Test
         @DisplayName("Authenticate with UserPass")
-        public void authUserPassTest() {
+        void authUserPassTest() {
             AuthResponse res = null;
             final String invalidUser = "foo";
             final String invalidPass = "bar";
@@ -1332,7 +1332,7 @@ public class HTTPVaultConnectorTest {
         @Test
         @Tag("tls")
         @DisplayName("TLS connection test")
-        public void tlsConnectionTest() {
+        void tlsConnectionTest() {
             TokenResponse res;
             try {
                 connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6");
@@ -1354,7 +1354,7 @@ public class HTTPVaultConnectorTest {
          */
         @Test
         @DisplayName("Seal test")
-        public void sealTest() throws VaultConnectorException {
+        void sealTest() throws VaultConnectorException {
             SealResponse sealStatus = connector.sealStatus();
             assumeFalse(sealStatus.isSealed());
 
@@ -1387,7 +1387,7 @@ public class HTTPVaultConnectorTest {
          */
         @Test
         @DisplayName("Health test")
-        public void healthTest() {
+        void healthTest() {
             HealthResponse res = null;
             try {
                 res = connector.getHealth();
@@ -1422,7 +1422,7 @@ public class HTTPVaultConnectorTest {
          */
         @Test
         @DisplayName("Connector close test")
-        public void closeTest() {
+        void closeTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 

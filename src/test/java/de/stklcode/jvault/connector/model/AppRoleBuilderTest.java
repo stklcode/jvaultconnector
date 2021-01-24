@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.*;
  * @author Stefan Kalscheuer
  * @since 0.4.0
  */
-public class AppRoleBuilderTest {
+class AppRoleBuilderTest {
     private static final String NAME = "TestRole";
     private static final String ID = "test-id";
     private static final Boolean BIND_SECRET_ID = true;
@@ -58,7 +58,7 @@ public class AppRoleBuilderTest {
             NAME, ID, BIND_SECRET_ID, CIDR_1, SECRET_ID_NUM_USES, SECRET_ID_TTL, ENABLE_LOCAL_SECRET_IDS, TOKEN_TTL, TOKEN_MAX_TTL, POLICY, CIDR_1, TOKEN_EXPLICIT_MAX_TTL, TOKEN_NO_DEFAULT_POLICY, TOKEN_NUM_USES, TOKEN_PERIOD, TOKEN_TYPE.value());
 
     @BeforeAll
-    public static void init() {
+    static void init() {
         BOUND_CIDR_LIST.add(CIDR_1);
         POLICIES.add(POLICY);
     }
@@ -67,7 +67,7 @@ public class AppRoleBuilderTest {
      * Build role with only a name.
      */
     @Test
-    public void buildDefaultTest() throws JsonProcessingException {
+    void buildDefaultTest() throws JsonProcessingException {
         AppRole role = AppRole.builder(NAME).build();
         assertThat(role.getId(), is(nullValue()));
         assertThat(role.getBindSecretId(), is(nullValue()));
@@ -95,7 +95,7 @@ public class AppRoleBuilderTest {
      * Build role with only a name.
      */
     @Test
-    public void legacyBuildDefaultTest() throws JsonProcessingException {
+    void legacyBuildDefaultTest() throws JsonProcessingException {
         AppRole role = new AppRoleBuilder(NAME).build();
         assertThat(role.getId(), is(nullValue()));
         assertThat(role.getBindSecretId(), is(nullValue()));
@@ -123,7 +123,7 @@ public class AppRoleBuilderTest {
      * Build token without all parameters set.
      */
     @Test
-    public void buildFullTest() throws JsonProcessingException {
+    void buildFullTest() throws JsonProcessingException {
         AppRole role = AppRole.builder(NAME)
                 .withId(ID)
                 .withBindSecretID(BIND_SECRET_ID)
@@ -168,7 +168,7 @@ public class AppRoleBuilderTest {
      * Build token without all parameters set.
      */
     @Test
-    public void legacyBuildFullTest() throws JsonProcessingException {
+    void legacyBuildFullTest() throws JsonProcessingException {
         AppRole role = new AppRoleBuilder(NAME)
                 .withId(ID)
                 .withBindSecretID(BIND_SECRET_ID)
@@ -213,7 +213,7 @@ public class AppRoleBuilderTest {
      * Test convenience methods
      */
     @Test
-    public void convenienceMethodsTest() {
+    void convenienceMethodsTest() {
         /* bind_secret_id */
         AppRole role = AppRole.builder(NAME).build();
         assertThat(role.getBindSecretId(), is(nullValue()));
@@ -257,7 +257,7 @@ public class AppRoleBuilderTest {
      * Test convenience methods
      */
     @Test
-    public void legacyConvenienceMethodsTest() {
+    void legacyConvenienceMethodsTest() {
         /* bind_secret_id */
         AppRole role = new AppRoleBuilder(NAME).build();
         assertThat(role.getBindSecretId(), is(nullValue()));

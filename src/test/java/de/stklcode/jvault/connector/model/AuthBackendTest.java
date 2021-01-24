@@ -27,13 +27,13 @@ import static org.hamcrest.Matchers.is;
  * @author Stefan Kalscheuer
  * @since 0.4.0
  */
-public class AuthBackendTest {
+class AuthBackendTest {
 
     /**
      * Test forType() method.
      */
     @Test
-    public void forTypeTest() {
+    void forTypeTest() {
         assertThat(AuthBackend.forType("token"), is(AuthBackend.TOKEN));
         assertThat(AuthBackend.forType("app-id"), is(AuthBackend.APPID));
         assertThat(AuthBackend.forType("userpass"), is(AuthBackend.USERPASS));

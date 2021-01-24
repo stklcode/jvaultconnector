@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-public class AuthMethodsResponseTest {
+class AuthMethodsResponseTest {
     private static final String GH_PATH = "github/";
     private static final String GH_TYPE = "github";
     private static final String GH_DESCR = "GitHub auth";
@@ -73,7 +73,7 @@ public class AuthMethodsResponseTest {
      * Test getter, setter and get-methods for response data.
      */
     @Test
-    public void getDataRoundtrip() {
+    void getDataRoundtrip() {
         // Create empty Object.
         AuthMethodsResponse res = new AuthMethodsResponse();
         assertThat("Initial method map should be empty", res.getSupportedMethods(), is(anEmptyMap()));
@@ -91,7 +91,7 @@ public class AuthMethodsResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             AuthMethodsResponse res = new ObjectMapper().readValue(RES_JSON, AuthMethodsResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));

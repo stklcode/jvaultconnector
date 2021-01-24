@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-public class AppRoleResponseTest {
+class AppRoleResponseTest {
     private static final Integer ROLE_TOKEN_TTL = 1200;
     private static final Integer ROLE_TOKEN_MAX_TTL = 1800;
     private static final Integer ROLE_SECRET_TTL = 600;
@@ -75,7 +75,7 @@ public class AppRoleResponseTest {
      * Test getter, setter and get-methods for response data.
      */
     @Test
-    public void getDataRoundtrip() {
+    void getDataRoundtrip() {
         // Create empty Object.
         AppRoleResponse res = new AppRoleResponse();
         assertThat("Initial data should be empty", res.getRole(), is(nullValue()));
@@ -93,7 +93,7 @@ public class AppRoleResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             AppRoleResponse res = new ObjectMapper().readValue(RES_JSON, AppRoleResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));

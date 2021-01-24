@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-public class AuthResponseTest {
+class AuthResponseTest {
     private static final String AUTH_ACCESSOR = "2c84f488-2133-4ced-87b0-570f93a76830";
     private static final String AUTH_CLIENT_TOKEN = "ABCD";
     private static final String AUTH_POLICY_1 = "web";
@@ -81,7 +81,7 @@ public class AuthResponseTest {
      * Test getter, setter and get-methods for response data.
      */
     @Test
-    public void getDataRoundtrip() {
+    void getDataRoundtrip() {
         // Create empty Object.
         AuthResponse res = new AuthResponse();
         assertThat("Initial data should be empty", res.getData(), is(nullValue()));
@@ -103,7 +103,7 @@ public class AuthResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             AuthResponse res = new ObjectMapper().readValue(RES_JSON, AuthResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));

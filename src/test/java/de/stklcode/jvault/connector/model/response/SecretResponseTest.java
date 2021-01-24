@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-public class SecretResponseTest {
+class SecretResponseTest {
     private static final Map<String, Object> DATA = new HashMap<>();
     private static final String KEY_UNKNOWN = "unknown";
     private static final String KEY_STRING = "test1";
@@ -120,7 +120,7 @@ public class SecretResponseTest {
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void getDataRoundtrip() throws InvalidResponseException {
+    void getDataRoundtrip() throws InvalidResponseException {
         // Create empty Object.
         SecretResponse res = new SecretResponse();
         assertThat("Initial data should be Map", res.getData(), is(instanceOf(Map.class)));
@@ -156,7 +156,7 @@ public class SecretResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             assertSecretData(new ObjectMapper().readValue(SECRET_JSON, SecretResponse.class));
         } catch (IOException e) {

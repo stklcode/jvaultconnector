@@ -20,9 +20,6 @@ import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.agent.ByteBuddyAgent;
-import net.bytebuddy.dynamic.loading.ClassReloadingStrategy;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ContentType;
@@ -33,6 +30,7 @@ import org.apache.http.message.BasicStatusLine;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,8 +40,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
-import static net.bytebuddy.implementation.MethodDelegation.to;
-import static net.bytebuddy.matcher.ElementMatchers.named;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,45 +55,31 @@ import static org.mockito.Mockito.*;
  * @author Stefan Kalscheuer
  * @since 0.7.0
  */
-public class HTTPVaultConnectorOfflineTest {
+class HTTPVaultConnectorOfflineTest {
     private static final String INVALID_URL = "foo:/\\1nv4l1d_UrL";
 
-    private static CloseableHttpClient httpMock = mock(CloseableHttpClient.class);
-    private CloseableHttpResponse responseMock = mock(CloseableHttpResponse.class);
+    private static CloseableHttpClient httpMock;
+    private final CloseableHttpResponse responseMock = mock(CloseableHttpResponse.class);
 
     @BeforeAll
-    public static void initByteBuddy() {
-        // Install ByteBuddy Agent.
-        ByteBuddyAgent.install();
-    }
-
-    /**
-     * Helper method for redefinition of {@link HttpClientBuilder#create()} from {@link #initHttpMock()}.
-     *
-     * @return Mocked HTTP client builder.
-     */
-    public static HttpClientBuilder create() {
-        return new MockedHttpClientBuilder();
+    static void prepare() {
+        // Mock the static HTTPClient creation.
+        MockedStatic<HttpClientBuilder> hcbMock = mockStatic(HttpClientBuilder.class);
+        hcbMock.when(HttpClientBuilder::create).thenReturn(new MockedHttpClientBuilder());
     }
 
     @BeforeEach
-    public void initHttpMock() {
-        // Redefine static method to return Mock on HttpClientBuilder creation.
-        new ByteBuddy().redefine(HttpClientBuilder.class)
-                .method(named("create"))
-                .intercept(to(HTTPVaultConnectorOfflineTest.class))
-                .make()
-                .load(HttpClientBuilder.class.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
-
+    void init() {
         // Re-initialize HTTP mock to ensure fresh (empty) results.
         httpMock = mock(CloseableHttpClient.class);
     }
+
 
     /**
      * Test exceptions thrown during request.
      */
     @Test
-    public void requestExceptionTest() throws IOException {
+    void requestExceptionTest() throws IOException {
         HTTPVaultConnector connector = new HTTPVaultConnector("http://127.0.0.1", null, 0, 250);
 
         // Test invalid response code.
@@ -154,7 +136,7 @@ public class HTTPVaultConnectorOfflineTest {
      * Test constructors of the {@link HTTPVaultConnector} class.
      */
     @Test
-    public void constructorTest() throws IOException, CertificateException {
+    void constructorTest() throws IOException, CertificateException {
         final String url = "https://vault.example.net/test/";
         final String hostname = "vault.example.com";
         final Integer port = 1337;
@@ -206,7 +188,7 @@ public class HTTPVaultConnectorOfflineTest {
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    public void sealExceptionTest() throws IOException {
+    void sealExceptionTest() throws IOException {
         HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
         try {
             connector.sealStatus();
@@ -233,7 +215,7 @@ public class HTTPVaultConnectorOfflineTest {
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    public void healthExceptionTest() throws IOException {
+    void healthExceptionTest() throws IOException {
         HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
         try {
             connector.getHealth();
@@ -259,7 +241,7 @@ public class HTTPVaultConnectorOfflineTest {
      * Test behavior on unparsable responses.
      */
     @Test
-    public void parseExceptionTest() throws IOException {
+    void parseExceptionTest() throws IOException {
         HTTPVaultConnector connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
         // Mock authorization.
         setPrivate(connector, "authorized", true);
@@ -382,7 +364,7 @@ public class HTTPVaultConnectorOfflineTest {
      * Test requests that expect an empty response with code 204, but receive a 200 body.
      */
     @Test
-    public void nonEmpty204ResponseTest() throws IOException {
+    void nonEmpty204ResponseTest() throws IOException {
         HTTPVaultConnector connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
         // Mock authorization.
         setPrivate(connector, "authorized", true);
@@ -454,7 +436,7 @@ public class HTTPVaultConnectorOfflineTest {
         }
     }
 
-    private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName)  {
+    private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) {
         try {
             return getPrivate(getPrivate(connector, "request"), fieldName);
         } catch (NoSuchFieldException | IllegalAccessException e) {

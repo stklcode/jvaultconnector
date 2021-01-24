@@ -29,19 +29,19 @@ import static org.hamcrest.core.Is.is;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-public class VaultConnectorExceptionTest {
+class VaultConnectorExceptionTest {
     private static final String MSG = "This is a test exception!";
     private static final Throwable CAUSE = new Exception("Test-Cause");
     private static final Integer STATUS_CODE = 1337;
     private static final String RESPONSE = "Dummy response";
 
     @Test
-    public void authorizationRequiredExceptionTest() {
+    void authorizationRequiredExceptionTest() {
         assertEmptyConstructor(new AuthorizationRequiredException());
     }
 
     @Test
-    public void connectionExceptionTest() {
+    void connectionExceptionTest() {
         assertEmptyConstructor(new ConnectionException());
         assertMsgConstructor(new ConnectionException(MSG));
         assertCauseConstructor(new ConnectionException(CAUSE));
@@ -49,7 +49,7 @@ public class VaultConnectorExceptionTest {
     }
 
     @Test
-    public void invalidRequestExceptionTest() {
+    void invalidRequestExceptionTest() {
         assertEmptyConstructor(new InvalidRequestException());
         assertMsgConstructor(new InvalidRequestException(MSG));
         assertCauseConstructor(new InvalidRequestException(CAUSE));
@@ -57,7 +57,7 @@ public class VaultConnectorExceptionTest {
     }
 
     @Test
-    public void invalidResponseExceptionTest() {
+    void invalidResponseExceptionTest() {
         assertEmptyConstructor(new InvalidResponseException());
         assertMsgConstructor(new InvalidResponseException(MSG));
         assertCauseConstructor(new InvalidResponseException(CAUSE));
@@ -93,7 +93,7 @@ public class VaultConnectorExceptionTest {
     }
 
     @Test
-    public void permissionDeniedExceptionTest() {
+    void permissionDeniedExceptionTest() {
         // Default message overwritten.
         PermissionDeniedException e = new PermissionDeniedException();
         assertThat(e, is(instanceOf(VaultConnectorException.class)));
@@ -108,7 +108,7 @@ public class VaultConnectorExceptionTest {
     }
 
     @Test
-    public void tlsExceptionTest() {
+    void tlsExceptionTest() {
         assertEmptyConstructor(new TlsException());
         assertMsgConstructor(new TlsException(MSG));
         assertCauseConstructor(new TlsException(CAUSE));

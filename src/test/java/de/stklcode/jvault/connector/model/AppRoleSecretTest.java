@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Stefan Kalscheuer
  * @since 0.5.0
  */
-public class AppRoleSecretTest {
+class AppRoleSecretTest {
 
     private static final String TEST_ID = "abc123";
     private static final Map<String, Object> TEST_META = new HashMap<>();
@@ -54,7 +54,7 @@ public class AppRoleSecretTest {
      * Test constructors.
      */
     @Test
-    public void constructorTest() {
+    void constructorTest() {
         /* Empty constructor */
         AppRoleSecret secret = new AppRoleSecret();
         assertThat(secret.getId(), is(nullValue()));
@@ -99,7 +99,7 @@ public class AppRoleSecretTest {
      * Test setter.
      */
     @Test
-    public void setterTest() {
+    void setterTest() {
         AppRoleSecret secret = new AppRoleSecret(TEST_ID);
         assertThat(secret.getCidrList(), is(nullValue()));
         assertThat(secret.getCidrListString(), is(emptyString()));
@@ -115,7 +115,7 @@ public class AppRoleSecretTest {
      * Test JSON (de)serialization.
      */
     @Test
-    public void jsonTest() throws NoSuchFieldException, IllegalAccessException {
+    void jsonTest() throws NoSuchFieldException, IllegalAccessException {
         ObjectMapper mapper = new ObjectMapper();
 
         /* A simple roundtrip first. All set fields should be present afterwards. */

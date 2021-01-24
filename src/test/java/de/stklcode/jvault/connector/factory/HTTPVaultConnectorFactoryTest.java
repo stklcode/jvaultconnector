@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.6.0
  */
-public class HTTPVaultConnectorFactoryTest {
+class HTTPVaultConnectorFactoryTest {
     private static String VAULT_ADDR = "https://localhost:8201";
     private static Integer VAULT_MAX_RETRIES = 13;
     private static String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";
@@ -50,7 +50,7 @@ public class HTTPVaultConnectorFactoryTest {
      * Test building from environment variables
      */
     @Test
-    public void testFromEnv() throws NoSuchFieldException, IllegalAccessException, IOException {
+    void testFromEnv() throws NoSuchFieldException, IllegalAccessException, IOException {
         /* Provide address only should be enough */
         setenv(VAULT_ADDR, null, null, null);
 

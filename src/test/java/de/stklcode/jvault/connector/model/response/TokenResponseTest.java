@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-public class TokenResponseTest {
+class TokenResponseTest {
     private static final Integer TOKEN_CREATION_TIME = 1457533232;
     private static final Integer TOKEN_TTL = 2764800;
     private static final Integer TOKEN_EXPLICIT_MAX_TTL = 0;
@@ -101,7 +101,7 @@ public class TokenResponseTest {
      * Test getter, setter and get-methods for response data.
      */
     @Test
-    public void getDataRoundtrip() {
+    void getDataRoundtrip() {
         // Create empty Object.
         TokenResponse res = new TokenResponse();
         assertThat("Initial data should be empty", res.getData(), is(nullValue()));
@@ -119,7 +119,7 @@ public class TokenResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             TokenResponse res = new ObjectMapper().readValue(RES_JSON, TokenResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));

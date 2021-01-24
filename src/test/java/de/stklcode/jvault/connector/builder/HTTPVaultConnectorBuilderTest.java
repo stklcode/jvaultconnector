@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.8.0
  */
-public class HTTPVaultConnectorBuilderTest {
+class HTTPVaultConnectorBuilderTest {
     private static final String VAULT_ADDR = "https://localhost:8201";
     private static final Integer VAULT_MAX_RETRIES = 13;
     private static final String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";

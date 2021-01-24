@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-public class SealResponseTest {
+class SealResponseTest {
     private static final String TYPE = "shamir";
     private static final Integer THRESHOLD = 3;
     private static final Integer SHARES = 5;
@@ -70,7 +70,7 @@ public class SealResponseTest {
      * Test creation from JSON value as returned by Vault when sealed (JSON example close to Vault documentation).
      */
     @Test
-    public void jsonRoundtripSealed() {
+    void jsonRoundtripSealed() {
         // First test sealed Vault's response.
         try {
             SealResponse res = new ObjectMapper().readValue(RES_SEALED, SealResponse.class);

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-public class MetadataResponseTest {
+class MetadataResponseTest {
     private static final String V1_TIME = "2018-03-22T02:24:06.945319214Z";
     private static final String V3_TIME = "2018-03-22T02:36:43.986212308Z";
     private static final String V2_TIME = "2018-03-22T02:36:33.954880664Z";
@@ -73,7 +73,7 @@ public class MetadataResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             MetadataResponse res = new ObjectMapper().readValue(META_JSON, MetadataResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));

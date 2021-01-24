@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-public class SecretListResponseTest {
+class SecretListResponseTest {
     private static final Map<String, Object> DATA = new HashMap<>();
     private static final String KEY1 = "key1";
     private static final String KEY2 = "key-2";
@@ -50,7 +50,7 @@ public class SecretListResponseTest {
      * @throws InvalidResponseException Should not occur
      */
     @Test
-    public void getKeysTest() throws InvalidResponseException {
+    void getKeysTest() throws InvalidResponseException {
         // Create empty Object.
         SecretListResponse res = new SecretListResponse();
         assertThat("Keys should be null without initialization", res.getKeys(), is(nullValue()));

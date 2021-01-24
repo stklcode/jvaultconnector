@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Stefan Kalscheuer
  * @since 0.7.0
  */
-public class HealthResponseTest {
+class HealthResponseTest {
     private static final String CLUSTER_ID = "c9abceea-4f46-4dab-a688-5ce55f89e228";
     private static final String CLUSTER_NAME = "vault-cluster-5515c810";
     private static final String VERSION = "0.9.2";
@@ -60,7 +60,7 @@ public class HealthResponseTest {
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
-    public void jsonRoundtrip() {
+    void jsonRoundtrip() {
         try {
             HealthResponse res = new ObjectMapper().readValue(RES_JSON, HealthResponse.class);
             assertThat("Parsed response is NULL", res, is(notNullValue()));
