@@ -1,3 +1,13 @@
+## unreleased
+
+### Breaking
+* Requires Java 11 or later
+
+### Improvements
+* Use pre-sized map objects for fixed-size payloads
+* Remove Apache HTTP Client dependency in favor of Java 11 HTTP
+
+
 ## 0.9.3 (2021-04-02)
 
 ### Improvements
