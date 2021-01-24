@@ -3,6 +3,9 @@
 ### Fixes
 * Only initialize custom trust managers, if CA certificate is actually provided (#43)
 
+### Improvements
+* Minor dependency updates
+
 ## 0.9.1 (2021-01-03)
 
 ### Improvements
