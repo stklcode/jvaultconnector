@@ -29,6 +29,7 @@ final class Error {
     static final String URI_FORMAT = "Invalid URI format";
     static final String RESPONSE_CODE = "Invalid response code";
     static final String INIT_SSL_CONTEXT = "Unable to initialize SSLContext";
+    static final String CONNECTION = "Unable to connect to Vault server";
 
     /**
      * Constructor hidden, this class should not be instantiated.
