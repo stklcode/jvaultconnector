@@ -367,18 +367,22 @@ public final class RequestHelper implements Serializable {
      */
     private SSLConnectionSocketFactory createSSLSocketFactory() throws TlsException {
         try {
-            // Create Keystore with trusted certificate.
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("trustedCert", trustedCaCert);
-
-            // Initialize TrustManager.
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keyStore);
-
-            // Create context using this TrustManager.
+            // Create context..
             SSLContext context = SSLContext.getInstance(tlsVersion);
-            context.init(null, tmf.getTrustManagers(), new SecureRandom());
+
+            if (trustedCaCert != null) {
+                // Create Keystore with trusted certificate.
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                keyStore.load(null, null);
+                keyStore.setCertificateEntry("trustedCert", trustedCaCert);
+
+                // Initialize TrustManager.
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(keyStore);
+                context.init(null, tmf.getTrustManagers(), null);
+            } else {
+                context.init(null, null, null);
+            }
 
             return new SSLConnectionSocketFactory(
                     context,
