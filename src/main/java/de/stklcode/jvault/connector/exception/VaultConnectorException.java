@@ -26,7 +26,7 @@ public abstract class VaultConnectorException extends Exception {
     /**
      * Constructs a new empty exception.
      */
-    public VaultConnectorException() {
+    protected VaultConnectorException() {
     }
 
     /**
@@ -34,7 +34,7 @@ public abstract class VaultConnectorException extends Exception {
      *
      * @param message the detail message
      */
-    public VaultConnectorException(final String message) {
+    protected VaultConnectorException(final String message) {
         super(message);
     }
 
@@ -43,7 +43,7 @@ public abstract class VaultConnectorException extends Exception {
      *
      * @param cause the cause
      */
-    public VaultConnectorException(final Throwable cause) {
+    protected VaultConnectorException(final Throwable cause) {
         super(cause);
     }
 
@@ -53,7 +53,7 @@ public abstract class VaultConnectorException extends Exception {
      * @param message the detail message
      * @param cause   the cause
      */
-    public VaultConnectorException(final String message, final Throwable cause) {
+    protected VaultConnectorException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }
