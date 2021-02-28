@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Collections.singletonMap;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -140,68 +141,61 @@ class HTTPVaultConnectorTest {
             /* Try to read path user has no permission to read */
             SecretResponse res = null;
             final String invalidPath = "invalid/path";
-            try {
-                res = connector.readSecret(invalidPath);
-                fail("Invalid secret path successfully read.");
-            } catch (VaultConnectorException e) {
-                assertThat(e, instanceOf(PermissionDeniedException.class));
-                /* Assert that the exception does not reveal secret or credentials */
-                assertThat(stackTrace(e), not(stringContainsInOrder(invalidPath)));
-                assertThat(stackTrace(e), not(stringContainsInOrder(USER_VALID)));
-                assertThat(stackTrace(e), not(stringContainsInOrder(PASS_VALID)));
-                assertThat(stackTrace(e), not(matchesPattern("[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}")));
-            }
+
+            VaultConnectorException e = assertThrows(
+                    PermissionDeniedException.class,
+                    () -> connector.readSecret(invalidPath),
+                    "Invalid secret path should raise an exception"
+            );
+
+            /* Assert that the exception does not reveal secret or credentials */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidPath)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(USER_VALID)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(PASS_VALID)));
+            assertThat(stackTrace(e), not(matchesPattern("[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}")));
 
             /* Try to read accessible path with known value */
-            try {
-                res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY);
-                assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET_VALUE));
-            } catch (VaultConnectorException e) {
-                fail("Valid secret path could not be read: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY),
+                    "Valid secret path could not be read"
+            );
+            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET_VALUE));
 
             /* Try to read accessible path with JSON value */
-            try {
-                res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON);
-                assertThat("Known secret returned null value.", res.getValue(), notNullValue());
-            } catch (VaultConnectorException e) {
-                fail("Valid secret path could not be read: " + e.getMessage());
-            }
-            try {
-                Credentials parsedRes = res.getValue(Credentials.class);
-                assertThat("JSON response was null", parsedRes, notNullValue());
-                assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
-                assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
-            } catch (InvalidResponseException e) {
-                fail("JSON response could not be parsed: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON),
+                    "Valid secret path could not be read"
+            );
+            assertThat("Known secret returned null value.", res.getValue(), notNullValue());
+
+            SecretResponse finalRes = res;
+            Credentials parsedRes = assertDoesNotThrow(() -> finalRes.getValue(Credentials.class), "JSON response could not be parsed");
+            assertThat("JSON response was null", parsedRes, notNullValue());
+            assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
+            assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
 
             /* Try to read accessible path with JSON value */
-            try {
-                res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON);
-                assertThat("Known secret returned null value.", res.getValue(), notNullValue());
-            } catch (VaultConnectorException e) {
-                fail("Valid secret path could not be read: " + e.getMessage());
-            }
-            try {
-                Credentials parsedRes = res.getValue(Credentials.class);
-                assertThat("JSON response was null", parsedRes, notNullValue());
-                assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
-                assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
-            } catch (InvalidResponseException e) {
-                fail("JSON response could not be parsed: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON),
+                    "Valid secret path could not be read"
+            );
+            assertThat("Known secret returned null value.", res.getValue(), notNullValue());
+
+            SecretResponse finalRes1 = res;
+            parsedRes = assertDoesNotThrow(() -> finalRes1.getValue(Credentials.class), "JSON response could not be parsed");
+            assertThat("JSON response was null", parsedRes, notNullValue());
+            assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
+            assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
 
             /* Try to read accessible complex secret */
-            try {
-                res = connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_COMPLEX);
-                assertThat("Known secret returned null value.", res.getData(), notNullValue());
-                assertThat("Unexpected value size", res.getData().keySet(), hasSize(2));
-                assertThat("Unexpected value", res.get("key1"), is("value1"));
-                assertThat("Unexpected value", res.get("key2"), is("value2"));
-            } catch (VaultConnectorException e) {
-                fail("Valid secret path could not be read: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_COMPLEX),
+                    "Valid secret path could not be read"
+            );
+            assertThat("Known secret returned null value.", res.getData(), notNullValue());
+            assertThat("Unexpected value size", res.getData().keySet(), hasSize(2));
+            assertThat("Unexpected value", res.get("key1"), is("value1"));
+            assertThat("Unexpected value", res.get("key2"), is("value2"));
         }
 
         /**
@@ -214,13 +208,12 @@ class HTTPVaultConnectorTest {
             authRoot();
             assumeTrue(connector.isAuthorized());
             /* Try to list secrets from valid path */
-            try {
-                List<String> secrets = connector.listSecrets(SECRET_PATH);
-                assertThat("Invalid nmber of secrets.", secrets.size(), greaterThan(0));
-                assertThat("Known secret key not found", secrets, hasItem(SECRET_KEY));
-            } catch (VaultConnectorException e) {
-                fail("Secrets could not be listed: " + e.getMessage());
-            }
+            List<String> secrets = assertDoesNotThrow(
+                    () -> connector.listSecrets(SECRET_PATH),
+                    "Secrets could not be listed"
+            );
+            assertThat("Invalid nmber of secrets.", secrets.size(), greaterThan(0));
+            assertThat("Known secret key not found", secrets, hasItem(SECRET_KEY));
         }
 
         /**
@@ -235,38 +228,36 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             /* Try to write to null path */
-            try {
-                connector.writeSecret(null, "someValue");
-                fail("Secret written to null path.");
-            } catch (VaultConnectorException e) {
-                assertThat(e, instanceOf(InvalidRequestException.class));
-            }
+            assertThrows(
+                    InvalidRequestException.class,
+                    () -> connector.writeSecret(null, "someValue"),
+                    "Secret written to null path."
+            );
+
             /* Try to write to invalid path */
-            try {
-                connector.writeSecret("", "someValue");
-                fail("Secret written to invalid path.");
-            } catch (VaultConnectorException e) {
-                assertThat(e, instanceOf(InvalidRequestException.class));
-            }
+            assertThrows(
+                    InvalidRequestException.class,
+                    () -> connector.writeSecret("", "someValue"),
+                    "Secret written to invalid path."
+            );
+
             /* Try to write to a path the user has no access for */
-            try {
-                connector.writeSecret("invalid/path", "someValue");
-                fail("Secret written to inaccessible path.");
-            } catch (VaultConnectorException e) {
-                assertThat(e, instanceOf(PermissionDeniedException.class));
-            }
+            assertThrows(
+                    PermissionDeniedException.class,
+                    () -> connector.writeSecret("invalid/path", "someValue"),
+                    "Secret written to inaccessible path."
+            );
+
             /* Perform a valid write/read roundtrip to valid path. Also check UTF8-encoding. */
-            try {
-                connector.writeSecret(SECRET_PATH + "/temp", "Abc123äöü,!");
-            } catch (VaultConnectorException e) {
-                fail("Secret written to inaccessible path.");
-            }
-            try {
-                SecretResponse res = connector.readSecret(SECRET_PATH + "/temp");
-                assertThat(res.getValue(), is("Abc123äöü,!"));
-            } catch (VaultConnectorException e) {
-                fail("Written secret could not be read.");
-            }
+            assertDoesNotThrow(
+                    () -> connector.writeSecret(SECRET_PATH + "/temp", "Abc123äöü,!"),
+                    "Failed to write secret to accessible path."
+            );
+            SecretResponse res = assertDoesNotThrow(
+                    () -> connector.readSecret(SECRET_PATH + "/temp"),
+                    "Written secret could not be read."
+            );
+            assertThat(res.getValue(), is("Abc123äöü,!"));
         }
 
         /**
@@ -280,34 +271,29 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             /* Write a test secret to vault */
-            try {
-                connector.writeSecret(SECRET_PATH + "/toDelete", "secret content");
-            } catch (VaultConnectorException e) {
-                fail("Secret written to inaccessible path.");
-            }
-            SecretResponse res = null;
-            try {
-                res = connector.readSecret(SECRET_PATH + "/toDelete");
-            } catch (VaultConnectorException e) {
-                fail("Written secret could not be read.");
-            }
+            assertDoesNotThrow(
+                    () -> connector.writeSecret(SECRET_PATH + "/toDelete", "secret content"),
+                    "Secret written to inaccessible path."
+            );
+            SecretResponse res = assertDoesNotThrow(
+                    () -> connector.readSecret(SECRET_PATH + "/toDelete"),
+                    "Written secret could not be read."
+            );
             assumeTrue(res != null);
 
             /* Delete secret */
-            try {
-                connector.deleteSecret(SECRET_PATH + "/toDelete");
-            } catch (VaultConnectorException e) {
-                fail("Revocation threw unexpected exception.");
-            }
+            assertDoesNotThrow(
+                    () -> connector.deleteSecret(SECRET_PATH + "/toDelete"),
+                    "Revocation threw unexpected exception."
+            );
 
             /* Try to read again */
-            try {
-                connector.readSecret(SECRET_PATH + "/toDelete");
-                fail("Successfully read deleted secret.");
-            } catch (VaultConnectorException e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-                assertThat(((InvalidResponseException) e).getStatusCode(), is(404));
-            }
+            InvalidResponseException e = assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.readSecret(SECRET_PATH + "/toDelete"),
+                    "Successfully read deleted secret."
+            );
+            assertThat(e.getStatusCode(), is(404));
         }
 
         /**
@@ -321,25 +307,21 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             /* Write a test secret to vault */
-            try {
-                connector.writeSecret(SECRET_PATH + "/toRevoke", "secret content");
-            } catch (VaultConnectorException e) {
-                fail("Secret written to inaccessible path.");
-            }
-            SecretResponse res = null;
-            try {
-                res = connector.readSecret(SECRET_PATH + "/toRevoke");
-            } catch (VaultConnectorException e) {
-                fail("Written secret could not be read.");
-            }
+            assertDoesNotThrow(
+                    () -> connector.writeSecret(SECRET_PATH + "/toRevoke", "secret content"),
+                    "Secret written to inaccessible path."
+            );
+            SecretResponse res = assertDoesNotThrow(
+                    () -> connector.readSecret(SECRET_PATH + "/toRevoke"),
+                    "Written secret could not be read."
+            );
             assumeTrue(res != null);
 
             /* Revoke secret */
-            try {
-                connector.revoke(SECRET_PATH + "/toRevoke");
-            } catch (VaultConnectorException e) {
-                fail("Revocation threw unexpected exception.");
-            }
+            assertDoesNotThrow(
+                    () -> connector.revoke(SECRET_PATH + "/toRevoke"),
+                    "Revocation threw unexpected exception."
+            );
         }
     }
 
@@ -366,24 +348,21 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             // Try to read accessible path with known value.
-            SecretResponse res;
-            try {
-                res = connector.readSecretData(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Metadata not populated for KV v2 secret", res.getMetadata(), is(notNullValue()));
-                assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(2));
-                assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE2));
-            } catch (VaultConnectorException e) {
-                fail("Valid secret path could not be read: " + e.getMessage());
-            }
+            SecretResponse res = assertDoesNotThrow(
+                    () -> connector.readSecretData(MOUNT_KV2, SECRET2_KEY),
+                    "Valid secret path could not be read."
+            );
+            assertThat("Metadata not populated for KV v2 secret", res.getMetadata(), is(notNullValue()));
+            assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(2));
+            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE2));
 
             // Try to read different version of same secret.
-            try {
-                res = connector.readSecretVersion(MOUNT_KV2, SECRET2_KEY, 1);
-                assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(1));
-                assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE1));
-            } catch (VaultConnectorException e) {
-                fail("Valid secret version could not be read: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.readSecretVersion(MOUNT_KV2, SECRET2_KEY, 1),
+                    "Valid secret version could not be read."
+            );
+            assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(1));
+            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE1));
         }
 
         /**
@@ -397,51 +376,40 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             // First get the current version of the secret.
-            int currentVersion = -1;
-            try {
-                MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                currentVersion = res.getMetadata().getCurrentVersion();
-            } catch (VaultConnectorException e) {
-                fail("Reading secret metadata failed: " + e.getMessage());
-            }
+            MetadataResponse res = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading secret metadata failed."
+            );
+            int currentVersion = res.getMetadata().getCurrentVersion();
 
             // Now write (update) the data and verify the version.
-            try {
-                Map<String, Object> data = new HashMap<>();
-                data.put("value", SECRET2_VALUE3);
-                SecretVersionResponse res = connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data);
-                assertThat("Version not updated after writing secret", res.getMetadata().getVersion(), is(currentVersion + 1));
-                currentVersion = res.getMetadata().getVersion();
-            } catch (VaultConnectorException e) {
-                fail("Writing secret to KV v2 store failed: " + e.getMessage());
-            }
+            Map<String, Object> data = new HashMap<>();
+            data.put("value", SECRET2_VALUE3);
+            SecretVersionResponse res2 = assertDoesNotThrow(
+                    () -> connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data),
+                    "Writing secret to KV v2 store failed."
+            );
+            assertThat("Version not updated after writing secret", res2.getMetadata().getVersion(), is(currentVersion + 1));
+            int currentVersion2 = res2.getMetadata().getVersion();
 
             // Verify the content.
-            try {
-                SecretResponse res = connector.readSecretData(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Data not updated correctly", res.getValue(), is(SECRET2_VALUE3));
-            } catch (VaultConnectorException e) {
-                fail("Reading secret from KV v2 store failed: " + e.getMessage());
-            }
+            SecretResponse res3 = assertDoesNotThrow(
+                    () -> connector.readSecretData(MOUNT_KV2, SECRET2_KEY),
+                    "Reading secret from KV v2 store failed."
+            );
+            assertThat("Data not updated correctly", res3.getValue(), is(SECRET2_VALUE3));
 
             // Now try with explicit CAS value (invalid).
-            try {
-                Map<String, Object> data = new HashMap<>();
-                data.put("value", SECRET2_VALUE4);
-                SecretVersionResponse res = connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data, currentVersion - 1);
-                fail("Writing secret to KV v2 with invalid CAS value succeeded");
-            } catch (VaultConnectorException e) {
-                assertThat("Unexpected exception", e, is(instanceOf(InvalidResponseException.class)));
-            }
+            Map<String, Object> data4 = singletonMap("value", SECRET2_VALUE4);
+            assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data4, currentVersion2 - 1),
+                    "Writing secret to KV v2 with invalid CAS value succeeded"
+            );
 
             // And finally with a correct CAS value.
-            try {
-                Map<String, Object> data = new HashMap<>();
-                data.put("value", SECRET2_VALUE4);
-                SecretVersionResponse res = connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data, currentVersion);
-            } catch (VaultConnectorException e) {
-                fail("Writing secret to KV v2 with correct CAS value failed: " + e.getMessage());
-            }
+            Map<String, Object> data5 = singletonMap("value", SECRET2_VALUE4);
+            assertDoesNotThrow(() -> connector.writeSecretData(MOUNT_KV2, SECRET2_KEY, data5, currentVersion2));
         }
 
         /**
@@ -455,30 +423,25 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             // Read current metadata first.
-            Integer maxVersions = -1;
-            try {
-                MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                maxVersions = res.getMetadata().getMaxVersions();
-                assumeTrue(res.getMetadata().getMaxVersions() == 10, "Unexpected maximum number of versions");
-            } catch (VaultConnectorException e) {
-                fail("Reading secret metadata failed: " + e.getMessage());
-            }
+            MetadataResponse res = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading secret metadata failed."
+            );
+            Integer maxVersions = res.getMetadata().getMaxVersions();
+            assumeTrue(10 == res.getMetadata().getMaxVersions(), "Unexpected maximum number of versions");
 
             // Now update the metadata.
-            try {
-                ++maxVersions;
-                connector.updateSecretMetadata(MOUNT_KV2, SECRET2_KEY, maxVersions, true);
-            } catch (VaultConnectorException e) {
-                fail("Updating secret metadata failed: " + e.getMessage());
-            }
+            assertDoesNotThrow(
+                    () -> connector.updateSecretMetadata(MOUNT_KV2, SECRET2_KEY, maxVersions + 1, true),
+                    "Updating secret metadata failed."
+            );
 
             // And verify the result.
-            try {
-                MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(maxVersions));
-            } catch (VaultConnectorException e) {
-                fail("Reading secret metadata failed: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading secret metadata failed."
+            );
+            assertThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(maxVersions + 1));
         }
 
         /**
@@ -492,17 +455,16 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             // Try to read accessible path with known value.
-            try {
-                MetadataResponse res = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Metadata not populated for KV v2 secret", res.getMetadata(), is(notNullValue()));
-                assertThat("Unexpected secret version", res.getMetadata().getCurrentVersion(), is(2));
-                assertThat("Unexpected number of secret versions", res.getMetadata().getVersions().size(), is(2));
-                assertThat("Creation date should be present", res.getMetadata().getCreatedTime(), is(notNullValue()));
-                assertThat("Update date should be present", res.getMetadata().getUpdatedTime(), is(notNullValue()));
-                assertThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(10));
-            } catch (VaultConnectorException e) {
-                fail("Valid secret path could not be read: " + e.getMessage());
-            }
+            MetadataResponse res = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Valid secret path could not be read."
+            );
+            assertThat("Metadata not populated for KV v2 secret", res.getMetadata(), is(notNullValue()));
+            assertThat("Unexpected secret version", res.getMetadata().getCurrentVersion(), is(2));
+            assertThat("Unexpected number of secret versions", res.getMetadata().getVersions().size(), is(2));
+            assertThat("Creation date should be present", res.getMetadata().getCreatedTime(), is(notNullValue()));
+            assertThat("Update date should be present", res.getMetadata().getUpdatedTime(), is(notNullValue()));
+            assertThat("Unexpected maximum number of versions", res.getMetadata().getMaxVersions(), is(10));
         }
 
         /**
@@ -515,63 +477,86 @@ class HTTPVaultConnectorTest {
             authUser();
             assumeTrue(connector.isAuthorized());
 
-            // Try to delete inexisting versions.
-            MetadataResponse meta;
-            try {
-                connector.deleteSecretVersions(MOUNT_KV2, SECRET2_KEY, 5, 42);
-                meta = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-            } catch (VaultConnectorException e) {
-                fail("Revealed non-existence of secret versions");
-            }
+            // Try to delete non-existing versions.
+            assertDoesNotThrow(
+                    () -> connector.deleteSecretVersions(MOUNT_KV2, SECRET2_KEY, 5, 42),
+                    "Revealed non-existence of secret versions"
+            );
+            assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Revealed non-existence of secret versions"
+            );
 
             // Now delete existing version and verify.
-            try {
-                connector.deleteSecretVersions(MOUNT_KV2, SECRET2_KEY, 1);
-                meta = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Expected deletion time for secret 1", meta.getMetadata().getVersions().get(1).getDeletionTime(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Deleting existing version failed");
-            }
+            assertDoesNotThrow(
+                    () -> connector.deleteSecretVersions(MOUNT_KV2, SECRET2_KEY, 1),
+                    "Deleting existing version failed"
+            );
+            MetadataResponse meta = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading deleted secret metadata failed"
+            );
+            assertThat(
+                    "Expected deletion time for secret 1",
+                    meta.getMetadata().getVersions().get(1).getDeletionTime(),
+                    is(notNullValue())
+            );
 
             // Undelete the just deleted version.
-            try {
-                connector.undeleteSecretVersions(MOUNT_KV2, SECRET2_KEY, 1);
-                meta = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Expected deletion time for secret 1 to be reset", meta.getMetadata().getVersions().get(1).getDeletionTime(), is(nullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Undeleting existing version failed");
-            }
+            assertDoesNotThrow(
+                    () -> connector.undeleteSecretVersions(MOUNT_KV2, SECRET2_KEY, 1),
+                    "Undeleting existing version failed"
+            );
+            meta = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading deleted secret metadata failed"
+            );
+            assertThat(
+                    "Expected deletion time for secret 1 to be reset",
+                    meta.getMetadata().getVersions().get(1).getDeletionTime(),
+                    is(nullValue())
+            );
 
             // Now destroy it.
-            try {
-                connector.destroySecretVersions(MOUNT_KV2, SECRET2_KEY, 1);
-                meta = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Expected secret 1 to be marked destroyed", meta.getMetadata().getVersions().get(1).isDestroyed(), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Destroying existing version failed");
-            }
+            assertDoesNotThrow(
+                    () -> connector.destroySecretVersions(MOUNT_KV2, SECRET2_KEY, 1),
+                    "Destroying existing version failed"
+            );
+            meta = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading destroyed secret metadata failed"
+            );
+            assertThat(
+                    "Expected secret 1 to be marked destroyed",
+                    meta.getMetadata().getVersions().get(1).isDestroyed(),
+                    is(true)
+            );
 
             // Delete latest version.
-            try {
-                connector.deleteLatestSecretVersion(MOUNT_KV2, SECRET2_KEY);
-                meta = connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                assertThat("Expected secret 2 to be deleted", meta.getMetadata().getVersions().get(2).getDeletionTime(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Deleting latest version failed");
-            }
+            assertDoesNotThrow(
+                    () -> connector.deleteLatestSecretVersion(MOUNT_KV2, SECRET2_KEY),
+                    "Deleting latest version failed"
+            );
+            meta = assertDoesNotThrow(
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading deleted secret metadata failed"
+            );
+            assertThat(
+                    "Expected secret 2 to be deleted",
+                    meta.getMetadata().getVersions().get(2).getDeletionTime(),
+                    is(notNullValue())
+            );
 
             // Delete all versions.
-            try {
-                connector.deleteAllSecretVersions(MOUNT_KV2, SECRET2_KEY);
-            } catch (VaultConnectorException e) {
-                fail("Deleting latest version failed: " + e.getMessage());
-            }
-            try {
-                connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY);
-                fail("Reading metadata of deleted secret should not succeed");
-            } catch (Exception e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-            }
+            assertDoesNotThrow(
+                    () -> connector.deleteAllSecretVersions(MOUNT_KV2, SECRET2_KEY),
+                    "Deleting latest version failed"
+            );
+            assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.readSecretMetadata(MOUNT_KV2, SECRET2_KEY),
+                    "Reading metadata of deleted secret should not succeed"
+            );
         }
     }
 
@@ -592,18 +577,16 @@ class HTTPVaultConnectorTest {
             /* Try unauthorized access first. */
             assumeFalse(connector.isAuthorized());
 
-            try {
-                connector.registerAppId("", "", "");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-            try {
-                connector.registerUserId("", "");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
+            assertThrows(
+                    AuthorizationRequiredException.class,
+                    () -> connector.registerAppId("", "", ""),
+                    "Expected exception not thrown"
+            );
+            assertThrows(
+                    AuthorizationRequiredException.class,
+                    () -> connector.registerUserId("", ""),
+                    "Expected exception not thrown"
+            );
         }
 
         /**
@@ -619,31 +602,28 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             /* Register App-ID */
-            try {
-                boolean res = connector.registerAppId(APP_ID, "user", "App Name");
-                assertThat("Failed to register App-ID", res, is(true));
-            } catch (VaultConnectorException e) {
-                fail("Failed to register App-ID: " + e.getMessage());
-            }
+            boolean res = assertDoesNotThrow(
+                    () -> connector.registerAppId(APP_ID, "user", "App Name"),
+                    "Failed to register App-ID"
+            );
+            assertThat("Failed to register App-ID", res, is(true));
 
             /* Register User-ID */
-            try {
-                boolean res = connector.registerUserId(APP_ID, USER_ID);
-                assertThat("Failed to register App-ID", res, is(true));
-            } catch (VaultConnectorException e) {
-                fail("Failed to register App-ID: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.registerUserId(APP_ID, USER_ID),
+                    "Failed to register App-ID"
+            );
+            assertThat("Failed to register App-ID", res, is(true));
 
             connector.resetAuth();
             assumeFalse(connector.isAuthorized());
 
             /* Authenticate with created credentials */
-            try {
-                AuthResponse res = connector.authAppId(APP_ID, USER_ID);
-                assertThat("Authorization flag not set after App-ID login.", connector.isAuthorized(), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Failed to authenticate using App-ID: " + e.getMessage());
-            }
+            AuthResponse resp = assertDoesNotThrow(
+                    () -> connector.authAppId(APP_ID, USER_ID),
+                    "Failed to authenticate using App-ID"
+            );
+            assertThat("Authorization flag not set after App-ID login.", connector.isAuthorized(), is(true));
         }
     }
 
@@ -668,54 +648,49 @@ class HTTPVaultConnectorTest {
             assumeFalse(connector.isAuthorized());
 
             /* Authenticate with correct credentials */
-            try {
-                AuthResponse res = connector.authAppRole(APPROLE_ROLE, APPROLE_SECRET);
-                assertThat("Authorization flag not set after AppRole login.", connector.isAuthorized(), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Failed to authenticate using AppRole: " + e.getMessage());
-            }
+            assertDoesNotThrow(
+                    () -> connector.authAppRole(APPROLE_ROLE, APPROLE_SECRET),
+                    "Failed to authenticate using AppRole."
+            );
+            assertThat("Authorization flag not set after AppRole login.", connector.isAuthorized(), is(true));
 
             /* Authenticate with valid secret ID against unknown role */
             final String invalidRole = "foo";
-            try {
-                connector.authAppRole(invalidRole, APPROLE_SECRET);
-                fail("Successfully logged in with unknown role");
-            } catch (VaultConnectorException e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-                /* Assert that the exception does not reveal role ID or secret */
-                assertThat(stackTrace(e), not(stringContainsInOrder(invalidRole)));
-                assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_SECRET)));
-            }
+            InvalidResponseException e = assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.authAppRole(invalidRole, APPROLE_SECRET),
+                    "Successfully logged in with unknown role"
+            );
+            /* Assert that the exception does not reveal role ID or secret */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidRole)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_SECRET)));
 
             /* Authenticate without wrong secret ID */
             final String invalidSecret = "foo";
-            try {
-                AuthResponse res = connector.authAppRole(APPROLE_ROLE, "foo");
-                fail("Successfully logged in without secret ID");
-            } catch (VaultConnectorException e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-                /* Assert that the exception does not reveal role ID or secret */
-                assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_ROLE)));
-                assertThat(stackTrace(e), not(stringContainsInOrder(invalidSecret)));
-            }
+            e = assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.authAppRole(APPROLE_ROLE, "foo"),
+                    "Successfully logged in without secret ID"
+            );
+            /* Assert that the exception does not reveal role ID or secret */
+            assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_ROLE)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidSecret)));
 
             /* Authenticate without secret ID */
-            try {
-                AuthResponse res = connector.authAppRole(APPROLE_ROLE);
-                fail("Successfully logged in without secret ID");
-            } catch (VaultConnectorException e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-                /* Assert that the exception does not reveal role ID */
-                assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_ROLE)));
-            }
+            e = assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.authAppRole(APPROLE_ROLE),
+                    "Successfully logged in without secret ID"
+            );
+            /* Assert that the exception does not reveal role ID */
+            assertThat(stackTrace(e), not(stringContainsInOrder(APPROLE_ROLE)));
 
             /* Authenticate with secret ID on role with CIDR whitelist */
-            try {
-                AuthResponse res = connector.authAppRole(APPROLE_ROLE2, APPROLE_SECRET);
-                assertThat("Authorization flag not set after AppRole login.", connector.isAuthorized(), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Failed to log in without secret ID");
-            }
+            assertDoesNotThrow(
+                    () -> connector.authAppRole(APPROLE_ROLE2, APPROLE_SECRET),
+                    "Failed to log in without secret ID"
+            );
+            assertThat("Authorization flag not set after AppRole login.", connector.isAuthorized(), is(true));
         }
 
         /**
@@ -728,43 +703,24 @@ class HTTPVaultConnectorTest {
             /* Try unauthorized access first. */
             assumeFalse(connector.isAuthorized());
 
-            try {
-                connector.listAppRoles();
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
+            assertThrows(AuthorizationRequiredException.class, () -> connector.listAppRoles());
 
-            try {
-                connector.listAppRoleSecrets("");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
+            assertThrows(AuthorizationRequiredException.class, () -> connector.listAppRoleSecrets(""));
 
             /* Authorize. */
             authRoot();
             assumeTrue(connector.isAuthorized());
 
             /* Verify pre-existing rules */
-            try {
-                List<String> res = connector.listAppRoles();
-                assertThat("Unexpected number of AppRoles", res, hasSize(2));
-                assertThat("Pre-configured roles not listed", res, containsInAnyOrder(APPROLE_ROLE_NAME, APPROLE_ROLE2_NAME));
-            } catch (VaultConnectorException e) {
-                fail("Role listing failed.");
-            }
+            List<String> res = assertDoesNotThrow(() -> connector.listAppRoles(), "Role listing failed.");
+            assertThat("Unexpected number of AppRoles", res, hasSize(2));
+            assertThat("Pre-configured roles not listed", res, containsInAnyOrder(APPROLE_ROLE_NAME, APPROLE_ROLE2_NAME));
 
             /* Check secret IDs */
-            try {
-                List<String> res = connector.listAppRoleSecrets(APPROLE_ROLE_NAME);
-                assertThat("Unexpected number of AppRole secrets", res, hasSize(1));
-                assertThat("Pre-configured AppRole secret not listed", res, contains(APPROLE_SECRET_ACCESSOR));
-            } catch (VaultConnectorException e) {
-                fail("AppRole secret listing failed.");
-            }
+            res = assertDoesNotThrow(() -> connector.listAppRoleSecrets(APPROLE_ROLE_NAME), "AppRole secret listing failed.");
+            assertThat("Unexpected number of AppRole secrets", res, hasSize(1));
+            assertThat("Pre-configured AppRole secret not listed", res, contains(APPROLE_SECRET_ACCESSOR));
         }
-
 
         /**
          * Test creation of a new AppRole.
@@ -775,61 +731,14 @@ class HTTPVaultConnectorTest {
         void createAppRoleTest() {
             /* Try unauthorized access first. */
             assumeFalse(connector.isAuthorized());
-            try {
-                connector.createAppRole(new AppRole());
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-
-            try {
-                connector.lookupAppRole("");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-
-            try {
-                connector.deleteAppRole("");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-
-            try {
-                connector.getAppRoleID("");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-
-            try {
-                connector.setAppRoleID("", "");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-
-            try {
-                connector.createAppRoleSecret("", "");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-
-            try {
-                connector.lookupAppRoleSecret("", "");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
-
-            try {
-                connector.destroyAppRoleSecret("", "");
-                fail("Expected exception not thrown");
-            } catch (Exception e) {
-                assertThat("Unexpected exception class", e, is(instanceOf(AuthorizationRequiredException.class)));
-            }
+            assertThrows(AuthorizationRequiredException.class, () -> connector.createAppRole(new AppRole()));
+            assertThrows(AuthorizationRequiredException.class, () -> connector.lookupAppRole(""));
+            assertThrows(AuthorizationRequiredException.class, () -> connector.deleteAppRole(""));
+            assertThrows(AuthorizationRequiredException.class, () -> connector.getAppRoleID(""));
+            assertThrows(AuthorizationRequiredException.class, () -> connector.setAppRoleID("", ""));
+            assertThrows(AuthorizationRequiredException.class, () -> connector.createAppRoleSecret("", ""));
+            assertThrows(AuthorizationRequiredException.class, () -> connector.lookupAppRoleSecret("", ""));
+            assertThrows(AuthorizationRequiredException.class, () -> connector.destroyAppRoleSecret("", ""));
 
             /* Authorize. */
             authRoot();
@@ -841,131 +750,72 @@ class HTTPVaultConnectorTest {
             AppRole role = AppRole.builder(roleName).build();
 
             /* Create role */
-            try {
-                boolean res = connector.createAppRole(role);
-                assertThat("No result given.", res, is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Role creation failed.");
-            }
+            boolean createRes = assertDoesNotThrow(() -> connector.createAppRole(role), "Role creation failed.");
+            assertThat("Role creation failed.", createRes, is(true));
 
             /* Lookup role */
-            try {
-                AppRoleResponse res = connector.lookupAppRole(roleName);
-                assertThat("Role lookup returned no role.", res.getRole(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Role lookup failed.");
-            }
+            AppRoleResponse res = assertDoesNotThrow(() -> connector.lookupAppRole(roleName), "Role lookup failed.");
+            assertThat("Role lookup returned no role.", res.getRole(), is(notNullValue()));
 
             /* Lookup role ID */
-            String roleID = "";
-            try {
-                roleID = connector.getAppRoleID(roleName);
-                assertThat("Role ID lookup returned empty ID.", roleID, is(not(emptyString())));
-            } catch (VaultConnectorException e) {
-                fail("Role ID lookup failed.");
-            }
+            String roleID = assertDoesNotThrow(() -> connector.getAppRoleID(roleName), "Role ID lookup failed.");
+            assertThat("Role ID lookup returned empty ID.", roleID, is(not(emptyString())));
 
             /* Set custom role ID */
-            roleID = "custom-role-id";
-            try {
-                connector.setAppRoleID(roleName, roleID);
-            } catch (VaultConnectorException e) {
-                fail("Setting custom role ID failed.");
-            }
+            String roleID2 = "custom-role-id";
+            assertDoesNotThrow(() -> connector.setAppRoleID(roleName, roleID2), "Setting custom role ID failed.");
 
             /* Verify role ID */
-            try {
-                String res = connector.getAppRoleID(roleName);
-                assertThat("Role ID lookup returned wrong ID.", res, is(roleID));
-            } catch (VaultConnectorException e) {
-                fail("Role ID lookup failed.");
-            }
+            String res2 = assertDoesNotThrow(() -> connector.getAppRoleID(roleName), "Role ID lookup failed.");
+            assertThat("Role ID lookup returned wrong ID.", res2, is(roleID2));
 
             /* Update role model with custom flags */
-            role = AppRole.builder(roleName)
+            AppRole role2 = AppRole.builder(roleName)
                     .wit0hTokenPeriod(321)
                     .build();
 
             /* Create role */
-            try {
-                boolean res = connector.createAppRole(role);
-                assertThat("No result given.", res, is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Role creation failed.");
-            }
+            boolean res3 = assertDoesNotThrow(() -> connector.createAppRole(role2), "Role creation failed.");
+            assertThat("No result given.", res3, is(notNullValue()));
 
             /* Lookup updated role */
-            try {
-                AppRoleResponse res = connector.lookupAppRole(roleName);
-                assertThat("Role lookup returned no role.", res.getRole(), is(notNullValue()));
-                assertThat("Token period not set for role.", res.getRole().getTokenPeriod(), is(321));
-            } catch (VaultConnectorException e) {
-                fail("Role lookup failed.");
-            }
+            res = assertDoesNotThrow(() -> connector.lookupAppRole(roleName), "Role lookup failed.");
+            assertThat("Role lookup returned no role.", res.getRole(), is(notNullValue()));
+            assertThat("Token period not set for role.", res.getRole().getTokenPeriod(), is(321));
 
             /* Create role by name */
-            roleName = "RoleByName";
-            try {
-                connector.createAppRole(roleName);
-            } catch (VaultConnectorException e) {
-                fail("Creation of role by name failed.");
-            }
-            try {
-                AppRoleResponse res = connector.lookupAppRole(roleName);
-                assertThat("Role lookuo returned not value", res.getRole(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Creation of role by name failed.");
-            }
+            String roleName2 = "RoleByName";
+            assertDoesNotThrow(() -> connector.createAppRole(roleName2), "Creation of role by name failed.");
+            res = assertDoesNotThrow(() -> connector.lookupAppRole(roleName2), "Creation of role by name failed.");
+            assertThat("Role lookuo returned not value", res.getRole(), is(notNullValue()));
 
             /* Create role by name with custom ID */
-            roleName = "RoleByName";
-            roleID = "RolyByNameID";
-            try {
-                connector.createAppRole(roleName, roleID);
-            } catch (VaultConnectorException e) {
-                fail("Creation of role by name failed.");
-            }
-            try {
-                AppRoleResponse res = connector.lookupAppRole(roleName);
-                assertThat("Role lookuo returned not value", res.getRole(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Creation of role by name failed.");
-            }
+            String roleName3 = "RoleByName";
+            String roleID3 = "RolyByNameID";
+            assertDoesNotThrow(() -> connector.createAppRole(roleName3, roleID3), "Creation of role by name failed.");
+            res = assertDoesNotThrow(() -> connector.lookupAppRole(roleName3), "Creation of role by name failed.");
+            assertThat("Role lookuo returned not value", res.getRole(), is(notNullValue()));
 
-            try {
-                String res = connector.getAppRoleID(roleName);
-                assertThat("Role lookuo returned wrong ID", res, is(roleID));
-            } catch (VaultConnectorException e) {
-                fail("Creation of role by name failed.");
-            }
+            res2 = assertDoesNotThrow(() -> connector.getAppRoleID(roleName3), "Creation of role by name failed.");
+            assertThat("Role lookuo returned wrong ID", res2, is(roleID3));
 
             /* Create role by name with policies */
-            try {
-                connector.createAppRole(roleName, Collections.singletonList("testpolicy"));
-            } catch (VaultConnectorException e) {
-                fail("Creation of role by name failed.");
-            }
-            try {
-                AppRoleResponse res = connector.lookupAppRole(roleName);
-                // Note: As of Vault 0.8.3 default policy is not added automatically, so this test should return 1, not 2.
-                assertThat("Role lookup returned wrong policy count (before Vault 0.8.3 is should be 2)", res.getRole().getPolicies(), hasSize(1));
-                assertThat("Role lookup returned wrong policies", res.getRole().getPolicies(), hasItem("testpolicy"));
-            } catch (VaultConnectorException e) {
-                fail("Creation of role by name failed.");
-            }
+            assertDoesNotThrow(
+                    () -> connector.createAppRole(roleName3, Collections.singletonList("testpolicy")),
+                    "Creation of role by name failed."
+            );
+            res = assertDoesNotThrow(() -> connector.lookupAppRole(roleName3), "Creation of role by name failed.");
+            // Note: As of Vault 0.8.3 default policy is not added automatically, so this test should return 1, not 2.
+            assertThat("Role lookup returned wrong policy count (before Vault 0.8.3 is should be 2)", res.getRole().getTokenPolicies(), hasSize(1));
+            assertThat("Role lookup returned wrong policies", res.getRole().getTokenPolicies(), hasItem("testpolicy"));
 
             /* Delete role */
-            try {
-                connector.deleteAppRole(roleName);
-            } catch (VaultConnectorException e) {
-                fail("Deletion of role failed.");
-            }
-            try {
-                connector.lookupAppRole(roleName);
-                fail("Deleted role could be looked up.");
-            } catch (VaultConnectorException e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-            }
+            assertDoesNotThrow(() -> connector.deleteAppRole(roleName3), "Deletion of role failed.");
+            assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.lookupAppRole(roleName3),
+                    "Deleted role could be looked up."
+            );
         }
 
         /**
@@ -979,42 +829,37 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
 
             /* Create default (random) secret for existing role */
-            try {
-                AppRoleSecretResponse res = connector.createAppRoleSecret(APPROLE_ROLE_NAME);
-                assertThat("No secret returned", res.getSecret(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("AppRole secret creation failed.");
-            }
+            AppRoleSecretResponse res = assertDoesNotThrow(
+                    () -> connector.createAppRoleSecret(APPROLE_ROLE_NAME),
+                    "AppRole secret creation failed."
+            );
+            assertThat("No secret returned", res.getSecret(), is(notNullValue()));
 
             /* Create secret with custom ID */
             String secretID = "customSecretId";
-            try {
-                AppRoleSecretResponse res = connector.createAppRoleSecret(APPROLE_ROLE_NAME, secretID);
-                assertThat("Unexpected secret ID returned", res.getSecret().getId(), is(secretID));
-            } catch (VaultConnectorException e) {
-                fail("AppRole secret creation failed.");
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.createAppRoleSecret(APPROLE_ROLE_NAME, secretID),
+                    "AppRole secret creation failed."
+            );
+            assertThat("Unexpected secret ID returned", res.getSecret().getId(), is(secretID));
 
             /* Lookup secret */
-            try {
-                AppRoleSecretResponse res = connector.lookupAppRoleSecret(APPROLE_ROLE_NAME, secretID);
-                assertThat("No secret information returned", res.getSecret(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("AppRole secret lookup failed.");
-            }
+            res = assertDoesNotThrow(
+                    () -> connector.lookupAppRoleSecret(APPROLE_ROLE_NAME, secretID),
+                    "AppRole secret lookup failed."
+            );
+            assertThat("No secret information returned", res.getSecret(), is(notNullValue()));
 
             /* Destroy secret */
-            try {
-                connector.destroyAppRoleSecret(APPROLE_ROLE_NAME, secretID);
-            } catch (VaultConnectorException e) {
-                fail("AppRole secret destruction failed.");
-            }
-            try {
-                AppRoleSecretResponse res = connector.lookupAppRoleSecret(APPROLE_ROLE_NAME, secretID);
-                fail("Destroyed AppRole secret successfully read.");
-            } catch (VaultConnectorException e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-            }
+            assertDoesNotThrow(
+                    () -> connector.destroyAppRoleSecret(APPROLE_ROLE_NAME, secretID),
+                    "AppRole secret destruction failed."
+            );
+            assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.lookupAppRoleSecret(APPROLE_ROLE_NAME, secretID),
+                    "Destroyed AppRole secret successfully read."
+            );
         }
     }
 
@@ -1029,23 +874,22 @@ class HTTPVaultConnectorTest {
         @Order(10)
         @DisplayName("Authenticate with token")
         void authTokenTest() {
-            TokenResponse res;
             final String invalidToken = "52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6";
-            try {
-                connector.authToken(invalidToken);
-                fail("Logged in with invalid token");
-            } catch (VaultConnectorException e) {
-                /* Assert that the exception does not reveal the token */
-                assertThat(stackTrace(e), not(stringContainsInOrder(invalidToken)));
-            }
+            VaultConnectorException e = assertThrows(
+                    VaultConnectorException.class,
+                    () -> connector.authToken(invalidToken),
+                    "Logged in with invalid token"
+            );
+            /* Assert that the exception does not reveal the token */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidToken)));
 
-            try {
-                res = connector.authToken(TOKEN_ROOT);
-                assertNotNull(res, "Login failed with valid token");
-                assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
-            } catch (VaultConnectorException ignored) {
-                fail("Login failed with valid token");
-            }
+
+            TokenResponse res = assertDoesNotThrow(
+                    () -> connector.authToken(TOKEN_ROOT),
+                    "Login failed with valid token"
+            );
+            assertNotNull(res, "Login failed with valid token");
+            assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
         }
 
         /**
@@ -1066,51 +910,43 @@ class HTTPVaultConnectorTest {
                     .build();
 
             /* Create token */
-            try {
-                AuthResponse res = connector.createToken(token);
-                assertThat("No result given.", res, is(notNullValue()));
-                assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id"));
-                assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
-                assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("root"));
-                assertThat("Invalid number of token policies returned.", res.getAuth().getTokenPolicies(), hasSize(1));
-                assertThat("Root policy not inherited for token.", res.getAuth().getTokenPolicies(), contains("root"));
-                assertThat("Unexpected token type.", res.getAuth().getTokenType(), is(Token.Type.SERVICE.value()));
-                assertThat("Metadata unexpected.", res.getAuth().getMetadata(), is(nullValue()));
-                assertThat("Root token should not be renewable", res.getAuth().isRenewable(), is(false));
-                assertThat("Root token should not be orphan", res.getAuth().isOrphan(), is(false));
+            AuthResponse res = assertDoesNotThrow(() -> connector.createToken(token), "Token creation failed");
+            assertThat("No result given.", res, is(notNullValue()));
+            assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id"));
+            assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
+            assertThat("Root policy not inherited.", res.getAuth().getPolicies(), contains("root"));
+            assertThat("Invalid number of token policies returned.", res.getAuth().getTokenPolicies(), hasSize(1));
+            assertThat("Root policy not inherited for token.", res.getAuth().getTokenPolicies(), contains("root"));
+            assertThat("Unexpected token type.", res.getAuth().getTokenType(), is(Token.Type.SERVICE.value()));
+            assertThat("Metadata unexpected.", res.getAuth().getMetadata(), is(nullValue()));
+            assertThat("Root token should not be renewable", res.getAuth().isRenewable(), is(false));
+            assertThat("Root token should not be orphan", res.getAuth().isOrphan(), is(false));
 
-                // Starting with Vault 1.0 a warning "custom ID uses weaker SHA1..." is given.
-                if (VAULT_VERSION.startsWith("1.")) {
-                    assertThat("Token creation did not return expected warning.", res.getWarnings(), hasSize(1));
-                } else {
-                    assertThat("Token creation returned warnings.", res.getWarnings(), is(nullValue()));
-                }
-            } catch (VaultConnectorException e) {
-                fail("Token creation failed: " + e.getMessage());
+            // Starting with Vault 1.0 a warning "custom ID uses weaker SHA1..." is given.
+            if (VAULT_VERSION.startsWith("1.")) {
+                assertThat("Token creation did not return expected warning.", res.getWarnings(), hasSize(1));
+            } else {
+                assertThat("Token creation returned warnings.", res.getWarnings(), is(nullValue()));
             }
 
             /* Create token with attributes */
-            token = Token.builder()
+            Token token2 = Token.builder()
                     .withId("test-id2")
                     .withDisplayName("test name 2")
                     .withPolicies(Collections.singletonList("testpolicy"))
                     .withoutDefaultPolicy()
                     .withMeta("foo", "bar")
                     .build();
-            try {
-                AuthResponse res = connector.createToken(token);
-                assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id2"));
-                assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
-                assertThat("Custom policy not set.", res.getAuth().getPolicies(), contains("testpolicy"));
-                assertThat("Metadata not given.", res.getAuth().getMetadata(), is(notNullValue()));
-                assertThat("Metadata not correct.", res.getAuth().getMetadata().get("foo"), is("bar"));
-                assertThat("Token should be renewable", res.getAuth().isRenewable(), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Token creation failed: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(() -> connector.createToken(token2), "Token creation failed");
+            assertThat("Invalid token ID returned.", res.getAuth().getClientToken(), is("test-id2"));
+            assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
+            assertThat("Custom policy not set.", res.getAuth().getPolicies(), contains("testpolicy"));
+            assertThat("Metadata not given.", res.getAuth().getMetadata(), is(notNullValue()));
+            assertThat("Metadata not correct.", res.getAuth().getMetadata().get("foo"), is("bar"));
+            assertThat("Token should be renewable", res.getAuth().isRenewable(), is(true));
 
             /* Overwrite token should fail as of Vault 0.8.0 */
-            token = Token.builder()
+            Token token3 = Token.builder()
                     .withId("test-id2")
                     .withDisplayName("test name 3")
                     .withPolicies(Arrays.asList("pol1", "pol2"))
@@ -1119,35 +955,29 @@ class HTTPVaultConnectorTest {
                     .withMeta("key", "value")
                     .withTtl(1234)
                     .build();
-            try {
-                connector.createToken(token);
-                fail("Overwriting token should fail as of Vault 0.8.0");
-            } catch (VaultConnectorException e) {
-                assertThat(e, is(instanceOf(InvalidResponseException.class)));
-                assertThat(((InvalidResponseException) e).getStatusCode(), is(400));
-                /* Assert that the exception does not reveal token ID */
-                assertThat(stackTrace(e), not(stringContainsInOrder(token.getId())));
-            }
+            InvalidResponseException e = assertThrows(
+                    InvalidResponseException.class,
+                    () -> connector.createToken(token3),
+                    "Overwriting token should fail as of Vault 0.8.0"
+            );
+            assertThat(e.getStatusCode(), is(400));
+            /* Assert that the exception does not reveal token ID */
+            assertThat(stackTrace(e), not(stringContainsInOrder(token3.getId())));
 
             /* Create token with batch type */
-            token = Token.builder()
+            Token token4 = Token.builder()
                     .withDisplayName("test name 3")
                     .withPolicy("batchpolicy")
                     .withoutDefaultPolicy()
                     .withType(Token.Type.BATCH)
                     .build();
-            try {
-                AuthResponse res = connector.createToken(token);
-                assertThat("Unexpected token prefix", res.getAuth().getClientToken(), startsWith("b."));
-                assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
-                assertThat("Custom policy policy not set.", res.getAuth().getPolicies(), contains("batchpolicy"));
-                assertThat("Token should not be renewable", res.getAuth().isRenewable(), is(false));
-                assertThat("Token should not be orphan", res.getAuth().isOrphan(), is(false));
-                assertThat("Specified token Type not set", res.getAuth().getTokenType(), is(Token.Type.BATCH.value()));
-
-            } catch (VaultConnectorException e) {
-                fail("Token creation failed: " + e.getMessage());
-            }
+            res = assertDoesNotThrow(() -> connector.createToken(token4), "Token creation failed");
+            assertThat("Unexpected token prefix", res.getAuth().getClientToken(), startsWith("b."));
+            assertThat("Invalid number of policies returned.", res.getAuth().getPolicies(), hasSize(1));
+            assertThat("Custom policy policy not set.", res.getAuth().getPolicies(), contains("batchpolicy"));
+            assertThat("Token should not be renewable", res.getAuth().isRenewable(), is(false));
+            assertThat("Token should not be orphan", res.getAuth().isOrphan(), is(false));
+            assertThat("Specified token Type not set", res.getAuth().getTokenType(), is(Token.Type.BATCH.value()));
         }
 
         /**
@@ -1165,25 +995,17 @@ class HTTPVaultConnectorTest {
                     .withId("my-token")
                     .withType(Token.Type.SERVICE)
                     .build();
-            try {
-                connector.createToken(token);
-            } catch (VaultConnectorException e) {
-                fail("Token creation failed.");
-            }
+            assertDoesNotThrow(() -> connector.createToken(token), "Token creation failed.");
 
             authRoot();
             assumeTrue(connector.isAuthorized());
 
-            try {
-                TokenResponse res = connector.lookupToken("my-token");
-                assertThat("Unexpected token ID", res.getData().getId(), is(token.getId()));
-                assertThat("Unexpected number of policies", res.getData().getPolicies(), hasSize(1));
-                assertThat("Unexpected policy", res.getData().getPolicies(), contains("root"));
-                assertThat("Unexpected token type", res.getData().getType(), is(token.getType()));
-                assertThat("Issue time expected to be filled", res.getData().getIssueTime(), is(notNullValue()));
-            } catch (VaultConnectorException e) {
-                fail("Token creation failed.");
-            }
+            TokenResponse res = assertDoesNotThrow(() -> connector.lookupToken("my-token"), "Token creation failed.");
+            assertThat("Unexpected token ID", res.getData().getId(), is(token.getId()));
+            assertThat("Unexpected number of policies", res.getData().getPolicies(), hasSize(1));
+            assertThat("Unexpected policy", res.getData().getPolicies(), contains("root"));
+            assertThat("Unexpected token type", res.getData().getType(), is(token.getType()));
+            assertThat("Issue time expected to be filled", res.getData().getIssueTime(), is(notNullValue()));
         }
 
         /**
@@ -1200,20 +1022,17 @@ class HTTPVaultConnectorTest {
             final String roleName = "test-role";
             final TokenRole role = TokenRole.builder().build();
 
-            try {
-                assertThat(connector.createOrUpdateTokenRole(roleName, role), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Token role creation failed.");
-            }
+            boolean creationRes = assertDoesNotThrow(
+                    () -> connector.createOrUpdateTokenRole(roleName, role),
+                    "Token role creation failed."
+            );
+            assertThat("Token role creation failed.", creationRes, is(true));
 
             // Read the role.
-            TokenRoleResponse res = null;
-            try {
-                res = connector.readTokenRole(roleName);
-            } catch (VaultConnectorException e) {
-                fail("Reading token role failed.");
-            }
-
+            TokenRoleResponse res = assertDoesNotThrow(
+                    () -> connector.readTokenRole(roleName),
+                    "Reading token role failed."
+            );
             assertThat("Token role response must not be null", res, is(notNullValue()));
             assertThat("Token role must not be null", res.getData(), is(notNullValue()));
             assertThat("Token role name not as expected", res.getData().getName(), is(roleName));
@@ -1230,18 +1049,13 @@ class HTTPVaultConnectorTest {
                     .withTokenNumUses(42)
                     .build();
 
-            try {
-                assertThat(connector.createOrUpdateTokenRole(role2), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Token role update failed.");
-            }
+            creationRes = assertDoesNotThrow(
+                    () -> connector.createOrUpdateTokenRole(role2),
+                    "Token role update failed."
+            );
+            assertThat("Token role update failed.", creationRes, is(true));
 
-            try {
-                res = connector.readTokenRole(roleName);
-            } catch (VaultConnectorException e) {
-                fail("Reading token role failed.");
-            }
-
+            res = assertDoesNotThrow(() -> connector.readTokenRole(roleName), "Reading token role failed.");
             assertThat("Token role response must not be null", res, is(notNullValue()));
             assertThat("Token role must not be null", res.getData(), is(notNullValue()));
             assertThat("Token role name not as expected", res.getData().getName(), is(roleName));
@@ -1250,24 +1064,14 @@ class HTTPVaultConnectorTest {
             assertThat("Unexpected number of token uses after update", res.getData().getTokenNumUses(), is(42));
 
             // List roles.
-            List<String> listRes = null;
-            try {
-                listRes = connector.listTokenRoles();
-            } catch (VaultConnectorException e) {
-                fail("Listing token roles failed.");
-            }
-
+            List<String> listRes = assertDoesNotThrow(() -> connector.listTokenRoles(), "Listing token roles failed.");
             assertThat("Token role list must not be null", listRes, is(notNullValue()));
             assertThat("Unexpected number of token roles", listRes, hasSize(1));
             assertThat("Unexpected token role in list", listRes, contains(roleName));
 
             // Delete the role.
-            try {
-                assertThat(connector.deleteTokenRole(roleName), is(true));
-            } catch (VaultConnectorException e) {
-                fail("Token role deletion failed.");
-            }
-
+            creationRes = assertDoesNotThrow(() -> connector.deleteTokenRole(roleName), "Token role deletion failed.");
+            assertThat("Token role deletion failed.", creationRes, is(true));
             assertThrows(InvalidResponseException.class, () -> connector.readTokenRole(roleName), "Reading nonexistent token role should fail");
             assertThrows(InvalidResponseException.class, () -> connector.listTokenRoles(), "Listing nonexistent token roles should fail");
         }
@@ -1283,18 +1087,13 @@ class HTTPVaultConnectorTest {
         @DisplayName("List auth methods")
         void authMethodsTest() {
             /* Authenticate as valid user */
-            try {
-                connector.authToken(TOKEN_ROOT);
-            } catch (VaultConnectorException ignored) {
-            }
+            assertDoesNotThrow(() -> connector.authToken(TOKEN_ROOT));
             assumeTrue(connector.isAuthorized());
 
-            List<AuthBackend> supportedBackends = null;
-            try {
-                supportedBackends = connector.getAuthBackends();
-            } catch (VaultConnectorException e) {
-                fail("Could not list supported auth backends: " + e.getMessage());
-            }
+            List<AuthBackend> supportedBackends = assertDoesNotThrow(
+                    () -> connector.getAuthBackends(),
+                    "Could not list supported auth backends."
+            );
             assertThat(supportedBackends, hasSize(4));
             assertThat(supportedBackends, hasItems(AuthBackend.TOKEN, AuthBackend.USERPASS, AuthBackend.APPID, AuthBackend.APPROLE));
         }
@@ -1305,23 +1104,21 @@ class HTTPVaultConnectorTest {
         @Test
         @DisplayName("Authenticate with UserPass")
         void authUserPassTest() {
-            AuthResponse res = null;
             final String invalidUser = "foo";
             final String invalidPass = "bar";
-            try {
-                connector.authUserPass(invalidUser, invalidPass);
-                fail("Logged in with invalid credentials");
-            } catch (VaultConnectorException e) {
-                /* Assert that the exception does not reveal credentials */
-                assertThat(stackTrace(e), not(stringContainsInOrder(invalidUser)));
-                assertThat(stackTrace(e), not(stringContainsInOrder(invalidPass)));
-            }
+            VaultConnectorException e = assertThrows(
+                    VaultConnectorException.class,
+                    () -> connector.authUserPass(invalidUser, invalidPass),
+                    "Logged in with invalid credentials"
+            );
+            /* Assert that the exception does not reveal credentials */
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidUser)));
+            assertThat(stackTrace(e), not(stringContainsInOrder(invalidPass)));
 
-            try {
-                res = connector.authUserPass(USER_VALID, PASS_VALID);
-            } catch (VaultConnectorException ignored) {
-                fail("Login failed with valid credentials: Exception thrown");
-            }
+            AuthResponse res = assertDoesNotThrow(
+                    () -> connector.authUserPass(USER_VALID, PASS_VALID),
+                    "Login failed with valid credentials: Exception thrown"
+            );
             assertNotNull(res.getAuth(), "Login failed with valid credentials: Response not available");
             assertThat("Login failed with valid credentials: Connector not authorized", connector.isAuthorized(), is(true));
         }
@@ -1333,20 +1130,18 @@ class HTTPVaultConnectorTest {
         @Tag("tls")
         @DisplayName("TLS connection test")
         void tlsConnectionTest() {
-            TokenResponse res;
-            try {
-                connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6");
-                fail("Logged in with invalid token");
-            } catch (VaultConnectorException ignored) {
-            }
+            assertThrows(
+                    VaultConnectorException.class,
+                    () -> connector.authToken("52135869df23a5e64c5d33a9785af5edb456b8a4a235d1fe135e6fba1c35edf6"),
+                    "Logged in with invalid token"
+            );
 
-            try {
-                res = connector.authToken(TOKEN_ROOT);
-                assertNotNull(res, "Login failed with valid token");
-                assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
-            } catch (VaultConnectorException ignored) {
-                fail("Login failed with valid token");
-            }
+            TokenResponse res = assertDoesNotThrow(
+                    () -> connector.authToken(TOKEN_ROOT),
+                    "Login failed with valid token"
+            );
+            assertNotNull(res, "Login failed with valid token");
+            assertThat("Login failed with valid token", connector.isAuthorized(), is(true));
         }
 
         /**
@@ -1359,27 +1154,19 @@ class HTTPVaultConnectorTest {
             assumeFalse(sealStatus.isSealed());
 
             /* Unauthorized sealing should fail */
-            try {
-                connector.seal();
-                fail("Unauthorized sealing succeeded");
-            } catch (VaultConnectorException e) {
-                assertThat("Vault sealed, although sealing failed", sealStatus.isSealed(), is(false));
-            }
+            assertThrows(VaultConnectorException.class, connector::seal, "Unauthorized sealing succeeded");
+            assertThat("Vault sealed, although sealing failed", sealStatus.isSealed(), is(false));
 
             /* Root user should be able to seal */
             authRoot();
             assumeTrue(connector.isAuthorized());
-            try {
-                connector.seal();
-                sealStatus = connector.sealStatus();
-                assertThat("Vault not sealed", sealStatus.isSealed(), is(true));
-                sealStatus = connector.unseal(KEY2);
-                assertThat("Vault unsealed with only 1 key", sealStatus.isSealed(), is(true));
-                sealStatus = connector.unseal(KEY3);
-                assertThat("Vault not unsealed", sealStatus.isSealed(), is(false));
-            } catch (VaultConnectorException e) {
-                fail("Sealing failed");
-            }
+            assertDoesNotThrow(connector::seal, "Sealing failed");
+            sealStatus = connector.sealStatus();
+            assertThat("Vault not sealed", sealStatus.isSealed(), is(true));
+            sealStatus = connector.unseal(KEY2);
+            assertThat("Vault unsealed with only 1 key", sealStatus.isSealed(), is(true));
+            sealStatus = connector.unseal(KEY3);
+            assertThat("Vault not unsealed", sealStatus.isSealed(), is(false));
         }
 
         /**
@@ -1388,12 +1175,7 @@ class HTTPVaultConnectorTest {
         @Test
         @DisplayName("Health test")
         void healthTest() {
-            HealthResponse res = null;
-            try {
-                res = connector.getHealth();
-            } catch (VaultConnectorException e) {
-                fail("Retrieving health status failed: " + e.getMessage());
-            }
+            HealthResponse res = assertDoesNotThrow(connector::getHealth, "Retrieving health status failed.");
             assertThat("Health response should be set", res, is(notNullValue()));
             assertThat("Unexpected version", res.getVersion(), is(VAULT_VERSION));
             assertThat("Unexpected init status", res.isInitialized(), is(true));
@@ -1402,18 +1184,11 @@ class HTTPVaultConnectorTest {
 
             // No seal vault and verify correct status.
             authRoot();
-            try {
-                connector.seal();
-                assumeTrue(connector.sealStatus().isSealed());
-                connector.resetAuth();  // Should work unauthenticated
-            } catch (VaultConnectorException e) {
-                fail("Unexpected exception on sealing: " + e.getMessage());
-            }
-            try {
-                res = connector.getHealth();
-            } catch (VaultConnectorException e) {
-                fail("Retrieving health status failed when sealed: " + e.getMessage());
-            }
+            assertDoesNotThrow(connector::seal, "Unexpected exception on sealing");
+            SealResponse sealStatus = assertDoesNotThrow(connector::sealStatus);
+            assumeTrue(sealStatus.isSealed());
+            connector.resetAuth();  // Should work unauthenticated
+            res = assertDoesNotThrow(connector::getHealth, "Retrieving health status failed when sealed");
             assertThat("Unexpected seal status", res.isSealed(), is(true));
         }
 
@@ -1422,21 +1197,17 @@ class HTTPVaultConnectorTest {
          */
         @Test
         @DisplayName("Connector close test")
-        void closeTest() {
+        void closeTest() throws NoSuchFieldException, IllegalAccessException {
             authUser();
             assumeTrue(connector.isAuthorized());
 
-            try {
-                connector.close();
-                assertThat("Not unauthorized after close().", connector.isAuthorized(), is(false));
+            assertDoesNotThrow(connector::close, "Closing the connector failed");
+            assertThat("Not unauthorized after close().", connector.isAuthorized(), is(false));
 
-                /* Verify that (private) token has indeed been removed */
-                Field tokenField = HTTPVaultConnector.class.getDeclaredField("token");
-                tokenField.setAccessible(true);
-                assertThat("Token not removed after close().", tokenField.get(connector), is(nullValue()));
-            } catch (Exception e) {
-                fail("Closing the connector failed: " + e.getMessage());
-            }
+            /* Verify that (private) token has indeed been removed */
+            Field tokenField = HTTPVaultConnector.class.getDeclaredField("token");
+            tokenField.setAccessible(true);
+            assertThat("Token not removed after close().", tokenField.get(connector), is(nullValue()));
         }
     }
 
@@ -1499,20 +1270,14 @@ class HTTPVaultConnectorTest {
      */
     private void authRoot() {
         /* Authenticate as valid user */
-        try {
-            connector.authToken(TOKEN_ROOT);
-        } catch (VaultConnectorException ignored) {
-        }
+        assertDoesNotThrow(() -> connector.authToken(TOKEN_ROOT));
     }
 
     /**
      * Authenticate with user credentials.
      */
     private void authUser() {
-        try {
-            connector.authUserPass(USER_VALID, PASS_VALID);
-        } catch (VaultConnectorException ignored) {
-        }
+        assertDoesNotThrow(() -> connector.authUserPass(USER_VALID, PASS_VALID));
     }
 
     /**

@@ -20,14 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * JUnit Test for {@link SecretResponse} model.
@@ -137,19 +137,18 @@ class SecretResponseTest {
         assertThat("Non-Null returned on unknown key", res.get(KEY_UNKNOWN), is(nullValue()));
 
         // Try explicit JSON conversion.
-        final List list = res.get(KEY_LIST, List.class);
+        final List<?> list = res.get(KEY_LIST, List.class);
         assertThat("JSON parsing of list failed", list, is(notNullValue()));
         assertThat("JSON parsing of list returned incorrect size", list.size(), is(2));
-        assertThat("JSON parsing of list returned incorrect elements", (List<Object>)list, contains("first", "second"));
+        assertThat("JSON parsing of list returned incorrect elements", list, contains("first", "second"));
         assertThat("Non-Null returned on unknown key", res.get(KEY_UNKNOWN, Object.class), is(nullValue()));
 
         // Requesting invalid class should result in Exception.
-        try {
-            res.get(KEY_LIST, Double.class);
-            fail("JSON parsing to incorrect type succeeded.");
-        } catch (Exception e) {
-            assertThat(e, is(instanceOf(InvalidResponseException.class)));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> res.get(KEY_LIST, Double.class),
+                "JSON parsing to incorrect type succeeded."
+        );
     }
 
     /**
@@ -157,41 +156,39 @@ class SecretResponseTest {
      */
     @Test
     void jsonRoundtrip() {
-        try {
-            assertSecretData(new ObjectMapper().readValue(SECRET_JSON, SecretResponse.class));
-        } catch (IOException e) {
-            fail("SecretResponse deserialization failed: " + e.getMessage());
-        }
+        SecretResponse res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(SECRET_JSON, SecretResponse.class),
+                "SecretResponse deserialization failed."
+        );
+        assertSecretData(res);
 
         // KV v2 secret.
-        try {
-            SecretResponse res = new ObjectMapper().readValue(SECRET_JSON_V2, SecretResponse.class);
-            assertSecretData(res);
-            assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
-            assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
-            assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
-            assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(emptyString()));
-            assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(nullValue()));
-            assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(false));
-            assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(1));
-        } catch (IOException e) {
-            fail("SecretResponse deserialization failed: " + e.getMessage());
-        }
+        res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(SECRET_JSON_V2, SecretResponse.class),
+                "SecretResponse deserialization failed."
+        );
+        assertSecretData(res);
+        assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
+        assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
+        assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
+        assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(emptyString()));
+        assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(nullValue()));
+        assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(false));
+        assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(1));
 
         // Deleted KV v2 secret.
-        try {
-            SecretResponse res = new ObjectMapper().readValue(SECRET_JSON_V2_2, SecretResponse.class);
-            assertSecretData(res);
-            assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
-            assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
-            assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
-            assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(SECRET_META_DELETED));
-            assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(notNullValue()));
-            assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(true));
-            assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(2));
-        } catch (IOException e) {
-            fail("SecretResponse deserialization failed: " + e.getMessage());
-        }
+        res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(SECRET_JSON_V2_2, SecretResponse.class),
+                "SecretResponse deserialization failed."
+        );
+        assertSecretData(res);
+        assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
+        assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
+        assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
+        assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(SECRET_META_DELETED));
+        assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(notNullValue()));
+        assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(true));
+        assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(2));
     }
 
     private void assertSecretData(SecretResponse res) {

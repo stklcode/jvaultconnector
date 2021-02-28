@@ -26,7 +26,7 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * JUnit Test for {@link SecretListResponse} model.
@@ -56,14 +56,13 @@ class SecretListResponseTest {
         assertThat("Keys should be null without initialization", res.getKeys(), is(nullValue()));
 
         // Provoke internal ClassCastException.
-        try {
-            Map<String, Object> invalidData = new HashMap<>();
-            invalidData.put("keys", "some string");
-            res.setData(invalidData);
-            fail("Setting incorrect class succeeded");
-        } catch (Exception e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        Map<String, Object> invalidData = new HashMap<>();
+        invalidData.put("keys", "some string");
+        assertThrows(
+                InvalidResponseException.class,
+                () -> res.setData(invalidData),
+                "Setting incorrect class succeeded"
+        );
 
         // Fill correct data.
         res.setData(DATA);

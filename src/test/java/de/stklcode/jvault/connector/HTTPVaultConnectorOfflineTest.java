@@ -30,6 +30,7 @@ import org.apache.http.message.BasicStatusLine;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.MockedStatic;
 
 import java.io.IOException;
@@ -44,7 +45,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -85,35 +87,32 @@ class HTTPVaultConnectorOfflineTest {
         // Test invalid response code.
         final int responseCode = 400;
         mockResponse(responseCode, "", ContentType.APPLICATION_JSON);
-        try {
-            connector.getHealth();
-            fail("Querying health status succeeded on invalid instance");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Invalid response code"));
-            assertThat("Unexpected status code in exception", ((InvalidResponseException) e).getStatusCode(), is(responseCode));
-            assertThat("Response message where none was expected", ((InvalidResponseException) e).getResponse(), is(nullValue()));
-        }
+        InvalidResponseException e = assertThrows(
+                InvalidResponseException.class,
+                connector::getHealth,
+                "Querying health status succeeded on invalid instance"
+        );
+        assertThat("Unexpected exception message", e.getMessage(), is("Invalid response code"));
+        assertThat("Unexpected status code in exception", ((InvalidResponseException) e).getStatusCode(), is(responseCode));
+        assertThat("Response message where none was expected", ((InvalidResponseException) e).getResponse(), is(nullValue()));
 
         // Simulate permission denied response.
         mockResponse(responseCode, "{\"errors\":[\"permission denied\"]}", ContentType.APPLICATION_JSON);
-        try {
-            connector.getHealth();
-            fail("Querying health status succeeded on invalid instance");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(PermissionDeniedException.class));
-        }
+        assertThrows(
+                PermissionDeniedException.class,
+                connector::getHealth,
+                "Querying health status succeeded on invalid instance"
+        );
 
         // Test exception thrown during request.
         when(httpMock.execute(any())).thenThrow(new IOException("Test Exception"));
-        try {
-            connector.getHealth();
-            fail("Querying health status succeeded on invalid instance");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Unable to read response"));
-            assertThat("Unexpected cause", e.getCause(), instanceOf(IOException.class));
-        }
+        e = assertThrows(
+                InvalidResponseException.class,
+                connector::getHealth,
+                "Querying health status succeeded on invalid instance"
+        );
+        assertThat("Unexpected exception message", e.getMessage(), is("Unable to read response"));
+        assertThat("Unexpected cause", e.getCause(), instanceOf(IOException.class));
 
         // Now simulate a failing request that succeeds on second try.
         connector = new HTTPVaultConnector("https://127.0.0.1", null, 1, 250);
@@ -125,11 +124,7 @@ class HTTPVaultConnectorOfflineTest {
                 .when(responseMock).getStatusLine();
         when(responseMock.getEntity()).thenReturn(new StringEntity("{}", ContentType.APPLICATION_JSON));
 
-        try {
-            connector.getHealth();
-        } catch (Exception e) {
-            fail("Request failed unexpectedly: " + e.getMessage());
-        }
+        assertDoesNotThrow(connector::getHealth, "Request failed unexpectedly");
     }
 
     /**
@@ -188,53 +183,46 @@ class HTTPVaultConnectorOfflineTest {
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    void sealExceptionTest() throws IOException {
+    void sealExceptionTest() {
         HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
-        try {
-            connector.sealStatus();
-            fail("Querying seal status succeeded on invalid URL");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidRequestException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
-        }
-
-        connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        VaultConnectorException e = assertThrows(
+                InvalidRequestException.class,
+                connector::sealStatus,
+                "Querying seal status succeeded on invalid URL"
+        );
+        assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
 
         // Simulate NULL response (mock not supplied with data).
-
-        try {
-            connector.sealStatus();
-            fail("Querying seal status succeeded on invalid instance");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
-        }
+        connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        e = assertThrows(
+                InvalidResponseException.class,
+                connector::sealStatus,
+                "Querying seal status succeeded on invalid instance"
+        );
+        assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
     }
 
     /**
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    void healthExceptionTest() throws IOException {
+    void healthExceptionTest() {
         HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
-        try {
-            connector.getHealth();
-            fail("Querying health status succeeded on invalid URL");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidRequestException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
-        }
-
-        connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        VaultConnectorException e = assertThrows(
+                InvalidRequestException.class,
+                connector::getHealth,
+                "Querying health status succeeded on invalid URL"
+        );
+        assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
 
         // Simulate NULL response (mock not supplied with data).
-        try {
-            connector.getHealth();
-            fail("Querying health status succeeded on invalid instance");
-        } catch (Exception e) {
-            assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
-            assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
-        }
+        connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        e = assertThrows(
+                InvalidResponseException.class,
+                connector::getHealth,
+                "Querying health status succeeded on invalid instance"
+        );
+        assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
     }
 
     /**
@@ -249,114 +237,25 @@ class HTTPVaultConnectorOfflineTest {
         mockResponse(200, "invalid", ContentType.APPLICATION_JSON);
 
         // Now test the methods.
-        try {
-            connector.sealStatus();
-            fail("sealStatus() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.unseal("key");
-            fail("unseal() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.getHealth();
-            fail("getHealth() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.getAuthBackends();
-            fail("getAuthBackends() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.authToken("token");
-            fail("authToken() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.lookupAppRole("roleName");
-            fail("lookupAppRole() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.getAppRoleID("roleName");
-            fail("getAppRoleID() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.createAppRoleSecret("roleName");
-            fail("createAppRoleSecret() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.lookupAppRoleSecret("roleName", "secretID");
-            fail("lookupAppRoleSecret() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.listAppRoles();
-            fail("listAppRoles() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.listAppRoleSecrets("roleName");
-            fail("listAppRoleSecrets() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.read("key");
-            fail("read() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.list("path");
-            fail("list() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.renew("leaseID");
-            fail("renew() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
-
-        try {
-            connector.lookupToken("token");
-            fail("lookupToken() succeeded on invalid instance");
-        } catch (Exception e) {
-            assertParseError(e);
-        }
+        assertParseError(connector::sealStatus, "sealStatus() succeeded on invalid instance");
+        assertParseError(() -> connector.unseal("key"), "unseal() succeeded on invalid instance");
+        assertParseError(connector::getHealth, "getHealth() succeeded on invalid instance");
+        assertParseError(connector::getAuthBackends, "getAuthBackends() succeeded on invalid instance");
+        assertParseError(() -> connector.authToken("token"), "authToken() succeeded on invalid instance");
+        assertParseError(() -> connector.lookupAppRole("roleName"), "lookupAppRole() succeeded on invalid instance");
+        assertParseError(() -> connector.getAppRoleID("roleName"), "getAppRoleID() succeeded on invalid instance");
+        assertParseError(() -> connector.createAppRoleSecret("roleName"), "createAppRoleSecret() succeeded on invalid instance");
+        assertParseError(() -> connector.lookupAppRoleSecret("roleName", "secretID"), "lookupAppRoleSecret() succeeded on invalid instance");
+        assertParseError(connector::listAppRoles, "listAppRoles() succeeded on invalid instance");
+        assertParseError(() -> connector.listAppRoleSecrets("roleName"), "listAppRoleSecrets() succeeded on invalid instance");
+        assertParseError(() -> connector.read("key"), "read() succeeded on invalid instance");
+        assertParseError(() -> connector.list("path"), "list() succeeded on invalid instance");
+        assertParseError(() -> connector.renew("leaseID"), "renew() succeeded on invalid instance");
+        assertParseError(() -> connector.lookupToken("token"), "lookupToken() succeeded on invalid instance");
     }
 
-    private void assertParseError(Exception e) {
-        assertThat("Unexpected type of exception", e, instanceOf(InvalidResponseException.class));
+    private void assertParseError(Executable executable, String message) {
+        InvalidResponseException e = assertThrows(InvalidResponseException.class, executable, message);
         assertThat("Unexpected exception message", e.getMessage(), is("Unable to parse response"));
     }
 
@@ -372,68 +271,59 @@ class HTTPVaultConnectorOfflineTest {
         mockResponse(200, "{}", ContentType.APPLICATION_JSON);
 
         // Now test the methods expecting a 204.
-        try {
-            connector.registerAppId("appID", "policy", "displayName");
-            fail("registerAppId() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.registerAppId("appID", "policy", "displayName"),
+                "registerAppId() with 200 response succeeded"
+        );
 
-        try {
-            connector.registerUserId("appID", "userID");
-            fail("registerUserId() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.registerUserId("appID", "userID"),
+                "registerUserId() with 200 response succeeded"
+        );
 
-        try {
-            connector.createAppRole("appID", Collections.singletonList("policy"));
-            fail("createAppRole() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.createAppRole("appID", Collections.singletonList("policy")),
+                "createAppRole() with 200 response succeeded"
+        );
 
-        try {
-            connector.deleteAppRole("roleName");
-            fail("deleteAppRole() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.deleteAppRole("roleName"),
+                "deleteAppRole() with 200 response succeeded"
+        );
 
-        try {
-            connector.setAppRoleID("roleName", "roleID");
-            fail("setAppRoleID() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.setAppRoleID("roleName", "roleID"),
+                "setAppRoleID() with 200 response succeeded"
+        );
 
-        try {
-            connector.destroyAppRoleSecret("roleName", "secretID");
-            fail("destroyAppRoleSecret() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.destroyAppRoleSecret("roleName", "secretID"),
+                "destroyAppRoleSecret() with 200 response succeeded"
+        );
 
-        try {
-            connector.destroyAppRoleSecret("roleName", "secretUD");
-            fail("destroyAppRoleSecret() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.destroyAppRoleSecret("roleName", "secretUD"),
+                "destroyAppRoleSecret() with 200 response succeeded"
+        );
 
-        try {
-            connector.delete("key");
-            fail("delete() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.delete("key"),
+                "delete() with 200 response succeeded"
+        );
 
-        try {
-            connector.revoke("leaseID");
-            fail("destroyAppRoleSecret() with 200 response succeeded");
-        } catch (VaultConnectorException e) {
-            assertThat("Unexpected exception type", e, instanceOf(InvalidResponseException.class));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> connector.revoke("leaseID"),
+                "destroyAppRoleSecret() with 200 response succeeded"
+        );
     }
 
     private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) {

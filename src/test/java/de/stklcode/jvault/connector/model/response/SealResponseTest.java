@@ -19,11 +19,9 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 /**
  * JUnit Test for {@link SealResponse} model.
@@ -72,41 +70,39 @@ class SealResponseTest {
     @Test
     void jsonRoundtripSealed() {
         // First test sealed Vault's response.
-        try {
-            SealResponse res = new ObjectMapper().readValue(RES_SEALED, SealResponse.class);
-            assertThat("Parsed response is NULL", res, is(notNullValue()));
-            assertThat("Incorrect seal type", res.getType(), is(TYPE));
-            assertThat("Incorrect seal status", res.isSealed(), is(true));
-            assertThat("Incorrect initialization status", res.isInitialized(), is(true));
-            assertThat("Incorrect threshold", res.getThreshold(), is(THRESHOLD));
-            assertThat("Incorrect number of shares", res.getNumberOfShares(), is(SHARES));
-            assertThat("Incorrect progress", res.getProgress(), is(PROGRESS_SEALED));
-            assertThat("Nonce not empty", res.getNonce(), is(""));
-            assertThat("Incorrect version", res.getVersion(), is(VERSION));
-            // And the fields, that should not be filled.
-            assertThat("Cluster name should not be populated", res.getClusterName(), is(nullValue()));
-            assertThat("Cluster ID should not be populated", res.getClusterId(), is(nullValue()));
-        } catch (IOException e) {
-            fail("TokenResponse deserialization failed: " + e.getMessage());
-        }
+        SealResponse res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(RES_SEALED, SealResponse.class),
+                "TokenResponse deserialization failed."
+        );
+        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        assertThat("Incorrect seal type", res.getType(), is(TYPE));
+        assertThat("Incorrect seal status", res.isSealed(), is(true));
+        assertThat("Incorrect initialization status", res.isInitialized(), is(true));
+        assertThat("Incorrect threshold", res.getThreshold(), is(THRESHOLD));
+        assertThat("Incorrect number of shares", res.getNumberOfShares(), is(SHARES));
+        assertThat("Incorrect progress", res.getProgress(), is(PROGRESS_SEALED));
+        assertThat("Nonce not empty", res.getNonce(), is(""));
+        assertThat("Incorrect version", res.getVersion(), is(VERSION));
+        // And the fields, that should not be filled.
+        assertThat("Cluster name should not be populated", res.getClusterName(), is(nullValue()));
+        assertThat("Cluster ID should not be populated", res.getClusterId(), is(nullValue()));
 
 
         // Not test unsealed Vault's response.
-        try {
-            SealResponse res = new ObjectMapper().readValue(RES_UNSEALED, SealResponse.class);
-            assertThat("Parsed response is NULL", res, is(notNullValue()));
-            assertThat("Incorrect seal type", res.getType(), is(TYPE));
-            assertThat("Incorrect seal status", res.isSealed(), is(false));
-            assertThat("Incorrect initialization status", res.isInitialized(), is(true));
-            assertThat("Incorrect threshold", res.getThreshold(), is(THRESHOLD));
-            assertThat("Incorrect number of shares", res.getNumberOfShares(), is(SHARES));
-            assertThat("Incorrect progress", res.getProgress(), is(PROGRESS_UNSEALED));
-            assertThat("Incorrect nonce", res.getNonce(), is(NONCE));
-            assertThat("Incorrect version", res.getVersion(), is(VERSION));
-            assertThat("Incorrect cluster name", res.getClusterName(), is(CLUSTER_NAME));
-            assertThat("Incorrect cluster ID", res.getClusterId(), is(CLUSTER_ID));
-        } catch (IOException e) {
-            fail("TokenResponse deserialization failed: " + e.getMessage());
-        }
+        res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(RES_UNSEALED, SealResponse.class),
+                "TokenResponse deserialization failed."
+        );
+        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        assertThat("Incorrect seal type", res.getType(), is(TYPE));
+        assertThat("Incorrect seal status", res.isSealed(), is(false));
+        assertThat("Incorrect initialization status", res.isInitialized(), is(true));
+        assertThat("Incorrect threshold", res.getThreshold(), is(THRESHOLD));
+        assertThat("Incorrect number of shares", res.getNumberOfShares(), is(SHARES));
+        assertThat("Incorrect progress", res.getProgress(), is(PROGRESS_UNSEALED));
+        assertThat("Incorrect nonce", res.getNonce(), is(NONCE));
+        assertThat("Incorrect version", res.getVersion(), is(VERSION));
+        assertThat("Incorrect cluster name", res.getClusterName(), is(CLUSTER_NAME));
+        assertThat("Incorrect cluster ID", res.getClusterId(), is(CLUSTER_ID));
     }
 }

@@ -17,16 +17,12 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 /**
  * JUnit Test for {@link MetadataResponse} model.
@@ -74,27 +70,25 @@ class MetadataResponseTest {
      */
     @Test
     void jsonRoundtrip() {
-        try {
-            MetadataResponse res = new ObjectMapper().readValue(META_JSON, MetadataResponse.class);
-            assertThat("Parsed response is NULL", res, is(notNullValue()));
-            assertThat("Parsed metadata is NULL", res.getMetadata(), is(notNullValue()));
-            assertThat("Incorrect created time", res.getMetadata().getCreatedTimeString(), is(V1_TIME));
-            assertThat("Parting created time failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
-            assertThat("Incorrect current version", res.getMetadata().getCurrentVersion(), is(CURRENT_VERSION));
-            assertThat("Incorrect max versions", res.getMetadata().getMaxVersions(), is(MAX_VERSIONS));
-            assertThat("Incorrect oldest version", res.getMetadata().getOldestVersion(), is(OLDEST_VERSION));
-            assertThat("Incorrect updated time", res.getMetadata().getUpdatedTimeString(), is(V3_TIME));
-            assertThat("Parting updated time failed", res.getMetadata().getUpdatedTime(), is(notNullValue()));
-            assertThat("Incorrect number of versions", res.getMetadata().getVersions().size(), is(3));
-            assertThat("Incorrect version 1 delete time", res.getMetadata().getVersions().get(1).getDeletionTimeString(), is(V2_TIME));
-            assertThat("Parsing version delete time failed", res.getMetadata().getVersions().get(1).getDeletionTime(), is(notNullValue()));
-            assertThat("Incorrect version 1 destroyed state", res.getMetadata().getVersions().get(1).isDestroyed(), is(true));
-            assertThat("Incorrect version 2 created time", res.getMetadata().getVersions().get(2).getCreatedTimeString(), is(V2_TIME));
-            assertThat("Parsing version created failed", res.getMetadata().getVersions().get(2).getCreatedTime(), is(notNullValue()));
-            assertThat("Incorrect version 3 destroyed state", res.getMetadata().getVersions().get(3).isDestroyed(), is(false));
-
-        } catch (IOException e) {
-            fail("MetadataResponse deserialization failed: " + e.getMessage());
-        }
+        MetadataResponse res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(META_JSON, MetadataResponse.class),
+                "MetadataResponse deserialization failed."
+        );
+        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        assertThat("Parsed metadata is NULL", res.getMetadata(), is(notNullValue()));
+        assertThat("Incorrect created time", res.getMetadata().getCreatedTimeString(), is(V1_TIME));
+        assertThat("Parting created time failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
+        assertThat("Incorrect current version", res.getMetadata().getCurrentVersion(), is(CURRENT_VERSION));
+        assertThat("Incorrect max versions", res.getMetadata().getMaxVersions(), is(MAX_VERSIONS));
+        assertThat("Incorrect oldest version", res.getMetadata().getOldestVersion(), is(OLDEST_VERSION));
+        assertThat("Incorrect updated time", res.getMetadata().getUpdatedTimeString(), is(V3_TIME));
+        assertThat("Parting updated time failed", res.getMetadata().getUpdatedTime(), is(notNullValue()));
+        assertThat("Incorrect number of versions", res.getMetadata().getVersions().size(), is(3));
+        assertThat("Incorrect version 1 delete time", res.getMetadata().getVersions().get(1).getDeletionTimeString(), is(V2_TIME));
+        assertThat("Parsing version delete time failed", res.getMetadata().getVersions().get(1).getDeletionTime(), is(notNullValue()));
+        assertThat("Incorrect version 1 destroyed state", res.getMetadata().getVersions().get(1).isDestroyed(), is(true));
+        assertThat("Incorrect version 2 created time", res.getMetadata().getVersions().get(2).getCreatedTimeString(), is(V2_TIME));
+        assertThat("Parsing version created failed", res.getMetadata().getVersions().get(2).getCreatedTime(), is(notNullValue()));
+        assertThat("Incorrect version 3 destroyed state", res.getMetadata().getVersions().get(3).isDestroyed(), is(false));
     }
 }

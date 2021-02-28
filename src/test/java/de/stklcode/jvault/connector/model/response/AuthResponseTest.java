@@ -21,13 +21,13 @@ import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * JUnit Test for {@link AuthResponse} model.
@@ -87,12 +87,11 @@ class AuthResponseTest {
         assertThat("Initial data should be empty", res.getData(), is(nullValue()));
 
         // Parsing invalid auth data map should fail.
-        try {
-            res.setAuth(INVALID_AUTH_DATA);
-            fail("Parsing invalid auth data succeeded");
-        } catch (Exception e) {
-            assertThat(e, is(instanceOf(InvalidResponseException.class)));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> res.setAuth(INVALID_AUTH_DATA),
+                "Parsing invalid auth data succeeded"
+        );
 
         // Data method should be agnostic.
         res.setData(INVALID_AUTH_DATA);
@@ -104,8 +103,10 @@ class AuthResponseTest {
      */
     @Test
     void jsonRoundtrip() {
-        try {
-            AuthResponse res = new ObjectMapper().readValue(RES_JSON, AuthResponse.class);
+            AuthResponse res = assertDoesNotThrow(
+                    () -> new ObjectMapper().readValue(RES_JSON, AuthResponse.class),
+                    "AuthResponse deserialization failed."
+            );
             assertThat("Parsed response is NULL", res, is(notNullValue()));
             // Extract auth data.
             AuthData data = res.getAuth();
@@ -123,9 +124,5 @@ class AuthResponseTest {
             assertThat("Incorrect token policies", data.getTokenPolicies(), containsInRelativeOrder(AUTH_POLICY_2, AUTH_POLICY_1));
             assertThat("Incorrect auth metadata size", data.getMetadata().entrySet(), hasSize(1));
             assertThat("Incorrect auth metadata", data.getMetadata().get(AUTH_META_KEY), is(AUTH_META_VALUE));
-
-        } catch (IOException e) {
-            fail("AuthResponse deserialization failed: " + e.getMessage());
-        }
     }
 }

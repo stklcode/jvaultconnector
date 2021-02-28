@@ -22,13 +22,13 @@ import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * JUnit Test for {@link AuthMethodsResponse} model.
@@ -79,12 +79,11 @@ class AuthMethodsResponseTest {
         assertThat("Initial method map should be empty", res.getSupportedMethods(), is(anEmptyMap()));
 
         // Parsing invalid data map should fail.
-        try {
-            res.setData(INVALID_DATA);
-            fail("Parsing invalid data succeeded");
-        } catch (Exception e) {
-            assertThat(e, is(instanceOf(InvalidResponseException.class)));
-        }
+        assertThrows(
+                InvalidResponseException.class,
+                () -> res.setData(INVALID_DATA),
+                "Parsing invalid data succeeded"
+        );
     }
 
     /**
@@ -92,34 +91,33 @@ class AuthMethodsResponseTest {
      */
     @Test
     void jsonRoundtrip() {
-        try {
-            AuthMethodsResponse res = new ObjectMapper().readValue(RES_JSON, AuthMethodsResponse.class);
-            assertThat("Parsed response is NULL", res, is(notNullValue()));
-            // Extract auth data.
-            Map<String, AuthMethod> supported = res.getSupportedMethods();
-            assertThat("Auth data is NULL", supported, is(notNullValue()));
-            assertThat("Incorrect number of supported methods", supported.entrySet(), hasSize(2));
-            assertThat("Incorrect method paths", supported.keySet(), containsInAnyOrder(GH_PATH, TK_PATH));
+        AuthMethodsResponse res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(RES_JSON, AuthMethodsResponse.class),
+                "AuthResponse deserialization failed"
+        );
+        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        // Extract auth data.
+        Map<String, AuthMethod> supported = res.getSupportedMethods();
+        assertThat("Auth data is NULL", supported, is(notNullValue()));
+        assertThat("Incorrect number of supported methods", supported.entrySet(), hasSize(2));
+        assertThat("Incorrect method paths", supported.keySet(), containsInAnyOrder(GH_PATH, TK_PATH));
 
-            // Verify first method.
-            AuthMethod method = supported.get(GH_PATH);
-            assertThat("Incorrect raw type for GitHub", method.getRawType(), is(GH_TYPE));
-            assertThat("Incorrect parsed type for GitHub", method.getType(), is(AuthBackend.GITHUB));
-            assertThat("Incorrect description for GitHub", method.getDescription(), is(GH_DESCR));
-            assertThat("Unexpected config for GitHub", method.getConfig(), is(nullValue()));
+        // Verify first method.
+        AuthMethod method = supported.get(GH_PATH);
+        assertThat("Incorrect raw type for GitHub", method.getRawType(), is(GH_TYPE));
+        assertThat("Incorrect parsed type for GitHub", method.getType(), is(AuthBackend.GITHUB));
+        assertThat("Incorrect description for GitHub", method.getDescription(), is(GH_DESCR));
+        assertThat("Unexpected config for GitHub", method.getConfig(), is(nullValue()));
 
-            // Verify first method.
-            method = supported.get(TK_PATH);
-            assertThat("Incorrect raw type for Token", method.getRawType(), is(TK_TYPE));
-            assertThat("Incorrect parsed type for Token", method.getType(), is(AuthBackend.TOKEN));
-            assertThat("Incorrect description for Token", method.getDescription(), is(TK_DESCR));
-            assertThat("Missing config for Token", method.getConfig(), is(notNullValue()));
-            assertThat("Unexpected config size for Token", method.getConfig().keySet(), hasSize(2));
-            assertThat("Incorrect lease TTL config", method.getConfig().get("default_lease_ttl"), is(TK_LEASE_TTL.toString()));
-            assertThat("Incorrect max lease TTL config", method.getConfig().get("max_lease_ttl"), is(TK_MAX_LEASE_TTL.toString()));
-        } catch (IOException e) {
-            fail("AuthResponse deserialization failed: " + e.getMessage());
-        }
+        // Verify first method.
+        method = supported.get(TK_PATH);
+        assertThat("Incorrect raw type for Token", method.getRawType(), is(TK_TYPE));
+        assertThat("Incorrect parsed type for Token", method.getType(), is(AuthBackend.TOKEN));
+        assertThat("Incorrect description for Token", method.getDescription(), is(TK_DESCR));
+        assertThat("Missing config for Token", method.getConfig(), is(notNullValue()));
+        assertThat("Unexpected config size for Token", method.getConfig().keySet(), hasSize(2));
+        assertThat("Incorrect lease TTL config", method.getConfig().get("default_lease_ttl"), is(TK_LEASE_TTL.toString()));
+        assertThat("Incorrect max lease TTL config", method.getConfig().get("max_lease_ttl"), is(TK_MAX_LEASE_TTL.toString()));
     }
 
     private static class Dummy {

@@ -18,7 +18,6 @@ package de.stklcode.jvault.connector.factory;
 
 import de.stklcode.jvault.connector.HTTPVaultConnector;
 import de.stklcode.jvault.connector.exception.TlsException;
-import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.test.EnvironmentMock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -30,7 +29,8 @@ import java.nio.file.NoSuchFileException;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * JUnit test for HTTP Vault connector factory
@@ -54,14 +54,11 @@ class HTTPVaultConnectorFactoryTest {
         /* Provide address only should be enough */
         setenv(VAULT_ADDR, null, null, null);
 
-        HTTPVaultConnectorFactory factory = null;
-        HTTPVaultConnector connector;
-        try {
-            factory = VaultConnectorFactory.httpFactory().fromEnv();
-        } catch (VaultConnectorException e) {
-            fail("Factory creation from minimal environment failed");
-        }
-        connector = factory.build();
+        HTTPVaultConnectorFactory factory = assertDoesNotThrow(
+                () -> VaultConnectorFactory.httpFactory().fromEnv(),
+                "Factory creation from minimal environment failed"
+        );
+        HTTPVaultConnector connector = factory.build();
 
         assertThat("URL nor set correctly", getRequestHelperPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
         assertThat("Trusted CA cert set when no cert provided", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
@@ -70,11 +67,10 @@ class HTTPVaultConnectorFactoryTest {
         /* Provide address and number of retries */
         setenv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), null);
 
-        try {
-            factory = VaultConnectorFactory.httpFactory().fromEnv();
-        } catch (VaultConnectorException e) {
-            fail("Factory creation from environment failed");
-        }
+        factory = assertDoesNotThrow(
+                () -> VaultConnectorFactory.httpFactory().fromEnv(),
+                "Factory creation from environment failed"
+        );
         connector = factory.build();
 
         assertThat("URL nor set correctly", getRequestHelperPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
@@ -85,23 +81,21 @@ class HTTPVaultConnectorFactoryTest {
         String VAULT_CACERT = tempDir.toString() + "/doesnotexist";
         setenv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null);
 
-        try {
-            VaultConnectorFactory.httpFactory().fromEnv();
-            fail("Creation with unknown cert path failed.");
-        } catch (VaultConnectorException e) {
-            assertThat(e, is(instanceOf(TlsException.class)));
-            assertThat(e.getCause(), is(instanceOf(NoSuchFileException.class)));
-            assertThat(((NoSuchFileException) e.getCause()).getFile(), is(VAULT_CACERT));
-        }
+        TlsException e = assertThrows(
+                TlsException.class,
+                () -> VaultConnectorFactory.httpFactory().fromEnv(),
+                "Creation with unknown cert path failed."
+        );
+        assertThat(e.getCause(), is(instanceOf(NoSuchFileException.class)));
+        assertThat(((NoSuchFileException) e.getCause()).getFile(), is(VAULT_CACERT));
 
         /* Automatic authentication */
         setenv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN);
 
-        try {
-            factory = VaultConnectorFactory.httpFactory().fromEnv();
-        } catch (VaultConnectorException e) {
-            fail("Factory creation from minimal environment failed");
-        }
+        factory = assertDoesNotThrow(
+                () -> VaultConnectorFactory.httpFactory().fromEnv(),
+                "Factory creation from minimal environment failed"
+        );
         assertThat("Token nor set correctly", getPrivate(getPrivate(factory, "delegate"), "token"), is(equalTo(VAULT_TOKEN)));
     }
 

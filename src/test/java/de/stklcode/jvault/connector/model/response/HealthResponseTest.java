@@ -19,12 +19,10 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 /**
  * JUnit Test for {@link AuthResponse} model.
@@ -56,26 +54,26 @@ class HealthResponseTest {
             "  \"replication_dr_mode\": \"" + REPL_DR_MODE + "\",\n" +
             "  \"performance_standby\": " + PERF_STANDBY + "\n" +
             "}";
+
     /**
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
     void jsonRoundtrip() {
-        try {
-            HealthResponse res = new ObjectMapper().readValue(RES_JSON, HealthResponse.class);
-            assertThat("Parsed response is NULL", res, is(notNullValue()));
-            assertThat("Incorrect cluster ID", res.getClusterID(), is(CLUSTER_ID));
-            assertThat("Incorrect cluster name", res.getClusterName(), is(CLUSTER_NAME));
-            assertThat("Incorrect version", res.getVersion(), is(VERSION));
-            assertThat("Incorrect server time", res.getServerTimeUTC(), is(SERVER_TIME_UTC));
-            assertThat("Incorrect standby state", res.isStandby(), is(STANDBY));
-            assertThat("Incorrect seal state", res.isSealed(), is(SEALED));
-            assertThat("Incorrect initialization state", res.isInitialized(), is(INITIALIZED));
-            assertThat("Incorrect performance standby state", res.isPerformanceStandby(), is(PERF_STANDBY));
-            assertThat("Incorrect replication perf mode", res.getReplicationPerfMode(), is(REPL_PERF_MODE));
-            assertThat("Incorrect replication DR mode", res.getReplicationDrMode(), is(REPL_DR_MODE));
-        } catch (IOException e) {
-            fail("Health deserialization failed: " + e.getMessage());
-        }
+        HealthResponse res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(RES_JSON, HealthResponse.class),
+                "Health deserialization failed."
+        );
+        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        assertThat("Incorrect cluster ID", res.getClusterID(), is(CLUSTER_ID));
+        assertThat("Incorrect cluster name", res.getClusterName(), is(CLUSTER_NAME));
+        assertThat("Incorrect version", res.getVersion(), is(VERSION));
+        assertThat("Incorrect server time", res.getServerTimeUTC(), is(SERVER_TIME_UTC));
+        assertThat("Incorrect standby state", res.isStandby(), is(STANDBY));
+        assertThat("Incorrect seal state", res.isSealed(), is(SEALED));
+        assertThat("Incorrect initialization state", res.isInitialized(), is(INITIALIZED));
+        assertThat("Incorrect performance standby state", res.isPerformanceStandby(), is(PERF_STANDBY));
+        assertThat("Incorrect replication perf mode", res.getReplicationPerfMode(), is(REPL_PERF_MODE));
+        assertThat("Incorrect replication DR mode", res.getReplicationDrMode(), is(REPL_DR_MODE));
     }
 }
