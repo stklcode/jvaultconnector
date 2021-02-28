@@ -27,9 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicStatusLine;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.MockedStatic;
 
@@ -60,15 +58,21 @@ import static org.mockito.Mockito.*;
 class HTTPVaultConnectorOfflineTest {
     private static final String INVALID_URL = "foo:/\\1nv4l1d_UrL";
 
+    private static MockedStatic<HttpClientBuilder> hcbMock;
     private static CloseableHttpClient httpMock;
     private final CloseableHttpResponse responseMock = mock(CloseableHttpResponse.class);
 
     @BeforeAll
     static void prepare() {
         // Mock the static HTTPClient creation.
-        MockedStatic<HttpClientBuilder> hcbMock = mockStatic(HttpClientBuilder.class);
+        hcbMock = mockStatic(HttpClientBuilder.class);
         hcbMock.when(HttpClientBuilder::create).thenReturn(new MockedHttpClientBuilder());
     }
+
+     @AfterAll
+     static void tearDown() {
+         hcbMock.close();
+     }
 
     @BeforeEach
     void init() {
