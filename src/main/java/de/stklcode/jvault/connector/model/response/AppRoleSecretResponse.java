@@ -40,7 +40,7 @@ public final class AppRoleSecretResponse extends VaultDataResponse {
         ObjectMapper mapper = new ObjectMapper();
         try {
             /* null empty strings on list objects */
-            Map<String, Object> filteredData = new HashMap<>();
+            Map<String, Object> filteredData = new HashMap<>(data.size(), 1);
             data.forEach((k, v) -> {
                 if (!(v instanceof String && ((String) v).isEmpty())) {
                     filteredData.put(k, v);

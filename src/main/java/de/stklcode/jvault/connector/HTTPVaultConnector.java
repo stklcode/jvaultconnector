@@ -25,10 +25,14 @@ import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 
 /**
  * Vault Connector implementation using Vault's HTTP API.
@@ -222,17 +226,17 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SealResponse sealStatus() throws VaultConnectorException {
-        return request.get(PATH_SEAL_STATUS, new HashMap<>(), token, SealResponse.class);
+        return request.get(PATH_SEAL_STATUS, emptyMap(), token, SealResponse.class);
     }
 
     @Override
     public final void seal() throws VaultConnectorException {
-        request.put(PATH_SEAL, new HashMap<>(), token);
+        request.put(PATH_SEAL, emptyMap(), token);
     }
 
     @Override
     public final SealResponse unseal(final String key, final Boolean reset) throws VaultConnectorException {
-        Map<String, String> param = new HashMap<>();
+        Map<String, String> param = new HashMap<>(2, 1);
         param.put("key", key);
         if (reset != null) {
             param.put("reset", reset.toString());
@@ -244,7 +248,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public HealthResponse getHealth() throws VaultConnectorException {
         /* Force status code to be 200, so we don't need to modify the request sequence. */
-        Map<String, String> param = new HashMap<>();
+        Map<String, String> param = new HashMap<>(3, 1);
         param.put("standbycode", "200");    // Default: 429.
         param.put("sealedcode", "200");     // Default: 503.
         param.put("uninitcode", "200");     // Default: 501.
@@ -260,7 +264,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final List<AuthBackend> getAuthBackends() throws VaultConnectorException {
         /* Issue request and parse response */
-        AuthMethodsResponse amr = request.get(PATH_AUTH, new HashMap<>(), token, AuthMethodsResponse.class);
+        AuthMethodsResponse amr = request.get(PATH_AUTH, emptyMap(), token, AuthMethodsResponse.class);
 
         return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
     }
@@ -270,7 +274,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* set token */
         this.token = token;
         this.tokenTTL = 0;
-        TokenResponse res = request.post(PATH_TOKEN + PATH_LOOKUP, new HashMap<>(), token, TokenResponse.class);
+        TokenResponse res = request.post(PATH_TOKEN + PATH_LOOKUP, emptyMap(), token, TokenResponse.class);
         authorized = true;
 
         return res;
@@ -279,15 +283,14 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final AuthResponse authUserPass(final String username, final String password)
             throws VaultConnectorException {
-        final Map<String, String> payload = new HashMap<>();
-        payload.put("password", password);
+        final Map<String, String> payload = singletonMap("password", password);
         return queryAuth(PATH_AUTH_USERPASS + username, payload);
     }
 
     @Override
     @Deprecated
     public final AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
-        final Map<String, String> payload = new HashMap<>();
+        final Map<String, String> payload = new HashMap<>(2, 1);
         payload.put("app_id", appID);
         payload.put("user_id", userID);
         return queryAuth(PATH_AUTH_APPID + "login", payload);
@@ -295,7 +298,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException {
-        final Map<String, String> payload = new HashMap<>();
+        final Map<String, String> payload = new HashMap<>(2, 1);
         payload.put("role_id", roleID);
         if (secretID != null) {
             payload.put("secret_id", secretID);
@@ -328,7 +331,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final boolean registerAppId(final String appID, final String policy, final String displayName)
             throws VaultConnectorException {
         requireAuth();
-        Map<String, String> payload = new HashMap<>();
+        Map<String, String> payload = new HashMap<>(2, 1);
         payload.put("value", policy);
         payload.put("display_name", displayName);
 
@@ -342,11 +345,13 @@ public class HTTPVaultConnector implements VaultConnector {
     @Deprecated
     public final boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
         requireAuth();
-        Map<String, String> payload = new HashMap<>();
-        payload.put("value", appID);
 
         /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(PATH_AUTH_APPID + "map/user-id/" + userID, payload, token);
+        request.postWithoutResponse(
+                PATH_AUTH_APPID + "map/user-id/" + userID,
+                singletonMap("value", appID),
+                token
+        );
 
         return true;
     }
@@ -366,7 +371,12 @@ public class HTTPVaultConnector implements VaultConnector {
     public final AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException {
         requireAuth();
         /* Request HTTP response and parse Secret */
-        return request.get(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), new HashMap<>(), token, AppRoleResponse.class);
+        return request.get(
+                String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""),
+                emptyMap(),
+                token,
+                AppRoleResponse.class
+        );
     }
 
     @Override
@@ -385,7 +395,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Issue request, parse response and extract Role ID */
         return request.get(
                 String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"),
-                new HashMap<>(),
+                emptyMap(),
                 token,
                 RawDataResponse.class
         ).getData().get("role_id").toString();
@@ -394,12 +404,13 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException {
         requireAuth();
-        /* Request HTTP response and parse Secret */
-        Map<String, String> payload = new HashMap<>();
-        payload.put("role_id", roleID);
 
         /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"), payload, token);
+        request.postWithoutResponse(
+                String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"),
+                singletonMap("role_id", roleID),
+                token
+        );
 
         return true;
     }
@@ -457,7 +468,13 @@ public class HTTPVaultConnector implements VaultConnector {
     public final List<String> listAppRoles() throws VaultConnectorException {
         requireAuth();
 
-        SecretListResponse secrets = request.get(PATH_AUTH_APPROLE + "role?list=true", new HashMap<>(), token, SecretListResponse.class);
+        SecretListResponse secrets = request.get(
+                PATH_AUTH_APPROLE + "role?list=true",
+                emptyMap(),
+                token,
+                SecretListResponse.class
+        );
+
         return secrets.getKeys();
     }
 
@@ -467,7 +484,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         SecretListResponse secrets = request.get(
                 String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id?list=true"),
-                new HashMap<>(),
+                emptyMap(),
                 token,
                 SecretListResponse.class
         );
@@ -479,14 +496,14 @@ public class HTTPVaultConnector implements VaultConnector {
     public final SecretResponse read(final String key) throws VaultConnectorException {
         requireAuth();
         /* Issue request and parse secret response */
-        return request.get(key, new HashMap<>(), token, SecretResponse.class);
+        return request.get(key, emptyMap(), token, SecretResponse.class);
     }
 
     @Override
     public final SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException {
         requireAuth();
         /* Request HTTP response and parse secret metadata */
-        Map<String, String> args = new HashMap<>();
+        Map<String, String> args = new HashMap<>(1, 1);
         if (version != null) {
             args.put("version", version.toString());
         }
@@ -499,14 +516,14 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Request HTTP response and parse secret metadata */
-        return request.get(mount + PATH_METADATA + key, new HashMap<>(), token, MetadataResponse.class);
+        return request.get(mount + PATH_METADATA + key, emptyMap(), token, MetadataResponse.class);
     }
 
     @Override
     public void updateSecretMetadata(final String mount, final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException {
         requireAuth();
 
-        Map<String, Object> payload = new HashMap<>();
+        Map<String, Object> payload = new HashMap<>(2, 1);
         if (maxVersions != null) {
             payload.put("max_versions", maxVersions);
         }
@@ -524,12 +541,12 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Add CAS value to options map if present.
-        Map<String, Object> options = new HashMap<>();
+        Map<String, Object> options = new HashMap<>(1, 1);
         if (cas != null) {
             options.put("cas", cas);
         }
 
-        Map<String, Object> payload = new HashMap<>();
+        Map<String, Object> payload = new HashMap<>(2, 1);
         payload.put("data", data);
         payload.put("options", options);
 
@@ -541,7 +558,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final List<String> list(final String path) throws VaultConnectorException {
         requireAuth();
 
-        SecretListResponse secrets = request.get(path + "/?list=true", new HashMap<>(), token, SecretListResponse.class);
+        SecretListResponse secrets = request.get(path + "/?list=true", emptyMap(), token, SecretListResponse.class);
 
         return secrets.getKeys();
     }
@@ -559,7 +576,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         // If options are given, split payload in two parts.
         if (options != null) {
-            Map<String, Object> payloadMap = new HashMap<>();
+            Map<String, Object> payloadMap = new HashMap<>(2, 1);
             payloadMap.put("data", data);
             payloadMap.put("options", options);
             payload = payloadMap;
@@ -616,8 +633,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Request HTTP response and expect empty result */
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("versions", versions);
+        Map<String, Object> payload = singletonMap("versions", versions);
 
         /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(mount + pathPart + key, payload, token);
@@ -628,14 +644,14 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.putWithoutResponse(PATH_REVOKE + leaseID, new HashMap<>(), token);
+        request.putWithoutResponse(PATH_REVOKE + leaseID, emptyMap(), token);
     }
 
     @Override
     public final SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException {
         requireAuth();
 
-        Map<String, String> payload = new HashMap<>();
+        Map<String, String> payload = new HashMap<>(2, 1);
         payload.put("lease_id", leaseID);
         if (increment != null) {
             payload.put("increment", increment.toString());
@@ -694,9 +710,12 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Request HTTP response and parse Secret */
-        Map<String, String> param = new HashMap<>();
-        param.put("token", token);
-        return request.get(PATH_TOKEN + PATH_LOOKUP, param, token, TokenResponse.class);
+        return request.get(
+                PATH_TOKEN + PATH_LOOKUP,
+                singletonMap("token", token),
+                token,
+                TokenResponse.class
+        );
     }
 
     @Override
@@ -720,7 +739,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         // Request HTTP response and parse response.
-        return request.get(PATH_TOKEN + PATH_ROLES + "/" + name, new HashMap<>(), token, TokenRoleResponse.class);
+        return request.get(PATH_TOKEN + PATH_ROLES + "/" + name, emptyMap(), token, TokenRoleResponse.class);
     }
 
     @Override

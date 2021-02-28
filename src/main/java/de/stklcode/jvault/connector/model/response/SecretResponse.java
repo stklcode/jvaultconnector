@@ -22,7 +22,7 @@ import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -66,7 +66,7 @@ public class SecretResponse extends VaultDataResponse {
      */
     public final Map<String, Object> getData() {
         if (data == null) {
-            return new HashMap<>();
+            return Collections.emptyMap();
         }
         return data;
     }

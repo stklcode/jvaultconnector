@@ -22,10 +22,7 @@ import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Vault Connector interface.
@@ -611,9 +608,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.5.0
      */
     default void write(final String key, final String value) throws VaultConnectorException {
-        Map<String, Object> param = new HashMap<>();
-        param.put("value", value);
-        write(key, param);
+        write(key, Collections.singletonMap("value", value));
     }
 
     /**
@@ -649,9 +644,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      */
     default void writeSecret(final String key, final String value) throws VaultConnectorException {
-        Map<String, Object> param = new HashMap<>();
-        param.put("value", value);
-        writeSecret(key, param);
+        writeSecret(key, Collections.singletonMap("value", value));
     }
 
     /**
