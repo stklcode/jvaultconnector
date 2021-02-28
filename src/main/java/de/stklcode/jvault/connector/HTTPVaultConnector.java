@@ -246,13 +246,18 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public HealthResponse getHealth() throws VaultConnectorException {
-        /* Force status code to be 200, so we don't need to modify the request sequence. */
-        Map<String, String> param = new HashMap<>(3, 1);
-        param.put("standbycode", "200");    // Default: 429.
-        param.put("sealedcode", "200");     // Default: 503.
-        param.put("uninitcode", "200");     // Default: 501.
 
-        return request.get(PATH_HEALTH, param, token, HealthResponse.class);
+        return request.get(
+                PATH_HEALTH,
+                // Force status code to be 200, so we don't need to modify the request sequence.
+                Map.of(
+                        "standbycode", "200",   // Default: 429.
+                        "sealedcode", "200",    // Default: 503.
+                        "uninitcode", "200"     // Default: 501.
+                ),
+                token,
+                HealthResponse.class
+        );
     }
 
     @Override
@@ -289,10 +294,13 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     @Deprecated
     public final AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
-        final Map<String, String> payload = new HashMap<>(2, 1);
-        payload.put("app_id", appID);
-        payload.put("user_id", userID);
-        return queryAuth(PATH_AUTH_APPID + "login", payload);
+        return queryAuth(
+                PATH_AUTH_APPID + "login",
+                Map.of(
+                        "app_id", appID,
+                        "user_id", userID
+                )
+        );
     }
 
     @Override
@@ -330,12 +338,16 @@ public class HTTPVaultConnector implements VaultConnector {
     public final boolean registerAppId(final String appID, final String policy, final String displayName)
             throws VaultConnectorException {
         requireAuth();
-        Map<String, String> payload = new HashMap<>(2, 1);
-        payload.put("value", policy);
-        payload.put("display_name", displayName);
 
         /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(PATH_AUTH_APPID + "map/app-id/" + appID, payload, token);
+        request.postWithoutResponse(
+                PATH_AUTH_APPID + "map/app-id/" + appID,
+                Map.of(
+                        "value", policy,
+                        "display_name", displayName
+                ),
+                token
+        );
 
         return true;
     }
@@ -540,17 +552,23 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Add CAS value to options map if present.
-        Map<String, Object> options = new HashMap<>(1, 1);
+        Map<String, Object> options;
         if (cas != null) {
-            options.put("cas", cas);
+            options = singletonMap("cas", cas);
+        } else {
+            options = emptyMap();
         }
 
-        Map<String, Object> payload = new HashMap<>(2, 1);
-        payload.put("data", data);
-        payload.put("options", options);
-
         /* Issue request and parse metadata response */
-        return request.post(mount + PATH_DATA + key, payload, token, SecretVersionResponse.class);
+        return request.post(
+                mount + PATH_DATA + key,
+                Map.of(
+                        "data", data,
+                        "options", options
+                ),
+                token,
+                SecretVersionResponse.class
+        );
     }
 
     @Override
@@ -575,10 +593,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
         // If options are given, split payload in two parts.
         if (options != null) {
-            Map<String, Object> payloadMap = new HashMap<>(2, 1);
-            payloadMap.put("data", data);
-            payloadMap.put("options", options);
-            payload = payloadMap;
+            payload = Map.of(
+                    "data", data,
+                    "options", options
+            );
         }
 
         /* Issue request and expect code 204 with empty response */
