@@ -16,37 +16,32 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.exception.InvalidRequestException;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
-import de.stklcode.jvault.connector.exception.PermissionDeniedException;
-import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicStatusLine;
-import org.junit.jupiter.api.*;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import de.stklcode.jvault.connector.exception.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.MockedStatic;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.ServerSocket;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * JUnit test for HTTP Vault connector.
@@ -58,40 +53,33 @@ import static org.mockito.Mockito.*;
 class HTTPVaultConnectorOfflineTest {
     private static final String INVALID_URL = "foo:/\\1nv4l1d_UrL";
 
-    private static MockedStatic<HttpClientBuilder> hcbMock;
-    private static CloseableHttpClient httpMock;
-    private final CloseableHttpResponse responseMock = mock(CloseableHttpResponse.class);
+    private static WireMockServer wireMock;
 
     @BeforeAll
     static void prepare() {
-        // Mock the static HTTPClient creation.
-        hcbMock = mockStatic(HttpClientBuilder.class);
-        hcbMock.when(HttpClientBuilder::create).thenReturn(new MockedHttpClientBuilder());
+        // Initialize HTTP mock.
+        wireMock = new WireMockServer(WireMockConfiguration.options().dynamicPort());
+        wireMock.start();
+        WireMock.configureFor("localhost", wireMock.port());
     }
 
-     @AfterAll
-     static void tearDown() {
-         hcbMock.close();
-     }
-
-    @BeforeEach
-    void init() {
-        // Re-initialize HTTP mock to ensure fresh (empty) results.
-        httpMock = mock(CloseableHttpClient.class);
+    @AfterAll
+    static void tearDown() {
+        wireMock.stop();
+        wireMock = null;
     }
-
 
     /**
      * Test exceptions thrown during request.
      */
     @Test
     void requestExceptionTest() throws IOException {
-        HTTPVaultConnector connector = new HTTPVaultConnector("http://127.0.0.1", null, 0, 250);
+        HTTPVaultConnector connector = new HTTPVaultConnector(wireMock.url("/"), null, 0, 250);
 
         // Test invalid response code.
         final int responseCode = 400;
-        mockResponse(responseCode, "", ContentType.APPLICATION_JSON);
-        InvalidResponseException e = assertThrows(
+        mockHttpResponse(responseCode, "", "application/json");
+        VaultConnectorException e = assertThrows(
                 InvalidResponseException.class,
                 connector::getHealth,
                 "Querying health status succeeded on invalid instance"
@@ -101,7 +89,7 @@ class HTTPVaultConnectorOfflineTest {
         assertThat("Response message where none was expected", ((InvalidResponseException) e).getResponse(), is(nullValue()));
 
         // Simulate permission denied response.
-        mockResponse(responseCode, "{\"errors\":[\"permission denied\"]}", ContentType.APPLICATION_JSON);
+        mockHttpResponse(responseCode, "{\"errors\":[\"permission denied\"]}", "application/json");
         assertThrows(
                 PermissionDeniedException.class,
                 connector::getHealth,
@@ -109,25 +97,27 @@ class HTTPVaultConnectorOfflineTest {
         );
 
         // Test exception thrown during request.
-        when(httpMock.execute(any())).thenThrow(new IOException("Test Exception"));
+        try (ServerSocket s = new ServerSocket(0)) {
+            connector = new HTTPVaultConnector("http://localst:" + s.getLocalPort() + "/", null, 0, 250);
+        }
         e = assertThrows(
-                InvalidResponseException.class,
+                ConnectionException.class,
                 connector::getHealth,
                 "Querying health status succeeded on invalid instance"
         );
-        assertThat("Unexpected exception message", e.getMessage(), is("Unable to read response"));
+        assertThat("Unexpected exception message", e.getMessage(), is("Unable to connect to Vault server"));
         assertThat("Unexpected cause", e.getCause(), instanceOf(IOException.class));
 
         // Now simulate a failing request that succeeds on second try.
-        connector = new HTTPVaultConnector("https://127.0.0.1", null, 1, 250);
-        doReturn(responseMock).doReturn(responseMock).when(httpMock).execute(any());
-        doReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 500, ""))
-                .doReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 500, ""))
-                .doReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 500, ""))
-                .doReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, ""))
-                .when(responseMock).getStatusLine();
-        when(responseMock.getEntity()).thenReturn(new StringEntity("{}", ContentType.APPLICATION_JSON));
+        connector = new HTTPVaultConnector(wireMock.url("/"), null, 1, 250);
 
+        WireMock.stubFor(
+                WireMock.any(anyUrl())
+                        .willReturn(aResponse().withStatus(500))
+                        .willReturn(aResponse().withStatus(500))
+                        .willReturn(aResponse().withStatus(500))
+                        .willReturn(aResponse().withStatus(200).withBody("{}").withHeader("Content-Type", "application/json"))
+        );
         assertDoesNotThrow(connector::getHealth, "Request failed unexpectedly");
     }
 
@@ -187,7 +177,7 @@ class HTTPVaultConnectorOfflineTest {
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    void sealExceptionTest() {
+    void sealExceptionTest() throws IOException {
         HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
         VaultConnectorException e = assertThrows(
                 InvalidRequestException.class,
@@ -196,21 +186,23 @@ class HTTPVaultConnectorOfflineTest {
         );
         assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
 
-        // Simulate NULL response (mock not supplied with data).
-        connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        // Simulate no connection.
+        try (ServerSocket s = new ServerSocket(0)) {
+            connector = new HTTPVaultConnector("http://localst:" + s.getLocalPort() + "/", null, 0, 250);
+        }
         e = assertThrows(
-                InvalidResponseException.class,
+                ConnectionException.class,
                 connector::sealStatus,
                 "Querying seal status succeeded on invalid instance"
         );
-        assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
+        assertThat("Unexpected exception message", e.getMessage(), is("Unable to connect to Vault server"));
     }
 
     /**
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    void healthExceptionTest() {
+    void healthExceptionTest() throws IOException {
         HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
         VaultConnectorException e = assertThrows(
                 InvalidRequestException.class,
@@ -219,14 +211,16 @@ class HTTPVaultConnectorOfflineTest {
         );
         assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
 
-        // Simulate NULL response (mock not supplied with data).
-        connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        // Simulate no connection.
+        try (ServerSocket s = new ServerSocket(0)) {
+            connector = new HTTPVaultConnector("http://localhost:" + s.getLocalPort() + "/", null, 0, 250);
+        }
         e = assertThrows(
-                InvalidResponseException.class,
+                ConnectionException.class,
                 connector::getHealth,
                 "Querying health status succeeded on invalid instance"
         );
-        assertThat("Unexpected exception message", e.getMessage(), is("Response unavailable"));
+        assertThat("Unexpected exception message", e.getMessage(), is("Unable to connect to Vault server"));
     }
 
     /**
@@ -234,11 +228,11 @@ class HTTPVaultConnectorOfflineTest {
      */
     @Test
     void parseExceptionTest() throws IOException {
-        HTTPVaultConnector connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+        HTTPVaultConnector connector = new HTTPVaultConnector(wireMock.url("/"), null, 0, 250);
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
-        mockResponse(200, "invalid", ContentType.APPLICATION_JSON);
+        mockHttpResponse(200, "invalid", "application/json");
 
         // Now test the methods.
         assertParseError(connector::sealStatus, "sealStatus() succeeded on invalid instance");
@@ -267,12 +261,12 @@ class HTTPVaultConnectorOfflineTest {
      * Test requests that expect an empty response with code 204, but receive a 200 body.
      */
     @Test
-    void nonEmpty204ResponseTest() throws IOException {
-        HTTPVaultConnector connector = new HTTPVaultConnector("https://127.0.0.1", null, 0, 250);
+    void nonEmpty204ResponseTest() {
+        HTTPVaultConnector connector = new HTTPVaultConnector(wireMock.url("/"), null, 0, 250);
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
-        mockResponse(200, "{}", ContentType.APPLICATION_JSON);
+        mockHttpResponse(200, "{}", "application/json");
 
         // Now test the methods expecting a 204.
         assertThrows(
@@ -361,20 +355,11 @@ class HTTPVaultConnectorOfflineTest {
         }
     }
 
-    private void mockResponse(int status, String body, ContentType type) throws IOException {
-        when(httpMock.execute(any())).thenReturn(responseMock);
-        when(responseMock.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), status, ""));
-        when(responseMock.getEntity()).thenReturn(new StringEntity(body, type));
+    private void mockHttpResponse(int status, String body, String contentType) {
+        WireMock.stubFor(
+                WireMock.any(anyUrl()).willReturn(
+                        aResponse().withStatus(status).withBody(body).withHeader("Content-Type", contentType)
+                )
+        );
     }
-
-    /**
-     * Mocked {@link HttpClientBuilder} that always returns the mocked client.
-     */
-    private static class MockedHttpClientBuilder extends HttpClientBuilder {
-        @Override
-        public CloseableHttpClient build() {
-            return httpMock;
-        }
-    }
-
 }
