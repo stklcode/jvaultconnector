@@ -2,9 +2,10 @@
 
 ### Improvements
 * Use pre-sized map objects for fixed-size payloads
+* Minor dependency updates
 
 ### Test
-* Tested against Vault 1.6.3
+* Tested against Vault 1.7.0
 
 ## 0.9.2 (2021-01-24)
 
