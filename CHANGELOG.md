@@ -3,6 +3,7 @@
 ### Improvements
 * Use pre-sized map objects for fixed-size payloads
 * Minor dependency updates
+* Unit test adjustments for JDK 16 build environments
 
 ### Test
 * Tested against Vault 1.7.0

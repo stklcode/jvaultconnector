@@ -23,6 +23,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <argLine></argLine>
     </properties>
 
     <developers>
@@ -96,6 +97,7 @@
                     <version>2.22.2</version>
                     <configuration>
                         <reuseForks>false</reuseForks>
+                        <argLine>@{argLine} --illegal-access=permit</argLine>
                     </configuration>
                 </plugin>
             </plugins>
