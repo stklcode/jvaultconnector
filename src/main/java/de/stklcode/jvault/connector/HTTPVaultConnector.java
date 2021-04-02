@@ -25,7 +25,6 @@ import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
 import java.security.cert.X509Certificate;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
