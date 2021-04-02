@@ -40,7 +40,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>jvault-connector</artifactId>
-    <version>0.9.2</version>
+    <version>0.9.3</version>
 </dependency>
 ```
 
@@ -86,20 +86,20 @@ vault.authAppRole("01234567-89ab-cdef-0123-456789abcdef", "fedcba98-7654-3210-fe
 
 ```java
 // Retrieve secret (prefix "secret/" assumed, use read() to read arbitrary paths)
-String secret = vault.readSecret("some/secret/key").get("value", String.class);
+String secret = vault.read("secret/some/key").get("value", String.class);
 
 // Complex secret.
-Map<String, Object> secretData = vault.readSecret("another/secret/key").getData();
+Map<String, Object> secretData = vault.read("secret/another/key").getData();
 
 // Write simple secret.
-vault.writeSecret("new/secret/key", "secret value");
+vault.write("secret/new/key", "secret value");
 
-// Write complex data to arbitraty path.
+// Write complex data.
 Map<String, Object> map = ...;
-vault.write("any/path/to/write", map);
+vault.write("path/to/write", map);
 
 // Delete secret.
-vault.delete("any/path/to/write");
+vault.delete("path/to/delete");
 ```
 
 ### Token and role creation

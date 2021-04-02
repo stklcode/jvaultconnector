@@ -1,4 +1,4 @@
-## unreleased
+## 0.9.3 (2021-04-02)
 
 ### Improvements
 * Use pre-sized map objects for fixed-size payloads
