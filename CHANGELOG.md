@@ -3,6 +3,9 @@
 ### Breaking
 * Requires Java 11 or later
 
+### Removal
+* Remove deprecated `VaultConnectorFactory` in favor of `VaultConnectorBuilder` with identical API
+
 ### Improvements
 * Use pre-sized map objects for fixed-size payloads
 * Remove Apache HTTP Client dependency in favor of Java 11 HTTP
