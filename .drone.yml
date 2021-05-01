@@ -8,7 +8,7 @@ steps:
       - mvn -B clean compile
     when:
       branch:
-        - master
+        - main
         - develop
         - feature/*
         - fix/*
@@ -35,5 +35,5 @@ steps:
       - mvn -B resources:testResources compiler:testCompile surefire:test
     when:
       branch:
-        - master
+        - main
         - release/*
