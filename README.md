@@ -1,6 +1,6 @@
 # Java Vault Connector 
 
-[![Build Status](https://travis-ci.com/stklcode/jvaultconnector.svg?branch=main)](https://travis-ci.com/stklcode/jvaultconnector)
+[![CI Status](https://github.com/stklcode/jvaultconnector/actions/workflows/ci.yml/badge.svg)](https://github.com/stklcode/jvaultconnector/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=de.stklcode.jvault%3Ajvault-connector&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.stklcode.jvault%3Ajvault-connector)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/stklcode/jvaultconnector/blob/main/LICENSE.txt) 
 [![Maven Central](https://img.shields.io/maven-central/v/de.stklcode.jvault/jvault-connector.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.stklcode.jvault%22%20AND%20a%3A%22jvault-connector%22)

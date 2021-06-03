@@ -1,0 +1,49 @@
+name: CI
+on: [ push, pull_request ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jdk: [ 11, 16 ]
+        vault: [ '1.7.2' ]
+        include:
+          - jdk: 11
+            vault: '1.7.2'
+            analysis: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: 'adopt-hotspot'
+      - name: Set up Vault
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+        run: |
+          wget -q "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_linux_amd64.zip"
+          wget -q -O - "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_SHA256SUMS" | grep linux_amd64 | sha256sum -c
+          unzip "vault_${{ matrix.vault }}_linux_amd64.zip"
+          rm "vault_${{ matrix.vault }}_linux_amd64.zip"
+          sudo mv vault /usr/bin/vault
+      - name: Test
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+        env:
+          VAULT_VERSION: ${{ matrix.vault }}
+        run: mvn -B -P coverage clean verify
+      - name: Test (offline)
+        if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release/')
+        run: mvn -B -P offline-tests -P coverage clean verify
+      - name: Analysis
+        if: matrix.analysis && github.event_name == 'push'
+        run: >
+          mvn -B sonar:sonar
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=stklcode-github
+          -Dsonar.login=$SONAR_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
