@@ -10,6 +10,9 @@
 * Use pre-sized map objects for fixed-size payloads
 * Remove Apache HTTP Client dependency in favor of Java 11 HTTP
 
+### Test
+* Tested against Vault 1.7.2
+
 
 ## 0.9.3 (2021-04-02)
 
