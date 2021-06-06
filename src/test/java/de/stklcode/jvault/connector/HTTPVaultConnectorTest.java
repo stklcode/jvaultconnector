@@ -771,7 +771,7 @@ class HTTPVaultConnectorTest {
 
             /* Update role model with custom flags */
             AppRole role2 = AppRole.builder(roleName)
-                    .wit0hTokenPeriod(321)
+                    .withTokenPeriod(321)
                     .build();
 
             /* Create role */

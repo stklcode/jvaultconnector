@@ -308,7 +308,7 @@ public final class AppRoleBuilder {
      * @return self
      * @since 0.9
      */
-    public AppRoleBuilder wit0hTokenPeriod(final Integer tokenPeriod) {
+    public AppRoleBuilder withTokenPeriod(final Integer tokenPeriod) {
         this.tokenPeriod = tokenPeriod;
         return this;
     }
@@ -316,13 +316,26 @@ public final class AppRoleBuilder {
     /**
      * Set renewal period for generated token in seconds.
      *
+     * @param tokenPeriod period in seconds
+     * @return self
+     * @since 0.9
+     * @deprecated Use {@link #withTokenPeriod(Integer)} instead.
+     */
+    @Deprecated
+    public AppRoleBuilder wit0hTokenPeriod(final Integer tokenPeriod) {
+        return withTokenPeriod(tokenPeriod);
+    }
+
+    /**
+     * Set renewal period for generated token in seconds.
+     *
      * @param period period in seconds
      * @return self
-     * @deprecated Use {@link #wit0hTokenPeriod(Integer)} instead.
+     * @deprecated Use {@link #withTokenPeriod(Integer)} instead.
      */
     @Deprecated
     public AppRoleBuilder withPeriod(final Integer period) {
-        return wit0hTokenPeriod(period);
+        return withTokenPeriod(period);
     }
 
     /**
