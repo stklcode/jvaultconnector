@@ -1,7 +1,13 @@
 ## unreleased
 
 ### Deprecations
-* `AppRole.Builder#wit0hTokenPeriod()` is deprecated in favor of `#withTokenPeriod()`
+* `AppRole.Builder#wit0hTokenPeriod()` is deprecated in favor of `#withTokenPeriod()` (#49)
+
+### Improvements
+* Minor dependency updates
+
+### Test
+* Tested against Vault 1.7.2
 
 ## 0.9.3 (2021-04-02)
 
