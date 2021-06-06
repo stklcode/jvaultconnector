@@ -106,53 +106,6 @@ public final class AppRole {
     }
 
     /**
-     * Construct complete {@link AppRole} object.
-     * <p>
-     * This constructor is used for transition from {@code bound_cidr_list} to {@code secret_id_bound_cidrs} only.
-     *
-     * @param name                 Role name (required)
-     * @param id                   Role ID (optional)
-     * @param bindSecretId         Bind secret ID (optional)
-     * @param secretIdBoundCidrs   Whitelist of subnets in CIDR notation (optional)
-     * @param secretIdNumUses      Maximum number of uses per secret (optional)
-     * @param secretIdTtl          Maximum TTL in seconds for secrets (optional)
-     * @param enableLocalSecretIds Enable local secret IDs (optional)
-     * @param tokenTtl             Token TTL in seconds (optional)
-     * @param tokenMaxTtl          Maximum token TTL in seconds, including renewals (optional)
-     * @param tokenPolicies        List of token policies (optional)
-     * @param tokenBoundCidrs      Whitelist of subnets in CIDR notation for associated tokens (optional)
-     * @param tokenExplicitMaxTtl  Explicit maximum TTL for associated tokens (optional)
-     * @param tokenNoDefaultPolicy Enable or disable default policy for associated tokens (optional)
-     * @param tokenNumUses         Number of uses for tokens (optional)
-     * @param tokenPeriod          Duration in seconds, if set the token is a periodic token (optional)
-     * @param tokenType            Token type (optional)
-     * @deprecated As of 0.9 in favor of {@link #builder(String)}. Will be removed with next major release.
-     */
-    @Deprecated
-    AppRole(final String name, final String id, final Boolean bindSecretId, final List<String> secretIdBoundCidrs,
-            final Integer secretIdNumUses, final Integer secretIdTtl, final Boolean enableLocalSecretIds,
-            final Integer tokenTtl, final Integer tokenMaxTtl, final List<String> tokenPolicies,
-            final List<String> tokenBoundCidrs, final Integer tokenExplicitMaxTtl, final Boolean tokenNoDefaultPolicy,
-            final Integer tokenNumUses, final Integer tokenPeriod, final String tokenType) {
-        this.name = name;
-        this.id = id;
-        this.bindSecretId = bindSecretId;
-        this.secretIdBoundCidrs = secretIdBoundCidrs;
-        this.tokenPolicies = tokenPolicies;
-        this.secretIdNumUses = secretIdNumUses;
-        this.secretIdTtl = secretIdTtl;
-        this.enableLocalSecretIds = enableLocalSecretIds;
-        this.tokenTtl = tokenTtl;
-        this.tokenMaxTtl = tokenMaxTtl;
-        this.tokenBoundCidrs = tokenBoundCidrs;
-        this.tokenExplicitMaxTtl = tokenExplicitMaxTtl;
-        this.tokenNoDefaultPolicy = tokenNoDefaultPolicy;
-        this.tokenNumUses = tokenNumUses;
-        this.tokenPeriod = tokenPeriod;
-        this.tokenType = tokenType;
-    }
-
-    /**
      * Construct {@link AppRole} object from {@link AppRole.Builder}.
      *
      * @param builder AppRole builder.
@@ -266,32 +219,12 @@ public final class AppRole {
     }
 
     /**
-     * @return list of token policies
-     * @deprecated Use {@link #getTokenPolicies()} instead.
-     */
-    @Deprecated
-    @JsonIgnore
-    public List<String> getPolicies() {
-        return getTokenPolicies();
-    }
-
-    /**
      * @param tokenPolicies list of token policies
      * @since 0.9
      */
     @JsonSetter("token_policies")
     public void setTokenPolicies(final List<String> tokenPolicies) {
         this.tokenPolicies = tokenPolicies;
-    }
-
-    /**
-     * @param policies list of policies
-     * @deprecated Use {@link #setTokenPolicies(List)} instead.
-     */
-    @Deprecated
-    @JsonIgnore
-    public void setPolicies(final List<String> policies) {
-        setTokenPolicies(policies);
     }
 
     /**
@@ -305,16 +238,6 @@ public final class AppRole {
             return "";
         }
         return String.join(",", tokenPolicies);
-    }
-
-    /**
-     * @return list of policies as comma-separated {@link String}
-     * @deprecated Use {@link #getTokenPoliciesString()} instead.
-     */
-    @Deprecated
-    @JsonIgnore
-    public String getPoliciesString() {
-        return getTokenPoliciesString();
     }
 
     /**
@@ -383,16 +306,6 @@ public final class AppRole {
      */
     public Integer getTokenPeriod() {
         return tokenPeriod;
-    }
-
-    /**
-     * @return duration in seconds, if specified
-     * @deprecated Use {@link #getTokenPeriod()} instead.
-     */
-    @Deprecated
-    @JsonIgnore
-    public Integer getPeriod() {
-        return getTokenPeriod();
     }
 
     /**
@@ -537,18 +450,6 @@ public final class AppRole {
         }
 
         /**
-         * Add given policies.
-         *
-         * @param policies the policies
-         * @return self
-         * @deprecated Use {@link #withTokenPolicies(List)} instead.
-         */
-        @Deprecated
-        public Builder withPolicies(final List<String> policies) {
-            return withTokenPolicies(policies);
-        }
-
-        /**
          * Add a single policy.
          *
          * @param tokenPolicy the token policy
@@ -561,18 +462,6 @@ public final class AppRole {
             }
             tokenPolicies.add(tokenPolicy);
             return this;
-        }
-
-        /**
-         * Add a single policy.
-         *
-         * @param policy the policy
-         * @return self
-         * @deprecated Use {@link #withTokenPolicy(String)} instead.
-         */
-        @Deprecated
-        public Builder withPolicy(final String policy) {
-            return withTokenPolicy(policy);
         }
 
         /**
@@ -706,31 +595,6 @@ public final class AppRole {
         public Builder withTokenPeriod(final Integer tokenPeriod) {
             this.tokenPeriod = tokenPeriod;
             return this;
-        }
-
-        /**
-         * Set renewal period for generated token in seconds.
-         *
-         * @param tokenPeriod period in seconds
-         * @return self
-         * @since 0.9
-         * @deprecated Use {@link #withTokenPeriod(Integer)} instead.
-         */
-        @Deprecated
-        public Builder wit0hTokenPeriod(final Integer tokenPeriod) {
-            return withTokenPeriod(tokenPeriod);
-        }
-
-        /**
-         * Set renewal period for generated token in seconds.
-         *
-         * @param period period in seconds
-         * @return self
-         * @deprecated Use {@link #withTokenPeriod(Integer)} instead.
-         */
-        @Deprecated
-        public Builder withPeriod(final Integer period) {
-            return withTokenPeriod(period);
         }
 
         /**

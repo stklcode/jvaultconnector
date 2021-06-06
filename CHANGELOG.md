@@ -5,6 +5,8 @@
 
 ### Removal
 * Remove deprecated `VaultConnectorFactory` in favor of `VaultConnectorBuilder` with identical API
+* Remove deprecated `AppRoleBuilder` and `TokenBuilder` in favor of `AppRole.Builder` and `Token.Builder`
+* Remove deprecated `Period`, `Policy` and `Policies` methods from `AppRole` in favor of `Token`-prefixed versions
 
 ### Improvements
 * Use pre-sized map objects for fixed-size payloads

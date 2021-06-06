@@ -28,12 +28,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 /**
- * JUnit Test for AppRole Builder.
+ * JUnit Test for {@link AppRole} and {@link AppRole.Builder}.
  *
  * @author Stefan Kalscheuer
  * @since 0.4.0
  */
-class AppRoleBuilderTest {
+class AppRoleTest {
     private static final String NAME = "TestRole";
     private static final String ID = "test-id";
     private static final Boolean BIND_SECRET_ID = true;
@@ -73,7 +73,6 @@ class AppRoleBuilderTest {
         assertThat(role.getBindSecretId(), is(nullValue()));
         assertThat(role.getSecretIdBoundCidrs(), is(nullValue()));
         assertThat(role.getTokenPolicies(), is(nullValue()));
-        assertThat(role.getPolicies(), is(nullValue()));
         assertThat(role.getSecretIdNumUses(), is(nullValue()));
         assertThat(role.getSecretIdTtl(), is(nullValue()));
         assertThat(role.getEnableLocalSecretIds(), is(nullValue()));
@@ -84,35 +83,6 @@ class AppRoleBuilderTest {
         assertThat(role.getTokenNoDefaultPolicy(), is(nullValue()));
         assertThat(role.getTokenNumUses(), is(nullValue()));
         assertThat(role.getTokenPeriod(), is(nullValue()));
-        assertThat(role.getPeriod(), is(nullValue()));
-        assertThat(role.getTokenType(), is(nullValue()));
-
-        /* optional fields should be ignored, so JSON string should only contain role_name */
-        assertThat(new ObjectMapper().writeValueAsString(role), is(JSON_MIN));
-    }
-
-    /**
-     * Build role with only a name.
-     */
-    @Test
-    void legacyBuildDefaultTest() throws JsonProcessingException {
-        AppRole role = new AppRoleBuilder(NAME).build();
-        assertThat(role.getId(), is(nullValue()));
-        assertThat(role.getBindSecretId(), is(nullValue()));
-        assertThat(role.getSecretIdBoundCidrs(), is(nullValue()));
-        assertThat(role.getTokenPolicies(), is(nullValue()));
-        assertThat(role.getPolicies(), is(nullValue()));
-        assertThat(role.getSecretIdNumUses(), is(nullValue()));
-        assertThat(role.getSecretIdTtl(), is(nullValue()));
-        assertThat(role.getEnableLocalSecretIds(), is(nullValue()));
-        assertThat(role.getTokenTtl(), is(nullValue()));
-        assertThat(role.getTokenMaxTtl(), is(nullValue()));
-        assertThat(role.getTokenBoundCidrs(), is(nullValue()));
-        assertThat(role.getTokenExplicitMaxTtl(), is(nullValue()));
-        assertThat(role.getTokenNoDefaultPolicy(), is(nullValue()));
-        assertThat(role.getTokenNumUses(), is(nullValue()));
-        assertThat(role.getTokenPeriod(), is(nullValue()));
-        assertThat(role.getPeriod(), is(nullValue()));
         assertThat(role.getTokenType(), is(nullValue()));
 
         /* optional fields should be ignored, so JSON string should only contain role_name */
@@ -146,7 +116,6 @@ class AppRoleBuilderTest {
         assertThat(role.getBindSecretId(), is(BIND_SECRET_ID));
         assertThat(role.getSecretIdBoundCidrs(), is(BOUND_CIDR_LIST));
         assertThat(role.getTokenPolicies(), is(POLICIES));
-        assertThat(role.getPolicies(), is(role.getTokenPolicies()));
         assertThat(role.getSecretIdNumUses(), is(SECRET_ID_NUM_USES));
         assertThat(role.getSecretIdTtl(), is(SECRET_ID_TTL));
         assertThat(role.getEnableLocalSecretIds(), is(ENABLE_LOCAL_SECRET_IDS));
@@ -157,52 +126,6 @@ class AppRoleBuilderTest {
         assertThat(role.getTokenNoDefaultPolicy(), is(TOKEN_NO_DEFAULT_POLICY));
         assertThat(role.getTokenNumUses(), is(TOKEN_NUM_USES));
         assertThat(role.getTokenPeriod(), is(TOKEN_PERIOD));
-        assertThat(role.getPeriod(), is(TOKEN_PERIOD));
-        assertThat(role.getTokenType(), is(TOKEN_TYPE.value()));
-
-        /* Verify that all parameters are included in JSON string */
-        assertThat(new ObjectMapper().writeValueAsString(role), is(JSON_FULL));
-    }
-
-    /**
-     * Build token without all parameters set.
-     */
-    @Test
-    void legacyBuildFullTest() throws JsonProcessingException {
-        AppRole role = new AppRoleBuilder(NAME)
-                .withId(ID)
-                .withBindSecretID(BIND_SECRET_ID)
-                .withSecretIdBoundCidrs(BOUND_CIDR_LIST)
-                .withTokenPolicies(POLICIES)
-                .withSecretIdNumUses(SECRET_ID_NUM_USES)
-                .withSecretIdTtl(SECRET_ID_TTL)
-                .withEnableLocalSecretIds(ENABLE_LOCAL_SECRET_IDS)
-                .withTokenTtl(TOKEN_TTL)
-                .withTokenMaxTtl(TOKEN_MAX_TTL)
-                .withTokenBoundCidrs(BOUND_CIDR_LIST)
-                .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
-                .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
-                .withTokenNumUses(TOKEN_NUM_USES)
-                .withTokenPeriod(TOKEN_PERIOD)
-                .withTokenType(TOKEN_TYPE)
-                .build();
-        assertThat(role.getName(), is(NAME));
-        assertThat(role.getId(), is(ID));
-        assertThat(role.getBindSecretId(), is(BIND_SECRET_ID));
-        assertThat(role.getSecretIdBoundCidrs(), is(BOUND_CIDR_LIST));
-        assertThat(role.getTokenPolicies(), is(POLICIES));
-        assertThat(role.getPolicies(), is(role.getTokenPolicies()));
-        assertThat(role.getSecretIdNumUses(), is(SECRET_ID_NUM_USES));
-        assertThat(role.getSecretIdTtl(), is(SECRET_ID_TTL));
-        assertThat(role.getEnableLocalSecretIds(), is(ENABLE_LOCAL_SECRET_IDS));
-        assertThat(role.getTokenTtl(), is(TOKEN_TTL));
-        assertThat(role.getTokenMaxTtl(), is(TOKEN_MAX_TTL));
-        assertThat(role.getTokenBoundCidrs(), is(BOUND_CIDR_LIST));
-        assertThat(role.getTokenExplicitMaxTtl(), is(TOKEN_EXPLICIT_MAX_TTL));
-        assertThat(role.getTokenNoDefaultPolicy(), is(TOKEN_NO_DEFAULT_POLICY));
-        assertThat(role.getTokenNumUses(), is(TOKEN_NUM_USES));
-        assertThat(role.getTokenPeriod(), is(TOKEN_PERIOD));
-        assertThat(role.getPeriod(), is(TOKEN_PERIOD));
         assertThat(role.getTokenType(), is(TOKEN_TYPE.value()));
 
         /* Verify that all parameters are included in JSON string */
@@ -243,57 +166,11 @@ class AppRoleBuilderTest {
         role = AppRole.builder(NAME).withTokenPolicy(POLICY_2).build();
         assertThat(role.getTokenPolicies(), hasSize(1));
         assertThat(role.getTokenPolicies(), contains(POLICY_2));
-        assertThat(role.getPolicies(), is(role.getTokenPolicies()));
         role = AppRole.builder(NAME)
                 .withTokenPolicies(POLICIES)
                 .withTokenPolicy(POLICY_2)
                 .build();
         assertThat(role.getTokenPolicies(), hasSize(2));
         assertThat(role.getTokenPolicies(), contains(POLICY, POLICY_2));
-        assertThat(role.getPolicies(), is(role.getTokenPolicies()));
-    }
-
-    /**
-     * Test convenience methods
-     */
-    @Test
-    void legacyConvenienceMethodsTest() {
-        /* bind_secret_id */
-        AppRole role = new AppRoleBuilder(NAME).build();
-        assertThat(role.getBindSecretId(), is(nullValue()));
-        role = new AppRoleBuilder(NAME).withBindSecretID().build();
-        assertThat(role.getBindSecretId(), is(true));
-        role = new AppRoleBuilder(NAME).withoutBindSecretID().build();
-        assertThat(role.getBindSecretId(), is(false));
-
-        /* Add single CIDR subnet */
-        role = new AppRoleBuilder(NAME).withSecretBoundCidr(CIDR_2).withTokenBoundCidr(CIDR_2).build();
-        assertThat(role.getSecretIdBoundCidrs(), hasSize(1));
-        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_2));
-        assertThat(role.getTokenBoundCidrs(), hasSize(1));
-        assertThat(role.getTokenBoundCidrs(), contains(CIDR_2));
-        role = new AppRoleBuilder(NAME)
-                .withSecretIdBoundCidrs(BOUND_CIDR_LIST)
-                .withSecretBoundCidr(CIDR_2)
-                .withTokenBoundCidrs(BOUND_CIDR_LIST)
-                .withTokenBoundCidr(CIDR_2)
-                .build();
-        assertThat(role.getSecretIdBoundCidrs(), hasSize(2));
-        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_1, CIDR_2));
-        assertThat(role.getTokenBoundCidrs(), hasSize(2));
-        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_1, CIDR_2));
-
-        /* Add single policy */
-        role = new AppRoleBuilder(NAME).withTokenPolicy(POLICY_2).build();
-        assertThat(role.getTokenPolicies(), hasSize(1));
-        assertThat(role.getTokenPolicies(), contains(POLICY_2));
-        assertThat(role.getPolicies(), is(role.getTokenPolicies()));
-        role = new AppRoleBuilder(NAME)
-                .withTokenPolicies(POLICIES)
-                .withTokenPolicy(POLICY_2)
-                .build();
-        assertThat(role.getTokenPolicies(), hasSize(2));
-        assertThat(role.getTokenPolicies(), contains(POLICY, POLICY_2));
-        assertThat(role.getPolicies(), is(role.getTokenPolicies()));
     }
 }

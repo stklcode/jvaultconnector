@@ -107,10 +107,7 @@ class AppRoleResponseTest {
         assertThat("Incorrect secret ID umber of uses", role.getSecretIdNumUses(), is(ROLE_SECRET_NUM_USES));
         assertThat("Incorrect number of policies", role.getTokenPolicies(), hasSize(1));
         assertThat("Incorrect role policies", role.getTokenPolicies(), contains(ROLE_POLICY));
-        assertThat("Incorrect number of policies", role.getPolicies(), hasSize(1));
-        assertThat("Incorrect role policies", role.getPolicies(), contains(ROLE_POLICY));
         assertThat("Incorrect role period", role.getTokenPeriod(), is(ROLE_PERIOD));
-        assertThat("Incorrect role period", role.getPeriod(), is(ROLE_PERIOD));
         assertThat("Incorrect role bind secret ID flag", role.getBindSecretId(), is(ROLE_BIND_SECRET));
         assertThat("Incorrect bound CIDR list", role.getTokenBoundCidrs(), is(nullValue()));
         assertThat("Incorrect bound CIDR list string", role.getTokenBoundCidrsString(), is(emptyString()));
