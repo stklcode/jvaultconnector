@@ -159,17 +159,17 @@ class HTTPVaultConnectorTest {
                     () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY),
                     "Valid secret path could not be read"
             );
-            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET_VALUE));
+            assertThat("Known secret returned invalid value.", res.get("value"), is(SECRET_VALUE));
 
             /* Try to read accessible path with JSON value */
             res = assertDoesNotThrow(
                     () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON),
                     "Valid secret path could not be read"
             );
-            assertThat("Known secret returned null value.", res.getValue(), notNullValue());
+            assertThat("Known secret returned null value.", res.get("value"), notNullValue());
 
             SecretResponse finalRes = res;
-            Credentials parsedRes = assertDoesNotThrow(() -> finalRes.getValue(Credentials.class), "JSON response could not be parsed");
+            Credentials parsedRes = assertDoesNotThrow(() -> finalRes.get("value", Credentials.class), "JSON response could not be parsed");
             assertThat("JSON response was null", parsedRes, notNullValue());
             assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
             assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
@@ -179,10 +179,10 @@ class HTTPVaultConnectorTest {
                     () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON),
                     "Valid secret path could not be read"
             );
-            assertThat("Known secret returned null value.", res.getValue(), notNullValue());
+            assertThat("Known secret returned null value.", res.get("value"), notNullValue());
 
             SecretResponse finalRes1 = res;
-            parsedRes = assertDoesNotThrow(() -> finalRes1.getValue(Credentials.class), "JSON response could not be parsed");
+            parsedRes = assertDoesNotThrow(() -> finalRes1.get("value", Credentials.class), "JSON response could not be parsed");
             assertThat("JSON response was null", parsedRes, notNullValue());
             assertThat("JSON response incorrect", parsedRes.getUsername(), is("user"));
             assertThat("JSON response incorrect", parsedRes.getPassword(), is("password"));
@@ -257,7 +257,7 @@ class HTTPVaultConnectorTest {
                     () -> connector.readSecret(SECRET_PATH + "/temp"),
                     "Written secret could not be read."
             );
-            assertThat(res.getValue(), is("Abc123äöü,!"));
+            assertThat(res.get("value"), is("Abc123äöü,!"));
         }
 
         /**
@@ -354,7 +354,7 @@ class HTTPVaultConnectorTest {
             );
             assertThat("Metadata not populated for KV v2 secret", res.getMetadata(), is(notNullValue()));
             assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(2));
-            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE2));
+            assertThat("Known secret returned invalid value.", res.get("value"), is(SECRET2_VALUE2));
 
             // Try to read different version of same secret.
             res = assertDoesNotThrow(
@@ -362,7 +362,7 @@ class HTTPVaultConnectorTest {
                     "Valid secret version could not be read."
             );
             assertThat("Unexpected secret version", res.getMetadata().getVersion(), is(1));
-            assertThat("Known secret returned invalid value.", res.getValue(), is(SECRET2_VALUE1));
+            assertThat("Known secret returned invalid value.", res.get("value"), is(SECRET2_VALUE1));
         }
 
         /**
@@ -397,7 +397,7 @@ class HTTPVaultConnectorTest {
                     () -> connector.readSecretData(MOUNT_KV2, SECRET2_KEY),
                     "Reading secret from KV v2 store failed."
             );
-            assertThat("Data not updated correctly", res3.getValue(), is(SECRET2_VALUE3));
+            assertThat("Data not updated correctly", res3.get("value"), is(SECRET2_VALUE3));
 
             // Now try with explicit CAS value (invalid).
             Map<String, Object> data4 = singletonMap("value", SECRET2_VALUE4);

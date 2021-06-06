@@ -96,37 +96,6 @@ public class SecretResponse extends VaultDataResponse {
     }
 
     /**
-     * Get data element for key "value".
-     * Method for backwards compatibility in case of simple secrets.
-     *
-     * @return the value
-     * @deprecated Deprecated artifact, will be removed at latest at v1.0.0
-     */
-    @Deprecated
-    public final String getValue() {
-        Object value = get("value");
-        if (value == null) {
-            return null;
-        }
-        return value.toString();
-    }
-
-    /**
-     * Get response parsed as JSON.
-     *
-     * @param type Class to parse response
-     * @param <T>  Class to parse response
-     * @return Parsed object
-     * @throws InvalidResponseException on parsing error
-     * @since 0.3
-     * @deprecated Deprecated artifact, will be removed at latest at v1.0.0
-     */
-    @Deprecated
-    public final <T> T getValue(final Class<T> type) throws InvalidResponseException {
-        return get("value", type);
-    }
-
-    /**
      * Get response parsed as JSON.
      *
      * @param key  the key
