@@ -48,8 +48,8 @@ Feel free to adapt this naming scheme to your forks.
 
 ### Merge Requirements
 
-To be merged into the master branch, your code has to pass the automated continuous integration tests, to ensure compatibility.
-In Addition your code has to be approved by a project member.
+To be merged into the main branch, your code has to pass the automated continuous integration tests, to ensure compatibility.
+In addition, your code has to be approved by a project member.
 
 #### What if my code fails the tests?
 
