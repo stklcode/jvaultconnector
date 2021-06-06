@@ -1,4 +1,4 @@
-## unreleased
+## 0.9.4 (2021-06-06)
 
 ### Deprecations
 * `AppRole.Builder#wit0hTokenPeriod()` is deprecated in favor of `#withTokenPeriod()` (#49)
