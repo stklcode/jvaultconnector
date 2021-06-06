@@ -10,9 +10,17 @@
 * Use pre-sized map objects for fixed-size payloads
 * Remove Apache HTTP Client dependency in favor of Java 11 HTTP
 
+
+## 0.9.4 (2021-06-06)
+
+### Deprecations
+* `AppRole.Builder#wit0hTokenPeriod()` is deprecated in favor of `#withTokenPeriod()` (#49)
+
+### Improvements
+* Minor dependency updates
+
 ### Test
 * Tested against Vault 1.7.2
-
 
 ## 0.9.3 (2021-04-02)
 
