@@ -703,7 +703,7 @@ public final class AppRole {
          * @return self
          * @since 0.9
          */
-        public Builder wit0hTokenPeriod(final Integer tokenPeriod) {
+        public Builder withTokenPeriod(final Integer tokenPeriod) {
             this.tokenPeriod = tokenPeriod;
             return this;
         }
@@ -711,13 +711,26 @@ public final class AppRole {
         /**
          * Set renewal period for generated token in seconds.
          *
+         * @param tokenPeriod period in seconds
+         * @return self
+         * @since 0.9
+         * @deprecated Use {@link #withTokenPeriod(Integer)} instead.
+         */
+        @Deprecated
+        public Builder wit0hTokenPeriod(final Integer tokenPeriod) {
+            return withTokenPeriod(tokenPeriod);
+        }
+
+        /**
+         * Set renewal period for generated token in seconds.
+         *
          * @param period period in seconds
          * @return self
-         * @deprecated Use {@link #wit0hTokenPeriod(Integer)} instead.
+         * @deprecated Use {@link #withTokenPeriod(Integer)} instead.
          */
         @Deprecated
         public Builder withPeriod(final Integer period) {
-            return wit0hTokenPeriod(period);
+            return withTokenPeriod(period);
         }
 
         /**

@@ -138,7 +138,7 @@ class AppRoleBuilderTest {
                 .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
                 .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
                 .withTokenNumUses(TOKEN_NUM_USES)
-                .wit0hTokenPeriod(TOKEN_PERIOD)
+                .withTokenPeriod(TOKEN_PERIOD)
                 .withTokenType(TOKEN_TYPE)
                 .build();
         assertThat(role.getName(), is(NAME));
@@ -183,7 +183,7 @@ class AppRoleBuilderTest {
                 .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
                 .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
                 .withTokenNumUses(TOKEN_NUM_USES)
-                .wit0hTokenPeriod(TOKEN_PERIOD)
+                .withTokenPeriod(TOKEN_PERIOD)
                 .withTokenType(TOKEN_TYPE)
                 .build();
         assertThat(role.getName(), is(NAME));
