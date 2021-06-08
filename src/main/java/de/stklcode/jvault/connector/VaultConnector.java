@@ -123,7 +123,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #authAppRole} instead.
      */
-    @Deprecated
+    @Deprecated(since = "0.4", forRemoval = false)
     AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException;
 
     /**
@@ -159,7 +159,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #createAppRole} instead.
      */
-    @Deprecated
+    @Deprecated(since = "0.4", forRemoval = false)
     boolean registerAppId(final String appID, final String policy, final String displayName)
             throws VaultConnectorException;
 
@@ -354,7 +354,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
      * Consider using {@link #createAppRoleSecret} instead.
      */
-    @Deprecated
+    @Deprecated(since = "0.4", forRemoval = false)
     boolean registerUserId(final String appID, final String userID) throws VaultConnectorException;
 
     /**
@@ -368,7 +368,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
      */
-    @Deprecated
+    @Deprecated(since = "0.4", forRemoval = false)
     default boolean registerAppUserId(final String appID,
                                       final String policy,
                                       final String displayName,
