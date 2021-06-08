@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -156,11 +157,6 @@ class HTTPVaultConnectorOfflineTest {
         connector = new HTTPVaultConnector(hostname, true, port, prefix);
         assertThat("Unexpected base URL with custom prefix", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPrefix));
         assertThat("Trusted CA cert set, but not specified", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
-
-        // Provide custom SSL context.
-        connector = new HTTPVaultConnector(hostname, true, port, prefix, trustedCaCert);
-        assertThat("Unexpected base URL with custom prefix", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPrefix));
-        assertThat("Trusted CA cert not filled correctly", getRequestHelperPrivate(connector, "trustedCaCert"), is(trustedCaCert));
 
         // Specify number of retries.
         connector = new HTTPVaultConnector(url, trustedCaCert, retries);

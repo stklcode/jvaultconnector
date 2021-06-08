@@ -85,6 +85,15 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     }
 
     /**
+     * Get hostname.
+     *
+     * @return Hostname or IP address
+     */
+    public String getHost() {
+        return this.host;
+    }
+
+    /**
      * Set port (default: 8200).
      *
      * @param port Vault TCP port
@@ -96,6 +105,15 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     }
 
     /**
+     * Set port..
+     *
+     * @return Vault TCP port
+     */
+    public Integer getPort() {
+        return this.port;
+    }
+
+    /**
      * Set TLS usage (default: TRUE).
      *
      * @param useTLS use TLS or not
@@ -104,6 +122,24 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     public HTTPVaultConnectorBuilder withTLS(final boolean useTLS) {
         this.tls = useTLS;
         return this;
+    }
+
+    /**
+     * Get TLS usage flag.
+     *
+     * @return use TLS or not
+     */
+    public boolean isWithTLS() {
+        return this.tls;
+    }
+
+    /**
+     * Get TLS version.
+     *
+     * @return TLS version.
+     */
+    public String getTlsVersion() {
+        return this.tlsVersion;
     }
 
     /**
@@ -152,12 +188,21 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     /**
      * Set API prefix. Default is "/v1/" and changes should not be necessary for current state of development.
      *
-     * @param prefix Vault API prefix (default: "/v1/"
+     * @param prefix Vault API prefix (default: "/v1/")
      * @return self
      */
     public HTTPVaultConnectorBuilder withPrefix(final String prefix) {
         this.prefix = prefix;
         return this;
+    }
+
+    /**
+     * Get API prefix.
+     *
+     * @return Vault API prefix.
+     */
+    public String getPrefix() {
+        return this.prefix;
     }
 
     /**
@@ -187,6 +232,15 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     public HTTPVaultConnectorBuilder withTrustedCA(final X509Certificate cert) {
         this.trustedCA = cert;
         return this;
+    }
+
+    /**
+     * Get the trusted CA certificate for HTTPS connections.
+     *
+     * @return path to certificate file, if specified.
+     */
+    public X509Certificate getTrustedCA() {
+        return this.trustedCA;
     }
 
     /**
@@ -253,6 +307,15 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     }
 
     /**
+     * Get the number of retries to attempt on 5xx errors.
+     *
+     * @return The number of retries to attempt on 5xx errors (default: 0)
+     */
+    public int getNumberOfRetries() {
+        return this.numberOfRetries;
+    }
+
+    /**
      * Define a custom timeout for the HTTP connection.
      *
      * @param milliseconds Timeout value in milliseconds.
@@ -264,9 +327,18 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
         return this;
     }
 
+    /**
+     * Get custom timeout for the HTTP connection.
+     *
+     * @return Timeout value in milliseconds.
+     */
+    public Integer getTimeout() {
+        return this.timeout;
+    }
+
     @Override
     public HTTPVaultConnector build() {
-        return new HTTPVaultConnector(host, tls, tlsVersion, port, prefix, trustedCA, numberOfRetries, timeout);
+        return new HTTPVaultConnector(this);
     }
 
     @Override

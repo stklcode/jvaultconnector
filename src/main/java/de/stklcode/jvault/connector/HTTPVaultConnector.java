@@ -16,6 +16,7 @@
 
 package de.stklcode.jvault.connector;
 
+import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.AuthorizationRequiredException;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
@@ -110,23 +111,6 @@ public class HTTPVaultConnector implements VaultConnector {
     /**
      * Create connector using hostname, schema, port, path and trusted certificate.
      *
-     * @param hostname      The hostname
-     * @param useTLS        If TRUE, use HTTPS, otherwise HTTP
-     * @param port          The port
-     * @param prefix        HTTP API prefix (default: /v1/)
-     * @param trustedCaCert Trusted CA certificate
-     */
-    public HTTPVaultConnector(final String hostname,
-                              final boolean useTLS,
-                              final Integer port,
-                              final String prefix,
-                              final X509Certificate trustedCaCert) {
-        this(hostname, useTLS, DEFAULT_TLS_VERSION, port, prefix, trustedCaCert, 0, null);
-    }
-
-    /**
-     * Create connector using hostname, schema, port, path and trusted certificate.
-     *
      * @param hostname        The hostname
      * @param useTLS          If TRUE, use HTTPS, otherwise HTTP
      * @param tlsVersion      TLS version
@@ -144,14 +128,34 @@ public class HTTPVaultConnector implements VaultConnector {
                               final X509Certificate trustedCaCert,
                               final int numberOfRetries,
                               final Integer timeout) {
-        this(((useTLS) ? "https" : "http")
+        this(
+                ((useTLS) ? "https" : "http")
                         + "://" + hostname
                         + ((port != null) ? ":" + port : "")
                         + prefix,
                 trustedCaCert,
                 numberOfRetries,
                 timeout,
-                tlsVersion);
+                tlsVersion
+        );
+    }
+
+    /**
+     * Create connector using a {@link HTTPVaultConnectorBuilder}.
+     *
+     * @param builder The builder.
+     */
+    public HTTPVaultConnector(final HTTPVaultConnectorBuilder builder) {
+        this.request = new RequestHelper(
+                ((builder.isWithTLS()) ? "https" : "http") + "://" +
+                        builder.getHost() +
+                        ((builder.getPort() != null) ? ":" + builder.getPort() : "") +
+                        builder.getPrefix(),
+                builder.getNumberOfRetries(),
+                builder.getTimeout(),
+                builder.getTlsVersion(),
+                builder.getTrustedCA()
+        );
     }
 
     /**
