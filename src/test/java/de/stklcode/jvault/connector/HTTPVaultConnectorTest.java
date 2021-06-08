@@ -16,8 +16,6 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
-import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.AppRole;
 import de.stklcode.jvault.connector.model.AuthBackend;
@@ -92,7 +90,7 @@ class HTTPVaultConnectorTest {
         }
 
         /* Initialize connector */
-        HTTPVaultConnectorBuilder builder = VaultConnectorBuilder.http()
+        HTTPVaultConnectorBuilder builder = HTTPVaultConnector.builder()
                 .withHost(config.getHost())
                 .withPort(config.getPort())
                 .withTLS(isTls);

@@ -18,4 +18,5 @@
  * This package contains the {@link de.stklcode.jvault.connector.builder.VaultConnectorBuilder} to initialize a
  * connector instance.
  */
+@Deprecated(forRemoval = true)
 package de.stklcode.jvault.connector.builder;

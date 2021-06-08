@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package de.stklcode.jvault.connector.builder;
+package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.HTTPVaultConnector;
+import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
@@ -64,7 +64,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      * Default empty constructor.
      * Initializes factory with default values.
      */
-    public HTTPVaultConnectorBuilder() {
+    HTTPVaultConnectorBuilder() {
         host = DEFAULT_HOST;
         port = DEFAULT_PORT;
         tls = DEFAULT_TLS;
@@ -89,7 +89,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return Hostname or IP address
      */
-    public String getHost() {
+    String getHost() {
         return this.host;
     }
 
@@ -109,7 +109,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return Vault TCP port
      */
-    public Integer getPort() {
+    Integer getPort() {
         return this.port;
     }
 
@@ -129,7 +129,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return use TLS or not
      */
-    public boolean isWithTLS() {
+    boolean isWithTLS() {
         return this.tls;
     }
 
@@ -138,7 +138,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return TLS version.
      */
-    public String getTlsVersion() {
+    String getTlsVersion() {
         return this.tlsVersion;
     }
 
@@ -201,7 +201,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return Vault API prefix.
      */
-    public String getPrefix() {
+    String getPrefix() {
         return this.prefix;
     }
 
@@ -239,7 +239,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return path to certificate file, if specified.
      */
-    public X509Certificate getTrustedCA() {
+    X509Certificate getTrustedCA() {
         return this.trustedCA;
     }
 
@@ -311,7 +311,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return The number of retries to attempt on 5xx errors (default: 0)
      */
-    public int getNumberOfRetries() {
+    int getNumberOfRetries() {
         return this.numberOfRetries;
     }
 
@@ -332,15 +332,27 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return Timeout value in milliseconds.
      */
-    public Integer getTimeout() {
+    Integer getTimeout() {
         return this.timeout;
     }
 
+    /**
+     * Build command, produces connector after initialization.
+     *
+     * @return Vault Connector instance.
+     */
     @Override
     public HTTPVaultConnector build() {
         return new HTTPVaultConnector(this);
     }
 
+    /**
+     * Build connector and authenticate with token set in factory or from environment.
+     *
+     * @return Authenticated Vault connector instance.
+     * @throws VaultConnectorException if authentication failed
+     * @since 0.6.0
+     */
     @Override
     public HTTPVaultConnector buildAndAuth() throws VaultConnectorException {
         if (token == null) {

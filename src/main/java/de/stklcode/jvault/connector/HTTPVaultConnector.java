@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.AuthorizationRequiredException;
 import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
@@ -71,6 +70,16 @@ public class HTTPVaultConnector implements VaultConnector {
     private boolean authorized = false;     // Authorization status.
     private String token;                   // Current token.
     private long tokenTTL = 0;              // Expiration time for current token.
+
+    /**
+     * Get a new builder for a connector.
+     *
+     * @return Builder instance.
+     * @since 1.0
+     */
+    public static HTTPVaultConnectorBuilder builder() {
+        return new HTTPVaultConnectorBuilder();
+    }
 
     /**
      * Create connector using hostname and schema.
