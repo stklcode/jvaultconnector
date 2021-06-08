@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.builder;
 
 import com.github.stefanbirkner.systemlambda.SystemLambda;
 import de.stklcode.jvault.connector.HTTPVaultConnector;
+import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -25,13 +26,9 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.NoSuchFileException;
-import java.util.concurrent.Callable;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit test for HTTP Vault connector factory
@@ -48,6 +45,35 @@ class HTTPVaultConnectorBuilderTest {
     File tempDir;
 
     /**
+     * Test the builder.
+     */
+    @Test
+    void builderTest() throws Exception {
+        /* Minimal configuration */
+        HTTPVaultConnector connector = VaultConnectorBuilder.http().withHost("vault.example.com").build();
+
+        assertEquals("https://vault.example.com:8200/v1/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
+        assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
+        assertEquals(0, getRequestHelperPrivate(connector, "retries"), "Number of retries unexpectedly set");
+
+        /* Specify all options */
+        HTTPVaultConnectorBuilder builder = VaultConnectorBuilder.http()
+                .withHost("vault2.example.com")
+                .withoutTLS()
+                .withPort(1234)
+                .withPrefix("/foo/")
+                .withTimeout(5678)
+                .withNumberOfRetries(9);
+        connector = builder.build();
+
+        assertEquals("http://vault2.example.com:1234/foo/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
+        assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
+        assertEquals(9, getRequestHelperPrivate(connector, "retries"), "Unexpected number of retries");
+        assertEquals(5678, getRequestHelperPrivate(connector, "timeout"), "Number timeout value");
+        assertThrows(ConnectionException.class, builder::buildAndAuth, "Immediate authentication should throw exception without token");
+    }
+
+    /**
      * Test building from environment variables
      */
     @Test
@@ -60,9 +86,9 @@ class HTTPVaultConnectorBuilderTest {
             );
             HTTPVaultConnector connector = builder.build();
 
-            assertThat("URL nor set correctly", getRequestHelperPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-            assertThat("Trusted CA cert set when no cert provided", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
-            assertThat("Non-default number of retries, when none set", getRequestHelperPrivate(connector, "retries"), is(0));
+            assertEquals(VAULT_ADDR + "/v1/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
+            assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
+            assertEquals(0, getRequestHelperPrivate(connector, "retries"), "Non-default number of retries, when none set");
 
             return null;
         });
@@ -75,9 +101,9 @@ class HTTPVaultConnectorBuilderTest {
             );
             HTTPVaultConnector connector = builder.build();
 
-            assertThat("URL nor set correctly", getRequestHelperPrivate(connector, "baseURL"), is(equalTo(VAULT_ADDR + "/v1/")));
-            assertThat("Trusted CA cert set when no cert provided", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
-            assertThat("Number of retries not set correctly", getRequestHelperPrivate(connector, "retries"), is(VAULT_MAX_RETRIES));
+            assertEquals(VAULT_ADDR + "/v1/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
+            assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
+            assertEquals(VAULT_MAX_RETRIES, getRequestHelperPrivate(connector, "retries"), "Number of retries not set correctly");
 
             return null;
         });
@@ -90,8 +116,8 @@ class HTTPVaultConnectorBuilderTest {
                     () -> VaultConnectorBuilder.http().fromEnv(),
                     "Creation with unknown cert path failed."
             );
-            assertThat(e.getCause(), is(instanceOf(NoSuchFileException.class)));
-            assertThat(((NoSuchFileException) e.getCause()).getFile(), is(VAULT_CACERT));
+            assertTrue(e.getCause() instanceof NoSuchFileException);
+            assertEquals(VAULT_CACERT, ((NoSuchFileException) e.getCause()).getFile());
 
             return null;
         });
@@ -102,7 +128,18 @@ class HTTPVaultConnectorBuilderTest {
                     () -> VaultConnectorBuilder.http().fromEnv(),
                     "Factory creation from minimal environment failed"
             );
-            assertThat("Token nor set correctly", getPrivate(builder, "token"), is(equalTo(VAULT_TOKEN)));
+            assertEquals(VAULT_TOKEN, getPrivate(builder, "token"), "Token not set correctly");
+
+            return null;
+        });
+
+        /* Invalid URL */
+        withVaultEnv("This is not a valid URL!", null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
+            assertThrows(
+                    ConnectionException.class,
+                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    "Invalid URL from environment should raise an exception"
+            );
 
             return null;
         });
@@ -121,7 +158,7 @@ class HTTPVaultConnectorBuilderTest {
 
     private Object getPrivate(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException {
         Field field = target.getClass().getDeclaredField(fieldName);
-        if (field.isAccessible()) {
+        if (field.canAccess(target)) {
             return field.get(target);
         }
         field.setAccessible(true);
