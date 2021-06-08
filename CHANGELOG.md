@@ -2,6 +2,7 @@
 
 ### Breaking
 * Requires Java 11 or later
+* Builder invocation has changed, use `HTTPVaultConnector.builder()....build()`
 
 ### Removal
 * Remove deprecated `VaultConnectorFactory` in favor of `VaultConnectorBuilder` with identical API

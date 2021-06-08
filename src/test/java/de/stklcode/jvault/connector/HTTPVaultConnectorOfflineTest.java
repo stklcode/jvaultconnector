@@ -19,7 +19,6 @@ package de.stklcode.jvault.connector;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

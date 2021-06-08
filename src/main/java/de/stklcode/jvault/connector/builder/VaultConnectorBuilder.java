@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.builder;
 
+import de.stklcode.jvault.connector.HTTPVaultConnector;
+import de.stklcode.jvault.connector.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.VaultConnector;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
@@ -25,15 +27,19 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
  *
  * @author Stefan Kalscheuer
  * @since 0.8.0
+ * @deprecated Builder interface is no longer maintained. Use {@link HTTPVaultConnector#builder()} for instantiation.
  */
+@Deprecated(forRemoval = true)
 public interface VaultConnectorBuilder {
     /**
      * Get Factory implementation for HTTP Vault Connector.
      *
      * @return HTTP Connector Factory
+     * @deprecated use {@link HTTPVaultConnector#builder()} instead.
      */
+    @Deprecated(forRemoval = true)
     static HTTPVaultConnectorBuilder http() {
-        return new HTTPVaultConnectorBuilder();
+        return HTTPVaultConnector.builder();
     }
 
     /**

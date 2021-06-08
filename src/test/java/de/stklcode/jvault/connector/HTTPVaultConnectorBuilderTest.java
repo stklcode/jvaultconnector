@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package de.stklcode.jvault.connector.builder;
+package de.stklcode.jvault.connector;
 
 import com.github.stefanbirkner.systemlambda.SystemLambda;
-import de.stklcode.jvault.connector.HTTPVaultConnector;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import org.junit.jupiter.api.Test;
@@ -50,14 +49,14 @@ class HTTPVaultConnectorBuilderTest {
     @Test
     void builderTest() throws Exception {
         /* Minimal configuration */
-        HTTPVaultConnector connector = VaultConnectorBuilder.http().withHost("vault.example.com").build();
+        HTTPVaultConnector connector = HTTPVaultConnector.builder().withHost("vault.example.com").build();
 
         assertEquals("https://vault.example.com:8200/v1/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
         assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
         assertEquals(0, getRequestHelperPrivate(connector, "retries"), "Number of retries unexpectedly set");
 
         /* Specify all options */
-        HTTPVaultConnectorBuilder builder = VaultConnectorBuilder.http()
+        HTTPVaultConnectorBuilder builder = HTTPVaultConnector.builder()
                 .withHost("vault2.example.com")
                 .withoutTLS()
                 .withPort(1234)
@@ -81,7 +80,7 @@ class HTTPVaultConnectorBuilderTest {
         /* Provide address only should be enough */
         withVaultEnv(VAULT_ADDR, null, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Factory creation from minimal environment failed"
             );
             HTTPVaultConnector connector = builder.build();
@@ -96,7 +95,7 @@ class HTTPVaultConnectorBuilderTest {
         /* Provide address and number of retries */
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Factory creation from environment failed"
             );
             HTTPVaultConnector connector = builder.build();
@@ -113,7 +112,7 @@ class HTTPVaultConnectorBuilderTest {
         withVaultEnv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             TlsException e = assertThrows(
                     TlsException.class,
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Creation with unknown cert path failed."
             );
             assertTrue(e.getCause() instanceof NoSuchFileException);
@@ -125,7 +124,7 @@ class HTTPVaultConnectorBuilderTest {
         /* Automatic authentication */
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Factory creation from minimal environment failed"
             );
             assertEquals(VAULT_TOKEN, getPrivate(builder, "token"), "Token not set correctly");
@@ -137,7 +136,7 @@ class HTTPVaultConnectorBuilderTest {
         withVaultEnv("This is not a valid URL!", null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             assertThrows(
                     ConnectionException.class,
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Invalid URL from environment should raise an exception"
             );
 
