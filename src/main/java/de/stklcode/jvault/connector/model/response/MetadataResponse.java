@@ -37,7 +37,7 @@ public class MetadataResponse extends VaultDataResponse {
 
     @Override
     public final void setData(final Map<String, Object> data) throws InvalidResponseException {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         try {
             this.metadata = mapper.readValue(mapper.writeValueAsString(data), SecretMetadata.class);
         } catch (IOException e) {

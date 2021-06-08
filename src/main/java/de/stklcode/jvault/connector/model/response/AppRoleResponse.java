@@ -37,7 +37,7 @@ public final class AppRoleResponse extends VaultDataResponse {
 
     @Override
     public void setData(final Map<String, Object> data) throws InvalidResponseException {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         try {
             /* null empty strings on list objects */
             Map<String, Object> filteredData = new HashMap<>(data.size(), 1);

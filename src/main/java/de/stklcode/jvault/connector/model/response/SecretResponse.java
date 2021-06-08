@@ -44,7 +44,7 @@ public class SecretResponse extends VaultDataResponse {
         if (data.size() == 2
                 && data.containsKey(KEY_DATA) && data.get(KEY_DATA) instanceof Map
                 && data.containsKey(KEY_METADATA) && data.get(KEY_METADATA) instanceof Map) {
-            ObjectMapper mapper = new ObjectMapper();
+            var mapper = new ObjectMapper();
             try {
                 // This is apparently a KV v2 value.
                 this.data = (Map<String, Object>) data.get(KEY_DATA);

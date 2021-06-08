@@ -45,7 +45,7 @@ public final class AuthResponse extends VaultDataResponse {
      */
     @JsonProperty("auth")
     public void setAuth(final Map<String, Object> auth) throws InvalidResponseException {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         try {
             this.auth = mapper.readValue(mapper.writeValueAsString(auth), AuthData.class);
         } catch (IOException e) {

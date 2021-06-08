@@ -44,7 +44,7 @@ public final class AuthMethodsResponse extends VaultDataResponse {
 
     @Override
     public void setData(final Map<String, Object> data) throws InvalidResponseException {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             try {
                 this.supportedMethods.put(entry.getKey(),

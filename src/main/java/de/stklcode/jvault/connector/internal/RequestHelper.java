@@ -77,7 +77,7 @@ public final class RequestHelper implements Serializable {
      */
     public String post(final String path, final Object payload, final String token) throws VaultConnectorException {
         // Initialize POST.
-        HttpRequest.Builder req = HttpRequest.newBuilder(URI.create(baseURL + path));
+        var req = HttpRequest.newBuilder(URI.create(baseURL + path));
 
         // Generate JSON from payload.
         try {
@@ -145,7 +145,7 @@ public final class RequestHelper implements Serializable {
      */
     public String put(final String path, final Map<String, String> payload, final String token) throws VaultConnectorException {
         // Initialize PUT.
-        HttpRequest.Builder req = HttpRequest.newBuilder(URI.create(baseURL + path));
+        var req = HttpRequest.newBuilder(URI.create(baseURL + path));
 
         // Generate JSON from payload.
         try {
@@ -250,7 +250,7 @@ public final class RequestHelper implements Serializable {
     public String get(final String path, final Map<String, String> payload, final String token)
             throws VaultConnectorException {
         // Add parameters to URI.
-        StringBuilder uriBuilder = new StringBuilder(baseURL + path);
+        var uriBuilder = new StringBuilder(baseURL + path);
 
         if (!payload.isEmpty()) {
             uriBuilder.append("?").append(
@@ -262,7 +262,7 @@ public final class RequestHelper implements Serializable {
 
         // Initialize GET.
         try {
-            HttpRequest.Builder req = HttpRequest.newBuilder(new URI(uriBuilder.toString()));
+            var req = HttpRequest.newBuilder(new URI(uriBuilder.toString()));
 
             // Set X-Vault-Token header.
             if (token != null) {
@@ -310,7 +310,7 @@ public final class RequestHelper implements Serializable {
         // Set JSON Header.
         requestBuilder.setHeader("accept", "application/json");
 
-        HttpClient.Builder clientBuilder = HttpClient.newBuilder();
+        var clientBuilder = HttpClient.newBuilder();
 
         // Set custom timeout, if defined.
         if (this.timeout != null) {
@@ -369,23 +369,23 @@ public final class RequestHelper implements Serializable {
     private SSLContext createSSLContext() throws TlsException {
         try {
             // Create context.
-            SSLContext context = SSLContext.getInstance(tlsVersion);
+            var sslContext = SSLContext.getInstance(tlsVersion);
 
             if (trustedCaCert != null) {
                 // Create Keystore with trusted certificate.
-                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(null, null);
                 keyStore.setCertificateEntry("trustedCert", trustedCaCert);
 
                 // Initialize TrustManager.
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                var tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 tmf.init(keyStore);
-                context.init(null, tmf.getTrustManagers(), null);
+                sslContext.init(null, tmf.getTrustManagers(), null);
             } else {
-                context.init(null, null, null);
+                sslContext.init(null, null, null);
             }
 
-            return context;
+            return sslContext;
         } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException | KeyManagementException e) {
             throw new TlsException(Error.INIT_SSL_CONTEXT, e);
         }
@@ -399,8 +399,8 @@ public final class RequestHelper implements Serializable {
      * @throws InvalidResponseException on reading errors
      */
     private String handleResult(final HttpResponse<InputStream> response) throws InvalidResponseException {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(response.body()))) {
-            return br.lines().collect(Collectors.joining("\n"));
+        try (var reader = new BufferedReader(new InputStreamReader(response.body()))) {
+            return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException ignored) {
             throw new InvalidResponseException(Error.READ_RESPONSE, 200);
         }
@@ -414,8 +414,8 @@ public final class RequestHelper implements Serializable {
      */
     private void handleError(final HttpResponse<InputStream> response) throws VaultConnectorException {
         if (response.body() != null) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(response.body()))) {
-                String responseString = br.lines().collect(Collectors.joining("\n"));
+            try (var reader = new BufferedReader(new InputStreamReader(response.body()))) {
+                var responseString = reader.lines().collect(Collectors.joining("\n"));
                 ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
                 /* Check for "permission denied" response */
                 if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied")) {

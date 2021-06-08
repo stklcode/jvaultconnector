@@ -22,7 +22,6 @@ import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -213,7 +212,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
         /* Parse URL from environment variable */
         if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).trim().isEmpty()) {
             try {
-                URL url = new URL(System.getenv(ENV_VAULT_ADDR));
+                var url = new URL(System.getenv(ENV_VAULT_ADDR));
                 this.host = url.getHost();
                 this.port = url.getPort();
                 this.tls = url.getProtocol().equals("https");
@@ -289,7 +288,7 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      * @since 0.4.0
      */
     private X509Certificate certificateFromFile(final Path certFile) throws TlsException {
-        try (InputStream is = Files.newInputStream(certFile)) {
+        try (var is = Files.newInputStream(certFile)) {
             return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
         } catch (IOException | CertificateException e) {
             throw new TlsException("Unable to read certificate.", e);

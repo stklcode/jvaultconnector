@@ -46,7 +46,7 @@ public final class TokenResponse extends VaultDataResponse {
      */
     @Override
     public void setData(final Map<String, Object> data) throws InvalidResponseException {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         try {
             this.data = mapper.readValue(mapper.writeValueAsString(data), TokenData.class);
         } catch (IOException e) {
