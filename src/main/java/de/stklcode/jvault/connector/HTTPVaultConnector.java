@@ -72,6 +72,16 @@ public class HTTPVaultConnector implements VaultConnector {
     private long tokenTTL = 0;              // Expiration time for current token.
 
     /**
+     * Get a new builder for a connector.
+     *
+     * @return Builder instance.
+     * @since 0.9.5
+     */
+    public static HTTPVaultConnectorBuilder builder() {
+        return new HTTPVaultConnectorBuilder();
+    }
+
+    /**
      * Create connector using hostname and schema.
      *
      * @param hostname The hostname

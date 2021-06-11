@@ -17,7 +17,7 @@
 package de.stklcode.jvault.connector.factory;
 
 import de.stklcode.jvault.connector.HTTPVaultConnector;
-import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
+import de.stklcode.jvault.connector.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import javax.net.ssl.SSLContext;
