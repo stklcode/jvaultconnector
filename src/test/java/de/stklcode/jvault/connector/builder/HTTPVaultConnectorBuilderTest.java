@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.builder;
 
 import com.github.stefanbirkner.systemlambda.SystemLambda;
 import de.stklcode.jvault.connector.HTTPVaultConnector;
+import de.stklcode.jvault.connector.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.TlsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -25,7 +26,6 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.NoSuchFileException;
-import java.util.concurrent.Callable;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.hamcrest.CoreMatchers.*;
@@ -55,7 +55,7 @@ class HTTPVaultConnectorBuilderTest {
         /* Provide address only should be enough */
         withVaultEnv(VAULT_ADDR, null, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Factory creation from minimal environment failed"
             );
             HTTPVaultConnector connector = builder.build();
@@ -70,7 +70,7 @@ class HTTPVaultConnectorBuilderTest {
         /* Provide address and number of retries */
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Factory creation from environment failed"
             );
             HTTPVaultConnector connector = builder.build();
@@ -87,7 +87,7 @@ class HTTPVaultConnectorBuilderTest {
         withVaultEnv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             TlsException e = assertThrows(
                     TlsException.class,
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Creation with unknown cert path failed."
             );
             assertThat(e.getCause(), is(instanceOf(NoSuchFileException.class)));
@@ -99,7 +99,7 @@ class HTTPVaultConnectorBuilderTest {
         /* Automatic authentication */
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> VaultConnectorBuilder.http().fromEnv(),
+                    () -> HTTPVaultConnector.builder().fromEnv(),
                     "Factory creation from minimal environment failed"
             );
             assertThat("Token nor set correctly", getPrivate(builder, "token"), is(equalTo(VAULT_TOKEN)));

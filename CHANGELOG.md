@@ -1,3 +1,12 @@
+## 0.9.5 (unreleased)
+
+### Deprecations
+* Deprecated builder invocation `VaultConnectorBuilder.http()` in favor of `HTTPVaultConnector.builder()`.
+* Deprecated `de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder` in favor of `de.stklcode.jvault.connector.HTTPVaultConnectorBuilder` (only package changed).
+  
+Old builders will be removed in 1.0
+
+
 ## 0.9.4 (2021-06-06)
 
 ### Deprecations

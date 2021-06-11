@@ -40,7 +40,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>jvault-connector</artifactId>
-    <version>0.9.4</version>
+    <version>0.9.5-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -50,21 +50,21 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 
 ```java
 // Instantiate using builder pattern style factory (TLS enabled by default)
-VaultConnector vault = VaultConnectorBuilder.http()
+VaultConnector vault = HTTPVaultConnector.builder()
  .withHost("127.0.0.1")
  .withPort(8200)
  .withTLS()
  .build();
 
 // Instantiate with custom SSL context
-VaultConnector vault = VaultConnectorBuilder.http()
+VaultConnector vault = HTTPVaultConnector.builder()
  .withHost("example.com")
  .withPort(8200)
  .withTrustedCA(Paths.get("/path/to/CA.pem"))
  .build();
 
 // Initialization from environment variables 
-VaultConnector vault = VaultConnectorBuilder.http()
+VaultConnector vault = HTTPVaultConnector.builder()
  .fromEnv()
  .build();
 ```

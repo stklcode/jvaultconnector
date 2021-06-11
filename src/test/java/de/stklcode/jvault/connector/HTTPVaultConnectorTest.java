@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder;
 import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.AppRole;
