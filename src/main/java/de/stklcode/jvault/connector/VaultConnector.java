@@ -401,7 +401,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param key Secret identifier
      * @return Secret response
      * @throws VaultConnectorException on error
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #read(String)} instead with key prefix "secret/".
      */
+    @Deprecated
     default SecretResponse readSecret(final String key) throws VaultConnectorException {
         return read(PATH_SECRET + "/" + key);
     }
@@ -642,7 +644,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param key   Secret path
      * @param value Secret value
      * @throws VaultConnectorException on error
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #write(String, String)} instead with key prefix "secret/".
      */
+    @Deprecated
     default void writeSecret(final String key, final String value) throws VaultConnectorException {
         writeSecret(key, Collections.singletonMap("value", value));
     }
@@ -656,7 +660,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param data Secret content. Value must be be JSON serializable.
      * @throws VaultConnectorException on error
      * @since 0.5.0
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #write(String, Map)} instead with key prefix "secret/".
      */
+    @Deprecated
     default void writeSecret(final String key, final Map<String, Object> data) throws VaultConnectorException {
         if (key == null || key.isEmpty()) {
             throw new InvalidRequestException("Secret path must not be empty.");
@@ -680,7 +686,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      *
      * @param key Secret path
      * @throws VaultConnectorException on error
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #delete(String)} instead with key prefix "secret/".
      */
+    @Deprecated
     default void deleteSecret(final String key) throws VaultConnectorException {
         delete(PATH_SECRET + "/" + key);
     }

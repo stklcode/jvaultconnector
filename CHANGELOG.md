@@ -1,8 +1,9 @@
 ## 0.9.5 (unreleased)
 
 ### Deprecations
-* Deprecated builder invocation `VaultConnectorBuilder.http()` in favor of `HTTPVaultConnector.builder()`.
-* Deprecated `de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder` in favor of `de.stklcode.jvault.connector.HTTPVaultConnectorBuilder` (only package changed).
+* Deprecate ` {read,write,delete}Secret()` convenience methods. Use `{read,write,delete}("secret/...")` instead (#52)
+* Deprecated builder invocation `VaultConnectorBuilder.http()` in favor of `HTTPVaultConnector.builder()` (#51)
+* Deprecated `de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder` in favor of `de.stklcode.jvault.connector.HTTPVaultConnectorBuilder` (only package changed) (#51)
   
 Old builders will be removed in 1.0
 
