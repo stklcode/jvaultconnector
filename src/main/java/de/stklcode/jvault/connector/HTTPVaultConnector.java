@@ -24,7 +24,8 @@ import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
-import java.security.cert.X509Certificate;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ import static java.util.Collections.singletonMap;
  * @since 0.1
  */
 public class HTTPVaultConnector implements VaultConnector {
-    private static final String PATH_PREFIX = "/v1/";
     private static final String PATH_SEAL_STATUS = "sys/seal-status";
     private static final String PATH_SEAL = "sys/seal";
     private static final String PATH_UNSEAL = "sys/unseal";
@@ -82,71 +82,26 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     /**
-     * Create connector using hostname and schema.
+     * Get a new builder for a connector.
      *
-     * @param hostname The hostname
-     * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
+     * @param baseURL Base URL.
+     * @return Builder instance.
+     * @throws URISyntaxException Invalid URI syntax.
+     * @since 1.0
      */
-    public HTTPVaultConnector(final String hostname, final boolean useTLS) {
-        this(hostname, useTLS, null);
+    public static HTTPVaultConnectorBuilder builder(String baseURL) throws URISyntaxException {
+        return new HTTPVaultConnectorBuilder().withBaseURL(baseURL);
     }
 
     /**
-     * Create connector using hostname, schema and port.
+     * Get a new builder for a connector.
      *
-     * @param hostname The hostname
-     * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
-     * @param port     The port
+     * @param baseURL Base URL.
+     * @return Builder instance.
+     * @since 1.0
      */
-    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port) {
-        this(hostname, useTLS, port, PATH_PREFIX);
-    }
-
-    /**
-     * Create connector using hostname, schema, port and path.
-     *
-     * @param hostname The hostname
-     * @param useTLS   If TRUE, use HTTPS, otherwise HTTP
-     * @param port     The port
-     * @param prefix   HTTP API prefix (default: /v1/)
-     */
-    public HTTPVaultConnector(final String hostname, final boolean useTLS, final Integer port, final String prefix) {
-        this(((useTLS) ? "https" : "http")
-                + "://" + hostname
-                + ((port != null) ? ":" + port : "")
-                + prefix);
-    }
-
-    /**
-     * Create connector using hostname, schema, port, path and trusted certificate.
-     *
-     * @param hostname        The hostname
-     * @param useTLS          If TRUE, use HTTPS, otherwise HTTP
-     * @param tlsVersion      TLS version
-     * @param port            The port
-     * @param prefix          HTTP API prefix (default: /v1/)
-     * @param trustedCaCert   Trusted CA certificate
-     * @param numberOfRetries Number of retries on 5xx errors
-     * @param timeout         Timeout for HTTP requests (milliseconds)
-     */
-    public HTTPVaultConnector(final String hostname,
-                              final boolean useTLS,
-                              final String tlsVersion,
-                              final Integer port,
-                              final String prefix,
-                              final X509Certificate trustedCaCert,
-                              final int numberOfRetries,
-                              final Integer timeout) {
-        this(
-                ((useTLS) ? "https" : "http")
-                        + "://" + hostname
-                        + ((port != null) ? ":" + port : "")
-                        + prefix,
-                trustedCaCert,
-                numberOfRetries,
-                timeout,
-                tlsVersion
-        );
+    public static HTTPVaultConnectorBuilder builder(URI baseURL) {
+        return new HTTPVaultConnectorBuilder().withBaseURL(baseURL);
     }
 
     /**
@@ -154,7 +109,7 @@ public class HTTPVaultConnector implements VaultConnector {
      *
      * @param builder The builder.
      */
-    public HTTPVaultConnector(final HTTPVaultConnectorBuilder builder) {
+    HTTPVaultConnector(final HTTPVaultConnectorBuilder builder) {
         this.request = new RequestHelper(
                 ((builder.isWithTLS()) ? "https" : "http") + "://" +
                         builder.getHost() +
@@ -165,68 +120,6 @@ public class HTTPVaultConnector implements VaultConnector {
                 builder.getTlsVersion(),
                 builder.getTrustedCA()
         );
-    }
-
-    /**
-     * Create connector using full URL.
-     *
-     * @param baseURL The URL
-     */
-    public HTTPVaultConnector(final String baseURL) {
-        this(baseURL, null);
-    }
-
-    /**
-     * Create connector using full URL and trusted certificate.
-     *
-     * @param baseURL       The URL
-     * @param trustedCaCert Trusted CA certificate
-     */
-    public HTTPVaultConnector(final String baseURL, final X509Certificate trustedCaCert) {
-        this(baseURL, trustedCaCert, 0, null);
-    }
-
-    /**
-     * Create connector using full URL and trusted certificate.
-     *
-     * @param baseURL         The URL
-     * @param trustedCaCert   Trusted CA certificate
-     * @param numberOfRetries Number of retries on 5xx errors
-     */
-    public HTTPVaultConnector(final String baseURL, final X509Certificate trustedCaCert, final int numberOfRetries) {
-        this(baseURL, trustedCaCert, numberOfRetries, null);
-    }
-
-    /**
-     * Create connector using full URL and trusted certificate.
-     *
-     * @param baseURL         The URL
-     * @param trustedCaCert   Trusted CA certificate
-     * @param numberOfRetries Number of retries on 5xx errors
-     * @param timeout         Timeout for HTTP requests (milliseconds)
-     */
-    public HTTPVaultConnector(final String baseURL,
-                              final X509Certificate trustedCaCert,
-                              final int numberOfRetries,
-                              final Integer timeout) {
-        this(baseURL, trustedCaCert, numberOfRetries, timeout, DEFAULT_TLS_VERSION);
-    }
-
-    /**
-     * Create connector using full URL and trusted certificate.
-     *
-     * @param baseURL         The URL
-     * @param trustedCaCert   Trusted CA certificate
-     * @param numberOfRetries Number of retries on 5xx errors
-     * @param timeout         Timeout for HTTP requests (milliseconds)
-     * @param tlsVersion      TLS Version.
-     */
-    public HTTPVaultConnector(final String baseURL,
-                              final X509Certificate trustedCaCert,
-                              final int numberOfRetries,
-                              final Integer timeout,
-                              final String tlsVersion) {
-        this.request = new RequestHelper(baseURL, numberOfRetries, timeout, tlsVersion, trustedCaCert);
     }
 
     @Override

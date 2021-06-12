@@ -57,7 +57,7 @@ public final class RequestHelper implements Serializable {
                          final Integer timeout,
                          final String tlsVersion,
                          final X509Certificate trustedCaCert) {
-        this.baseURL = baseURL;
+        this.baseURL = baseURL + (baseURL.endsWith("/") ? "" : "/");
         this.retries = retries;
         this.timeout = timeout;
         this.tlsVersion = tlsVersion;

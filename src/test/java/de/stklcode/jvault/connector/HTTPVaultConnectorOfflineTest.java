@@ -19,7 +19,10 @@ package de.stklcode.jvault.connector;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import de.stklcode.jvault.connector.exception.*;
+import de.stklcode.jvault.connector.exception.ConnectionException;
+import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.exception.PermissionDeniedException;
+import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -51,8 +55,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @since 0.7.0
  */
 class HTTPVaultConnectorOfflineTest {
-    private static final String INVALID_URL = "foo:/\\1nv4l1d_UrL";
-
     private static WireMockServer wireMock;
 
     @BeforeAll
@@ -73,8 +75,8 @@ class HTTPVaultConnectorOfflineTest {
      * Test exceptions thrown during request.
      */
     @Test
-    void requestExceptionTest() throws IOException {
-        HTTPVaultConnector connector = new HTTPVaultConnector(wireMock.url("/"), null, 0, 250);
+    void requestExceptionTest() throws IOException, URISyntaxException {
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.url("/")).withTimeout(250).build();
 
         // Test invalid response code.
         final int responseCode = 400;
@@ -98,7 +100,7 @@ class HTTPVaultConnectorOfflineTest {
 
         // Test exception thrown during request.
         try (ServerSocket s = new ServerSocket(0)) {
-            connector = new HTTPVaultConnector("http://localst:" + s.getLocalPort() + "/", null, 0, 250);
+            connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort() + "/").withTimeout(250).build();
         }
         e = assertThrows(
                 ConnectionException.class,
@@ -109,7 +111,7 @@ class HTTPVaultConnectorOfflineTest {
         assertThat("Unexpected cause", e.getCause(), instanceOf(IOException.class));
 
         // Now simulate a failing request that succeeds on second try.
-        connector = new HTTPVaultConnector(wireMock.url("/"), null, 1, 250);
+        connector = HTTPVaultConnector.builder(wireMock.url("/")).withNumberOfRetries(1).withTimeout(250).build();
 
         WireMock.stubFor(
                 WireMock.any(anyUrl())
@@ -125,13 +127,13 @@ class HTTPVaultConnectorOfflineTest {
      * Test constructors of the {@link HTTPVaultConnector} class.
      */
     @Test
-    void constructorTest() throws IOException, CertificateException {
+    void constructorTest() throws IOException, CertificateException, URISyntaxException {
         final String url = "https://vault.example.net/test/";
         final String hostname = "vault.example.com";
         final Integer port = 1337;
         final String prefix = "/custom/prefix/";
         final int retries = 42;
-        final String expectedNoTls = "http://" + hostname + "/v1/";
+        final String expectedNoTls = "http://" + hostname + ":8200/v1/";
         final String expectedCustomPort = "https://" + hostname + ":" + port + "/v1/";
         final String expectedCustomPrefix = "https://" + hostname + ":" + port + prefix;
         X509Certificate trustedCaCert;
@@ -141,30 +143,30 @@ class HTTPVaultConnectorOfflineTest {
         }
 
         // Most basic constructor expects complete URL.
-        HTTPVaultConnector connector = new HTTPVaultConnector(url);
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(url).build();
         assertThat("Unexpected base URL", getRequestHelperPrivate(connector, "baseURL"), is(url));
 
         // Now override TLS usage.
-        connector = new HTTPVaultConnector(hostname, false);
+        connector = HTTPVaultConnector.builder().withHost(hostname).withoutTLS().build();
         assertThat("Unexpected base URL with TLS disabled", getRequestHelperPrivate(connector, "baseURL"), is(expectedNoTls));
 
         // Specify custom port.
-        connector = new HTTPVaultConnector(hostname, true, port);
+        connector = HTTPVaultConnector.builder().withHost(hostname).withTLS().withPort(port).build();
         assertThat("Unexpected base URL with custom port", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPort));
 
         // Specify custom prefix.
-        connector = new HTTPVaultConnector(hostname, true, port, prefix);
+        connector = HTTPVaultConnector.builder().withHost(hostname).withTLS().withPort(port).withPrefix(prefix).build();
         assertThat("Unexpected base URL with custom prefix", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPrefix));
         assertThat("Trusted CA cert set, but not specified", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
 
         // Specify number of retries.
-        connector = new HTTPVaultConnector(url, trustedCaCert, retries);
+        connector = HTTPVaultConnector.builder(url).withTrustedCA(trustedCaCert).withNumberOfRetries(retries).build();
         assertThat("Number of retries not set correctly", getRequestHelperPrivate(connector, "retries"), is(retries));
 
         // Test TLS version (#22).
         assertThat("TLS version should be 1.2 if not specified", getRequestHelperPrivate(connector, "tlsVersion"), is("TLSv1.2"));
         // Now override.
-        connector = new HTTPVaultConnector(url, trustedCaCert, retries, null, "TLSv1.1");
+        connector = HTTPVaultConnector.builder(url).withTrustedCA(trustedCaCert).withNumberOfRetries(retries).withTLS("TLSv1.1").build();
         assertThat("Overridden TLS version 1.1 not correct", getRequestHelperPrivate(connector, "tlsVersion"), is("TLSv1.1"));
     }
 
@@ -172,20 +174,13 @@ class HTTPVaultConnectorOfflineTest {
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    void sealExceptionTest() throws IOException {
-        HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
-        VaultConnectorException e = assertThrows(
-                InvalidRequestException.class,
-                connector::sealStatus,
-                "Querying seal status succeeded on invalid URL"
-        );
-        assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
-
+    void sealExceptionTest() throws IOException, URISyntaxException {
         // Simulate no connection.
+        VaultConnector connector;
         try (ServerSocket s = new ServerSocket(0)) {
-            connector = new HTTPVaultConnector("http://localst:" + s.getLocalPort() + "/", null, 0, 250);
+            connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort()).withTimeout(250).build();
         }
-        e = assertThrows(
+        ConnectionException e = assertThrows(
                 ConnectionException.class,
                 connector::sealStatus,
                 "Querying seal status succeeded on invalid instance"
@@ -197,20 +192,13 @@ class HTTPVaultConnectorOfflineTest {
      * This test is designed to test exceptions caught and thrown by seal-methods if Vault is not reachable.
      */
     @Test
-    void healthExceptionTest() throws IOException {
-        HTTPVaultConnector connector = new HTTPVaultConnector(INVALID_URL);
-        VaultConnectorException e = assertThrows(
-                InvalidRequestException.class,
-                connector::getHealth,
-                "Querying health status succeeded on invalid URL"
-        );
-        assertThat("Unexpected exception message", e.getMessage(), is("Invalid URI format"));
-
+    void healthExceptionTest() throws IOException, URISyntaxException {
         // Simulate no connection.
+        HTTPVaultConnector connector;
         try (ServerSocket s = new ServerSocket(0)) {
-            connector = new HTTPVaultConnector("http://localhost:" + s.getLocalPort() + "/", null, 0, 250);
+            connector = HTTPVaultConnector.builder("http://localhost:" + s.getLocalPort() + "/").withTimeout(250).build();
         }
-        e = assertThrows(
+        ConnectionException e = assertThrows(
                 ConnectionException.class,
                 connector::getHealth,
                 "Querying health status succeeded on invalid instance"
@@ -222,8 +210,8 @@ class HTTPVaultConnectorOfflineTest {
      * Test behavior on unparsable responses.
      */
     @Test
-    void parseExceptionTest() throws IOException {
-        HTTPVaultConnector connector = new HTTPVaultConnector(wireMock.url("/"), null, 0, 250);
+    void parseExceptionTest() throws URISyntaxException {
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.url("/")).withTimeout(250).build();
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
@@ -256,8 +244,8 @@ class HTTPVaultConnectorOfflineTest {
      * Test requests that expect an empty response with code 204, but receive a 200 body.
      */
     @Test
-    void nonEmpty204ResponseTest() {
-        HTTPVaultConnector connector = new HTTPVaultConnector(wireMock.url("/"), null, 0, 250);
+    void nonEmpty204ResponseTest() throws URISyntaxException {
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.url("/")).withTimeout(250).build();
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.

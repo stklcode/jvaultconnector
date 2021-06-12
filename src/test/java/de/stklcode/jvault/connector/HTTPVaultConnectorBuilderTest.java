@@ -24,6 +24,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.nio.file.NoSuchFileException;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
@@ -70,6 +71,24 @@ class HTTPVaultConnectorBuilderTest {
         assertEquals(9, getRequestHelperPrivate(connector, "retries"), "Unexpected number of retries");
         assertEquals(5678, getRequestHelperPrivate(connector, "timeout"), "Number timeout value");
         assertThrows(ConnectionException.class, builder::buildAndAuth, "Immediate authentication should throw exception without token");
+
+        /* Initialization from URL */
+        assertThrows(
+                URISyntaxException.class,
+                () -> HTTPVaultConnector.builder().withBaseURL("foo:/\\1nv4l1d_UrL"),
+                "Initialization from invalid URL should fail"
+        );
+        connector = assertDoesNotThrow(
+                () -> HTTPVaultConnector.builder().withBaseURL("https://vault3.example.com:5678/bar/").build(),
+                "Initialization from valid URL should not fail"
+        );
+        assertEquals("https://vault3.example.com:5678/bar/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
+
+        /* Port numbers */
+        assertThrows(IllegalArgumentException.class, () -> HTTPVaultConnector.builder().withPort(65536), "Too large port number should throw an exception");
+        assertThrows(IllegalArgumentException.class, () -> HTTPVaultConnector.builder().withPort(0), "Port number 0 should throw an exception");
+        builder = assertDoesNotThrow(() -> HTTPVaultConnector.builder().withPort(-1), "Port number -1 should not throw an exception");
+        assertNull(builder.getPort(), "Port number -1 should be omitted");
     }
 
     /**

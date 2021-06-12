@@ -16,13 +16,14 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.builder.VaultConnectorBuilder;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +31,7 @@ import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Objects;
 
 /**
  * Vault Connector Builder implementation for HTTP Vault connectors.
@@ -37,7 +39,7 @@ import java.security.cert.X509Certificate;
  * @author Stefan Kalscheuer
  * @since 0.8.0
  */
-public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
+public final class HTTPVaultConnectorBuilder {
     private static final String ENV_VAULT_ADDR = "VAULT_ADDR";
     private static final String ENV_VAULT_CACERT = "VAULT_CACERT";
     private static final String ENV_VAULT_TOKEN = "VAULT_TOKEN";
@@ -74,6 +76,32 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
     }
 
     /**
+     * Set base URL, e.g. "protocol://host:port/prefix".
+     *
+     * @param baseURL Base URL
+     * @return self
+     * @throws URISyntaxException Invalid URI syntax.
+     * @since 1.0
+     */
+    public HTTPVaultConnectorBuilder withBaseURL(final String baseURL) throws URISyntaxException {
+        return withBaseURL(new URI(baseURL));
+    }
+
+    /**
+     * Set base URL, e.g. "protocol://host:port/prefix".
+     *
+     * @param baseURL Base URL
+     * @return self
+     * @since 1.0
+     */
+    public HTTPVaultConnectorBuilder withBaseURL(final URI baseURL) {
+        return withTLS(!("http".equalsIgnoreCase(Objects.requireNonNullElse(baseURL.getScheme(), ""))))
+                .withHost(baseURL.getHost())
+                .withPort(baseURL.getPort())
+                .withPrefix(baseURL.getPath());
+    }
+
+    /**
      * Set hostname (default: 127.0.0.1).
      *
      * @param host Hostname or IP address
@@ -95,12 +123,20 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
 
     /**
      * Set port (default: 8200).
+     * A value of {@code null} or {@code -1} indicates that no port is specified, i.e. the protocol default is used.
+     * Otherwise a valid port number bwetween 1 and 65535 is expected.
      *
      * @param port Vault TCP port
      * @return self
      */
     public HTTPVaultConnectorBuilder withPort(final Integer port) {
-        this.port = port;
+        if (port < 0) {
+            this.port = null;
+        } else if(port < 1 || port > 65535) {
+            throw new IllegalArgumentException("Port number " + port + " out of range");
+        } else {
+            this.port = port;
+        }
         return this;
     }
 
@@ -341,7 +377,6 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      *
      * @return Vault Connector instance.
      */
-    @Override
     public HTTPVaultConnector build() {
         return new HTTPVaultConnector(this);
     }
@@ -353,7 +388,6 @@ public final class HTTPVaultConnectorBuilder implements VaultConnectorBuilder {
      * @throws VaultConnectorException if authentication failed
      * @since 0.6.0
      */
-    @Override
     public HTTPVaultConnector buildAndAuth() throws VaultConnectorException {
         if (token == null) {
             throw new ConnectionException("No vault token provided, unable to authenticate.");
