@@ -119,7 +119,7 @@ class HTTPVaultConnectorTest {
     @DisplayName("Read/Write Tests")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class ReadWriteTests {
-        private static final String SECRET_PATH = "userstore";
+        private static final String SECRET_PATH = "secret/userstore";
         private static final String SECRET_KEY = "foo";
         private static final String SECRET_VALUE = "bar";
         private static final String SECRET_KEY_JSON = "json";
@@ -138,11 +138,11 @@ class HTTPVaultConnectorTest {
 
             /* Try to read path user has no permission to read */
             SecretResponse res = null;
-            final String invalidPath = "invalid/path";
+            final String invalidPath = "secret/invalid/path";
 
             VaultConnectorException e = assertThrows(
                     PermissionDeniedException.class,
-                    () -> connector.readSecret(invalidPath),
+                    () -> connector.read(invalidPath),
                     "Invalid secret path should raise an exception"
             );
 
@@ -154,14 +154,14 @@ class HTTPVaultConnectorTest {
 
             /* Try to read accessible path with known value */
             res = assertDoesNotThrow(
-                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY),
+                    () -> connector.read(SECRET_PATH + "/" + SECRET_KEY),
                     "Valid secret path could not be read"
             );
             assertThat("Known secret returned invalid value.", res.get("value"), is(SECRET_VALUE));
 
             /* Try to read accessible path with JSON value */
             res = assertDoesNotThrow(
-                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON),
+                    () -> connector.read(SECRET_PATH + "/" + SECRET_KEY_JSON),
                     "Valid secret path could not be read"
             );
             assertThat("Known secret returned null value.", res.get("value"), notNullValue());
@@ -174,7 +174,7 @@ class HTTPVaultConnectorTest {
 
             /* Try to read accessible path with JSON value */
             res = assertDoesNotThrow(
-                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_JSON),
+                    () -> connector.read(SECRET_PATH + "/" + SECRET_KEY_JSON),
                     "Valid secret path could not be read"
             );
             assertThat("Known secret returned null value.", res.get("value"), notNullValue());
@@ -187,7 +187,7 @@ class HTTPVaultConnectorTest {
 
             /* Try to read accessible complex secret */
             res = assertDoesNotThrow(
-                    () -> connector.readSecret(SECRET_PATH + "/" + SECRET_KEY_COMPLEX),
+                    () -> connector.read(SECRET_PATH + "/" + SECRET_KEY_COMPLEX),
                     "Valid secret path could not be read"
             );
             assertThat("Known secret returned null value.", res.getData(), notNullValue());
@@ -207,7 +207,7 @@ class HTTPVaultConnectorTest {
             assumeTrue(connector.isAuthorized());
             /* Try to list secrets from valid path */
             List<String> secrets = assertDoesNotThrow(
-                    () -> connector.listSecrets(SECRET_PATH),
+                    () -> connector.list(SECRET_PATH),
                     "Secrets could not be listed"
             );
             assertThat("Invalid nmber of secrets.", secrets.size(), greaterThan(0));
@@ -228,31 +228,31 @@ class HTTPVaultConnectorTest {
             /* Try to write to null path */
             assertThrows(
                     InvalidRequestException.class,
-                    () -> connector.writeSecret(null, "someValue"),
+                    () -> connector.write(null, "someValue"),
                     "Secret written to null path."
             );
 
             /* Try to write to invalid path */
             assertThrows(
                     InvalidRequestException.class,
-                    () -> connector.writeSecret("", "someValue"),
+                    () -> connector.write("", "someValue"),
                     "Secret written to invalid path."
             );
 
             /* Try to write to a path the user has no access for */
             assertThrows(
                     PermissionDeniedException.class,
-                    () -> connector.writeSecret("invalid/path", "someValue"),
+                    () -> connector.write("invalid/path", "someValue"),
                     "Secret written to inaccessible path."
             );
 
             /* Perform a valid write/read roundtrip to valid path. Also check UTF8-encoding. */
             assertDoesNotThrow(
-                    () -> connector.writeSecret(SECRET_PATH + "/temp", "Abc123äöü,!"),
+                    () -> connector.write(SECRET_PATH + "/temp", "Abc123äöü,!"),
                     "Failed to write secret to accessible path."
             );
             SecretResponse res = assertDoesNotThrow(
-                    () -> connector.readSecret(SECRET_PATH + "/temp"),
+                    () -> connector.read(SECRET_PATH + "/temp"),
                     "Written secret could not be read."
             );
             assertThat(res.get("value"), is("Abc123äöü,!"));
@@ -270,25 +270,25 @@ class HTTPVaultConnectorTest {
 
             /* Write a test secret to vault */
             assertDoesNotThrow(
-                    () -> connector.writeSecret(SECRET_PATH + "/toDelete", "secret content"),
+                    () -> connector.write(SECRET_PATH + "/toDelete", "secret content"),
                     "Secret written to inaccessible path."
             );
             SecretResponse res = assertDoesNotThrow(
-                    () -> connector.readSecret(SECRET_PATH + "/toDelete"),
+                    () -> connector.read(SECRET_PATH + "/toDelete"),
                     "Written secret could not be read."
             );
             assumeTrue(res != null);
 
             /* Delete secret */
             assertDoesNotThrow(
-                    () -> connector.deleteSecret(SECRET_PATH + "/toDelete"),
+                    () -> connector.delete(SECRET_PATH + "/toDelete"),
                     "Revocation threw unexpected exception."
             );
 
             /* Try to read again */
             InvalidResponseException e = assertThrows(
                     InvalidResponseException.class,
-                    () -> connector.readSecret(SECRET_PATH + "/toDelete"),
+                    () -> connector.read(SECRET_PATH + "/toDelete"),
                     "Successfully read deleted secret."
             );
             assertThat(e.getStatusCode(), is(404));
@@ -306,11 +306,11 @@ class HTTPVaultConnectorTest {
 
             /* Write a test secret to vault */
             assertDoesNotThrow(
-                    () -> connector.writeSecret(SECRET_PATH + "/toRevoke", "secret content"),
+                    () -> connector.write(SECRET_PATH + "/toRevoke", "secret content"),
                     "Secret written to inaccessible path."
             );
             SecretResponse res = assertDoesNotThrow(
-                    () -> connector.readSecret(SECRET_PATH + "/toRevoke"),
+                    () -> connector.read(SECRET_PATH + "/toRevoke"),
                     "Written secret could not be read."
             );
             assumeTrue(res != null);
