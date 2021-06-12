@@ -14,6 +14,7 @@
 ### Improvements
 * Use pre-sized map objects for fixed-size payloads
 * Remove Apache HTTP Client dependency in favor of Java 11 HTTP
+* Introduce Java module descriptor
 
 
 ## 0.9.4 (2021-06-06)
