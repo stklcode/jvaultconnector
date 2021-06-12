@@ -19,10 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link AuthResponse} model.
@@ -64,16 +61,16 @@ class HealthResponseTest {
                 () -> new ObjectMapper().readValue(RES_JSON, HealthResponse.class),
                 "Health deserialization failed."
         );
-        assertThat("Parsed response is NULL", res, is(notNullValue()));
-        assertThat("Incorrect cluster ID", res.getClusterID(), is(CLUSTER_ID));
-        assertThat("Incorrect cluster name", res.getClusterName(), is(CLUSTER_NAME));
-        assertThat("Incorrect version", res.getVersion(), is(VERSION));
-        assertThat("Incorrect server time", res.getServerTimeUTC(), is(SERVER_TIME_UTC));
-        assertThat("Incorrect standby state", res.isStandby(), is(STANDBY));
-        assertThat("Incorrect seal state", res.isSealed(), is(SEALED));
-        assertThat("Incorrect initialization state", res.isInitialized(), is(INITIALIZED));
-        assertThat("Incorrect performance standby state", res.isPerformanceStandby(), is(PERF_STANDBY));
-        assertThat("Incorrect replication perf mode", res.getReplicationPerfMode(), is(REPL_PERF_MODE));
-        assertThat("Incorrect replication DR mode", res.getReplicationDrMode(), is(REPL_DR_MODE));
+        assertNotNull(res, "Parsed response is NULL");
+        assertEquals(CLUSTER_ID, res.getClusterID(), "Incorrect cluster ID");
+        assertEquals(CLUSTER_NAME, res.getClusterName(), "Incorrect cluster name");
+        assertEquals(VERSION, res.getVersion(), "Incorrect version");
+        assertEquals(SERVER_TIME_UTC, res.getServerTimeUTC(), "Incorrect server time");
+        assertEquals(STANDBY, res.isStandby(), "Incorrect standby state");
+        assertEquals(SEALED, res.isSealed(), "Incorrect seal state");
+        assertEquals(INITIALIZED, res.isInitialized(), "Incorrect initialization state");
+        assertEquals(PERF_STANDBY, res.isPerformanceStandby(), "Incorrect performance standby state");
+        assertEquals(REPL_PERF_MODE, res.getReplicationPerfMode(), "Incorrect replication perf mode");
+        assertEquals(REPL_DR_MODE, res.getReplicationDrMode(), "Incorrect replication DR mode");
     }
 }

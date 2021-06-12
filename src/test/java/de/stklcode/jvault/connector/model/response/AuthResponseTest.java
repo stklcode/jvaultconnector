@@ -23,11 +23,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link AuthResponse} model.
@@ -84,7 +82,7 @@ class AuthResponseTest {
     void getDataRoundtrip() {
         // Create empty Object.
         AuthResponse res = new AuthResponse();
-        assertThat("Initial data should be empty", res.getData(), is(nullValue()));
+        assertNull(res.getData(), "Initial data should be empty");
 
         // Parsing invalid auth data map should fail.
         assertThrows(
@@ -95,7 +93,7 @@ class AuthResponseTest {
 
         // Data method should be agnostic.
         res.setData(INVALID_AUTH_DATA);
-        assertThat("Data not passed through", res.getData(), is(INVALID_AUTH_DATA));
+        assertEquals(INVALID_AUTH_DATA, res.getData(), "Data not passed through");
     }
 
     /**
@@ -103,26 +101,26 @@ class AuthResponseTest {
      */
     @Test
     void jsonRoundtrip() {
-            AuthResponse res = assertDoesNotThrow(
-                    () -> new ObjectMapper().readValue(RES_JSON, AuthResponse.class),
-                    "AuthResponse deserialization failed."
-            );
-            assertThat("Parsed response is NULL", res, is(notNullValue()));
-            // Extract auth data.
-            AuthData data = res.getAuth();
-            assertThat("Auth data is NULL", data, is(notNullValue()));
-            assertThat("Incorrect auth accessor", data.getAccessor(), is(AUTH_ACCESSOR));
-            assertThat("Incorrect auth client token", data.getClientToken(), is(AUTH_CLIENT_TOKEN));
-            assertThat("Incorrect auth lease duration", data.getLeaseDuration(), is(AUTH_LEASE_DURATION));
-            assertThat("Incorrect auth renewable flag", data.isRenewable(), is(AUTH_RENEWABLE));
-            assertThat("Incorrect auth orphan flag", data.isOrphan(), is(AUTH_ORPHAN));
-            assertThat("Incorrect auth token type", data.getTokenType(), is(AUTH_TOKEN_TYPE));
-            assertThat("Incorrect auth entity id", data.getEntityId(), is(AUTH_ENTITY_ID));
-            assertThat("Incorrect number of policies", data.getPolicies(), hasSize(2));
-            assertThat("Incorrect auth policies", data.getPolicies(), containsInRelativeOrder(AUTH_POLICY_1, AUTH_POLICY_2));
-            assertThat("Incorrect number of token policies", data.getTokenPolicies(), hasSize(2));
-            assertThat("Incorrect token policies", data.getTokenPolicies(), containsInRelativeOrder(AUTH_POLICY_2, AUTH_POLICY_1));
-            assertThat("Incorrect auth metadata size", data.getMetadata().entrySet(), hasSize(1));
-            assertThat("Incorrect auth metadata", data.getMetadata().get(AUTH_META_KEY), is(AUTH_META_VALUE));
+        AuthResponse res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(RES_JSON, AuthResponse.class),
+                "AuthResponse deserialization failed."
+        );
+        assertNotNull(res, "Parsed response is NULL");
+        // Extract auth data.
+        AuthData data = res.getAuth();
+        assertNotNull(data, "Auth data is NULL");
+        assertEquals(AUTH_ACCESSOR, data.getAccessor(), "Incorrect auth accessor");
+        assertEquals(AUTH_CLIENT_TOKEN, data.getClientToken(), "Incorrect auth client token");
+        assertEquals(AUTH_LEASE_DURATION, data.getLeaseDuration(), "Incorrect auth lease duration");
+        assertEquals(AUTH_RENEWABLE, data.isRenewable(), "Incorrect auth renewable flag");
+        assertEquals(AUTH_ORPHAN, data.isOrphan(), "Incorrect auth orphan flag");
+        assertEquals(AUTH_TOKEN_TYPE, data.getTokenType(), "Incorrect auth token type");
+        assertEquals(AUTH_ENTITY_ID, data.getEntityId(), "Incorrect auth entity id");
+        assertEquals(2, data.getPolicies().size(), "Incorrect number of policies");
+        assertTrue(data.getPolicies().containsAll(Set.of(AUTH_POLICY_1, AUTH_POLICY_2)));
+        assertEquals(2, data.getTokenPolicies().size(), "Incorrect number of token policies");
+        assertTrue(data.getTokenPolicies().containsAll(Set.of(AUTH_POLICY_2, AUTH_POLICY_1)), "Incorrect token policies");
+        assertEquals(1, data.getMetadata().size(), "Incorrect auth metadata size");
+        assertEquals(AUTH_META_VALUE, data.getMetadata().get(AUTH_META_KEY), "Incorrect auth metadata");
     }
 }

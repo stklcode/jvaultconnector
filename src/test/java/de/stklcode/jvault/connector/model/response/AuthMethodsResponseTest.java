@@ -22,13 +22,12 @@ import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link AuthMethodsResponse} model.
@@ -76,7 +75,7 @@ class AuthMethodsResponseTest {
     void getDataRoundtrip() {
         // Create empty Object.
         AuthMethodsResponse res = new AuthMethodsResponse();
-        assertThat("Initial method map should be empty", res.getSupportedMethods(), is(anEmptyMap()));
+        assertEquals(Collections.emptyMap(), res.getSupportedMethods(), "Initial method map should be empty");
 
         // Parsing invalid data map should fail.
         assertThrows(
@@ -95,29 +94,29 @@ class AuthMethodsResponseTest {
                 () -> new ObjectMapper().readValue(RES_JSON, AuthMethodsResponse.class),
                 "AuthResponse deserialization failed"
         );
-        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        assertNotNull(res, "Parsed response is NULL");
         // Extract auth data.
         Map<String, AuthMethod> supported = res.getSupportedMethods();
-        assertThat("Auth data is NULL", supported, is(notNullValue()));
-        assertThat("Incorrect number of supported methods", supported.entrySet(), hasSize(2));
-        assertThat("Incorrect method paths", supported.keySet(), containsInAnyOrder(GH_PATH, TK_PATH));
+        assertNotNull(supported, "Auth data is NULL");
+        assertEquals(2, supported.size(), "Incorrect number of supported methods");
+        assertTrue(supported.keySet().containsAll(Set.of(GH_PATH, TK_PATH)), "Incorrect method paths");
 
         // Verify first method.
         AuthMethod method = supported.get(GH_PATH);
-        assertThat("Incorrect raw type for GitHub", method.getRawType(), is(GH_TYPE));
-        assertThat("Incorrect parsed type for GitHub", method.getType(), is(AuthBackend.GITHUB));
-        assertThat("Incorrect description for GitHub", method.getDescription(), is(GH_DESCR));
-        assertThat("Unexpected config for GitHub", method.getConfig(), is(nullValue()));
+        assertEquals(GH_TYPE, method.getRawType(), "Incorrect raw type for GitHub");
+        assertEquals(AuthBackend.GITHUB, method.getType(), "Incorrect parsed type for GitHub");
+        assertEquals(GH_DESCR, method.getDescription(), "Incorrect description for GitHub");
+        assertNull(method.getConfig(), "Unexpected config for GitHub");
 
         // Verify first method.
         method = supported.get(TK_PATH);
-        assertThat("Incorrect raw type for Token", method.getRawType(), is(TK_TYPE));
-        assertThat("Incorrect parsed type for Token", method.getType(), is(AuthBackend.TOKEN));
-        assertThat("Incorrect description for Token", method.getDescription(), is(TK_DESCR));
-        assertThat("Missing config for Token", method.getConfig(), is(notNullValue()));
-        assertThat("Unexpected config size for Token", method.getConfig().keySet(), hasSize(2));
-        assertThat("Incorrect lease TTL config", method.getConfig().get("default_lease_ttl"), is(TK_LEASE_TTL.toString()));
-        assertThat("Incorrect max lease TTL config", method.getConfig().get("max_lease_ttl"), is(TK_MAX_LEASE_TTL.toString()));
+        assertEquals(TK_TYPE, method.getRawType(), "Incorrect raw type for Token");
+        assertEquals(AuthBackend.TOKEN, method.getType(), "Incorrect parsed type for Token");
+        assertEquals(TK_DESCR, method.getDescription(), "Incorrect description for Token");
+        assertNotNull(method.getConfig(), "Missing config for Token");
+        assertEquals(2, method.getConfig().size(), "Unexpected config size for Token");
+        assertEquals(TK_LEASE_TTL.toString(), method.getConfig().get("default_lease_ttl"), "Incorrect lease TTL config");
+        assertEquals(TK_MAX_LEASE_TTL.toString(), method.getConfig().get("max_lease_ttl"), "Incorrect max lease TTL config");
     }
 
     private static class Dummy {

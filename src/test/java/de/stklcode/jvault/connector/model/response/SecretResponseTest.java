@@ -23,11 +23,9 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link SecretResponse} model.
@@ -123,25 +121,25 @@ class SecretResponseTest {
     void getDataRoundtrip() throws InvalidResponseException {
         // Create empty Object.
         SecretResponse res = new SecretResponse();
-        assertThat("Initial data should be Map", res.getData(), is(instanceOf(Map.class)));
-        assertThat("Initial data should be empty", res.getData().entrySet(), empty());
-        assertThat("Getter should return NULL on empty data map", res.get(KEY_STRING), is(nullValue()));
+        assertNotNull(res.getData(), "Initial data should be Map");
+        assertTrue(res.getData().isEmpty(), "Initial data should be empty");
+        assertNull(res.get(KEY_STRING), "Getter should return NULL on empty data map");
 
         // Fill data map.
         res.setData(DATA);
-        assertThat("Data setter/getter not transparent", res.getData(), is(DATA));
-        assertThat("Data size modified", res.getData().keySet(), hasSize(DATA.size()));
-        assertThat("Data keys not passed correctly", res.getData().keySet(), containsInAnyOrder(KEY_STRING, KEY_INTEGER, KEY_LIST));
-        assertThat("Data values not passed correctly", res.get(KEY_STRING), is(VAL_STRING));
-        assertThat("Data values not passed correctly", res.get(KEY_INTEGER), is(VAL_INTEGER));
-        assertThat("Non-Null returned on unknown key", res.get(KEY_UNKNOWN), is(nullValue()));
+        assertEquals(DATA, res.getData(), "Data setter/getter not transparent");
+        assertEquals(DATA.size(), res.getData().keySet().size(), "Data size modified");
+        assertTrue(res.getData().keySet().containsAll(Set.of(KEY_STRING, KEY_INTEGER, KEY_LIST)), "Data keys not passed correctly");
+        assertEquals(VAL_STRING, res.get(KEY_STRING), "Data values not passed correctly");
+        assertEquals(VAL_INTEGER, res.get(KEY_INTEGER), "Data values not passed correctly");
+        assertNull(res.get(KEY_UNKNOWN), "Non-Null returned on unknown key");
 
         // Try explicit JSON conversion.
         final List<?> list = res.get(KEY_LIST, List.class);
-        assertThat("JSON parsing of list failed", list, is(notNullValue()));
-        assertThat("JSON parsing of list returned incorrect size", list.size(), is(2));
-        assertThat("JSON parsing of list returned incorrect elements", list, contains("first", "second"));
-        assertThat("Non-Null returned on unknown key", res.get(KEY_UNKNOWN, Object.class), is(nullValue()));
+        assertNotNull(list, "JSON parsing of list failed");
+        assertEquals(2, list.size(), "JSON parsing of list returned incorrect size");
+        assertTrue(list.containsAll(List.of("first", "second")), "JSON parsing of list returned incorrect elements");
+        assertNull(res.get(KEY_UNKNOWN, Object.class), "Non-Null returned on unknown key");
 
         // Requesting invalid class should result in Exception.
         assertThrows(
@@ -168,13 +166,13 @@ class SecretResponseTest {
                 "SecretResponse deserialization failed."
         );
         assertSecretData(res);
-        assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
-        assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
-        assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
-        assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(emptyString()));
-        assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(nullValue()));
-        assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(false));
-        assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(1));
+        assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
+        assertEquals(SECRET_META_CREATED, res.getMetadata().getCreatedTimeString(), "Incorrect creation date string");
+        assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");
+        assertEquals("", res.getMetadata().getDeletionTimeString(), "Incorrect deletion date string");
+        assertNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
+        assertEquals(false, res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
+        assertEquals(1, res.getMetadata().getVersion(), "Incorrect secret version");
 
         // Deleted KV v2 secret.
         res = assertDoesNotThrow(
@@ -182,22 +180,22 @@ class SecretResponseTest {
                 "SecretResponse deserialization failed."
         );
         assertSecretData(res);
-        assertThat("SecretResponse does not contain metadata", res.getMetadata(), is(notNullValue()));
-        assertThat("Incorrect creation date string", res.getMetadata().getCreatedTimeString(), is(SECRET_META_CREATED));
-        assertThat("Creation date parsing failed", res.getMetadata().getCreatedTime(), is(notNullValue()));
-        assertThat("Incorrect deletion date string", res.getMetadata().getDeletionTimeString(), is(SECRET_META_DELETED));
-        assertThat("Incorrect deletion date", res.getMetadata().getDeletionTime(), is(notNullValue()));
-        assertThat("Secret destroyed when not expected", res.getMetadata().isDestroyed(), is(true));
-        assertThat("Incorrect secret version", res.getMetadata().getVersion(), is(2));
+        assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
+        assertEquals(SECRET_META_CREATED, res.getMetadata().getCreatedTimeString(), "Incorrect creation date string");
+        assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");
+        assertEquals(SECRET_META_DELETED, res.getMetadata().getDeletionTimeString(), "Incorrect deletion date string");
+        assertNotNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
+        assertEquals(true, res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
+        assertEquals(2, res.getMetadata().getVersion(), "Incorrect secret version");
     }
 
     private void assertSecretData(SecretResponse res) {
-        assertThat("Parsed response is NULL", res, is(notNullValue()));
-        assertThat("Incorrect lease ID", res.getLeaseId(), is(SECRET_LEASE_ID));
-        assertThat("Incorrect lease duration", res.getLeaseDuration(), is(SECRET_LEASE_DURATION));
-        assertThat("Incorrect renewable status", res.isRenewable(), is(SECRET_RENEWABLE));
-        assertThat("Incorrect warnings", res.getWarnings(), is(SECRET_WARNINGS));
-        assertThat("Response does not contain correct data", res.get(SECRET_DATA_K1), is(SECRET_DATA_V1));
-        assertThat("Response does not contain correct data", res.get(SECRET_DATA_K2), is(SECRET_DATA_V2));
+        assertNotNull(res, "Parsed response is NULL");
+        assertEquals(SECRET_LEASE_ID, res.getLeaseId(), "Incorrect lease ID");
+        assertEquals(SECRET_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
+        assertEquals(SECRET_RENEWABLE, res.isRenewable(), "Incorrect renewable status");
+        assertEquals(SECRET_WARNINGS, res.getWarnings(), "Incorrect warnings");
+        assertEquals(SECRET_DATA_V1, res.get(SECRET_DATA_K1), "Response does not contain correct data");
+        assertEquals(SECRET_DATA_V2, res.get(SECRET_DATA_K2), "Response does not contain correct data");
     }
 }

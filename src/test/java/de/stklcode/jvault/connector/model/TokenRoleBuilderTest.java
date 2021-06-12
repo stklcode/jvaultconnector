@@ -23,8 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit Test for {@link Token.Builder}
@@ -80,20 +79,20 @@ class TokenRoleBuilderTest {
     @Test
     void buildDefaultTest() throws JsonProcessingException {
         TokenRole role = TokenRole.builder().build();
-        assertThat(role.getAllowedPolicies(), is(nullValue()));
-        assertThat(role.getDisallowedPolicies(), is(nullValue()));
-        assertThat(role.getOrphan(), is(nullValue()));
-        assertThat(role.getRenewable(), is(nullValue()));
-        assertThat(role.getAllowedEntityAliases(), is(nullValue()));
-        assertThat(role.getTokenBoundCidrs(), is(nullValue()));
-        assertThat(role.getTokenExplicitMaxTtl(), is(nullValue()));
-        assertThat(role.getTokenNoDefaultPolicy(), is(nullValue()));
-        assertThat(role.getTokenNumUses(), is(nullValue()));
-        assertThat(role.getTokenPeriod(), is(nullValue()));
-        assertThat(role.getTokenType(), is(nullValue()));
+        assertNull(role.getAllowedPolicies());
+        assertNull(role.getDisallowedPolicies());
+        assertNull(role.getOrphan());
+        assertNull(role.getRenewable());
+        assertNull(role.getAllowedEntityAliases());
+        assertNull(role.getTokenBoundCidrs());
+        assertNull(role.getTokenExplicitMaxTtl());
+        assertNull(role.getTokenNoDefaultPolicy());
+        assertNull(role.getTokenNumUses());
+        assertNull(role.getTokenPeriod());
+        assertNull(role.getTokenType());
 
-        /* optional fields should be ignored, so JSON string should be empty */
-        assertThat(new ObjectMapper().writeValueAsString(role), is("{}"));
+        // Optional fields should be ignored, so JSON string should be empty.
+        assertEquals("{}", new ObjectMapper().writeValueAsString(role));
     }
 
     /**
@@ -121,20 +120,20 @@ class TokenRoleBuilderTest {
                 .withTokenType(null)
                 .build();
 
-        assertThat(role.getAllowedPolicies(), is(nullValue()));
-        assertThat(role.getDisallowedPolicies(), is(nullValue()));
-        assertThat(role.getOrphan(), is(nullValue()));
-        assertThat(role.getRenewable(), is(nullValue()));
-        assertThat(role.getAllowedEntityAliases(), is(nullValue()));
-        assertThat(role.getTokenBoundCidrs(), is(nullValue()));
-        assertThat(role.getTokenExplicitMaxTtl(), is(nullValue()));
-        assertThat(role.getTokenNoDefaultPolicy(), is(nullValue()));
-        assertThat(role.getTokenNumUses(), is(nullValue()));
-        assertThat(role.getTokenPeriod(), is(nullValue()));
-        assertThat(role.getTokenType(), is(nullValue()));
+        assertNull(role.getAllowedPolicies());
+        assertNull(role.getDisallowedPolicies());
+        assertNull(role.getOrphan());
+        assertNull(role.getRenewable());
+        assertNull(role.getAllowedEntityAliases());
+        assertNull(role.getTokenBoundCidrs());
+        assertNull(role.getTokenExplicitMaxTtl());
+        assertNull(role.getTokenNoDefaultPolicy());
+        assertNull(role.getTokenNumUses());
+        assertNull(role.getTokenPeriod());
+        assertNull(role.getTokenType());
 
-        /* optional fields should be ignored, so JSON string should be empty */
-        assertThat(new ObjectMapper().writeValueAsString(role), is("{}"));
+        // Optional fields should be ignored, so JSON string should be empty.
+        assertEquals("{}", new ObjectMapper().writeValueAsString(role));
     }
 
     /**
@@ -161,24 +160,24 @@ class TokenRoleBuilderTest {
                 .withTokenPeriod(TOKEN_PERIOD)
                 .withTokenType(TOKEN_TYPE)
                 .build();
-        assertThat(role.getName(), is(NAME));
-        assertThat(role.getAllowedPolicies(), hasSize(ALLOWED_POLICIES.size() + 1));
-        assertThat(role.getAllowedPolicies(), containsInAnyOrder(ALLOWED_POLICY_1, ALLOWED_POLICY_2, ALLOWED_POLICY_3));
-        assertThat(role.getDisallowedPolicies(), hasSize(DISALLOWED_POLICIES.size() + 1));
-        assertThat(role.getDisallowedPolicies(), containsInAnyOrder(DISALLOWED_POLICY_1, DISALLOWED_POLICY_2, DISALLOWED_POLICY_3));
-        assertThat(role.getOrphan(), is(ORPHAN));
-        assertThat(role.getRenewable(), is(RENEWABLE));
-        assertThat(role.getPathSuffix(), is(PATH_SUFFIX));
-        assertThat(role.getAllowedEntityAliases(), hasSize(ALLOWED_ENTITY_ALIASES.size() + 1));
-        assertThat(role.getAllowedEntityAliases(), containsInAnyOrder(ALLOWED_ENTITY_ALIAS_1, ALLOWED_ENTITY_ALIAS_2, ALLOWED_ENTITY_ALIAS_3));
-        assertThat(role.getTokenBoundCidrs(), hasSize(TOKEN_BOUND_CIDRS.size() + 1));
-        assertThat(role.getTokenBoundCidrs(), containsInAnyOrder(TOKEN_BOUND_CIDR_1, TOKEN_BOUND_CIDR_2, TOKEN_BOUND_CIDR_3));
-        assertThat(role.getTokenNoDefaultPolicy(), is(TOKEN_NO_DEFAULT_POLICY));
-        assertThat(role.getTokenNumUses(), is(TOKEN_NUM_USES));
-        assertThat(role.getTokenPeriod(), is(TOKEN_PERIOD));
-        assertThat(role.getTokenType(), is(TOKEN_TYPE.value()));
+        assertEquals(NAME, role.getName());
+        assertEquals(ALLOWED_POLICIES.size() + 1, role.getAllowedPolicies().size());
+        assertTrue(role.getAllowedPolicies().containsAll(List.of(ALLOWED_POLICY_1, ALLOWED_POLICY_2, ALLOWED_POLICY_3)));
+        assertEquals(DISALLOWED_POLICIES.size() + 1, role.getDisallowedPolicies().size());
+        assertTrue(role.getDisallowedPolicies().containsAll(List.of(DISALLOWED_POLICY_1, DISALLOWED_POLICY_2, DISALLOWED_POLICY_3)));
+        assertEquals(ORPHAN, role.getOrphan());
+        assertEquals(RENEWABLE, role.getRenewable());
+        assertEquals(PATH_SUFFIX, role.getPathSuffix());
+        assertEquals(ALLOWED_ENTITY_ALIASES.size() + 1, role.getAllowedEntityAliases().size());
+        assertTrue(role.getAllowedEntityAliases().containsAll(List.of(ALLOWED_ENTITY_ALIAS_1, ALLOWED_ENTITY_ALIAS_2, ALLOWED_ENTITY_ALIAS_3)));
+        assertEquals(TOKEN_BOUND_CIDRS.size() + 1, role.getTokenBoundCidrs().size());
+        assertTrue(role.getTokenBoundCidrs().containsAll(List.of(TOKEN_BOUND_CIDR_1, TOKEN_BOUND_CIDR_2, TOKEN_BOUND_CIDR_3)));
+        assertEquals(TOKEN_NO_DEFAULT_POLICY, role.getTokenNoDefaultPolicy());
+        assertEquals(TOKEN_NUM_USES, role.getTokenNumUses());
+        assertEquals(TOKEN_PERIOD, role.getTokenPeriod());
+        assertEquals(TOKEN_TYPE.value(), role.getTokenType());
 
-        /* Verify that all parameters are included in JSON string */
-        assertThat(new ObjectMapper().writeValueAsString(role), is(JSON_FULL));
+        // Verify that all parameters are included in JSON string.
+        assertEquals(JSON_FULL, new ObjectMapper().writeValueAsString(role));
     }
 }

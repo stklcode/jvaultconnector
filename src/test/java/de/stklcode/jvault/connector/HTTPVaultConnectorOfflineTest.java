@@ -40,12 +40,7 @@ import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit test for HTTP Vault connector.
@@ -86,9 +81,9 @@ class HTTPVaultConnectorOfflineTest {
                 connector::getHealth,
                 "Querying health status succeeded on invalid instance"
         );
-        assertThat("Unexpected exception message", e.getMessage(), is("Invalid response code"));
-        assertThat("Unexpected status code in exception", ((InvalidResponseException) e).getStatusCode(), is(responseCode));
-        assertThat("Response message where none was expected", ((InvalidResponseException) e).getResponse(), is(nullValue()));
+        assertEquals("Invalid response code", e.getMessage(), "Unexpected exception message");
+        assertEquals(responseCode, ((InvalidResponseException) e).getStatusCode(), "Unexpected status code in exception");
+        assertNull(((InvalidResponseException) e).getResponse(), "Response message where none was expected");
 
         // Simulate permission denied response.
         mockHttpResponse(responseCode, "{\"errors\":[\"permission denied\"]}", "application/json");
@@ -107,8 +102,8 @@ class HTTPVaultConnectorOfflineTest {
                 connector::getHealth,
                 "Querying health status succeeded on invalid instance"
         );
-        assertThat("Unexpected exception message", e.getMessage(), is("Unable to connect to Vault server"));
-        assertThat("Unexpected cause", e.getCause(), instanceOf(IOException.class));
+        assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
+        assertTrue(e.getCause() instanceof IOException, "Unexpected cause");
 
         // Now simulate a failing request that succeeds on second try.
         connector = HTTPVaultConnector.builder(wireMock.url("/")).withNumberOfRetries(1).withTimeout(250).build();
@@ -144,30 +139,30 @@ class HTTPVaultConnectorOfflineTest {
 
         // Most basic constructor expects complete URL.
         HTTPVaultConnector connector = HTTPVaultConnector.builder(url).build();
-        assertThat("Unexpected base URL", getRequestHelperPrivate(connector, "baseURL"), is(url));
+        assertEquals(url, getRequestHelperPrivate(connector, "baseURL"), "Unexpected base URL");
 
         // Now override TLS usage.
         connector = HTTPVaultConnector.builder().withHost(hostname).withoutTLS().build();
-        assertThat("Unexpected base URL with TLS disabled", getRequestHelperPrivate(connector, "baseURL"), is(expectedNoTls));
+        assertEquals(expectedNoTls, getRequestHelperPrivate(connector, "baseURL"), "Unexpected base URL with TLS disabled");
 
         // Specify custom port.
         connector = HTTPVaultConnector.builder().withHost(hostname).withTLS().withPort(port).build();
-        assertThat("Unexpected base URL with custom port", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPort));
+        assertEquals(expectedCustomPort, getRequestHelperPrivate(connector, "baseURL"), "Unexpected base URL with custom port");
 
         // Specify custom prefix.
         connector = HTTPVaultConnector.builder().withHost(hostname).withTLS().withPort(port).withPrefix(prefix).build();
-        assertThat("Unexpected base URL with custom prefix", getRequestHelperPrivate(connector, "baseURL"), is(expectedCustomPrefix));
-        assertThat("Trusted CA cert set, but not specified", getRequestHelperPrivate(connector, "trustedCaCert"), is(nullValue()));
+        assertEquals(expectedCustomPrefix, getRequestHelperPrivate(connector, "baseURL"), "Unexpected base URL with custom prefix");
+        assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set, but not specified");
 
         // Specify number of retries.
         connector = HTTPVaultConnector.builder(url).withTrustedCA(trustedCaCert).withNumberOfRetries(retries).build();
-        assertThat("Number of retries not set correctly", getRequestHelperPrivate(connector, "retries"), is(retries));
+        assertEquals(retries, getRequestHelperPrivate(connector, "retries"), "Number of retries not set correctly");
 
         // Test TLS version (#22).
-        assertThat("TLS version should be 1.2 if not specified", getRequestHelperPrivate(connector, "tlsVersion"), is("TLSv1.2"));
+        assertEquals("TLSv1.2", getRequestHelperPrivate(connector, "tlsVersion"), "TLS version should be 1.2 if not specified");
         // Now override.
         connector = HTTPVaultConnector.builder(url).withTrustedCA(trustedCaCert).withNumberOfRetries(retries).withTLS("TLSv1.1").build();
-        assertThat("Overridden TLS version 1.1 not correct", getRequestHelperPrivate(connector, "tlsVersion"), is("TLSv1.1"));
+        assertEquals("TLSv1.1", getRequestHelperPrivate(connector, "tlsVersion"), "Overridden TLS version 1.1 not correct");
     }
 
     /**
@@ -185,7 +180,7 @@ class HTTPVaultConnectorOfflineTest {
                 connector::sealStatus,
                 "Querying seal status succeeded on invalid instance"
         );
-        assertThat("Unexpected exception message", e.getMessage(), is("Unable to connect to Vault server"));
+        assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
     }
 
     /**
@@ -203,7 +198,7 @@ class HTTPVaultConnectorOfflineTest {
                 connector::getHealth,
                 "Querying health status succeeded on invalid instance"
         );
-        assertThat("Unexpected exception message", e.getMessage(), is("Unable to connect to Vault server"));
+        assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
     }
 
     /**
@@ -237,7 +232,7 @@ class HTTPVaultConnectorOfflineTest {
 
     private void assertParseError(Executable executable, String message) {
         InvalidResponseException e = assertThrows(InvalidResponseException.class, executable, message);
-        assertThat("Unexpected exception message", e.getMessage(), is("Unable to parse response"));
+        assertEquals("Unable to parse response", e.getMessage(), "Unexpected exception message");
     }
 
     /**

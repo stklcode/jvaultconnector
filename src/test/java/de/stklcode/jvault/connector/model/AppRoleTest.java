@@ -24,8 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link AppRole} and {@link AppRole.Builder}.
@@ -69,24 +68,24 @@ class AppRoleTest {
     @Test
     void buildDefaultTest() throws JsonProcessingException {
         AppRole role = AppRole.builder(NAME).build();
-        assertThat(role.getId(), is(nullValue()));
-        assertThat(role.getBindSecretId(), is(nullValue()));
-        assertThat(role.getSecretIdBoundCidrs(), is(nullValue()));
-        assertThat(role.getTokenPolicies(), is(nullValue()));
-        assertThat(role.getSecretIdNumUses(), is(nullValue()));
-        assertThat(role.getSecretIdTtl(), is(nullValue()));
-        assertThat(role.getEnableLocalSecretIds(), is(nullValue()));
-        assertThat(role.getTokenTtl(), is(nullValue()));
-        assertThat(role.getTokenMaxTtl(), is(nullValue()));
-        assertThat(role.getTokenBoundCidrs(), is(nullValue()));
-        assertThat(role.getTokenExplicitMaxTtl(), is(nullValue()));
-        assertThat(role.getTokenNoDefaultPolicy(), is(nullValue()));
-        assertThat(role.getTokenNumUses(), is(nullValue()));
-        assertThat(role.getTokenPeriod(), is(nullValue()));
-        assertThat(role.getTokenType(), is(nullValue()));
+        assertNull(role.getId());
+        assertNull(role.getBindSecretId());
+        assertNull(role.getSecretIdBoundCidrs());
+        assertNull(role.getTokenPolicies());
+        assertNull(role.getSecretIdNumUses());
+        assertNull(role.getSecretIdTtl());
+        assertNull(role.getEnableLocalSecretIds());
+        assertNull(role.getTokenTtl());
+        assertNull(role.getTokenMaxTtl());
+        assertNull(role.getTokenBoundCidrs());
+        assertNull(role.getTokenExplicitMaxTtl());
+        assertNull(role.getTokenNoDefaultPolicy());
+        assertNull(role.getTokenNumUses());
+        assertNull(role.getTokenPeriod());
+        assertNull(role.getTokenType());
 
-        /* optional fields should be ignored, so JSON string should only contain role_name */
-        assertThat(new ObjectMapper().writeValueAsString(role), is(JSON_MIN));
+        // Optional fields should be ignored, so JSON string should only contain role_name.
+        assertEquals(JSON_MIN, new ObjectMapper().writeValueAsString(role));
     }
 
     /**
@@ -111,25 +110,25 @@ class AppRoleTest {
                 .withTokenPeriod(TOKEN_PERIOD)
                 .withTokenType(TOKEN_TYPE)
                 .build();
-        assertThat(role.getName(), is(NAME));
-        assertThat(role.getId(), is(ID));
-        assertThat(role.getBindSecretId(), is(BIND_SECRET_ID));
-        assertThat(role.getSecretIdBoundCidrs(), is(BOUND_CIDR_LIST));
-        assertThat(role.getTokenPolicies(), is(POLICIES));
-        assertThat(role.getSecretIdNumUses(), is(SECRET_ID_NUM_USES));
-        assertThat(role.getSecretIdTtl(), is(SECRET_ID_TTL));
-        assertThat(role.getEnableLocalSecretIds(), is(ENABLE_LOCAL_SECRET_IDS));
-        assertThat(role.getTokenTtl(), is(TOKEN_TTL));
-        assertThat(role.getTokenMaxTtl(), is(TOKEN_MAX_TTL));
-        assertThat(role.getTokenBoundCidrs(), is(BOUND_CIDR_LIST));
-        assertThat(role.getTokenExplicitMaxTtl(), is(TOKEN_EXPLICIT_MAX_TTL));
-        assertThat(role.getTokenNoDefaultPolicy(), is(TOKEN_NO_DEFAULT_POLICY));
-        assertThat(role.getTokenNumUses(), is(TOKEN_NUM_USES));
-        assertThat(role.getTokenPeriod(), is(TOKEN_PERIOD));
-        assertThat(role.getTokenType(), is(TOKEN_TYPE.value()));
+        assertEquals(NAME, role.getName());
+        assertEquals(ID, role.getId());
+        assertEquals(BIND_SECRET_ID, role.getBindSecretId());
+        assertEquals(BOUND_CIDR_LIST, role.getSecretIdBoundCidrs());
+        assertEquals(POLICIES, role.getTokenPolicies());
+        assertEquals(SECRET_ID_NUM_USES, role.getSecretIdNumUses());
+        assertEquals(SECRET_ID_TTL, role.getSecretIdTtl());
+        assertEquals(ENABLE_LOCAL_SECRET_IDS, role.getEnableLocalSecretIds());
+        assertEquals(TOKEN_TTL, role.getTokenTtl());
+        assertEquals(TOKEN_MAX_TTL, role.getTokenMaxTtl());
+        assertEquals(BOUND_CIDR_LIST, role.getTokenBoundCidrs());
+        assertEquals(TOKEN_EXPLICIT_MAX_TTL, role.getTokenExplicitMaxTtl());
+        assertEquals(TOKEN_NO_DEFAULT_POLICY, role.getTokenNoDefaultPolicy());
+        assertEquals(TOKEN_NUM_USES, role.getTokenNumUses());
+        assertEquals(TOKEN_PERIOD, role.getTokenPeriod());
+        assertEquals(TOKEN_TYPE.value(), role.getTokenType());
 
-        /* Verify that all parameters are included in JSON string */
-        assertThat(new ObjectMapper().writeValueAsString(role), is(JSON_FULL));
+        // Verify that all parameters are included in JSON string.
+        assertEquals(JSON_FULL, new ObjectMapper().writeValueAsString(role));
     }
 
     /**
@@ -137,40 +136,40 @@ class AppRoleTest {
      */
     @Test
     void convenienceMethodsTest() {
-        /* bind_secret_id */
+        // bind_secret_id.
         AppRole role = AppRole.builder(NAME).build();
-        assertThat(role.getBindSecretId(), is(nullValue()));
+        assertNull(role.getBindSecretId());
         role = AppRole.builder(NAME).withBindSecretID().build();
-        assertThat(role.getBindSecretId(), is(true));
+        assertEquals(true, role.getBindSecretId());
         role = AppRole.builder(NAME).withoutBindSecretID().build();
-        assertThat(role.getBindSecretId(), is(false));
+        assertEquals(false, role.getBindSecretId());
 
-        /* Add single CIDR subnet */
+        // Add single CIDR subnet.
         role = AppRole.builder(NAME).withSecretBoundCidr(CIDR_2).withTokenBoundCidr(CIDR_2).build();
-        assertThat(role.getSecretIdBoundCidrs(), hasSize(1));
-        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_2));
-        assertThat(role.getTokenBoundCidrs(), hasSize(1));
-        assertThat(role.getTokenBoundCidrs(), contains(CIDR_2));
+        assertEquals(1, role.getSecretIdBoundCidrs().size());
+        assertEquals(CIDR_2, role.getSecretIdBoundCidrs().get(0));
+        assertEquals(1, role.getTokenBoundCidrs().size());
+        assertEquals(CIDR_2, role.getTokenBoundCidrs().get(0));
         role = AppRole.builder(NAME)
                 .withSecretIdBoundCidrs(BOUND_CIDR_LIST)
                 .withSecretBoundCidr(CIDR_2)
                 .withTokenBoundCidrs(BOUND_CIDR_LIST)
                 .withTokenBoundCidr(CIDR_2)
                 .build();
-        assertThat(role.getSecretIdBoundCidrs(), hasSize(2));
-        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_1, CIDR_2));
-        assertThat(role.getTokenBoundCidrs(), hasSize(2));
-        assertThat(role.getSecretIdBoundCidrs(), contains(CIDR_1, CIDR_2));
+        assertEquals(2, role.getSecretIdBoundCidrs().size());
+        assertTrue(role.getSecretIdBoundCidrs().containsAll(List.of(CIDR_1, CIDR_2)));
+        assertEquals(2, role.getTokenBoundCidrs().size());
+        assertTrue(role.getSecretIdBoundCidrs().containsAll(List.of(CIDR_1, CIDR_2)));
 
-        /* Add single policy */
+        // Add single policy.
         role = AppRole.builder(NAME).withTokenPolicy(POLICY_2).build();
-        assertThat(role.getTokenPolicies(), hasSize(1));
-        assertThat(role.getTokenPolicies(), contains(POLICY_2));
+        assertEquals(1, role.getTokenPolicies().size());
+        assertEquals(POLICY_2, role.getTokenPolicies().get(0));
         role = AppRole.builder(NAME)
                 .withTokenPolicies(POLICIES)
                 .withTokenPolicy(POLICY_2)
                 .build();
-        assertThat(role.getTokenPolicies(), hasSize(2));
-        assertThat(role.getTokenPolicies(), contains(POLICY, POLICY_2));
+        assertEquals(2, role.getTokenPolicies().size());
+        assertTrue(role.getTokenPolicies().containsAll(List.of(POLICY, POLICY_2)));
     }
 }

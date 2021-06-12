@@ -16,18 +16,14 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * JUnit Test for {@link CredentialsResponse} model.
@@ -55,12 +51,12 @@ class CredentialsResponseTest {
     void getCredentialsTest() throws InvalidResponseException {
         // Create empty Object.
         CredentialsResponse res = new CredentialsResponse();
-        assertThat("Username not present in data map should not return anything", res.getUsername(), is(nullValue()));
-        assertThat("Password not present in data map should not return anything", res.getPassword(), is(nullValue()));
+        assertNull(res.getUsername(), "Username not present in data map should not return anything");
+        assertNull(res.getPassword(), "Password not present in data map should not return anything");
 
         // Fill data map.
         res.setData(DATA);
-        assertThat("Incorrect username", res.getUsername(), is(VAL_USER));
-        assertThat("Incorrect password", res.getPassword(), is(VAL_PASS));
+        assertEquals(VAL_USER, res.getUsername(), "Incorrect username");
+        assertEquals(VAL_PASS, res.getPassword(), "Incorrect password");
     }
 }

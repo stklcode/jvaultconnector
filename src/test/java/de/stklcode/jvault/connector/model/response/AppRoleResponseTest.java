@@ -24,10 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link AppRoleResponse} model.
@@ -78,7 +75,7 @@ class AppRoleResponseTest {
     void getDataRoundtrip() {
         // Create empty Object.
         AppRoleResponse res = new AppRoleResponse();
-        assertThat("Initial data should be empty", res.getRole(), is(nullValue()));
+        assertNull(res.getRole(), "Initial data should be empty");
 
         // Parsing invalid auth data map should fail.
         assertThrows(
@@ -97,19 +94,19 @@ class AppRoleResponseTest {
                 () -> new ObjectMapper().readValue(RES_JSON, AppRoleResponse.class),
                 "AuthResponse deserialization failed."
         );
-        assertThat("Parsed response is NULL", res, is(notNullValue()));
+        assertNotNull(res, "Parsed response is NULL");
         // Extract role data.
         AppRole role = res.getRole();
-        assertThat("Role data is NULL", role, is(notNullValue()));
-        assertThat("Incorrect token TTL", role.getTokenTtl(), is(ROLE_TOKEN_TTL));
-        assertThat("Incorrect token max TTL", role.getTokenMaxTtl(), is(ROLE_TOKEN_MAX_TTL));
-        assertThat("Incorrect secret ID TTL", role.getSecretIdTtl(), is(ROLE_SECRET_TTL));
-        assertThat("Incorrect secret ID umber of uses", role.getSecretIdNumUses(), is(ROLE_SECRET_NUM_USES));
-        assertThat("Incorrect number of policies", role.getTokenPolicies(), hasSize(1));
-        assertThat("Incorrect role policies", role.getTokenPolicies(), contains(ROLE_POLICY));
-        assertThat("Incorrect role period", role.getTokenPeriod(), is(ROLE_PERIOD));
-        assertThat("Incorrect role bind secret ID flag", role.getBindSecretId(), is(ROLE_BIND_SECRET));
-        assertThat("Incorrect bound CIDR list", role.getTokenBoundCidrs(), is(nullValue()));
-        assertThat("Incorrect bound CIDR list string", role.getTokenBoundCidrsString(), is(emptyString()));
+        assertNotNull(role, "Role data is NULL");
+        assertEquals(ROLE_TOKEN_TTL, role.getTokenTtl(), "Incorrect token TTL");
+        assertEquals(ROLE_TOKEN_MAX_TTL, role.getTokenMaxTtl(), "Incorrect token max TTL");
+        assertEquals(ROLE_SECRET_TTL, role.getSecretIdTtl(), "Incorrect secret ID TTL");
+        assertEquals(ROLE_SECRET_NUM_USES, role.getSecretIdNumUses(), "Incorrect secret ID umber of uses");
+        assertEquals(1, role.getTokenPolicies().size(), "Incorrect number of policies");
+        assertEquals(ROLE_POLICY, role.getTokenPolicies().get(0), "Incorrect role policies");
+        assertEquals(ROLE_PERIOD, role.getTokenPeriod(), "Incorrect role period");
+        assertEquals(ROLE_BIND_SECRET, role.getBindSecretId(), "Incorrect role bind secret ID flag");
+        assertNull(role.getTokenBoundCidrs(), "Incorrect bound CIDR list");
+        assertEquals("", role.getTokenBoundCidrsString(), "Incorrect bound CIDR list string");
     }
 }

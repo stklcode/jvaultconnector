@@ -18,10 +18,8 @@ package de.stklcode.jvault.connector.exception;
 
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Common JUnit test for Exceptions extending {@link VaultConnectorException}.
@@ -65,42 +63,39 @@ class VaultConnectorExceptionTest {
 
         // Constructor with message and status code.
         InvalidResponseException e = new InvalidResponseException(MSG, STATUS_CODE);
-        assertThat(e.getMessage(), is(MSG));
-        assertThat(e.getCause(), is(nullValue()));
-        assertThat(e.getStatusCode(), is(STATUS_CODE));
-        assertThat(e.getResponse(), is(nullValue()));
+        assertEquals(MSG, e.getMessage());
+        assertNull(e.getCause());
+        assertEquals(STATUS_CODE, e.getStatusCode());
+        assertNull(e.getResponse());
 
         // Constructor with message, status code and cause.
         e = new InvalidResponseException(MSG, STATUS_CODE, CAUSE);
-        assertThat(e.getMessage(), is(MSG));
-        assertThat(e.getCause(), is(CAUSE));
-        assertThat(e.getStatusCode(), is(STATUS_CODE));
-        assertThat(e.getResponse(), is(nullValue()));
+        assertEquals(MSG, e.getMessage());
+        assertEquals(CAUSE, e.getCause());
+        assertEquals(STATUS_CODE, e.getStatusCode());
+        assertNull(e.getResponse());
 
         // Constructor with message, status code and response.
         e = new InvalidResponseException(MSG, STATUS_CODE, RESPONSE);
-        assertThat(e.getMessage(), is(MSG));
-        assertThat(e.getCause(), is(nullValue()));
-        assertThat(e.getStatusCode(), is(STATUS_CODE));
-        assertThat(e.getResponse(), is(RESPONSE));
+        assertEquals(MSG, e.getMessage());
+        assertNull(e.getCause());
+        assertEquals(STATUS_CODE, e.getStatusCode());
+        assertEquals(RESPONSE, e.getResponse());
 
         // Constructor with message, status code, response and cause.
         e = new InvalidResponseException(MSG, STATUS_CODE, RESPONSE, CAUSE);
-        assertThat(e.getMessage(), is(MSG));
-        assertThat(e.getCause(), is(CAUSE));
-        assertThat(e.getStatusCode(), is(STATUS_CODE));
-        assertThat(e.getResponse(), is(RESPONSE));
+        assertEquals(MSG, e.getMessage());
+        assertEquals(CAUSE, e.getCause());
+        assertEquals(STATUS_CODE, e.getStatusCode());
+        assertEquals(RESPONSE, e.getResponse());
     }
 
     @Test
     void permissionDeniedExceptionTest() {
         // Default message overwritten.
         PermissionDeniedException e = new PermissionDeniedException();
-        assertThat(e, is(instanceOf(VaultConnectorException.class)));
-        assertThat(e, is(instanceOf(Exception.class)));
-        assertThat(e, is(instanceOf(Throwable.class)));
-        assertThat(e.getMessage(), is("Permission denied"));
-        assertThat(e.getCause(), is(nullValue()));
+        assertEquals("Permission denied", e.getMessage());
+        assertNull(e.getCause());
 
         assertMsgConstructor(new PermissionDeniedException(MSG));
         assertCauseConstructor(new PermissionDeniedException(CAUSE));
@@ -121,11 +116,8 @@ class VaultConnectorExceptionTest {
      * @param e the exception
      */
     private void assertEmptyConstructor(VaultConnectorException e) {
-        assertThat(e, is(instanceOf(VaultConnectorException.class)));
-        assertThat(e, is(instanceOf(Exception.class)));
-        assertThat(e, is(instanceOf(Throwable.class)));
-        assertThat(e.getMessage(), is(nullValue()));
-        assertThat(e.getCause(), is(nullValue()));
+        assertNull(e.getMessage());
+        assertNull(e.getCause());
     }
 
     /**
@@ -134,8 +126,8 @@ class VaultConnectorExceptionTest {
      * @param e the exception
      */
     private void assertMsgConstructor(VaultConnectorException e) {
-        assertThat(e.getMessage(), is(MSG));
-        assertThat(e.getCause(), is(nullValue()));
+        assertEquals(MSG, e.getMessage());
+        assertNull(e.getCause());
     }
 
     /**
@@ -144,8 +136,8 @@ class VaultConnectorExceptionTest {
      * @param e the exception
      */
     private void assertCauseConstructor(VaultConnectorException e) {
-        assertThat(e.getMessage(), is(CAUSE.toString()));
-        assertThat(e.getCause(), is(CAUSE));
+        assertEquals(CAUSE.toString(), e.getMessage());
+        assertEquals(CAUSE, e.getCause());
     }
 
     /**
@@ -154,7 +146,7 @@ class VaultConnectorExceptionTest {
      * @param e the exception
      */
     private void assertMsgCauseConstructor(VaultConnectorException e) {
-        assertThat(e.getMessage(), is(MSG));
-        assertThat(e.getCause(), is(CAUSE));
+        assertEquals(MSG, e.getMessage());
+        assertEquals(CAUSE, e.getCause());
     }
 }

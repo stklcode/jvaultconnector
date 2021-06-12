@@ -21,13 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link Token} and {@link Token.Builder}.
@@ -55,7 +51,6 @@ class TokenTest {
     private static final Boolean RENEWABLE = true;
     private static final Integer PERIOD = 3600;
     private static final String ENTITY_ALIAS = "alias-value";
-    private static final String LEGACY_JSON_FULL = "{\"id\":\"test-id\",\"type\":\"service\",\"display_name\":\"display-name\",\"no_parent\":false,\"no_default_policy\":false,\"ttl\":123,\"num_uses\":4,\"policies\":[\"policy\"],\"meta\":{\"key\":\"value\"},\"renewable\":true}";
     private static final String JSON_FULL = "{\"id\":\"test-id\",\"type\":\"service\",\"display_name\":\"display-name\",\"no_parent\":false,\"no_default_policy\":false,\"ttl\":123,\"explicit_max_ttl\":456,\"num_uses\":4,\"policies\":[\"policy\"],\"meta\":{\"key\":\"value\"},\"renewable\":true,\"period\":3600,\"entity_alias\":\"alias-value\"}";
 
     @BeforeAll
@@ -70,22 +65,22 @@ class TokenTest {
     @Test
     void buildDefaultTest() throws JsonProcessingException {
         Token token = Token.builder().build();
-        assertThat(token.getId(), is(nullValue()));
-        assertThat(token.getType(), is(nullValue()));
-        assertThat(token.getDisplayName(), is(nullValue()));
-        assertThat(token.getNoParent(), is(nullValue()));
-        assertThat(token.getNoDefaultPolicy(), is(nullValue()));
-        assertThat(token.getTtl(), is(nullValue()));
-        assertThat(token.getExplicitMaxTtl(), is(nullValue()));
-        assertThat(token.getNumUses(), is(nullValue()));
-        assertThat(token.getPolicies(), is(nullValue()));
-        assertThat(token.getMeta(), is(nullValue()));
-        assertThat(token.isRenewable(), is(nullValue()));
-        assertThat(token.getPeriod(), is(nullValue()));
-        assertThat(token.getEntityAlias(), is(nullValue()));
+        assertNull(token.getId());
+        assertNull(token.getType());
+        assertNull(token.getDisplayName());
+        assertNull(token.getNoParent());
+        assertNull(token.getNoDefaultPolicy());
+        assertNull(token.getTtl());
+        assertNull(token.getExplicitMaxTtl());
+        assertNull(token.getNumUses());
+        assertNull(token.getPolicies());
+        assertNull(token.getMeta());
+        assertNull(token.isRenewable());
+        assertNull(token.getPeriod());
+        assertNull(token.getEntityAlias());
 
-        /* optional fields should be ignored, so JSON string should be empty */
-        assertThat(new ObjectMapper().writeValueAsString(token), is("{}"));
+        // Optional fields should be ignored, so JSON string should be empty.
+        assertEquals("{}", new ObjectMapper().writeValueAsString(token));
     }
 
     /**
@@ -108,21 +103,21 @@ class TokenTest {
                 .withPeriod(PERIOD)
                 .withEntityAlias(ENTITY_ALIAS)
                 .build();
-        assertThat(token.getId(), is(ID));
-        assertThat(token.getType(), is(Token.Type.SERVICE.value()));
-        assertThat(token.getDisplayName(), is(DISPLAY_NAME));
-        assertThat(token.getNoParent(), is(NO_PARENT));
-        assertThat(token.getNoDefaultPolicy(), is(NO_DEFAULT_POLICY));
-        assertThat(token.getTtl(), is(TTL));
-        assertThat(token.getExplicitMaxTtl(), is(EXPLICIT_MAX_TTL));
-        assertThat(token.getNumUses(), is(NUM_USES));
-        assertThat(token.getPolicies(), is(POLICIES));
-        assertThat(token.getMeta(), is(META));
-        assertThat(token.isRenewable(), is(RENEWABLE));
-        assertThat(token.getPeriod(), is(PERIOD));
+        assertEquals(ID, token.getId());
+        assertEquals(Token.Type.SERVICE.value(), token.getType());
+        assertEquals(DISPLAY_NAME, token.getDisplayName());
+        assertEquals(NO_PARENT, token.getNoParent());
+        assertEquals(NO_DEFAULT_POLICY, token.getNoDefaultPolicy());
+        assertEquals(TTL, token.getTtl());
+        assertEquals(EXPLICIT_MAX_TTL, token.getExplicitMaxTtl());
+        assertEquals(NUM_USES, token.getNumUses());
+        assertEquals(POLICIES, token.getPolicies());
+        assertEquals(META, token.getMeta());
+        assertEquals(RENEWABLE, token.isRenewable());
+        assertEquals(PERIOD, token.getPeriod());
 
-        /* Verify that all parameters are included in JSON string */
-        assertThat(new ObjectMapper().writeValueAsString(token), is(JSON_FULL));
+        // Verify that all parameters are included in JSON string.
+        assertEquals(JSON_FULL, new ObjectMapper().writeValueAsString(token));
     }
 
     /**
@@ -130,46 +125,46 @@ class TokenTest {
      */
     @Test
     void convenienceMethodsTest() {
-        /* Parent */
+        // Parent.
         Token token = Token.builder().asOrphan().build();
-        assertThat(token.getNoParent(), is(true));
+        assertEquals(true, token.getNoParent());
         token = Token.builder().withParent().build();
-        assertThat(token.getNoParent(), is(false));
+        assertEquals(false, token.getNoParent());
 
-        /* Default policy */
+        // Default policy.
         token = Token.builder().withDefaultPolicy().build();
-        assertThat(token.getNoDefaultPolicy(), is(false));
+        assertEquals(false, token.getNoDefaultPolicy());
         token = Token.builder().withoutDefaultPolicy().build();
-        assertThat(token.getNoDefaultPolicy(), is(true));
+        assertEquals(true, token.getNoDefaultPolicy());
 
-        /* Renewability */
+        // Renewability.
         token = Token.builder().renewable().build();
-        assertThat(token.isRenewable(), is(true));
+        assertEquals(true, token.isRenewable());
         token = Token.builder().notRenewable().build();
-        assertThat(token.isRenewable(), is(false));
+        assertEquals(false, token.isRenewable());
 
-        /* Add single policy */
+        // Add single policy.
         token = Token.builder().withPolicy(POLICY_2).build();
-        assertThat(token.getPolicies(), hasSize(1));
-        assertThat(token.getPolicies(), contains(POLICY_2));
+        assertEquals(1, token.getPolicies().size());
+        assertEquals(List.of(POLICY_2), token.getPolicies());
         token = Token.builder()
                 .withPolicies(POLICY, POLICY_2)
                 .withPolicy(POLICY_3)
                 .build();
-        assertThat(token.getPolicies(), hasSize(3));
-        assertThat(token.getPolicies(), contains(POLICY, POLICY_2, POLICY_3));
+        assertEquals(3, token.getPolicies().size());
+        assertTrue(token.getPolicies().containsAll(List.of(POLICY, POLICY_2, POLICY_3)));
 
-        /* Add single metadata */
+        // Add single metadata.
         token = Token.builder().withMeta(META_KEY_2, META_VALUE_2).build();
-        assertThat(token.getMeta().size(), is(1));
-        assertThat(token.getMeta().keySet(), contains(META_KEY_2));
-        assertThat(token.getMeta().get(META_KEY_2), is(META_VALUE_2));
+        assertEquals(1, token.getMeta().size());
+        assertEquals(Set.of(META_KEY_2), token.getMeta().keySet());
+        assertEquals(META_VALUE_2, token.getMeta().get(META_KEY_2));
         token = Token.builder()
                 .withMeta(META)
                 .withMeta(META_KEY_2, META_VALUE_2)
                 .build();
-        assertThat(token.getMeta().size(), is(2));
-        assertThat(token.getMeta().get(META_KEY), is(META_VALUE));
-        assertThat(token.getMeta().get(META_KEY_2), is(META_VALUE_2));
+        assertEquals(2, token.getMeta().size());
+        assertEquals(META_VALUE, token.getMeta().get(META_KEY));
+        assertEquals(META_VALUE_2, token.getMeta().get(META_KEY_2));
     }
 }

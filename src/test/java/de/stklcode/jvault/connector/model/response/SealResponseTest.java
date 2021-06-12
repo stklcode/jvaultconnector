@@ -19,9 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link SealResponse} model.
@@ -74,18 +72,18 @@ class SealResponseTest {
                 () -> new ObjectMapper().readValue(RES_SEALED, SealResponse.class),
                 "TokenResponse deserialization failed."
         );
-        assertThat("Parsed response is NULL", res, is(notNullValue()));
-        assertThat("Incorrect seal type", res.getType(), is(TYPE));
-        assertThat("Incorrect seal status", res.isSealed(), is(true));
-        assertThat("Incorrect initialization status", res.isInitialized(), is(true));
-        assertThat("Incorrect threshold", res.getThreshold(), is(THRESHOLD));
-        assertThat("Incorrect number of shares", res.getNumberOfShares(), is(SHARES));
-        assertThat("Incorrect progress", res.getProgress(), is(PROGRESS_SEALED));
-        assertThat("Nonce not empty", res.getNonce(), is(""));
-        assertThat("Incorrect version", res.getVersion(), is(VERSION));
+        assertNotNull(res, "Parsed response is NULL");
+        assertEquals(TYPE, res.getType(), "Incorrect seal type");
+        assertTrue(res.isSealed(), "Incorrect seal status");
+        assertTrue(res.isInitialized(), "Incorrect initialization status");
+        assertEquals(THRESHOLD, res.getThreshold(), "Incorrect threshold");
+        assertEquals(SHARES, res.getNumberOfShares(), "Incorrect number of shares");
+        assertEquals(PROGRESS_SEALED, res.getProgress(), "Incorrect progress");
+        assertEquals("", res.getNonce(), "Nonce not empty");
+        assertEquals(VERSION, res.getVersion(), "Incorrect version");
         // And the fields, that should not be filled.
-        assertThat("Cluster name should not be populated", res.getClusterName(), is(nullValue()));
-        assertThat("Cluster ID should not be populated", res.getClusterId(), is(nullValue()));
+        assertNull(res.getClusterName(), "Cluster name should not be populated");
+        assertNull(res.getClusterId(), "Cluster ID should not be populated");
 
 
         // Not test unsealed Vault's response.
@@ -93,16 +91,16 @@ class SealResponseTest {
                 () -> new ObjectMapper().readValue(RES_UNSEALED, SealResponse.class),
                 "TokenResponse deserialization failed."
         );
-        assertThat("Parsed response is NULL", res, is(notNullValue()));
-        assertThat("Incorrect seal type", res.getType(), is(TYPE));
-        assertThat("Incorrect seal status", res.isSealed(), is(false));
-        assertThat("Incorrect initialization status", res.isInitialized(), is(true));
-        assertThat("Incorrect threshold", res.getThreshold(), is(THRESHOLD));
-        assertThat("Incorrect number of shares", res.getNumberOfShares(), is(SHARES));
-        assertThat("Incorrect progress", res.getProgress(), is(PROGRESS_UNSEALED));
-        assertThat("Incorrect nonce", res.getNonce(), is(NONCE));
-        assertThat("Incorrect version", res.getVersion(), is(VERSION));
-        assertThat("Incorrect cluster name", res.getClusterName(), is(CLUSTER_NAME));
-        assertThat("Incorrect cluster ID", res.getClusterId(), is(CLUSTER_ID));
+        assertNotNull(res, "Parsed response is NULL");
+        assertEquals(TYPE, res.getType(), "Incorrect seal type");
+        assertFalse(res.isSealed(), "Incorrect seal status");
+        assertTrue(res.isInitialized(), "Incorrect initialization status");
+        assertEquals(THRESHOLD, res.getThreshold(), "Incorrect threshold");
+        assertEquals(SHARES, res.getNumberOfShares(), "Incorrect number of shares");
+        assertEquals(PROGRESS_UNSEALED, res.getProgress(), "Incorrect progress");
+        assertEquals(NONCE, res.getNonce(), "Incorrect nonce");
+        assertEquals(VERSION, res.getVersion(), "Incorrect version");
+        assertEquals(CLUSTER_NAME, res.getClusterName(), "Incorrect cluster name");
+        assertEquals(CLUSTER_ID, res.getClusterId(), "Incorrect cluster ID");
     }
 }

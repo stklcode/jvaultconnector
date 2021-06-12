@@ -19,10 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link SecretVersionResponse} model.
@@ -53,11 +50,11 @@ class SecretVersionResponseTest {
                 () -> new ObjectMapper().readValue(META_JSON, SecretVersionResponse.class),
                 "SecretVersionResponse deserialization failed"
         );
-        assertThat("Parsed response is NULL", res, is(notNullValue()));
-        assertThat("Parsed metadata is NULL", res.getMetadata(), is(notNullValue()));
-        assertThat("Incorrect created time", res.getMetadata().getCreatedTimeString(), is(CREATION_TIME));
-        assertThat("Incorrect deletion time", res.getMetadata().getDeletionTimeString(), is(DELETION_TIME));
-        assertThat("Incorrect destroyed state", res.getMetadata().isDestroyed(), is(false));
-        assertThat("Incorrect version", res.getMetadata().getVersion(), is(VERSION));
+        assertNotNull(res, "Parsed response is NULL");
+        assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
+        assertEquals(CREATION_TIME, res.getMetadata().getCreatedTimeString(), "Incorrect created time");
+        assertEquals(DELETION_TIME, res.getMetadata().getDeletionTimeString(), "Incorrect deletion time");
+        assertEquals(false, res.getMetadata().isDestroyed(), "Incorrect destroyed state");
+        assertEquals(VERSION, res.getMetadata().getVersion(), "Incorrect version");
     }
 }

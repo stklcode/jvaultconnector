@@ -49,14 +49,14 @@ class HTTPVaultConnectorBuilderTest {
      */
     @Test
     void builderTest() throws Exception {
-        /* Minimal configuration */
+        // Minimal configuration.
         HTTPVaultConnector connector = HTTPVaultConnector.builder().withHost("vault.example.com").build();
 
         assertEquals("https://vault.example.com:8200/v1/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
         assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
         assertEquals(0, getRequestHelperPrivate(connector, "retries"), "Number of retries unexpectedly set");
 
-        /* Specify all options */
+        // Specify all options.
         HTTPVaultConnectorBuilder builder = HTTPVaultConnector.builder()
                 .withHost("vault2.example.com")
                 .withoutTLS()
@@ -72,7 +72,7 @@ class HTTPVaultConnectorBuilderTest {
         assertEquals(5678, getRequestHelperPrivate(connector, "timeout"), "Number timeout value");
         assertThrows(ConnectionException.class, builder::buildAndAuth, "Immediate authentication should throw exception without token");
 
-        /* Initialization from URL */
+        // Initialization from URL.
         assertThrows(
                 URISyntaxException.class,
                 () -> HTTPVaultConnector.builder().withBaseURL("foo:/\\1nv4l1d_UrL"),
@@ -84,7 +84,7 @@ class HTTPVaultConnectorBuilderTest {
         );
         assertEquals("https://vault3.example.com:5678/bar/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
 
-        /* Port numbers */
+        // Port numbers.
         assertThrows(IllegalArgumentException.class, () -> HTTPVaultConnector.builder().withPort(65536), "Too large port number should throw an exception");
         assertThrows(IllegalArgumentException.class, () -> HTTPVaultConnector.builder().withPort(0), "Port number 0 should throw an exception");
         builder = assertDoesNotThrow(() -> HTTPVaultConnector.builder().withPort(-1), "Port number -1 should not throw an exception");
@@ -96,7 +96,7 @@ class HTTPVaultConnectorBuilderTest {
      */
     @Test
     void testFromEnv() throws Exception {
-        /* Provide address only should be enough */
+        // Provide address only should be enough.
         withVaultEnv(VAULT_ADDR, null, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
                     () -> HTTPVaultConnector.builder().fromEnv(),
@@ -111,7 +111,7 @@ class HTTPVaultConnectorBuilderTest {
             return null;
         });
 
-        /* Provide address and number of retries */
+        // Provide address and number of retries.
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
                     () -> HTTPVaultConnector.builder().fromEnv(),
@@ -126,7 +126,7 @@ class HTTPVaultConnectorBuilderTest {
             return null;
         });
 
-        /* Provide CA certificate */
+        // Provide CA certificate.
         String VAULT_CACERT = tempDir.toString() + "/doesnotexist";
         withVaultEnv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             TlsException e = assertThrows(
@@ -140,7 +140,7 @@ class HTTPVaultConnectorBuilderTest {
             return null;
         });
 
-        /* Automatic authentication */
+        // Automatic authentication.
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
                     () -> HTTPVaultConnector.builder().fromEnv(),
@@ -151,7 +151,7 @@ class HTTPVaultConnectorBuilderTest {
             return null;
         });
 
-        /* Invalid URL */
+        // Invalid URL.
         withVaultEnv("This is not a valid URL!", null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             assertThrows(
                     ConnectionException.class,

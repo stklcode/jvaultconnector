@@ -19,14 +19,9 @@ package de.stklcode.jvault.connector.model.response;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link SecretListResponse} model.
@@ -53,7 +48,7 @@ class SecretListResponseTest {
     void getKeysTest() throws InvalidResponseException {
         // Create empty Object.
         SecretListResponse res = new SecretListResponse();
-        assertThat("Keys should be null without initialization", res.getKeys(), is(nullValue()));
+        assertNull(res.getKeys(), "Keys should be null without initialization");
 
         // Provoke internal ClassCastException.
         Map<String, Object> invalidData = new HashMap<>();
@@ -66,8 +61,8 @@ class SecretListResponseTest {
 
         // Fill correct data.
         res.setData(DATA);
-        assertThat("Keys should be filled here", res.getKeys(), is(notNullValue()));
-        assertThat("Unexpected number of keys", res.getKeys(), hasSize(2));
-        assertThat("Unexpected keys", res.getKeys(), contains(KEY1, KEY2));
+        assertNotNull(res.getKeys(), "Keys should be filled here");
+        assertEquals(2, res.getKeys().size(), "Unexpected number of keys");
+        assertTrue(res.getKeys().containsAll(Set.of(KEY1, KEY2)), "Unexpected keys");
     }
 }

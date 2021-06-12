@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Simple credentials class for JSON testing.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public class Credentials {
     @JsonProperty("username")

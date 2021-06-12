@@ -18,8 +18,8 @@ package de.stklcode.jvault.connector.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * JUnit Test for AuthBackend model.
@@ -34,12 +34,11 @@ class AuthBackendTest {
      */
     @Test
     void forTypeTest() {
-        assertThat(AuthBackend.forType("token"), is(AuthBackend.TOKEN));
-        assertThat(AuthBackend.forType("app-id"), is(AuthBackend.APPID));
-        assertThat(AuthBackend.forType("userpass"), is(AuthBackend.USERPASS));
-        assertThat(AuthBackend.forType("github"), is(AuthBackend.GITHUB));
-        assertThat(AuthBackend.forType(""), is(AuthBackend.UNKNOWN));
-        assertThat(AuthBackend.forType("foobar"), is(AuthBackend.UNKNOWN));
+        assertEquals(AuthBackend.TOKEN, AuthBackend.forType("token"));
+        assertEquals(AuthBackend.APPID, AuthBackend.forType("app-id"));
+        assertEquals(AuthBackend.USERPASS, AuthBackend.forType("userpass"));
+        assertEquals(AuthBackend.GITHUB, AuthBackend.forType("github"));
+        assertEquals(AuthBackend.UNKNOWN, AuthBackend.forType(""));
+        assertEquals(AuthBackend.UNKNOWN, AuthBackend.forType("foobar"));
     }
-
 }
