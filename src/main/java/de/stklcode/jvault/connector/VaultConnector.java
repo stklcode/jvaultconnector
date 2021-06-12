@@ -450,7 +450,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @return Metadata for the created/updated secret.
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #writeSecretData(String, String, Map)} instead with mount parameter "secret".
      */
+    @Deprecated
     default SecretVersionResponse writeSecretData(final String key, final Map<String, Object> data) throws VaultConnectorException {
         return writeSecretData(PATH_SECRET, key, data, null);
     }
@@ -499,7 +501,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @return Secret response
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #readSecretVersion(String, String, Integer)} instead with mount parameter "secret".
      */
+    @Deprecated
     default SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException {
         return readSecretVersion(PATH_SECRET, key, version);
     }
@@ -528,7 +532,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @return Metadata response
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #readSecretMetadata(String, String)} instead with mount parameter "secret".
      */
+    @Deprecated
     default MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException {
         return readSecretMetadata(PATH_SECRET, key);
     }
@@ -544,7 +550,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param casRequired Specify if Check-And-Set is required for this secret.
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #updateSecretMetadata(String, String, Integer, boolean)} instead with mount parameter "secret".
      */
+    @Deprecated
     default void updateSecretMetadata(final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException {
         updateSecretMetadata(PATH_SECRET, key, maxVersions, casRequired);
     }
@@ -596,7 +604,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param path Root path to search
      * @return List of secret keys
      * @throws VaultConnectorException on error
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #list(String)} instead with key prefix "secret/".
      */
+    @Deprecated
     default List<String> listSecrets(final String path) throws VaultConnectorException {
         return list(PATH_SECRET + "/" + path);
     }
@@ -701,7 +711,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param key Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #deleteLatestSecretVersion(String, String)} instead with mount parameter "secret".
      */
+    @Deprecated
     default void deleteLatestSecretVersion(final String key) throws VaultConnectorException {
         deleteLatestSecretVersion(PATH_SECRET, key);
     }
@@ -727,7 +739,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param key Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #deleteAllSecretVersions(String)} instead with mount parameter "secret".
      */
+    @Deprecated
     default void deleteAllSecretVersions(final String key) throws VaultConnectorException {
         deleteAllSecretVersions(PATH_SECRET, key);
     }
@@ -754,7 +768,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param versions Versions of the secret to delete.
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #deleteSecretVersions(String, String, int...)} instead with mount parameter "secret".
      */
+    @Deprecated
     default void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
         deleteSecretVersions(PATH_SECRET, key, versions);
     }
@@ -780,7 +796,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param versions Versions of the secret to undelete.
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #undeleteSecretVersions(String, String, int...)} instead with mount parameter "secret".
      */
+    @Deprecated
     default void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
         undeleteSecretVersions(PATH_SECRET, key, versions);
     }
@@ -805,7 +823,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param versions Versions of the secret to destroy.
      * @throws VaultConnectorException on error
      * @since 0.8
+     * @deprecated Convenience method will be removed in 1.0. Use {@link #destroySecretVersions(String, String, int...)} instead with mount parameter "secret".
      */
+    @Deprecated
     default void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException {
         destroySecretVersions(PATH_SECRET, key, versions);
     }
