@@ -16,13 +16,15 @@
 
 package de.stklcode.jvault.connector;
 
-import de.stklcode.jvault.connector.exception.InvalidRequestException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Vault Connector interface.
@@ -32,10 +34,6 @@ import java.util.*;
  * @since 0.1
  */
 public interface VaultConnector extends AutoCloseable, Serializable {
-    /**
-     * Default sub-path for Vault secrets.
-     */
-    String PATH_SECRET = "secret";
 
     /**
      * Reset authorization information.
@@ -394,34 +392,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     SecretResponse read(final String key) throws VaultConnectorException;
 
     /**
-     * Retrieve secret from Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to key.
-     *
-     * @param key Secret identifier
-     * @return Secret response
-     * @throws VaultConnectorException on error
-     */
-    default SecretResponse readSecret(final String key) throws VaultConnectorException {
-        return read(PATH_SECRET + "/" + key);
-    }
-
-    /**
-     * Retrieve the latest secret data for specific version from Vault.
-     * <br>
-     * Prefix "secret/data" is automatically added to key.
-     * Only available for KV v2 secrets.
-     *
-     * @param key Secret identifier
-     * @return Secret response
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default SecretResponse readSecretData(final String key) throws VaultConnectorException {
-        return readSecretVersion(key, null);
-    }
-
-    /**
      * Retrieve the latest secret data for specific version from Vault.
      * <br>
      * Path {@code <mount>/data/<key>} is read here.
@@ -435,22 +405,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      */
     default SecretResponse readSecretData(final String mount, final String key) throws VaultConnectorException {
         return readSecretVersion(mount, key, null);
-    }
-
-    /**
-     * Write secret to Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path.
-     * Only available for KV v2 secrets.
-     *
-     * @param key  Secret identifier.
-     * @param data Secret content. Value must be be JSON serializable.
-     * @return Metadata for the created/updated secret.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default SecretVersionResponse writeSecretData(final String key, final Map<String, Object> data) throws VaultConnectorException {
-        return writeSecretData(PATH_SECRET, key, data, null);
     }
 
     /**
@@ -492,22 +446,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Path {@code <mount>/data/<key>} is read here.
      * Only available for KV v2 secrets.
      *
-     * @param key     Secret identifier
-     * @param version Version to read. If {@code null} or zero, the latest version will be returned.
-     * @return Secret response
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default SecretResponse readSecretVersion(final String key, final Integer version) throws VaultConnectorException {
-        return readSecretVersion(PATH_SECRET, key, version);
-    }
-
-    /**
-     * Retrieve secret data from Vault.
-     * <br>
-     * Path {@code <mount>/data/<key>} is read here.
-     * Only available for KV v2 secrets.
-     *
      * @param mount   Secret store mount point (without leading or trailing slash).
      * @param key     Secret identifier
      * @param version Version to read. If {@code null} or zero, the latest version will be returned.
@@ -516,36 +454,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8
      */
     SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException;
-
-    /**
-     * Retrieve secret metadata from Vault.
-     * Path {@code secret/metadata/<key>} is read here.
-     * Only available for KV v2 secrets.
-     *
-     * @param key Secret identifier
-     * @return Metadata response
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default MetadataResponse readSecretMetadata(final String key) throws VaultConnectorException {
-        return readSecretMetadata(PATH_SECRET, key);
-    }
-
-    /**
-     * Update secret metadata.
-     * <br>
-     * Path {@code secret/metadata/<key>} is read here.
-     * Only available for KV v2 secrets.
-     *
-     * @param key         Secret identifier
-     * @param maxVersions Maximum number of versions (fallback to backend default if {@code null})
-     * @param casRequired Specify if Check-And-Set is required for this secret.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default void updateSecretMetadata(final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException {
-        updateSecretMetadata(PATH_SECRET, key, maxVersions, casRequired);
-    }
 
     /**
      * Retrieve secret metadata from Vault.
@@ -587,19 +495,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     List<String> list(final String path) throws VaultConnectorException;
 
     /**
-     * List available secrets from Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path.
-     *
-     * @param path Root path to search
-     * @return List of secret keys
-     * @throws VaultConnectorException on error
-     */
-    default List<String> listSecrets(final String path) throws VaultConnectorException {
-        return list(PATH_SECRET + "/" + path);
-    }
-
-    /**
      * Write simple value to Vault.
      *
      * @param key   Secret path
@@ -635,36 +530,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException;
 
     /**
-     * Write secret to Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path.
-     *
-     * @param key   Secret path
-     * @param value Secret value
-     * @throws VaultConnectorException on error
-     */
-    default void writeSecret(final String key, final String value) throws VaultConnectorException {
-        writeSecret(key, Collections.singletonMap("value", value));
-    }
-
-    /**
-     * Write secret to Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path.
-     *
-     * @param key  Secret path
-     * @param data Secret content. Value must be be JSON serializable.
-     * @throws VaultConnectorException on error
-     * @since 0.5.0
-     */
-    default void writeSecret(final String key, final Map<String, Object> data) throws VaultConnectorException {
-        if (key == null || key.isEmpty()) {
-            throw new InvalidRequestException("Secret path must not be empty.");
-        }
-        write(PATH_SECRET + "/" + key, data);
-    }
-
-    /**
      * Delete key from Vault.
      *
      * @param key Secret path
@@ -672,31 +537,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.5.0
      */
     void delete(final String key) throws VaultConnectorException;
-
-    /**
-     * Delete secret from Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path.
-     *
-     * @param key Secret path
-     * @throws VaultConnectorException on error
-     */
-    default void deleteSecret(final String key) throws VaultConnectorException {
-        delete(PATH_SECRET + "/" + key);
-    }
-
-    /**
-     * Delete latest version of a secret from Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path. Only available for KV v2 stores.
-     *
-     * @param key Secret path.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default void deleteLatestSecretVersion(final String key) throws VaultConnectorException {
-        deleteLatestSecretVersion(PATH_SECRET, key);
-    }
 
     /**
      * Delete latest version of a secret from Vault.
@@ -716,40 +556,12 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Prefix {@code secret/} is automatically added to path.
      * Only available for KV v2 stores.
      *
-     * @param key Secret path.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default void deleteAllSecretVersions(final String key) throws VaultConnectorException {
-        deleteAllSecretVersions(PATH_SECRET, key);
-    }
-
-    /**
-     * Delete latest version of a secret from Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path.
-     * Only available for KV v2 stores.
-     *
      * @param mount Secret store mount point (without leading or trailing slash).
      * @param key   Secret path.
      * @throws VaultConnectorException on error
      * @since 0.8
      */
     void deleteAllSecretVersions(final String mount, final String key) throws VaultConnectorException;
-
-    /**
-     * Delete secret versions from Vault.
-     * <br>
-     * Only available for KV v2 stores.
-     *
-     * @param key      Secret path.
-     * @param versions Versions of the secret to delete.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default void deleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
-        deleteSecretVersions(PATH_SECRET, key, versions);
-    }
 
     /**
      * Delete secret versions from Vault.
@@ -768,19 +580,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Undelete (restore) secret versions from Vault.
      * Only available for KV v2 stores.
      *
-     * @param key      Secret path.
-     * @param versions Versions of the secret to undelete.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default void undeleteSecretVersions(final String key, final int... versions) throws VaultConnectorException {
-        undeleteSecretVersions(PATH_SECRET, key, versions);
-    }
-
-    /**
-     * Undelete (restore) secret versions from Vault.
-     * Only available for KV v2 stores.
-     *
      * @param mount    Secret store mount point (without leading or trailing slash).
      * @param key      Secret path.
      * @param versions Versions of the secret to undelete.
@@ -788,19 +587,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8
      */
     void undeleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException;
-
-    /**
-     * Destroy secret versions from Vault.
-     * Only available for KV v2 stores.
-     *
-     * @param key      Secret path.
-     * @param versions Versions of the secret to destroy.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default void destroySecretVersions(final String key, final int... versions) throws VaultConnectorException {
-        destroySecretVersions(PATH_SECRET, key, versions);
-    }
 
     /**
      * Destroy secret versions from Vault.

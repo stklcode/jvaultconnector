@@ -8,7 +8,8 @@
 * Remove deprecated `VaultConnectorFactory` in favor of `VaultConnectorBuilder` with identical API
 * Remove deprecated `AppRoleBuilder` and `TokenBuilder` in favor of `AppRole.Builder` and `Token.Builder`
 * Remove deprecated `Period`, `Policy` and `Policies` methods from `AppRole` in favor of `Token`-prefixed versions
-* Remove deprecated `SecretResponse#getValue()` method, use `get("value")` instead.
+* Remove deprecated `SecretResponse#getValue()` method, use `get("value")` instead
+* Remove deprecated convenience methods for interaction with "secret" mount
 
 ### Improvements
 * Use pre-sized map objects for fixed-size payloads
