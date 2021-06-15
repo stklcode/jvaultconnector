@@ -96,8 +96,16 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.2</version>
                     <configuration>
-                        <reuseForks>false</reuseForks>
-                        <argLine>@{argLine} --illegal-access=permit</argLine>
+                        <argLine>
+                            @{argLine}
+                            --illegal-access=permit
+                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector=ALL-UNNAMED
+                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.exception=ALL-UNNAMED
+                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.model=ALL-UNNAMED
+                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.model.response=ALL-UNNAMED
+                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.model.response.embedded=ALL-UNNAMED
+                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.test=com.fasterxml.jackson.databind
+                        </argLine>
                     </configuration>
                 </plugin>
             </plugins>
