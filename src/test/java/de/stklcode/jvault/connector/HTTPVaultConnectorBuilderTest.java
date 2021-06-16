@@ -132,7 +132,7 @@ class HTTPVaultConnectorBuilderTest {
             TlsException e = assertThrows(
                     TlsException.class,
                     () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Creation with unknown cert path failed."
+                    "Creation with unknown cert path failed"
             );
             assertTrue(e.getCause() instanceof NoSuchFileException);
             assertEquals(VAULT_CACERT, ((NoSuchFileException) e.getCause()).getFile());

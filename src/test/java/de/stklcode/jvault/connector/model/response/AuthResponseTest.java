@@ -103,7 +103,7 @@ class AuthResponseTest {
     void jsonRoundtrip() {
         AuthResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_JSON, AuthResponse.class),
-                "AuthResponse deserialization failed."
+                "AuthResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         // Extract auth data.
@@ -120,7 +120,6 @@ class AuthResponseTest {
         assertTrue(data.getPolicies().containsAll(Set.of(AUTH_POLICY_1, AUTH_POLICY_2)));
         assertEquals(2, data.getTokenPolicies().size(), "Incorrect number of token policies");
         assertTrue(data.getTokenPolicies().containsAll(Set.of(AUTH_POLICY_2, AUTH_POLICY_1)), "Incorrect token policies");
-        assertEquals(1, data.getMetadata().size(), "Incorrect auth metadata size");
-        assertEquals(AUTH_META_VALUE, data.getMetadata().get(AUTH_META_KEY), "Incorrect auth metadata");
+        assertEquals(Map.of(AUTH_META_KEY, AUTH_META_VALUE), data.getMetadata(), "Incorrect auth metadata");
     }
 }

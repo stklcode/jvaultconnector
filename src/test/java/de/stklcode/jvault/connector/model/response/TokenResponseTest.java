@@ -119,7 +119,7 @@ class TokenResponseTest {
     void jsonRoundtrip() {
         TokenResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_JSON, TokenResponse.class),
-                "TokenResponse deserialization failed."
+                "TokenResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
@@ -139,8 +139,7 @@ class TokenResponseTest {
         assertEquals(TOKEN_ID, data.getId(), "Incorrect token ID");
         assertEquals(TOKEN_ISSUE_TIME, data.getIssueTimeString(), "Incorrect token issue time");
         assertEquals(ZonedDateTime.parse(TOKEN_ISSUE_TIME), data.getIssueTime(), "Incorrect parsed token issue time");
-        assertEquals(1, data.getMeta().size(), "Incorrect token metadata size");
-        assertEquals(TOKEN_META_VALUE, data.getMeta().get(TOKEN_META_KEY), "Incorrect token metadata");
+        assertEquals(Map.of(TOKEN_META_KEY, TOKEN_META_VALUE), data.getMeta(), "Incorrect token metadata");
         assertEquals(TOKEN_NUM_USES, data.getNumUses(), "Incorrect token number of uses");
         assertEquals(TOKEN_ORPHAN, data.isOrphan(), "Incorrect token orphan flag");
         assertEquals(TOKEN_PATH, data.getPath(), "Incorrect token path");

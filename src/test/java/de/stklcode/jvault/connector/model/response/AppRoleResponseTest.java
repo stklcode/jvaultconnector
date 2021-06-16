@@ -22,6 +22,7 @@ import de.stklcode.jvault.connector.model.AppRole;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,7 +93,7 @@ class AppRoleResponseTest {
     void jsonRoundtrip() {
         AppRoleResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_JSON, AppRoleResponse.class),
-                "AuthResponse deserialization failed."
+                "AuthResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         // Extract role data.
@@ -102,8 +103,7 @@ class AppRoleResponseTest {
         assertEquals(ROLE_TOKEN_MAX_TTL, role.getTokenMaxTtl(), "Incorrect token max TTL");
         assertEquals(ROLE_SECRET_TTL, role.getSecretIdTtl(), "Incorrect secret ID TTL");
         assertEquals(ROLE_SECRET_NUM_USES, role.getSecretIdNumUses(), "Incorrect secret ID umber of uses");
-        assertEquals(1, role.getTokenPolicies().size(), "Incorrect number of policies");
-        assertEquals(ROLE_POLICY, role.getTokenPolicies().get(0), "Incorrect role policies");
+        assertEquals(List.of(ROLE_POLICY), role.getTokenPolicies(), "Incorrect policies");
         assertEquals(ROLE_PERIOD, role.getTokenPeriod(), "Incorrect role period");
         assertEquals(ROLE_BIND_SECRET, role.getBindSecretId(), "Incorrect role bind secret ID flag");
         assertNull(role.getTokenBoundCidrs(), "Incorrect bound CIDR list");

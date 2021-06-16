@@ -70,7 +70,7 @@ class SealResponseTest {
         // First test sealed Vault's response.
         SealResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_SEALED, SealResponse.class),
-                "TokenResponse deserialization failed."
+                "TokenResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(TYPE, res.getType(), "Incorrect seal type");
@@ -89,7 +89,7 @@ class SealResponseTest {
         // Not test unsealed Vault's response.
         res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_UNSEALED, SealResponse.class),
-                "TokenResponse deserialization failed."
+                "TokenResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(TYPE, res.getType(), "Incorrect seal type");

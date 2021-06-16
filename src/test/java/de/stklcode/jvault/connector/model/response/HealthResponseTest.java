@@ -59,7 +59,7 @@ class HealthResponseTest {
     void jsonRoundtrip() {
         HealthResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_JSON, HealthResponse.class),
-                "Health deserialization failed."
+                "Health deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(CLUSTER_ID, res.getClusterID(), "Incorrect cluster ID");

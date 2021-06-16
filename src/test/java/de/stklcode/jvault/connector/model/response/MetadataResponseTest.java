@@ -69,7 +69,7 @@ class MetadataResponseTest {
     void jsonRoundtrip() {
         MetadataResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(META_JSON, MetadataResponse.class),
-                "MetadataResponse deserialization failed."
+                "MetadataResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");

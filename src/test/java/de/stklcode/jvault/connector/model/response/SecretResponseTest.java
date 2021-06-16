@@ -145,7 +145,7 @@ class SecretResponseTest {
         assertThrows(
                 InvalidResponseException.class,
                 () -> res.get(KEY_LIST, Double.class),
-                "JSON parsing to incorrect type succeeded."
+                "JSON parsing to incorrect type succeeded"
         );
     }
 
@@ -156,14 +156,14 @@ class SecretResponseTest {
     void jsonRoundtrip() {
         SecretResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(SECRET_JSON, SecretResponse.class),
-                "SecretResponse deserialization failed."
+                "SecretResponse deserialization failed"
         );
         assertSecretData(res);
 
         // KV v2 secret.
         res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(SECRET_JSON_V2, SecretResponse.class),
-                "SecretResponse deserialization failed."
+                "SecretResponse deserialization failed"
         );
         assertSecretData(res);
         assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
@@ -177,7 +177,7 @@ class SecretResponseTest {
         // Deleted KV v2 secret.
         res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(SECRET_JSON_V2_2, SecretResponse.class),
-                "SecretResponse deserialization failed."
+                "SecretResponse deserialization failed"
         );
         assertSecretData(res);
         assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
