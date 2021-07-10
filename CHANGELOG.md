@@ -16,6 +16,9 @@
 * Remove Apache HTTP Client dependency in favor of Java 11 HTTP
 * Introduce Java module descriptor
 
+### Test
+* Tested against Vault 1.7.3
+
 
 ## 0.9.4 (2021-06-06)
 
