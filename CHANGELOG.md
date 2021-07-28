@@ -11,7 +11,7 @@ Old builders will be removed in 1.0
 * Minor dependency updates
 
 ### Test
-* Tested against Vault 1.7.3
+* Tested against Vault 1.8.0
 
 ## 0.9.4 (2021-06-06)
 
