@@ -40,7 +40,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>jvault-connector</artifactId>
-    <version>1.0.0-SNAPSHOTf</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -118,10 +118,10 @@ AppRoleSecretResponse secret = vault.createAppRoleSecret("testrole");
 
 ## Links
 
-[Project Page](http://jvault.stklcode.de)
+[Project Page](https://jvault.stklcode.de)
 
-[JavaDoc API](http://jvault.stklcode.de/apidocs/)
+[JavaDoc API](https://jvault.stklcode.de/apidocs/)
 
 ## License
 
-The project is licensed under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+The project is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).

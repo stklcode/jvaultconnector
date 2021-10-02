@@ -1,4 +1,4 @@
-## unreleased
+## 1.0.0 (2021-10-02)
 
 ### Breaking
 * Requires Java 11 or later
