@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * Vault response from credentials lookup. Simple wrapper for data objects containing username and password fields.
  *
- * @author  Stefan Kalscheuer
- * @since   0.5.0
+ * @author Stefan Kalscheuer
+ * @since 0.5.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class CredentialsResponse extends SecretResponse {

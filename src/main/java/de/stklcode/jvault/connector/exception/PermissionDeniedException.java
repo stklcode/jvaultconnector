@@ -19,8 +19,8 @@ package de.stklcode.jvault.connector.exception;
 /**
  * Exception thrown when trying to access a path the current user/token does not have permission to access.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public class PermissionDeniedException extends VaultConnectorException {
     /**

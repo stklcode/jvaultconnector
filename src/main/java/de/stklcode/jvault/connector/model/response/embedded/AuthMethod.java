@@ -26,8 +26,8 @@ import java.util.Map;
 /**
  * Embedded authentication method response.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthMethod {

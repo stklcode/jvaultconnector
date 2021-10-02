@@ -24,8 +24,8 @@ import java.util.List;
 /**
  * Vault response in case of errors.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class ErrorResponse implements VaultResponse {

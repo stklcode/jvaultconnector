@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Vault response for health query.
  *
- * @author  Stefan Kalscheuer
- * @since   0.7.0
+ * @author Stefan Kalscheuer
+ * @since 0.7.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class HealthResponse implements VaultResponse {

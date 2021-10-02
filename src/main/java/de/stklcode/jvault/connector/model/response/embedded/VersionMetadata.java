@@ -26,8 +26,8 @@ import java.time.format.DateTimeParseException;
 /**
  * Embedded metadata for a single Key-Value v2 version.
  *
- * @author  Stefan Kalscheuer
- * @since   0.8
+ * @author Stefan Kalscheuer
+ * @since 0.8
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class VersionMetadata {

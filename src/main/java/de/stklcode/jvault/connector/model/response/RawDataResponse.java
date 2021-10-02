@@ -23,8 +23,8 @@ import java.util.Map;
 /**
  * Simple Vault data response.
  *
- * @author  Stefan Kalscheuer
- * @since   0.4.0
+ * @author Stefan Kalscheuer
+ * @since 0.4.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class RawDataResponse extends VaultDataResponse {

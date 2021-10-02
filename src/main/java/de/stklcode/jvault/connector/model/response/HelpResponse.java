@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Vault response for help request.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class HelpResponse implements VaultResponse {

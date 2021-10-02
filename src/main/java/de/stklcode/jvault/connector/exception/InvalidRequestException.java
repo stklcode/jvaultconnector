@@ -19,8 +19,8 @@ package de.stklcode.jvault.connector.exception;
 /**
  * Exception thrown when trying to send malformed request.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 public class InvalidRequestException extends VaultConnectorException {
     /**

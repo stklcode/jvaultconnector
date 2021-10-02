@@ -25,8 +25,8 @@ import java.util.Map;
 /**
  * Embedded authorization information inside Vault response.
  *
- * @author  Stefan Kalscheuer
- * @since   0.1
+ * @author Stefan Kalscheuer
+ * @since 0.1
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthData {

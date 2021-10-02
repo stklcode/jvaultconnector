@@ -19,8 +19,8 @@ package de.stklcode.jvault.connector.exception;
 /**
  * Exception thrown on errors with TLS connection.
  *
- * @author  Stefan Kalscheuer
- * @since   0.4.0
+ * @author Stefan Kalscheuer
+ * @since 0.4.0
  */
 public class TlsException extends VaultConnectorException {
     /**

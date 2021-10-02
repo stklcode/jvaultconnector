@@ -27,8 +27,8 @@ import java.util.Map;
 /**
  * Embedded metadata for Key-Value v2 secrets.
  *
- * @author  Stefan Kalscheuer
- * @since   0.8
+ * @author Stefan Kalscheuer
+ * @since 0.8
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretMetadata {
