@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.jdk }}
-          distribution: 'adopt-hotspot'
+          distribution: 'temurin'
       - name: Set up Vault
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
         run: |
