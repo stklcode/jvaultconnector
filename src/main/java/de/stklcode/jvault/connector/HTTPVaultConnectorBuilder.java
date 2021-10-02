@@ -38,6 +38,7 @@ import java.util.Objects;
  *
  * @author Stefan Kalscheuer
  * @since 0.8.0
+ * @since 0.9.5 Package {@link de.stklcode.jvault.connector}
  */
 public final class HTTPVaultConnectorBuilder {
     private static final String ENV_VAULT_ADDR = "VAULT_ADDR";
@@ -132,7 +133,7 @@ public final class HTTPVaultConnectorBuilder {
     public HTTPVaultConnectorBuilder withPort(final Integer port) {
         if (port < 0) {
             this.port = null;
-        } else if(port < 1 || port > 65535) {
+        } else if (port < 1 || port > 65535) {
             throw new IllegalArgumentException("Port number " + port + " out of range");
         } else {
             this.port = port;

@@ -75,7 +75,7 @@ public class HTTPVaultConnector implements VaultConnector {
      * Get a new builder for a connector.
      *
      * @return Builder instance.
-     * @since 1.0
+     * @since 0.9.5
      */
     public static HTTPVaultConnectorBuilder builder() {
         return new HTTPVaultConnectorBuilder();

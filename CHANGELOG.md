@@ -20,6 +20,21 @@
 * Tested against Vault 1.8.3
 
 
+## 0.9.5 (2021-07-28)
+
+### Deprecations
+* Deprecate ` {read,write,delete}Secret()` convenience methods. Use `{read,write,delete}("secret/...")` instead (#52)
+* Deprecated builder invocation `VaultConnectorBuilder.http()` in favor of `HTTPVaultConnector.builder()` (#51)
+* Deprecated `de.stklcode.jvault.connector.builder.HTTPVaultConnectorBuilder` in favor of `de.stklcode.jvault.connector.HTTPVaultConnectorBuilder` (only package changed) (#51)
+
+Old builders will be removed in 1.0
+
+### Improvements
+* Minor dependency updates
+
+### Test
+* Tested against Vault 1.8.0
+
 ## 0.9.4 (2021-06-06)
 
 ### Deprecations
