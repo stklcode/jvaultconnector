@@ -125,13 +125,13 @@ public final class HTTPVaultConnectorBuilder {
     /**
      * Set port (default: 8200).
      * A value of {@code null} or {@code -1} indicates that no port is specified, i.e. the protocol default is used.
-     * Otherwise a valid port number bwetween 1 and 65535 is expected.
+     * Otherwise, a valid port number between 1 and 65535 is expected.
      *
      * @param port Vault TCP port
      * @return self
      */
     public HTTPVaultConnectorBuilder withPort(final Integer port) {
-        if (port < 0) {
+        if (port == null || port < 0) {
             this.port = null;
         } else if (port < 1 || port > 65535) {
             throw new IllegalArgumentException("Port number " + port + " out of range");
