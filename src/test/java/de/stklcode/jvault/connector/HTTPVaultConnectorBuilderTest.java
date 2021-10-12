@@ -89,6 +89,8 @@ class HTTPVaultConnectorBuilderTest {
         assertThrows(IllegalArgumentException.class, () -> HTTPVaultConnector.builder().withPort(0), "Port number 0 should throw an exception");
         builder = assertDoesNotThrow(() -> HTTPVaultConnector.builder().withPort(-1), "Port number -1 should not throw an exception");
         assertNull(builder.getPort(), "Port number -1 should be omitted");
+        builder = assertDoesNotThrow(() -> HTTPVaultConnector.builder().withPort(null), "Port number NULL should not throw an exception");
+        assertNull(builder.getPort(), "Port number NULL should be passed through");
     }
 
     /**
