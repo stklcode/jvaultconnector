@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Simple Vault data response.
@@ -28,6 +29,8 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class RawDataResponse extends VaultDataResponse {
+    private static final long serialVersionUID = -5494734676257709074L;
+
     private Map<String, Object> data;
 
     @Override
@@ -40,5 +43,21 @@ public final class RawDataResponse extends VaultDataResponse {
      */
     public Map<String, Object> getData() {
         return data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        RawDataResponse that = (RawDataResponse) o;
+        return Objects.equals(data, that.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), data);
     }
 }

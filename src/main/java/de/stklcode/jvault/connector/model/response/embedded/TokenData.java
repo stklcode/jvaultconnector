@@ -19,18 +19,23 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Embedded token information inside Vault response.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class TokenData {
+public final class TokenData implements Serializable {
+    private static final long serialVersionUID = 2915180734313753649L;
+
     @JsonProperty("accessor")
     private String accessor;
 
@@ -230,5 +235,38 @@ public final class TokenData {
      */
     public Map<String, Object> getMeta() {
         return meta;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TokenData tokenData = (TokenData) o;
+        return orphan == tokenData.orphan &&
+                renewable == tokenData.renewable &&
+                Objects.equals(accessor, tokenData.accessor) &&
+                Objects.equals(creationTime, tokenData.creationTime) &&
+                Objects.equals(creationTtl, tokenData.creationTtl) &&
+                Objects.equals(name, tokenData.name) &&
+                Objects.equals(entityId, tokenData.entityId) &&
+                Objects.equals(expireTime, tokenData.expireTime) &&
+                Objects.equals(explicitMaxTtl, tokenData.explicitMaxTtl) &&
+                Objects.equals(id, tokenData.id) &&
+                Objects.equals(issueTime, tokenData.issueTime) &&
+                Objects.equals(meta, tokenData.meta) &&
+                Objects.equals(numUses, tokenData.numUses) &&
+                Objects.equals(path, tokenData.path) &&
+                Objects.equals(policies, tokenData.policies) &&
+                Objects.equals(ttl, tokenData.ttl) &&
+                Objects.equals(type, tokenData.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accessor, creationTime, creationTtl, name, entityId, expireTime, explicitMaxTtl, id,
+                issueTime, meta, numUses, orphan, path, policies, renewable, ttl, type);
     }
 }

@@ -20,10 +20,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
+import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,11 +63,7 @@ class AuthMethodsResponseTest {
             "  }\n" +
             "}";
 
-    private static final Map<String, Object> INVALID_DATA = new HashMap<>();
-
-    static {
-        INVALID_DATA.put("dummy/", new Dummy());
-    }
+    private static final Map<String, Object> INVALID_DATA = Map.of("dummy/", new Dummy());
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -119,7 +116,12 @@ class AuthMethodsResponseTest {
         assertEquals(TK_MAX_LEASE_TTL.toString(), method.getConfig().get("max_lease_ttl"), "Incorrect max lease TTL config");
     }
 
-    private static class Dummy {
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(AuthMethodsResponse.class).verify();
+    }
 
+    private static class Dummy implements Serializable {
+        private static final long serialVersionUID = 9075949348402246139L;
     }
 }

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -27,9 +28,12 @@ import java.util.*;
  *
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class Token {
+public final class Token implements Serializable {
+    private static final long serialVersionUID = 5208508683665365287L;
+
     /**
      * Get {@link Builder} instance.
      *
@@ -212,6 +216,35 @@ public final class Token {
      */
     public String getEntityAlias() {
         return entityAlias;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Token token = (Token) o;
+        return Objects.equals(id, token.id) &&
+                Objects.equals(type, token.type) &&
+                Objects.equals(displayName, token.displayName) &&
+                Objects.equals(noParent, token.noParent) &&
+                Objects.equals(noDefaultPolicy, token.noDefaultPolicy) &&
+                Objects.equals(ttl, token.ttl) &&
+                Objects.equals(explicitMaxTtl, token.explicitMaxTtl) &&
+                Objects.equals(numUses, token.numUses) &&
+                Objects.equals(policies, token.policies) &&
+                Objects.equals(meta, token.meta) &&
+                Objects.equals(renewable, token.renewable) &&
+                Objects.equals(period, token.period) &&
+                Objects.equals(entityAlias, token.entityAlias);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, displayName, noParent, noDefaultPolicy, ttl, explicitMaxTtl, numUses, policies,
+                meta, renewable, period, entityAlias);
     }
 
     /**

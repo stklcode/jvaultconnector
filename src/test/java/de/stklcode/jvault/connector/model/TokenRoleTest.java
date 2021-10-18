@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -26,12 +27,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit Test for {@link Token.Builder}
+ * Unit Test for {@link TokenRole} and {@link TokenRole.Builder}.
  *
  * @author Stefan Kalscheuer
  * @since 0.9
  */
-class TokenRoleBuilderTest {
+class TokenRoleTest {
     private static final String NAME = "test-role";
     private static final String ALLOWED_POLICY_1 = "apol-1";
     private static final String ALLOWED_POLICY_2 = "apol-2";
@@ -132,6 +133,9 @@ class TokenRoleBuilderTest {
         assertNull(role.getTokenPeriod());
         assertNull(role.getTokenType());
 
+        // Empty builder should be equal to no-arg construction.
+        assertEquals(role, new TokenRole());
+
         // Optional fields should be ignored, so JSON string should be empty.
         assertEquals("{}", new ObjectMapper().writeValueAsString(role));
     }
@@ -179,5 +183,10 @@ class TokenRoleBuilderTest {
 
         // Verify that all parameters are included in JSON string.
         assertEquals(JSON_FULL, new ObjectMapper().writeValueAsString(role));
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(TokenRole.class).verify();
     }
 }

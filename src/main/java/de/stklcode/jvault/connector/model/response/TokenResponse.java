@@ -24,6 +24,7 @@ import de.stklcode.jvault.connector.model.response.embedded.TokenData;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault response from token lookup providing Token information in {@link TokenData} field.
@@ -33,6 +34,8 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenResponse extends VaultDataResponse {
+    private static final long serialVersionUID = 2248288114849229479L;
+
     private TokenData data;
 
     @JsonProperty("auth")
@@ -59,5 +62,21 @@ public final class TokenResponse extends VaultDataResponse {
      */
     public TokenData getData() {
         return data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        TokenResponse that = (TokenResponse) o;
+        return Objects.equals(data, that.data) && Objects.equals(auth, that.auth);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), data, auth);
     }
 }

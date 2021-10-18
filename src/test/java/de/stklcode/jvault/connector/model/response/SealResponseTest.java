@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +80,7 @@ class SealResponseTest {
         // First test sealed Vault's response.
         SealResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_SEALED, SealResponse.class),
-                "TokenResponse deserialization failed"
+                "SealResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(TYPE, res.getType(), "Incorrect seal type");
@@ -101,7 +102,7 @@ class SealResponseTest {
         // Not test unsealed Vault's response.
         res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(RES_UNSEALED, SealResponse.class),
-                "TokenResponse deserialization failed"
+                "SealResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(TYPE, res.getType(), "Incorrect seal type");
@@ -117,5 +118,10 @@ class SealResponseTest {
         assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");
         assertEquals(RECOVERY_SEAL, res.getRecoverySeal(), "Incorrect recovery seal");
         assertEquals(STORAGE_TYPE, res.getStorageType(), "Incorrect storage type");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(SealResponse.class).verify();
     }
 }

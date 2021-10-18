@@ -19,9 +19,9 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,11 +69,7 @@ class AuthResponseTest {
             "  }\n" +
             "}";
 
-    private static final Map<String, Object> INVALID_AUTH_DATA = new HashMap<>();
-
-    static {
-        INVALID_AUTH_DATA.put("policies", "fancy-policy");
-    }
+    private static final Map<String, Object> INVALID_AUTH_DATA = Map.of("policies", "fancy-policy");
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -121,5 +117,10 @@ class AuthResponseTest {
         assertEquals(2, data.getTokenPolicies().size(), "Incorrect number of token policies");
         assertTrue(data.getTokenPolicies().containsAll(Set.of(AUTH_POLICY_2, AUTH_POLICY_1)), "Incorrect token policies");
         assertEquals(Map.of(AUTH_META_KEY, AUTH_META_VALUE), data.getMetadata(), "Incorrect auth metadata");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(AuthResponse.class).verify();
     }
 }

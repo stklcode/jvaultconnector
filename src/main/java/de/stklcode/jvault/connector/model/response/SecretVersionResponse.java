@@ -23,6 +23,7 @@ import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault response for a single secret version metadata, i.e. after update (KV v2).
@@ -32,6 +33,7 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretVersionResponse extends VaultDataResponse {
+    private static final long serialVersionUID = -6681638207727120184L;
 
     private VersionMetadata metadata;
 
@@ -52,5 +54,21 @@ public class SecretVersionResponse extends VaultDataResponse {
      */
     public VersionMetadata getMetadata() {
         return metadata;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        SecretVersionResponse that = (SecretVersionResponse) o;
+        return Objects.equals(metadata, that.metadata);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), metadata);
     }
 }

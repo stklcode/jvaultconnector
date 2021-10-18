@@ -19,10 +19,10 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,11 +89,7 @@ class TokenResponseTest {
             "  \"auth\": null\n" +
             "}";
 
-    private static final Map<String, Object> INVALID_TOKEN_DATA = new HashMap<>();
-
-    static {
-        INVALID_TOKEN_DATA.put("num_uses", "fourtytwo");
-    }
+    private static final Map<String, Object> INVALID_TOKEN_DATA = Map.of("num_uses", "fourtytwo");
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -148,5 +144,10 @@ class TokenResponseTest {
         assertEquals(TOKEN_RENEWABLE, data.isRenewable(), "Incorrect token renewable flag");
         assertEquals(RES_TTL, data.getTtl(), "Incorrect token TTL");
         assertEquals(TOKEN_TYPE, data.getType(), "Incorrect token type");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(TokenResponse.class).verify();
     }
 }

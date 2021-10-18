@@ -19,17 +19,22 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Embedded authorization information inside Vault response.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class AuthData {
+public final class AuthData implements Serializable {
+    private static final long serialVersionUID = -6962244199229885869L;
+
     @JsonProperty("client_token")
     private String clientToken;
 
@@ -132,5 +137,32 @@ public final class AuthData {
      */
     public boolean isOrphan() {
         return orphan;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AuthData authData = (AuthData) o;
+        return renewable == authData.renewable &&
+                orphan == authData.orphan &&
+                Objects.equals(clientToken, authData.clientToken) &&
+                Objects.equals(accessor, authData.accessor) &&
+                Objects.equals(policies, authData.policies) &&
+                Objects.equals(tokenPolicies, authData.tokenPolicies) &&
+                Objects.equals(metadata, authData.metadata) &&
+                Objects.equals(leaseDuration, authData.leaseDuration) &&
+                Objects.equals(entityId, authData.entityId) &&
+                Objects.equals(tokenType, authData.tokenType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clientToken, accessor, policies, tokenPolicies, metadata, leaseDuration, renewable,
+                entityId, tokenType, orphan);
     }
 }

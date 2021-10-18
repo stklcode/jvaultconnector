@@ -18,9 +18,9 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.6.2
  */
 class SecretResponseTest {
-    private static final Map<String, Object> DATA = new HashMap<>();
     private static final String KEY_UNKNOWN = "unknown";
     private static final String KEY_STRING = "test1";
     private static final String VAL_STRING = "testvalue";
@@ -42,6 +41,12 @@ class SecretResponseTest {
     private static final Integer VAL_INTEGER = 42;
     private static final String KEY_LIST = "list";
     private static final String VAL_LIST = "[\"first\",\"second\"]";
+
+    private static final Map<String, Object> DATA = Map.of(
+            KEY_STRING, VAL_STRING,
+            KEY_INTEGER, VAL_INTEGER,
+            KEY_LIST, VAL_LIST
+    );
 
     private static final String SECRET_REQUEST_ID = "68315073-6658-e3ff-2da7-67939fb91bbd";
     private static final String SECRET_LEASE_ID = "";
@@ -104,13 +109,6 @@ class SecretResponseTest {
             "    \"warnings\": " + SECRET_WARNINGS + "\n" +
             "}";
 
-
-    static {
-        DATA.put(KEY_STRING, VAL_STRING);
-        DATA.put(KEY_INTEGER, VAL_INTEGER);
-        DATA.put(KEY_LIST, VAL_LIST);
-    }
-
     /**
      * Test getter, setter and get-methods for response data.
      *
@@ -171,7 +169,7 @@ class SecretResponseTest {
         assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");
         assertEquals("", res.getMetadata().getDeletionTimeString(), "Incorrect deletion date string");
         assertNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
-        assertEquals(false, res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
+        assertFalse(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
         assertEquals(1, res.getMetadata().getVersion(), "Incorrect secret version");
 
         // Deleted KV v2 secret.
@@ -185,8 +183,13 @@ class SecretResponseTest {
         assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");
         assertEquals(SECRET_META_DELETED, res.getMetadata().getDeletionTimeString(), "Incorrect deletion date string");
         assertNotNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
-        assertEquals(true, res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
+        assertTrue(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
         assertEquals(2, res.getMetadata().getVersion(), "Incorrect secret version");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(SecretResponse.class).verify();
     }
 
     private void assertSecretData(SecretResponse res) {

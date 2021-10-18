@@ -19,6 +19,8 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * Vault response for seal status or unseal request.
  *
@@ -27,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SealResponse implements VaultResponse {
+    private static final long serialVersionUID = -3661916639367542617L;
+
     @JsonProperty("type")
     private String type;
 
@@ -164,5 +168,34 @@ public final class SealResponse implements VaultResponse {
      */
     public String getStorageType() {
         return storageType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SealResponse that = (SealResponse) o;
+        return sealed == that.sealed &&
+                initialized == that.initialized &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(threshold, that.threshold) &&
+                Objects.equals(numberOfShares, that.numberOfShares) &&
+                Objects.equals(progress, that.progress) &&
+                Objects.equals(version, that.version) &&
+                Objects.equals(nonce, that.nonce) &&
+                Objects.equals(clusterName, that.clusterName) &&
+                Objects.equals(clusterId, that.clusterId) &&
+                Objects.equals(migration, that.migration) &&
+                Objects.equals(recoverySeal, that.recoverySeal) &&
+                Objects.equals(storageType, that.storageType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, sealed, initialized, threshold, numberOfShares, progress, version, nonce,
+                clusterName, clusterId, migration, recoverySeal, storageType);
     }
 }

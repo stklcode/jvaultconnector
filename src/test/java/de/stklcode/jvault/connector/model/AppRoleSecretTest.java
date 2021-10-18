@@ -17,11 +17,10 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,13 +36,11 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 class AppRoleSecretTest {
     private static final String TEST_ID = "abc123";
-    private static final Map<String, Object> TEST_META = new HashMap<>();
-    private static final List<String> TEST_CIDR = Arrays.asList("203.0.113.0/24", "198.51.100.0/24");
-
-    static {
-        TEST_META.put("foo", "bar");
-        TEST_META.put("number", 1337);
-    }
+    private static final Map<String, Object> TEST_META = Map.of(
+            "foo", "bar",
+            "number", 1337
+    );
+    private static final List<String> TEST_CIDR = List.of("203.0.113.0/24", "198.51.100.0/24");
 
     /**
      * Test constructors.
@@ -167,7 +164,11 @@ class AppRoleSecretTest {
         assertEquals("TEST_LASTUPDATE", secret2.getLastUpdatedTime());
         assertEquals(678, secret2.getNumUses());
         assertEquals(12345, secret2.getTtl());
+    }
 
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(AppRoleSecret.class).verify();
     }
 
     private static void setPrivateField(Object object, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
@@ -182,5 +183,4 @@ class AppRoleSecretTest {
         return json.replaceAll("\"cidr_list\":\"([^\"]*)\"", "\"cidr_list\":\\[$1\\]")
                 .replaceAll("(\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+)", "\"$1\"");
     }
-
 }

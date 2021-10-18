@@ -20,17 +20,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Vault Token Role metamodel.
  *
  * @author Stefan Kalscheuer
  * @since 0.9
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class TokenRole {
+public final class TokenRole implements Serializable {
+    private static final long serialVersionUID = -6159563751115867561L;
+
     /**
      * Get {@link Builder} instance.
      *
@@ -203,6 +208,36 @@ public final class TokenRole {
      */
     public String getTokenType() {
         return tokenType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TokenRole tokenRole = (TokenRole) o;
+        return Objects.equals(name, tokenRole.name) &&
+                Objects.equals(allowedPolicies, tokenRole.allowedPolicies) &&
+                Objects.equals(disallowedPolicies, tokenRole.disallowedPolicies) &&
+                Objects.equals(orphan, tokenRole.orphan) &&
+                Objects.equals(renewable, tokenRole.renewable) &&
+                Objects.equals(pathSuffix, tokenRole.pathSuffix) &&
+                Objects.equals(allowedEntityAliases, tokenRole.allowedEntityAliases) &&
+                Objects.equals(tokenBoundCidrs, tokenRole.tokenBoundCidrs) &&
+                Objects.equals(tokenExplicitMaxTtl, tokenRole.tokenExplicitMaxTtl) &&
+                Objects.equals(tokenNoDefaultPolicy, tokenRole.tokenNoDefaultPolicy) &&
+                Objects.equals(tokenNumUses, tokenRole.tokenNumUses) &&
+                Objects.equals(tokenPeriod, tokenRole.tokenPeriod) &&
+                Objects.equals(tokenType, tokenRole.tokenType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, allowedPolicies, disallowedPolicies, orphan, renewable, pathSuffix,
+                allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl, tokenNoDefaultPolicy, tokenNumUses,
+                tokenPeriod, tokenType);
     }
 
     /**

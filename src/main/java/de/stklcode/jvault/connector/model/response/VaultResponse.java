@@ -16,11 +16,14 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import java.io.Serializable;
+
 /**
  * Marker interface for responses from Vault backend.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 1.1 extends {@link Serializable}
  */
-public interface VaultResponse {
+public interface VaultResponse extends Serializable {
 }

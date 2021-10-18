@@ -21,16 +21,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import de.stklcode.jvault.connector.model.AuthBackend;
 
+import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Embedded authentication method response.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class AuthMethod {
+public final class AuthMethod implements Serializable {
+    private static final long serialVersionUID = -5241997986380823391L;
+
     private AuthBackend type;
     private String rawType;
 
@@ -85,5 +90,25 @@ public final class AuthMethod {
      */
     public boolean isLocal() {
         return local;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AuthMethod that = (AuthMethod) o;
+        return local == that.local &&
+                type == that.type &&
+                Objects.equals(rawType, that.rawType) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(config, that.config);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, rawType, description, config, local);
     }
 }

@@ -17,9 +17,9 @@
 package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,14 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @since 0.8
  */
 class CredentialsResponseTest {
-    private static final Map<String, Object> DATA = new HashMap<>();
     private static final String VAL_USER = "testUserName";
     private static final String VAL_PASS = "5up3r5ecr3tP455";
-
-    static {
-        DATA.put("username", VAL_USER);
-        DATA.put("password", VAL_PASS);
-    }
+    private static final Map<String, Object> DATA = Map.of(
+            "username", VAL_USER,
+            "password", VAL_PASS
+    );
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -47,7 +45,6 @@ class CredentialsResponseTest {
      * @throws InvalidResponseException Should not occur
      */
     @Test
-    @SuppressWarnings("unchecked")
     void getCredentialsTest() throws InvalidResponseException {
         // Create empty Object.
         CredentialsResponse res = new CredentialsResponse();
@@ -58,5 +55,10 @@ class CredentialsResponseTest {
         res.setData(DATA);
         assertEquals(VAL_USER, res.getUsername(), "Incorrect username");
         assertEquals(VAL_PASS, res.getPassword(), "Incorrect password");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(CredentialsResponse.class).verify();
     }
 }

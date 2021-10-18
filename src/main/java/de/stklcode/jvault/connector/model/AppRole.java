@@ -18,17 +18,22 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Vault AppRole role metamodel.
  *
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class AppRole {
+public final class AppRole implements Serializable {
+    private static final long serialVersionUID = -6248529625864573990L;
+
     /**
      * Get {@link Builder} instance.
      *
@@ -314,6 +319,39 @@ public final class AppRole {
      */
     public String getTokenType() {
         return tokenType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AppRole appRole = (AppRole) o;
+        return Objects.equals(name, appRole.name) &&
+                Objects.equals(id, appRole.id) &&
+                Objects.equals(bindSecretId, appRole.bindSecretId) &&
+                Objects.equals(secretIdBoundCidrs, appRole.secretIdBoundCidrs) &&
+                Objects.equals(secretIdNumUses, appRole.secretIdNumUses) &&
+                Objects.equals(secretIdTtl, appRole.secretIdTtl) &&
+                Objects.equals(enableLocalSecretIds, appRole.enableLocalSecretIds) &&
+                Objects.equals(tokenTtl, appRole.tokenTtl) &&
+                Objects.equals(tokenMaxTtl, appRole.tokenMaxTtl) &&
+                Objects.equals(tokenPolicies, appRole.tokenPolicies) &&
+                Objects.equals(tokenBoundCidrs, appRole.tokenBoundCidrs) &&
+                Objects.equals(tokenExplicitMaxTtl, appRole.tokenExplicitMaxTtl) &&
+                Objects.equals(tokenNoDefaultPolicy, appRole.tokenNoDefaultPolicy) &&
+                Objects.equals(tokenNumUses, appRole.tokenNumUses) &&
+                Objects.equals(tokenPeriod, appRole.tokenPeriod) &&
+                Objects.equals(tokenType, appRole.tokenType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, id, bindSecretId, secretIdBoundCidrs, secretIdNumUses, secretIdTtl,
+                enableLocalSecretIds, tokenTtl, tokenMaxTtl, tokenPolicies, tokenBoundCidrs, tokenExplicitMaxTtl,
+                tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
     }
 
 

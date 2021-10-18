@@ -24,6 +24,7 @@ import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault response for secret request.
@@ -33,6 +34,8 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretResponse extends VaultDataResponse {
+    private static final long serialVersionUID = -8215178956885015265L;
+
     private static final String KEY_DATA = "data";
     private static final String KEY_METADATA = "metadata";
 
@@ -115,5 +118,21 @@ public class SecretResponse extends VaultDataResponse {
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        SecretResponse that = (SecretResponse) o;
+        return Objects.equals(data, that.data) && Objects.equals(metadata, that.metadata);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), data, metadata);
     }
 }

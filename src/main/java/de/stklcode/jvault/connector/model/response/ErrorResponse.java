@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Vault response in case of errors.
@@ -29,6 +30,8 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class ErrorResponse implements VaultResponse {
+    private static final long serialVersionUID = -6227368087842549149L;
+
     @JsonProperty("errors")
     private List<String> errors;
 
@@ -46,5 +49,21 @@ public final class ErrorResponse implements VaultResponse {
         } else {
             return errors.get(0);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ErrorResponse that = (ErrorResponse) o;
+        return Objects.equals(errors, that.errors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(errors);
     }
 }

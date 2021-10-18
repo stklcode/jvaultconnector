@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -81,6 +82,9 @@ class TokenTest {
 
         // Optional fields should be ignored, so JSON string should be empty.
         assertEquals("{}", new ObjectMapper().writeValueAsString(token));
+
+        // Empty builder should be equal to no-arg construction.
+        assertEquals(token, new Token());
     }
 
     /**
@@ -166,5 +170,10 @@ class TokenTest {
         assertEquals(2, token.getMeta().size());
         assertEquals(META_VALUE, token.getMeta().get(META_KEY));
         assertEquals(META_VALUE_2, token.getMeta().get(META_KEY_2));
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(Token.class).verify();
     }
 }

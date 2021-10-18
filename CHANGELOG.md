@@ -7,6 +7,7 @@
 * Add `migration`, `recovery_seal` and `storage_type` fields to `SealReponse` model
 * Add support for `wrap_info` in data response models
 * Dependency updates
+* model and response classes implement `Serializable` (#57)
 
 ### Test
 * Tested against Vault 1.10.0

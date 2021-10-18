@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,5 +88,10 @@ class MetadataResponseTest {
         assertEquals(V2_TIME, res.getMetadata().getVersions().get(2).getCreatedTimeString(), "Incorrect version 2 created time");
         assertNotNull(res.getMetadata().getVersions().get(2).getCreatedTime(), "Parsing version created failed");
         assertFalse(res.getMetadata().getVersions().get(3).isDestroyed(), "Incorrect version 3 destroyed state");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(MetadataResponse.class).verify();
     }
 }

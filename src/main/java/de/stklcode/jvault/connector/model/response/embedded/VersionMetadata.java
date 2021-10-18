@@ -19,18 +19,23 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 
 /**
  * Embedded metadata for a single Key-Value v2 version.
  *
  * @author Stefan Kalscheuer
  * @since 0.8
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class VersionMetadata {
+public final class VersionMetadata implements Serializable {
+    private static final long serialVersionUID = -5286693953873839611L;
+
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSX");
 
     @JsonProperty("created_time")
@@ -103,4 +108,22 @@ public final class VersionMetadata {
         return version;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        VersionMetadata that = (VersionMetadata) o;
+        return destroyed == that.destroyed &&
+                Objects.equals(createdTimeString, that.createdTimeString) &&
+                Objects.equals(deletionTimeString, that.deletionTimeString) &&
+                Objects.equals(version, that.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(createdTimeString, deletionTimeString, destroyed, version);
+    }
 }

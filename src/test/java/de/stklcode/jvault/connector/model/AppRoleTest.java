@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -171,5 +172,10 @@ class AppRoleTest {
                 .build();
         assertEquals(2, role.getTokenPolicies().size());
         assertTrue(role.getTokenPolicies().containsAll(List.of(POLICY, POLICY_2)));
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(AppRole.class).verify();
     }
 }

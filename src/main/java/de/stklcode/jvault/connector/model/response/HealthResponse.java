@@ -19,6 +19,8 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * Vault response for health query.
  *
@@ -27,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class HealthResponse implements VaultResponse {
+    private static final long serialVersionUID = 6483840078694294401L;
+
     @JsonProperty("cluster_id")
     private String clusterID;
 
@@ -128,5 +132,31 @@ public final class HealthResponse implements VaultResponse {
      */
     public Boolean isPerformanceStandby() {
         return performanceStandby;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        HealthResponse that = (HealthResponse) o;
+        return Objects.equals(clusterID, that.clusterID) &&
+                Objects.equals(clusterName, that.clusterName) &&
+                Objects.equals(version, that.version) &&
+                Objects.equals(serverTimeUTC, that.serverTimeUTC) &&
+                Objects.equals(standby, that.standby) &&
+                Objects.equals(sealed, that.sealed) &&
+                Objects.equals(initialized, that.initialized) &&
+                Objects.equals(replicationPerfMode, that.replicationPerfMode) &&
+                Objects.equals(replicationDrMode, that.replicationDrMode) &&
+                Objects.equals(performanceStandby, that.performanceStandby);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clusterID, clusterName, version, serverTimeUTC, standby, sealed, initialized,
+                replicationPerfMode, replicationDrMode, performanceStandby);
     }
 }

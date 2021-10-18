@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -72,5 +73,10 @@ class HealthResponseTest {
         assertEquals(PERF_STANDBY, res.isPerformanceStandby(), "Incorrect performance standby state");
         assertEquals(REPL_PERF_MODE, res.getReplicationPerfMode(), "Incorrect replication perf mode");
         assertEquals(REPL_DR_MODE, res.getReplicationDrMode(), "Incorrect replication DR mode");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(HealthResponse.class).verify();
     }
 }

@@ -22,6 +22,7 @@ import de.stklcode.jvault.connector.exception.InvalidResponseException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault response for secret list request.
@@ -31,13 +32,14 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretListResponse extends VaultDataResponse {
+    private static final long serialVersionUID = -5279146643326713976L;
+
     private List<String> keys;
 
     /**
      * Set data. Extracts list of keys from raw response data.
      *
      * @param data Raw data
-     * @throws InvalidResponseException on parsing errors
      */
     @JsonProperty("data")
     public void setData(final Map<String, Object> data) throws InvalidResponseException {
@@ -53,5 +55,21 @@ public final class SecretListResponse extends VaultDataResponse {
      */
     public List<String> getKeys() {
         return keys;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        SecretListResponse that = (SecretListResponse) o;
+        return Objects.equals(keys, that.keys);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), keys);
     }
 }

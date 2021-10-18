@@ -17,9 +17,13 @@
 package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,14 +34,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.8
  */
 class SecretListResponseTest {
-    private static final Map<String, Object> DATA = new HashMap<>();
     private static final String KEY1 = "key1";
     private static final String KEY2 = "key-2";
     private static final List<String> KEYS = Arrays.asList(KEY1, KEY2);
-
-    static {
-        DATA.put("keys", KEYS);
-    }
+    private static final Map<String, Object> DATA = Map.of("keys", KEYS);
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -51,8 +51,7 @@ class SecretListResponseTest {
         assertNull(res.getKeys(), "Keys should be null without initialization");
 
         // Provoke internal ClassCastException.
-        Map<String, Object> invalidData = new HashMap<>();
-        invalidData.put("keys", "some string");
+        Map<String, Object> invalidData = Map.of("keys", "some string");
         assertThrows(
                 InvalidResponseException.class,
                 () -> res.setData(invalidData),
@@ -64,5 +63,10 @@ class SecretListResponseTest {
         assertNotNull(res.getKeys(), "Keys should be filled here");
         assertEquals(2, res.getKeys().size(), "Unexpected number of keys");
         assertTrue(res.getKeys().containsAll(Set.of(KEY1, KEY2)), "Unexpected keys");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(SecretListResponse.class).verify();
     }
 }

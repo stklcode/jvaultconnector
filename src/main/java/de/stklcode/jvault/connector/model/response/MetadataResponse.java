@@ -23,6 +23,7 @@ import de.stklcode.jvault.connector.model.response.embedded.SecretMetadata;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault response for secret metadata (KV v2).
@@ -32,6 +33,7 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MetadataResponse extends VaultDataResponse {
+    private static final long serialVersionUID = 3407081728744500975L;
 
     private SecretMetadata metadata;
 
@@ -52,5 +54,21 @@ public class MetadataResponse extends VaultDataResponse {
      */
     public SecretMetadata getMetadata() {
         return metadata;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        MetadataResponse that = (MetadataResponse) o;
+        return Objects.equals(metadata, that.metadata);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), metadata);
     }
 }

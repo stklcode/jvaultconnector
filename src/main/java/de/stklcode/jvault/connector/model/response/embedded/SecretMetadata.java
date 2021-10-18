@@ -19,19 +19,24 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Embedded metadata for Key-Value v2 secrets.
  *
  * @author Stefan Kalscheuer
  * @since 0.8
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class SecretMetadata {
+public final class SecretMetadata implements Serializable {
+    private static final long serialVersionUID = 1684891108903409038L;
+
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSX");
 
     @JsonProperty("created_time")
@@ -124,4 +129,24 @@ public final class SecretMetadata {
         return versions;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SecretMetadata that = (SecretMetadata) o;
+        return Objects.equals(createdTimeString, that.createdTimeString) &&
+                Objects.equals(currentVersion, that.currentVersion) &&
+                Objects.equals(maxVersions, that.maxVersions) &&
+                Objects.equals(oldestVersion, that.oldestVersion) &&
+                Objects.equals(updatedTime, that.updatedTime) &&
+                Objects.equals(versions, that.versions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(createdTimeString, currentVersion, maxVersions, oldestVersion, updatedTime, versions);
+    }
 }

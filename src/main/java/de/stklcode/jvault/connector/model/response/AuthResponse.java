@@ -24,6 +24,7 @@ import de.stklcode.jvault.connector.model.response.embedded.AuthData;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault response for authentication providing auth info in {@link AuthData} field.
@@ -33,6 +34,8 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthResponse extends VaultDataResponse {
+    private static final long serialVersionUID = -6728387061352164781L;
+
     private Map<String, Object> data;
 
     private AuthData auth;
@@ -70,5 +73,21 @@ public final class AuthResponse extends VaultDataResponse {
      */
     public AuthData getAuth() {
         return auth;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        AuthResponse that = (AuthResponse) o;
+        return Objects.equals(data, that.data) && Objects.equals(auth, that.auth);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), data, auth);
     }
 }

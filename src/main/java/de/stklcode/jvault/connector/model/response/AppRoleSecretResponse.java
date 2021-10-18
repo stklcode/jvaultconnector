@@ -24,6 +24,7 @@ import de.stklcode.jvault.connector.model.AppRoleSecret;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault response for AppRole lookup.
@@ -33,6 +34,8 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRoleSecretResponse extends VaultDataResponse {
+    private static final long serialVersionUID = 7511563325431032667L;
+
     private AppRoleSecret secret;
 
     @Override
@@ -57,5 +60,21 @@ public final class AppRoleSecretResponse extends VaultDataResponse {
      */
     public AppRoleSecret getSecret() {
         return secret;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
+            return false;
+        }
+        AppRoleSecretResponse that = (AppRoleSecretResponse) o;
+        return Objects.equals(secret, that.secret);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), secret);
     }
 }

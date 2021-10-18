@@ -18,17 +18,22 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Vault AppRole role metamodel.
  *
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @since 1.1 implements {@link Serializable}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class AppRoleSecret {
+public final class AppRoleSecret implements Serializable {
+    private static final long serialVersionUID = -3401074170145792641L;
+
     @JsonProperty("secret_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
@@ -165,5 +170,30 @@ public final class AppRoleSecret {
      */
     public Integer getTtl() {
         return ttl;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AppRoleSecret that = (AppRoleSecret) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(accessor, that.accessor) &&
+                Objects.equals(metadata, that.metadata) &&
+                Objects.equals(cidrList, that.cidrList) &&
+                Objects.equals(creationTime, that.creationTime) &&
+                Objects.equals(expirationTime, that.expirationTime) &&
+                Objects.equals(lastUpdatedTime, that.lastUpdatedTime) &&
+                Objects.equals(numUses, that.numUses) &&
+                Objects.equals(ttl, that.ttl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, accessor, metadata, cidrList, creationTime, expirationTime, lastUpdatedTime, numUses,
+                ttl);
     }
 }

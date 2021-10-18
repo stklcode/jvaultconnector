@@ -19,9 +19,9 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.AppRole;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,11 +63,7 @@ class AppRoleResponseTest {
             "  \"lease_id\": \"\"\n" +
             "}";
 
-    private static final Map<String, Object> INVALID_DATA = new HashMap<>();
-
-    static {
-        INVALID_DATA.put("token_policies", "fancy-policy");
-    }
+    private static final Map<String, Object> INVALID_DATA = Map.of("token_policies", "fancy-policy");
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -108,5 +104,10 @@ class AppRoleResponseTest {
         assertEquals(ROLE_BIND_SECRET, role.getBindSecretId(), "Incorrect role bind secret ID flag");
         assertNull(role.getTokenBoundCidrs(), "Incorrect bound CIDR list");
         assertEquals("", role.getTokenBoundCidrsString(), "Incorrect bound CIDR list string");
+    }
+
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier.simple().forClass(AppRoleResponse.class).verify();
     }
 }

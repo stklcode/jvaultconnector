@@ -22,6 +22,7 @@ import de.stklcode.jvault.connector.model.response.embedded.WrapInfo;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Abstract Vault response with default payload fields.
@@ -30,6 +31,8 @@ import java.util.Map;
  * @since 0.1
  */
 public abstract class VaultDataResponse implements VaultResponse {
+    private static final long serialVersionUID = 2507925101227179499L;
+
     @JsonProperty("lease_id")
     private String leaseId;
 
@@ -88,5 +91,25 @@ public abstract class VaultDataResponse implements VaultResponse {
      */
     public final WrapInfo getWrapInfo() {
         return wrapInfo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        VaultDataResponse that = (VaultDataResponse) o;
+        return renewable == that.renewable &&
+                Objects.equals(leaseId, that.leaseId) &&
+                Objects.equals(leaseDuration, that.leaseDuration) &&
+                Objects.equals(warnings, that.warnings) &&
+                Objects.equals(wrapInfo, that.wrapInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(leaseId, renewable, leaseDuration, warnings, wrapInfo);
     }
 }

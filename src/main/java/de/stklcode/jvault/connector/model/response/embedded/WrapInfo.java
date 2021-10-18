@@ -18,13 +18,17 @@ package de.stklcode.jvault.connector.model.response.embedded;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * Wrapping information object.
  *
  * @author Stefan Kalscheuer
  * @since 1.1
  */
-public class WrapInfo {
+public class WrapInfo implements Serializable {
+    private static final long serialVersionUID = -7764500642913116581L;
 
     @JsonProperty("token")
     private String token;
@@ -64,5 +68,24 @@ public class WrapInfo {
      */
     public String getCreationPath() {
         return creationPath;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        WrapInfo that = (WrapInfo) o;
+        return Objects.equals(token, that.token) &&
+                Objects.equals(ttl, that.ttl) &&
+                Objects.equals(creationTime, that.creationTime) &&
+                Objects.equals(creationPath, that.creationPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(token, ttl, creationTime, creationPath);
     }
 }
