@@ -17,13 +17,10 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,20 +31,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.6.2
  */
 class SecretResponseTest {
-    private static final String KEY_UNKNOWN = "unknown";
-    private static final String KEY_STRING = "test1";
-    private static final String VAL_STRING = "testvalue";
-    private static final String KEY_INTEGER = "test2";
-    private static final Integer VAL_INTEGER = 42;
-    private static final String KEY_LIST = "list";
-    private static final String VAL_LIST = "[\"first\",\"second\"]";
-
-    private static final Map<String, Object> DATA = Map.of(
-            KEY_STRING, VAL_STRING,
-            KEY_INTEGER, VAL_INTEGER,
-            KEY_LIST, VAL_LIST
-    );
-
     private static final String SECRET_REQUEST_ID = "68315073-6658-e3ff-2da7-67939fb91bbd";
     private static final String SECRET_LEASE_ID = "";
     private static final Integer SECRET_LEASE_DURATION = 2764800;
@@ -110,57 +93,19 @@ class SecretResponseTest {
             "}";
 
     /**
-     * Test getter, setter and get-methods for response data.
-     *
-     * @throws InvalidResponseException Should not occur
-     */
-    @Test
-    @SuppressWarnings("unchecked")
-    void getDataRoundtrip() throws InvalidResponseException {
-        // Create empty Object.
-        SecretResponse res = new SecretResponse();
-        assertNotNull(res.getData(), "Initial data should be Map");
-        assertTrue(res.getData().isEmpty(), "Initial data should be empty");
-        assertNull(res.get(KEY_STRING), "Getter should return NULL on empty data map");
-
-        // Fill data map.
-        res.setData(DATA);
-        assertEquals(DATA, res.getData(), "Data setter/getter not transparent");
-        assertEquals(DATA.size(), res.getData().keySet().size(), "Data size modified");
-        assertTrue(res.getData().keySet().containsAll(Set.of(KEY_STRING, KEY_INTEGER, KEY_LIST)), "Data keys not passed correctly");
-        assertEquals(VAL_STRING, res.get(KEY_STRING), "Data values not passed correctly");
-        assertEquals(VAL_INTEGER, res.get(KEY_INTEGER), "Data values not passed correctly");
-        assertNull(res.get(KEY_UNKNOWN), "Non-Null returned on unknown key");
-
-        // Try explicit JSON conversion.
-        final List<?> list = res.get(KEY_LIST, List.class);
-        assertNotNull(list, "JSON parsing of list failed");
-        assertEquals(2, list.size(), "JSON parsing of list returned incorrect size");
-        assertTrue(list.containsAll(List.of("first", "second")), "JSON parsing of list returned incorrect elements");
-        assertNull(res.get(KEY_UNKNOWN, Object.class), "Non-Null returned on unknown key");
-
-        // Requesting invalid class should result in Exception.
-        assertThrows(
-                InvalidResponseException.class,
-                () -> res.get(KEY_LIST, Double.class),
-                "JSON parsing to incorrect type succeeded"
-        );
-    }
-
-    /**
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
     void jsonRoundtrip() {
         SecretResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(SECRET_JSON, SecretResponse.class),
+                () -> new ObjectMapper().readValue(SECRET_JSON, PlainSecretResponse.class),
                 "SecretResponse deserialization failed"
         );
         assertSecretData(res);
 
         // KV v2 secret.
         res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(SECRET_JSON_V2, SecretResponse.class),
+                () -> new ObjectMapper().readValue(SECRET_JSON_V2, MetaSecretResponse.class),
                 "SecretResponse deserialization failed"
         );
         assertSecretData(res);
@@ -174,7 +119,7 @@ class SecretResponseTest {
 
         // Deleted KV v2 secret.
         res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(SECRET_JSON_V2_2, SecretResponse.class),
+                () -> new ObjectMapper().readValue(SECRET_JSON_V2_2, MetaSecretResponse.class),
                 "SecretResponse deserialization failed"
         );
         assertSecretData(res);
@@ -190,6 +135,8 @@ class SecretResponseTest {
     @Test
     void testEqualsHashcode() {
         EqualsVerifier.simple().forClass(SecretResponse.class).verify();
+        EqualsVerifier.simple().forClass(PlainSecretResponse.class).verify();
+        EqualsVerifier.simple().forClass(MetaSecretResponse.class).verify();
     }
 
     private void assertSecretData(SecretResponse res) {

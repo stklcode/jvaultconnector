@@ -18,12 +18,8 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
 
-import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -34,34 +30,26 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenResponse extends VaultDataResponse {
-    private static final long serialVersionUID = 2248288114849229479L;
+    private static final long serialVersionUID = -4053126653764241197L;
 
+    @JsonProperty("data")
     private TokenData data;
 
     @JsonProperty("auth")
     private Boolean auth;
 
     /**
-     * Set data. Parses response data map to {@link TokenData}.
-     *
-     * @param data Raw response data
-     * @throws InvalidResponseException on parsing errors
-     */
-    @Override
-    public void setData(final Map<String, Object> data) throws InvalidResponseException {
-        var mapper = new ObjectMapper();
-        try {
-            this.data = mapper.readValue(mapper.writeValueAsString(data), TokenData.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException("Failed deserializing response", e);
-        }
-    }
-
-    /**
      * @return Token data
      */
     public TokenData getData() {
         return data;
+    }
+
+    /**
+     * @return Auth data
+     */
+    public Boolean getAuth() {
+        return auth;
     }
 
     @Override

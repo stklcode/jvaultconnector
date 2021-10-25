@@ -16,16 +16,14 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * JUnit Test for {@link SecretListResponse} model.
@@ -36,33 +34,30 @@ import static org.junit.jupiter.api.Assertions.*;
 class SecretListResponseTest {
     private static final String KEY1 = "key1";
     private static final String KEY2 = "key-2";
-    private static final List<String> KEYS = Arrays.asList(KEY1, KEY2);
-    private static final Map<String, Object> DATA = Map.of("keys", KEYS);
+    private static final String JSON = "{\n" +
+            "  \"auth\": null,\n" +
+            "  \"data\": {\n" +
+            "    \"keys\": [" +
+            "      \"" + KEY1 + "\",\n" +
+            "      \"" + KEY2 + "\"\n" +
+            "    ]\n" +
+            "  },\n" +
+            "  \"lease_duration\": 2764800,\n" +
+            "  \"lease_id\": \"\",\n" +
+            "  \"renewable\": false\n" +
+            "}";
 
     /**
-     * Test getter, setter and get-methods for response data.
-     *
-     * @throws InvalidResponseException Should not occur
+     * Test JSON deserialization and key getter.
      */
     @Test
-    void getKeysTest() throws InvalidResponseException {
-        // Create empty Object.
-        SecretListResponse res = new SecretListResponse();
-        assertNull(res.getKeys(), "Keys should be null without initialization");
-
-        // Provoke internal ClassCastException.
-        Map<String, Object> invalidData = Map.of("keys", "some string");
-        assertThrows(
-                InvalidResponseException.class,
-                () -> res.setData(invalidData),
-                "Setting incorrect class succeeded"
+    void getKeysTest() {
+        SecretListResponse res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(JSON, SecretListResponse.class),
+                "SecretListResponse deserialization failed"
         );
 
-        // Fill correct data.
-        res.setData(DATA);
-        assertNotNull(res.getKeys(), "Keys should be filled here");
-        assertEquals(2, res.getKeys().size(), "Unexpected number of keys");
-        assertTrue(res.getKeys().containsAll(Set.of(KEY1, KEY2)), "Unexpected keys");
+        assertEquals(List.of(KEY1, KEY2), res.getKeys(), "Unexpected secret keys");
     }
 
     @Test

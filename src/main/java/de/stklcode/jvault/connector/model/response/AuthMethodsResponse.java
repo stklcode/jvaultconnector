@@ -17,11 +17,9 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -34,8 +32,9 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthMethodsResponse extends VaultDataResponse {
-    private static final long serialVersionUID = 5521702564857621352L;
+    private static final long serialVersionUID = -1802724129533405375L;
 
+    @JsonProperty("data")
     private Map<String, AuthMethod> supportedMethods;
 
     /**
@@ -43,19 +42,6 @@ public final class AuthMethodsResponse extends VaultDataResponse {
      */
     public AuthMethodsResponse() {
         this.supportedMethods = new HashMap<>();
-    }
-
-    @Override
-    public void setData(final Map<String, Object> data) throws InvalidResponseException {
-        var mapper = new ObjectMapper();
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-            try {
-                this.supportedMethods.put(entry.getKey(),
-                        mapper.readValue(mapper.writeValueAsString(entry.getValue()), AuthMethod.class));
-            } catch (IOException e) {
-                throw new InvalidResponseException();
-            }
-        }
     }
 
     /**

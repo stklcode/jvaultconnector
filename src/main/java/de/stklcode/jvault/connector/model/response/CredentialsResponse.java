@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * @since 0.5.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class CredentialsResponse extends SecretResponse {
+public final class CredentialsResponse extends PlainSecretResponse {
     private static final long serialVersionUID = -1439692963299045425L;
 
     /**

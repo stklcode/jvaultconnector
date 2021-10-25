@@ -17,12 +17,9 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
-import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,19 +30,10 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretVersionResponse extends VaultDataResponse {
-    private static final long serialVersionUID = -6681638207727120184L;
+    private static final long serialVersionUID = 2748635005258576174L;
 
+    @JsonProperty("data")
     private VersionMetadata metadata;
-
-    @Override
-    public final void setData(final Map<String, Object> data) throws InvalidResponseException {
-        var mapper = new ObjectMapper();
-        try {
-            this.metadata = mapper.readValue(mapper.writeValueAsString(data), VersionMetadata.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException("Failed deserializing response", e);
-        }
-    }
 
     /**
      * Get the actual metadata.

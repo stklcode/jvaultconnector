@@ -63,8 +63,6 @@ class AuthMethodsResponseTest {
             "  }\n" +
             "}";
 
-    private static final Map<String, Object> INVALID_DATA = Map.of("dummy/", new Dummy());
-
     /**
      * Test getter, setter and get-methods for response data.
      */
@@ -73,13 +71,6 @@ class AuthMethodsResponseTest {
         // Create empty Object.
         AuthMethodsResponse res = new AuthMethodsResponse();
         assertEquals(Collections.emptyMap(), res.getSupportedMethods(), "Initial method map should be empty");
-
-        // Parsing invalid data map should fail.
-        assertThrows(
-                InvalidResponseException.class,
-                () -> res.setData(INVALID_DATA),
-                "Parsing invalid data succeeded"
-        );
     }
 
     /**

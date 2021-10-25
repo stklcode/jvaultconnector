@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
@@ -89,8 +88,6 @@ class TokenResponseTest {
             "  \"auth\": null\n" +
             "}";
 
-    private static final Map<String, Object> INVALID_TOKEN_DATA = Map.of("num_uses", "fourtytwo");
-
     /**
      * Test getter, setter and get-methods for response data.
      */
@@ -99,13 +96,6 @@ class TokenResponseTest {
         // Create empty Object.
         TokenResponse res = new TokenResponse();
         assertNull(res.getData(), "Initial data should be empty");
-
-        // Parsing invalid data map should fail.
-        assertThrows(
-                InvalidResponseException.class,
-                () -> res.setData(INVALID_TOKEN_DATA),
-                "Parsing invalid token data succeeded"
-        );
     }
 
     /**

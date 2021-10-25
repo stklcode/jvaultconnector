@@ -8,6 +8,7 @@
 * Add support for `wrap_info` in data response models
 * Dependency updates
 * model and response classes implement `Serializable` (#57)
+* split `SercretResponse`  into `PlainSecretResponse` and `MetaSecretResponse` subclasses (common API unchanged)
 
 ### Test
 * Tested against Vault 1.10.0

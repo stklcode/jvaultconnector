@@ -411,7 +411,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final SecretResponse read(final String key) throws VaultConnectorException {
         requireAuth();
         /* Issue request and parse secret response */
-        return request.get(key, emptyMap(), token, SecretResponse.class);
+        return request.get(key, emptyMap(), token, PlainSecretResponse.class);
     }
 
     @Override
@@ -423,7 +423,7 @@ public class HTTPVaultConnector implements VaultConnector {
             args.put("version", version.toString());
         }
 
-        return request.get(mount + PATH_DATA + key, args, token, SecretResponse.class);
+        return request.get(mount + PATH_DATA + key, args, token, MetaSecretResponse.class);
     }
 
     @Override

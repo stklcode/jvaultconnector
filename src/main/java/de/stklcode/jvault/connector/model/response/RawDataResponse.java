@@ -17,7 +17,9 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -29,19 +31,15 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class RawDataResponse extends VaultDataResponse {
-    private static final long serialVersionUID = -5494734676257709074L;
+    private static final long serialVersionUID = -319727427792124071L;
 
-    private Map<String, Object> data;
-
-    @Override
-    public void setData(final Map<String, Object> data) {
-        this.data = data;
-    }
+    @JsonProperty("data")
+    private Map<String, Serializable> data;
 
     /**
      * @return Raw data {@link Map}
      */
-    public Map<String, Object> getData() {
+    public Map<String, Serializable> getData() {
         return data;
     }
 

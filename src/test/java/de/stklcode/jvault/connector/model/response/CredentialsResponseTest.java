@@ -16,14 +16,12 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link CredentialsResponse} model.
@@ -34,10 +32,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class CredentialsResponseTest {
     private static final String VAL_USER = "testUserName";
     private static final String VAL_PASS = "5up3r5ecr3tP455";
-    private static final Map<String, Object> DATA = Map.of(
-            "username", VAL_USER,
-            "password", VAL_PASS
-    );
+    private static final String JSON = "{\n" +
+            "    \"request_id\": \"68315073-6658-e3ff-2da7-67939fb91bbd\",\n" +
+            "    \"lease_id\": \"\",\n" +
+            "    \"lease_duration\": 2764800,\n" +
+            "    \"renewable\": false,\n" +
+            "    \"data\": {\n" +
+            "        \"username\": \"" + VAL_USER + "\",\n" +
+            "        \"password\": \"" + VAL_PASS + "\"\n" +
+            "    },\n" +
+            "    \"warnings\": null\n" +
+            "}";
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -51,8 +56,10 @@ class CredentialsResponseTest {
         assertNull(res.getUsername(), "Username not present in data map should not return anything");
         assertNull(res.getPassword(), "Password not present in data map should not return anything");
 
-        // Fill data map.
-        res.setData(DATA);
+        res = assertDoesNotThrow(
+                () -> new ObjectMapper().readValue(JSON, CredentialsResponse.class),
+                "Deserialization of CredentialsResponse failed"
+        );
         assertEquals(VAL_USER, res.getUsername(), "Incorrect username");
         assertEquals(VAL_PASS, res.getPassword(), "Incorrect password");
     }

@@ -18,12 +18,8 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
 
-import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -34,39 +30,10 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthResponse extends VaultDataResponse {
-    private static final long serialVersionUID = -6728387061352164781L;
+    private static final long serialVersionUID = 1628851361067456715L;
 
-    private Map<String, Object> data;
-
-    private AuthData auth;
-
-    /**
-     * Set authentication data. The input will be mapped to the {@link AuthData} model.
-     *
-     * @param auth Raw authentication data
-     * @throws InvalidResponseException on mapping errors
-     */
     @JsonProperty("auth")
-    public void setAuth(final Map<String, Object> auth) throws InvalidResponseException {
-        var mapper = new ObjectMapper();
-        try {
-            this.auth = mapper.readValue(mapper.writeValueAsString(auth), AuthData.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException("Failed deserializing response", e);
-        }
-    }
-
-    @Override
-    public void setData(final Map<String, Object> data) {
-        this.data = data;
-    }
-
-    /**
-     * @return Raw data
-     */
-    public Map<String, Object> getData() {
-        return data;
-    }
+    private AuthData auth;
 
     /**
      * @return Authentication data
@@ -83,11 +50,11 @@ public final class AuthResponse extends VaultDataResponse {
             return false;
         }
         AuthResponse that = (AuthResponse) o;
-        return Objects.equals(data, that.data) && Objects.equals(auth, that.auth);
+        return Objects.equals(auth, that.auth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), data, auth);
+        return Objects.hash(super.hashCode(), auth);
     }
 }

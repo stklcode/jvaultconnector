@@ -18,10 +18,10 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.model.response.embedded.SecretListWrapper;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,29 +32,19 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretListResponse extends VaultDataResponse {
-    private static final long serialVersionUID = -5279146643326713976L;
 
-    private List<String> keys;
-
-    /**
-     * Set data. Extracts list of keys from raw response data.
-     *
-     * @param data Raw data
-     */
+    private static final long serialVersionUID = 8597121175002967213L;
     @JsonProperty("data")
-    public void setData(final Map<String, Object> data) throws InvalidResponseException {
-        try {
-            this.keys = (List<String>) data.get("keys");
-        } catch (ClassCastException e) {
-            throw new InvalidResponseException("Keys could not be parsed from data.", e);
-        }
-    }
+    private SecretListWrapper data;
 
     /**
      * @return List of secret keys
      */
     public List<String> getKeys() {
-        return keys;
+        if (data == null) {
+            return Collections.emptyList();
+        }
+        return Objects.requireNonNullElseGet(data.getKeys(), Collections::emptyList);
     }
 
     @Override
@@ -65,11 +55,11 @@ public final class SecretListResponse extends VaultDataResponse {
             return false;
         }
         SecretListResponse that = (SecretListResponse) o;
-        return Objects.equals(keys, that.keys);
+        return Objects.equals(data, that.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), keys);
+        return Objects.hash(super.hashCode(), data);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 Stefan Kalscheuer
+ * Copyright 2016-2021 Stefan Kalscheuer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,43 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.stklcode.jvault.connector.model.TokenRole;
-import de.stklcode.jvault.connector.model.response.embedded.TokenData;
+import de.stklcode.jvault.connector.model.response.embedded.SecretWrapper;
+import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
 /**
- * Vault response from token role lookup providing Token information in {@link TokenData} field.
+ * Vault response for secret responses with metadata.
  *
  * @author Stefan Kalscheuer
- * @since 0.9
+ * @since 1.1 abstract
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class TokenRoleResponse extends VaultDataResponse {
-    private static final long serialVersionUID = 5265363857731948626L;
+public class MetaSecretResponse extends SecretResponse {
+    private static final long serialVersionUID = -1076542846391240162L;
 
     @JsonProperty("data")
-    private TokenRole data;
+    private SecretWrapper secret;
 
-    /**
-     * @return TokenRole data
-     */
-    public TokenRole getData() {
-        return data;
+    @Override
+    public final Map<String, Serializable> getData() {
+        if (secret !=  null) {
+            return secret.getData();
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public final VersionMetadata getMetadata() {
+        if (secret !=  null) {
+            return secret.getMetadata();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -50,12 +64,12 @@ public final class TokenRoleResponse extends VaultDataResponse {
         } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
             return false;
         }
-        TokenRoleResponse that = (TokenRoleResponse) o;
-        return Objects.equals(data, that.data);
+        MetaSecretResponse that = (MetaSecretResponse) o;
+        return Objects.equals(secret, that.secret);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), data);
+        return Objects.hash(super.hashCode(), secret);
     }
 }

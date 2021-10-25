@@ -17,13 +17,9 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.AppRoleSecret;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -34,26 +30,10 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRoleSecretResponse extends VaultDataResponse {
-    private static final long serialVersionUID = 7511563325431032667L;
+    private static final long serialVersionUID = -2484103304072370585L;
 
+    @JsonProperty("data")
     private AppRoleSecret secret;
-
-    @Override
-    public void setData(final Map<String, Object> data) throws InvalidResponseException {
-        var mapper = new ObjectMapper();
-        try {
-            /* null empty strings on list objects */
-            Map<String, Object> filteredData = new HashMap<>(data.size(), 1);
-            data.forEach((k, v) -> {
-                if (!(v instanceof String && ((String) v).isEmpty())) {
-                    filteredData.put(k, v);
-                }
-            });
-            this.secret = mapper.readValue(mapper.writeValueAsString(filteredData), AppRoleSecret.class);
-        } catch (IOException e) {
-            throw new InvalidResponseException("Failed deserializing response", e);
-        }
-    }
 
     /**
      * @return The secret

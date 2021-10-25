@@ -22,57 +22,28 @@ import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Vault response for secret request.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 1.1 abstract
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SecretResponse extends VaultDataResponse {
-    private static final long serialVersionUID = -8215178956885015265L;
-
-    private static final String KEY_DATA = "data";
-    private static final String KEY_METADATA = "metadata";
-
-    private Map<String, Object> data;
-    private VersionMetadata metadata;
-
-    @Override
-    public final void setData(final Map<String, Object> data) throws InvalidResponseException {
-        if (data.size() == 2
-                && data.containsKey(KEY_DATA) && data.get(KEY_DATA) instanceof Map
-                && data.containsKey(KEY_METADATA) && data.get(KEY_METADATA) instanceof Map) {
-            var mapper = new ObjectMapper();
-            try {
-                // This is apparently a KV v2 value.
-                this.data = (Map<String, Object>) data.get(KEY_DATA);
-                this.metadata = mapper.readValue(mapper.writeValueAsString(data.get(KEY_METADATA)), VersionMetadata.class);
-            } catch (ClassCastException | IOException e) {
-                throw new InvalidResponseException("Failed deserializing response", e);
-            }
-        } else {
-            // For KV v1 without metadata just store the data map.
-            this.data = data;
-        }
-    }
+public abstract class SecretResponse extends VaultDataResponse {
+    private static final long serialVersionUID = 5198088815871692951L;
 
     /**
      * Get complete data object.
      *
      * @return data map
      * @since 0.4.0
+     * @since 1.1 Serializable map value.
      */
-    public final Map<String, Object> getData() {
-        if (data == null) {
-            return Collections.emptyMap();
-        }
-        return data;
-    }
+    public abstract Map<String, Serializable> getData();
 
     /**
      * Get secret metadata. This is only available for KV v2 secrets.
@@ -80,9 +51,7 @@ public class SecretResponse extends VaultDataResponse {
      * @return Metadata of the secret.
      * @since 0.8
      */
-    public final VersionMetadata getMetadata() {
-        return metadata;
-    }
+    public abstract VersionMetadata getMetadata();
 
     /**
      * Get a single value for given key.
@@ -92,9 +61,6 @@ public class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      */
     public final Object get(final String key) {
-        if (data == null) {
-            return null;
-        }
         return getData().get(key);
     }
 
@@ -103,12 +69,12 @@ public class SecretResponse extends VaultDataResponse {
      *
      * @param key  the key
      * @param type Class to parse response
-     * @param <T>  Class to parse response
+     * @param <C>  Class to parse response
      * @return Parsed object or {@code null} if absent
      * @throws InvalidResponseException on parsing error
      * @since 0.4.0
      */
-    public final <T> T get(final String key, final Class<T> type) throws InvalidResponseException {
+    public final <C> C get(final String key, final Class<C> type) throws InvalidResponseException {
         try {
             Object rawValue = get(key);
             if (rawValue == null) {
@@ -118,21 +84,5 @@ public class SecretResponse extends VaultDataResponse {
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        SecretResponse that = (SecretResponse) o;
-        return Objects.equals(data, that.data) && Objects.equals(metadata, that.metadata);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), data, metadata);
     }
 }

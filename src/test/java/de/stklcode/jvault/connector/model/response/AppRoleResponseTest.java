@@ -17,13 +17,11 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.AppRole;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -63,8 +61,6 @@ class AppRoleResponseTest {
             "  \"lease_id\": \"\"\n" +
             "}";
 
-    private static final Map<String, Object> INVALID_DATA = Map.of("token_policies", "fancy-policy");
-
     /**
      * Test getter, setter and get-methods for response data.
      */
@@ -73,13 +69,6 @@ class AppRoleResponseTest {
         // Create empty Object.
         AppRoleResponse res = new AppRoleResponse();
         assertNull(res.getRole(), "Initial data should be empty");
-
-        // Parsing invalid auth data map should fail.
-        assertThrows(
-                InvalidResponseException.class,
-                () -> res.setData(INVALID_DATA),
-                "Parsing invalid data succeeded"
-        );
     }
 
     /**
