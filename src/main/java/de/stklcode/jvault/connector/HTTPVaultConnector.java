@@ -63,8 +63,6 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_UNDELETE = "/undelete/";
     private static final String PATH_DESTROY = "/destroy/";
 
-    public static final String DEFAULT_TLS_VERSION = "TLSv1.2";
-
     private final RequestHelper request;
 
     private boolean authorized = false;     // Authorization status.
