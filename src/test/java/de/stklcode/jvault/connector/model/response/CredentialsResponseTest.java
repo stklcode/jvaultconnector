@@ -16,9 +16,10 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-class CredentialsResponseTest {
+class CredentialsResponseTest extends AbstractModelTest<CredentialsResponse> {
     private static final String VAL_USER = "testUserName";
     private static final String VAL_PASS = "5up3r5ecr3tP455";
     private static final String JSON = "{\n" +
@@ -43,6 +44,20 @@ class CredentialsResponseTest {
             "    },\n" +
             "    \"warnings\": null\n" +
             "}";
+
+    CredentialsResponseTest() {
+        super(CredentialsResponse.class);
+    }
+
+    @Override
+    protected CredentialsResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(JSON, CredentialsResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -62,10 +77,5 @@ class CredentialsResponseTest {
         );
         assertEquals(VAL_USER, res.getUsername(), "Incorrect username");
         assertEquals(VAL_PASS, res.getPassword(), "Incorrect password");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(CredentialsResponse.class).verify();
     }
 }

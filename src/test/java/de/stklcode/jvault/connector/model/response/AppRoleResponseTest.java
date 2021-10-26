@@ -16,9 +16,10 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.AppRole;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-class AppRoleResponseTest {
+class AppRoleResponseTest extends AbstractModelTest<AppRoleResponse> {
     private static final Integer ROLE_TOKEN_TTL = 1200;
     private static final Integer ROLE_TOKEN_MAX_TTL = 1800;
     private static final Integer ROLE_SECRET_TTL = 600;
@@ -60,6 +61,20 @@ class AppRoleResponseTest {
             "  \"renewable\": false,\n" +
             "  \"lease_id\": \"\"\n" +
             "}";
+
+    AppRoleResponseTest() {
+        super(AppRoleResponse.class);
+    }
+
+    @Override
+    protected AppRoleResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(RES_JSON, AppRoleResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -93,10 +108,5 @@ class AppRoleResponseTest {
         assertEquals(ROLE_BIND_SECRET, role.getBindSecretId(), "Incorrect role bind secret ID flag");
         assertNull(role.getTokenBoundCidrs(), "Incorrect bound CIDR list");
         assertEquals("", role.getTokenBoundCidrsString(), "Incorrect bound CIDR list string");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(AppRoleResponse.class).verify();
     }
 }

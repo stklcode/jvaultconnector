@@ -18,7 +18,6 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -32,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.9
  */
-class TokenRoleTest {
+class TokenRoleTest extends AbstractModelTest<TokenRole> {
     private static final String NAME = "test-role";
     private static final String ALLOWED_POLICY_1 = "apol-1";
     private static final String ALLOWED_POLICY_2 = "apol-2";
@@ -73,6 +72,33 @@ class TokenRoleTest {
             "\"token_num_uses\":" + TOKEN_NUM_USES + "," +
             "\"token_period\":" + TOKEN_PERIOD + "," +
             "\"token_type\":\"" + TOKEN_TYPE.value() + "\"}";
+
+    TokenRoleTest() {
+        super(TokenRole.class);
+    }
+
+    @Override
+    protected TokenRole createFull() {
+        return TokenRole.builder()
+                .forName(NAME)
+                .withAllowedPolicies(ALLOWED_POLICIES)
+                .withAllowedPolicy(ALLOWED_POLICY_3)
+                .withDisallowedPolicy(DISALLOWED_POLICY_1)
+                .withDisallowedPolicies(DISALLOWED_POLICIES)
+                .orphan(ORPHAN)
+                .renewable(RENEWABLE)
+                .withPathSuffix(PATH_SUFFIX)
+                .withAllowedEntityAliases(ALLOWED_ENTITY_ALIASES)
+                .withAllowedEntityAlias(ALLOWED_ENTITY_ALIAS_2)
+                .withTokenBoundCidr(TOKEN_BOUND_CIDR_3)
+                .withTokenBoundCidrs(TOKEN_BOUND_CIDRS)
+                .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
+                .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
+                .withTokenNumUses(TOKEN_NUM_USES)
+                .withTokenPeriod(TOKEN_PERIOD)
+                .withTokenType(TOKEN_TYPE)
+                .build();
+    }
 
     /**
      * Build token without any parameters.
@@ -145,25 +171,7 @@ class TokenRoleTest {
      */
     @Test
     void buildFullTest() throws JsonProcessingException {
-        TokenRole role = TokenRole.builder()
-                .forName(NAME)
-                .withAllowedPolicies(ALLOWED_POLICIES)
-                .withAllowedPolicy(ALLOWED_POLICY_3)
-                .withDisallowedPolicy(DISALLOWED_POLICY_1)
-                .withDisallowedPolicies(DISALLOWED_POLICIES)
-                .orphan(ORPHAN)
-                .renewable(RENEWABLE)
-                .withPathSuffix(PATH_SUFFIX)
-                .withAllowedEntityAliases(ALLOWED_ENTITY_ALIASES)
-                .withAllowedEntityAlias(ALLOWED_ENTITY_ALIAS_2)
-                .withTokenBoundCidr(TOKEN_BOUND_CIDR_3)
-                .withTokenBoundCidrs(TOKEN_BOUND_CIDRS)
-                .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
-                .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
-                .withTokenNumUses(TOKEN_NUM_USES)
-                .withTokenPeriod(TOKEN_PERIOD)
-                .withTokenType(TOKEN_TYPE)
-                .build();
+        TokenRole role = createFull();
         assertEquals(NAME, role.getName());
         assertEquals(ALLOWED_POLICIES.size() + 1, role.getAllowedPolicies().size());
         assertTrue(role.getAllowedPolicies().containsAll(List.of(ALLOWED_POLICY_1, ALLOWED_POLICY_2, ALLOWED_POLICY_3)));
@@ -183,10 +191,5 @@ class TokenRoleTest {
 
         // Verify that all parameters are included in JSON string.
         assertEquals(JSON_FULL, new ObjectMapper().writeValueAsString(role));
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(TokenRole.class).verify();
     }
 }

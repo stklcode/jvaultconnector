@@ -18,7 +18,6 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.4.0
  */
-class TokenTest {
+class TokenTest extends AbstractModelTest<Token> {
     private static final String ID = "test-id";
     private static final String DISPLAY_NAME = "display-name";
     private static final Boolean NO_PARENT = false;
@@ -53,6 +52,29 @@ class TokenTest {
     private static final Integer PERIOD = 3600;
     private static final String ENTITY_ALIAS = "alias-value";
     private static final String JSON_FULL = "{\"id\":\"test-id\",\"type\":\"service\",\"display_name\":\"display-name\",\"no_parent\":false,\"no_default_policy\":false,\"ttl\":123,\"explicit_max_ttl\":456,\"num_uses\":4,\"policies\":[\"policy\"],\"meta\":{\"key\":\"value\"},\"renewable\":true,\"period\":3600,\"entity_alias\":\"alias-value\"}";
+
+    TokenTest() {
+        super(Token.class);
+    }
+
+    @Override
+    protected Token createFull() {
+        return Token.builder()
+                .withId(ID)
+                .withType(Token.Type.SERVICE)
+                .withDisplayName(DISPLAY_NAME)
+                .withNoParent(NO_PARENT)
+                .withNoDefaultPolicy(NO_DEFAULT_POLICY)
+                .withTtl(TTL)
+                .withExplicitMaxTtl(EXPLICIT_MAX_TTL)
+                .withNumUses(NUM_USES)
+                .withPolicies(POLICIES)
+                .withMeta(META)
+                .withRenewable(RENEWABLE)
+                .withPeriod(PERIOD)
+                .withEntityAlias(ENTITY_ALIAS)
+                .build();
+    }
 
     @BeforeAll
     static void init() {
@@ -92,21 +114,7 @@ class TokenTest {
      */
     @Test
     void buildFullTest() throws JsonProcessingException {
-        Token token = Token.builder()
-                .withId(ID)
-                .withType(Token.Type.SERVICE)
-                .withDisplayName(DISPLAY_NAME)
-                .withNoParent(NO_PARENT)
-                .withNoDefaultPolicy(NO_DEFAULT_POLICY)
-                .withTtl(TTL)
-                .withExplicitMaxTtl(EXPLICIT_MAX_TTL)
-                .withNumUses(NUM_USES)
-                .withPolicies(POLICIES)
-                .withMeta(META)
-                .withRenewable(RENEWABLE)
-                .withPeriod(PERIOD)
-                .withEntityAlias(ENTITY_ALIAS)
-                .build();
+        Token token = createFull();
         assertEquals(ID, token.getId());
         assertEquals(Token.Type.SERVICE.value(), token.getType());
         assertEquals(DISPLAY_NAME, token.getDisplayName());
@@ -170,10 +178,5 @@ class TokenTest {
         assertEquals(2, token.getMeta().size());
         assertEquals(META_VALUE, token.getMeta().get(META_KEY));
         assertEquals(META_VALUE_2, token.getMeta().get(META_KEY_2));
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(Token.class).verify();
     }
 }

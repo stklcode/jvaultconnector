@@ -16,8 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.7.0
  */
-class HealthResponseTest {
+class HealthResponseTest extends AbstractModelTest<HealthResponse> {
     private static final String CLUSTER_ID = "c9abceea-4f46-4dab-a688-5ce55f89e228";
     private static final String CLUSTER_NAME = "vault-cluster-5515c810";
     private static final String VERSION = "0.9.2";
@@ -53,6 +54,20 @@ class HealthResponseTest {
             "  \"performance_standby\": " + PERF_STANDBY + "\n" +
             "}";
 
+    HealthResponseTest() {
+        super(HealthResponse.class);
+    }
+
+    @Override
+    protected HealthResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(RES_JSON, HealthResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
+
     /**
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
@@ -73,10 +88,5 @@ class HealthResponseTest {
         assertEquals(PERF_STANDBY, res.isPerformanceStandby(), "Incorrect performance standby state");
         assertEquals(REPL_PERF_MODE, res.getReplicationPerfMode(), "Incorrect replication perf mode");
         assertEquals(REPL_DR_MODE, res.getReplicationDrMode(), "Incorrect replication DR mode");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(HealthResponse.class).verify();
     }
 }

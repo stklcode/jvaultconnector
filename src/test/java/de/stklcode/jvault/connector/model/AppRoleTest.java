@@ -18,7 +18,6 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.4.0
  */
-class AppRoleTest {
+class AppRoleTest extends AbstractModelTest<AppRole> {
     private static final String NAME = "TestRole";
     private static final String ID = "test-id";
     private static final Boolean BIND_SECRET_ID = true;
@@ -56,6 +55,31 @@ class AppRoleTest {
     private static final String JSON_MIN = "{\"role_name\":\"" + NAME + "\"}";
     private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"role_id\":\"%s\",\"bind_secret_id\":%s,\"secret_id_bound_cidrs\":\"%s\",\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"enable_local_secret_ids\":%s,\"token_ttl\":%d,\"token_max_ttl\":%d,\"token_policies\":\"%s\",\"token_bound_cidrs\":\"%s\",\"token_explicit_max_ttl\":%d,\"token_no_default_policy\":%s,\"token_num_uses\":%d,\"token_period\":%d,\"token_type\":\"%s\"}",
             NAME, ID, BIND_SECRET_ID, CIDR_1, SECRET_ID_NUM_USES, SECRET_ID_TTL, ENABLE_LOCAL_SECRET_IDS, TOKEN_TTL, TOKEN_MAX_TTL, POLICY, CIDR_1, TOKEN_EXPLICIT_MAX_TTL, TOKEN_NO_DEFAULT_POLICY, TOKEN_NUM_USES, TOKEN_PERIOD, TOKEN_TYPE.value());
+
+    AppRoleTest() {
+        super(AppRole.class);
+    }
+
+    @Override
+    protected AppRole createFull() {
+        return AppRole.builder(NAME)
+                .withId(ID)
+                .withBindSecretID(BIND_SECRET_ID)
+                .withSecretIdBoundCidrs(BOUND_CIDR_LIST)
+                .withTokenPolicies(POLICIES)
+                .withSecretIdNumUses(SECRET_ID_NUM_USES)
+                .withSecretIdTtl(SECRET_ID_TTL)
+                .withEnableLocalSecretIds(ENABLE_LOCAL_SECRET_IDS)
+                .withTokenTtl(TOKEN_TTL)
+                .withTokenMaxTtl(TOKEN_MAX_TTL)
+                .withTokenBoundCidrs(BOUND_CIDR_LIST)
+                .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
+                .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
+                .withTokenNumUses(TOKEN_NUM_USES)
+                .withTokenPeriod(TOKEN_PERIOD)
+                .withTokenType(TOKEN_TYPE)
+                .build();
+    }
 
     @BeforeAll
     static void init() {
@@ -94,23 +118,7 @@ class AppRoleTest {
      */
     @Test
     void buildFullTest() throws JsonProcessingException {
-        AppRole role = AppRole.builder(NAME)
-                .withId(ID)
-                .withBindSecretID(BIND_SECRET_ID)
-                .withSecretIdBoundCidrs(BOUND_CIDR_LIST)
-                .withTokenPolicies(POLICIES)
-                .withSecretIdNumUses(SECRET_ID_NUM_USES)
-                .withSecretIdTtl(SECRET_ID_TTL)
-                .withEnableLocalSecretIds(ENABLE_LOCAL_SECRET_IDS)
-                .withTokenTtl(TOKEN_TTL)
-                .withTokenMaxTtl(TOKEN_MAX_TTL)
-                .withTokenBoundCidrs(BOUND_CIDR_LIST)
-                .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
-                .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
-                .withTokenNumUses(TOKEN_NUM_USES)
-                .withTokenPeriod(TOKEN_PERIOD)
-                .withTokenType(TOKEN_TYPE)
-                .build();
+        AppRole role = createFull();
         assertEquals(NAME, role.getName());
         assertEquals(ID, role.getId());
         assertEquals(BIND_SECRET_ID, role.getBindSecretId());
@@ -172,10 +180,5 @@ class AppRoleTest {
                 .build();
         assertEquals(2, role.getTokenPolicies().size());
         assertTrue(role.getTokenPolicies().containsAll(List.of(POLICY, POLICY_2)));
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(AppRole.class).verify();
     }
 }

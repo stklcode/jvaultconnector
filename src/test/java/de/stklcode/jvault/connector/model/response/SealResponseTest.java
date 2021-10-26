@@ -16,8 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-class SealResponseTest {
+class SealResponseTest extends AbstractModelTest<SealResponse> {
     private static final String TYPE = "shamir";
     private static final Integer THRESHOLD = 3;
     private static final Integer SHARES = 5;
@@ -71,6 +72,20 @@ class SealResponseTest {
             "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
             "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
             "}";
+
+    SealResponseTest() {
+        super(SealResponse.class);
+    }
+
+    @Override
+    protected SealResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(RES_UNSEALED, SealResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
 
     /**
      * Test creation from JSON value as returned by Vault when sealed (JSON example close to Vault documentation).
@@ -118,10 +133,5 @@ class SealResponseTest {
         assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");
         assertEquals(RECOVERY_SEAL, res.getRecoverySeal(), "Incorrect recovery seal");
         assertEquals(STORAGE_TYPE, res.getStorageType(), "Incorrect storage type");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(SealResponse.class).verify();
     }
 }

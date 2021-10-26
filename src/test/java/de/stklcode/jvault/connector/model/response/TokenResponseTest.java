@@ -16,9 +16,10 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-class TokenResponseTest {
+class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     private static final Integer TOKEN_CREATION_TIME = 1457533232;
     private static final Integer TOKEN_TTL = 2764800;
     private static final Integer TOKEN_EXPLICIT_MAX_TTL = 0;
@@ -88,6 +89,20 @@ class TokenResponseTest {
             "  \"auth\": null\n" +
             "}";
 
+    TokenResponseTest() {
+        super(TokenResponse.class);
+    }
+
+    @Override
+    protected TokenResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(RES_JSON, TokenResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
+
     /**
      * Test getter, setter and get-methods for response data.
      */
@@ -134,10 +149,5 @@ class TokenResponseTest {
         assertEquals(TOKEN_RENEWABLE, data.isRenewable(), "Incorrect token renewable flag");
         assertEquals(RES_TTL, data.getTtl(), "Incorrect token TTL");
         assertEquals(TOKEN_TYPE, data.getType(), "Incorrect token type");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(TokenResponse.class).verify();
     }
 }

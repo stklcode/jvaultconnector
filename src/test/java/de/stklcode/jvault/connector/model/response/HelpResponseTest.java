@@ -16,8 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,10 +28,24 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Stefan Kalscheuer
  */
-class HelpResponseTest {
+class HelpResponseTest extends AbstractModelTest<HelpResponse> {
     private static final String HELP = "Help Text.";
 
     private static final String JSON = "{\"help\":\"" + HELP + "\"}";
+
+    HelpResponseTest() {
+        super(HelpResponse.class);
+    }
+
+    @Override
+    protected HelpResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(JSON, HelpResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
 
     /**
      * Test creation from JSON value as returned by Vault.
@@ -49,10 +64,5 @@ class HelpResponseTest {
                 assertDoesNotThrow(() -> om.writeValueAsString(res), "HelpResponse serialization failed"),
                 "Unexpected JSON string after serialization"
         );
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(HelpResponse.class).verify();
     }
 }

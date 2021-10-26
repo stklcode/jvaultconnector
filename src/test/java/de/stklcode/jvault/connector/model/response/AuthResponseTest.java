@@ -16,9 +16,10 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-class AuthResponseTest {
+class AuthResponseTest extends AbstractModelTest<AuthResponse> {
     private static final String AUTH_ACCESSOR = "2c84f488-2133-4ced-87b0-570f93a76830";
     private static final String AUTH_CLIENT_TOKEN = "ABCD";
     private static final String AUTH_POLICY_1 = "web";
@@ -68,15 +69,18 @@ class AuthResponseTest {
             "  }\n" +
             "}";
 
-    /**
-     * Test getter, setter and get-methods for response data.
-     */
-    @Test
-    void getDataRoundtrip() {
-        // Create empty Object.
-        AuthResponse res = new AuthResponse();
-        // TODO
-//        assertNull(res.getData(), "Initial data should be empty");
+    AuthResponseTest() {
+        super(AuthResponse.class);
+    }
+
+    @Override
+    protected AuthResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(RES_JSON, AuthResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
     }
 
     /**
@@ -104,10 +108,5 @@ class AuthResponseTest {
         assertEquals(2, data.getTokenPolicies().size(), "Incorrect number of token policies");
         assertTrue(data.getTokenPolicies().containsAll(Set.of(AUTH_POLICY_2, AUTH_POLICY_1)), "Incorrect token policies");
         assertEquals(Map.of(AUTH_META_KEY, AUTH_META_VALUE), data.getMetadata(), "Incorrect auth metadata");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(AuthResponse.class).verify();
     }
 }

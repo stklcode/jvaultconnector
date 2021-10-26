@@ -16,8 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,12 +26,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * JUnit Test for {@link SecretResponse} model.
+ * JUnit Test for {@link MetaSecretResponse} model.
  *
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-class SecretResponseTest {
+class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
     private static final String SECRET_REQUEST_ID = "68315073-6658-e3ff-2da7-67939fb91bbd";
     private static final String SECRET_LEASE_ID = "";
     private static final Integer SECRET_LEASE_DURATION = 2764800;
@@ -42,17 +43,6 @@ class SecretResponseTest {
     private static final String SECRET_META_CREATED = "2018-03-22T02:24:06.945319214Z";
     private static final String SECRET_META_DELETED = "2018-03-23T03:25:07.056420325Z";
     private static final List<String> SECRET_WARNINGS = null;
-    private static final String SECRET_JSON = "{\n" +
-            "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
-            "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
-            "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
-            "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
-            "    \"data\": {\n" +
-            "        \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
-            "        \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
-            "    },\n" +
-            "    \"warnings\": " + SECRET_WARNINGS + "\n" +
-            "}";
     private static final String SECRET_JSON_V2 = "{\n" +
             "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
             "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
@@ -92,19 +82,27 @@ class SecretResponseTest {
             "    \"warnings\": " + SECRET_WARNINGS + "\n" +
             "}";
 
+    MetaSecretResponseTest() {
+        super(MetaSecretResponse.class);
+    }
+
+    @Override
+    protected MetaSecretResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(SECRET_JSON_V2, MetaSecretResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
+
     /**
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
     @Test
     void jsonRoundtrip() {
-        SecretResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(SECRET_JSON, PlainSecretResponse.class),
-                "SecretResponse deserialization failed"
-        );
-        assertSecretData(res);
-
         // KV v2 secret.
-        res = assertDoesNotThrow(
+        MetaSecretResponse res = assertDoesNotThrow(
                 () -> new ObjectMapper().readValue(SECRET_JSON_V2, MetaSecretResponse.class),
                 "SecretResponse deserialization failed"
         );
@@ -130,13 +128,6 @@ class SecretResponseTest {
         assertNotNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
         assertTrue(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
         assertEquals(2, res.getMetadata().getVersion(), "Incorrect secret version");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(SecretResponse.class).verify();
-        EqualsVerifier.simple().forClass(PlainSecretResponse.class).verify();
-        EqualsVerifier.simple().forClass(MetaSecretResponse.class).verify();
     }
 
     private void assertSecretData(SecretResponse res) {

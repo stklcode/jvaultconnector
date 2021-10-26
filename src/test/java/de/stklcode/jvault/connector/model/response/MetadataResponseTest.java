@@ -16,8 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-class MetadataResponseTest {
+class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
     private static final String V1_TIME = "2018-03-22T02:24:06.945319214Z";
     private static final String V3_TIME = "2018-03-22T02:36:43.986212308Z";
     private static final String V2_TIME = "2018-03-22T02:36:33.954880664Z";
@@ -63,6 +64,20 @@ class MetadataResponseTest {
             "  }\n" +
             "}";
 
+    MetadataResponseTest() {
+        super(MetadataResponse.class);
+    }
+
+    @Override
+    protected MetadataResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(META_JSON, MetadataResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
+
     /**
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
      */
@@ -88,10 +103,5 @@ class MetadataResponseTest {
         assertEquals(V2_TIME, res.getMetadata().getVersions().get(2).getCreatedTimeString(), "Incorrect version 2 created time");
         assertNotNull(res.getMetadata().getVersions().get(2).getCreatedTime(), "Parsing version created failed");
         assertFalse(res.getMetadata().getVersions().get(3).isDestroyed(), "Incorrect version 3 destroyed state");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(MetadataResponse.class).verify();
     }
 }

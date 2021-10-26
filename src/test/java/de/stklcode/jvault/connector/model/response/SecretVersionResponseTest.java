@@ -16,8 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-class SecretVersionResponseTest {
+class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse> {
     private static final String CREATION_TIME = "2018-03-22T02:24:06.945319214Z";
     private static final String DELETION_TIME = "2018-03-22T02:36:43.986212308Z";
     private static final Integer VERSION = 42;
@@ -41,6 +42,20 @@ class SecretVersionResponseTest {
             "    \"version\": " + VERSION + "\n" +
             "  }\n" +
             "}";
+
+    SecretVersionResponseTest() {
+        super(SecretVersionResponse.class);
+    }
+
+    @Override
+    protected SecretVersionResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(META_JSON, SecretVersionResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
 
     /**
      * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
@@ -57,10 +72,5 @@ class SecretVersionResponseTest {
         assertEquals(DELETION_TIME, res.getMetadata().getDeletionTimeString(), "Incorrect deletion time");
         assertFalse(res.getMetadata().isDestroyed(), "Incorrect destroyed state");
         assertEquals(VERSION, res.getMetadata().getVersion(), "Incorrect version");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(SecretVersionResponse.class).verify();
     }
 }

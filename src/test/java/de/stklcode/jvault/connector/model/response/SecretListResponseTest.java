@@ -16,14 +16,14 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit Test for {@link SecretListResponse} model.
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Stefan Kalscheuer
  * @since 0.8
  */
-class SecretListResponseTest {
+class SecretListResponseTest extends AbstractModelTest<SecretListResponse> {
     private static final String KEY1 = "key1";
     private static final String KEY2 = "key-2";
     private static final String JSON = "{\n" +
@@ -47,6 +47,20 @@ class SecretListResponseTest {
             "  \"renewable\": false\n" +
             "}";
 
+    SecretListResponseTest() {
+        super(SecretListResponse.class);
+    }
+
+    @Override
+    protected SecretListResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(JSON, SecretListResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
+
     /**
      * Test JSON deserialization and key getter.
      */
@@ -58,10 +72,5 @@ class SecretListResponseTest {
         );
 
         assertEquals(List.of(KEY1, KEY2), res.getKeys(), "Unexpected secret keys");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(SecretListResponse.class).verify();
     }
 }

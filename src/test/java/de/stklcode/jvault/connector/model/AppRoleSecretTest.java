@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -34,13 +33,22 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Stefan Kalscheuer
  * @since 0.5.0
  */
-class AppRoleSecretTest {
+class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
     private static final String TEST_ID = "abc123";
     private static final Map<String, Object> TEST_META = Map.of(
             "foo", "bar",
             "number", 1337
     );
     private static final List<String> TEST_CIDR = List.of("203.0.113.0/24", "198.51.100.0/24");
+
+    AppRoleSecretTest() {
+        super(AppRoleSecret.class);
+    }
+
+    @Override
+    protected AppRoleSecret createFull() {
+        return new AppRoleSecret(TEST_ID, TEST_META, TEST_CIDR);
+    }
 
     /**
      * Test constructors.
@@ -164,11 +172,6 @@ class AppRoleSecretTest {
         assertEquals("TEST_LASTUPDATE", secret2.getLastUpdatedTime());
         assertEquals(678, secret2.getNumUses());
         assertEquals(12345, secret2.getTtl());
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(AppRoleSecret.class).verify();
     }
 
     private static void setPrivateField(Object object, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {

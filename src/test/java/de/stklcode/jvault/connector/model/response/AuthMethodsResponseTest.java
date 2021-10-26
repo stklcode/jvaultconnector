@@ -16,14 +16,13 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.6.2
  */
-class AuthMethodsResponseTest {
+class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     private static final String GH_PATH = "github/";
     private static final String GH_TYPE = "github";
     private static final String GH_DESCR = "GitHub auth";
@@ -62,6 +61,20 @@ class AuthMethodsResponseTest {
             "    }\n" +
             "  }\n" +
             "}";
+
+    AuthMethodsResponseTest() {
+        super(AuthMethodsResponse.class);
+    }
+
+    @Override
+    protected AuthMethodsResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(RES_JSON, AuthMethodsResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
 
     /**
      * Test getter, setter and get-methods for response data.
@@ -105,14 +118,5 @@ class AuthMethodsResponseTest {
         assertEquals(2, method.getConfig().size(), "Unexpected config size for Token");
         assertEquals(TK_LEASE_TTL.toString(), method.getConfig().get("default_lease_ttl"), "Incorrect lease TTL config");
         assertEquals(TK_MAX_LEASE_TTL.toString(), method.getConfig().get("max_lease_ttl"), "Incorrect max lease TTL config");
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(AuthMethodsResponse.class).verify();
-    }
-
-    private static class Dummy implements Serializable {
-        private static final long serialVersionUID = 9075949348402246139L;
     }
 }

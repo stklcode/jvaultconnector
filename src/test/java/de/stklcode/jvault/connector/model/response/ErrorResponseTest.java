@@ -16,8 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,12 +30,26 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Stefan Kalscheuer
  */
-class ErrorResponseTest {
+class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
     private static final String ERROR_1 = "Error #1";
     private static final String ERROR_2 = "Error #2";
 
     private static final String JSON = "{\"errors\":[\"" + ERROR_1 + "\",\"" + ERROR_2 + "\"]}";
     private static final String JSON_EMPTY = "{\"errors\":[]}";
+
+    ErrorResponseTest() {
+        super(ErrorResponse.class);
+    }
+
+    @Override
+    protected ErrorResponse createFull() {
+        try {
+            return new ObjectMapper().readValue(JSON, ErrorResponse.class);
+        } catch (JsonProcessingException e) {
+            fail("Creation of full model instance failed", e);
+            return null;
+        }
+    }
 
     /**
      * Test creation from JSON value as returned by Vault.
@@ -71,10 +86,5 @@ class ErrorResponseTest {
         assertEquals("error response", res.toString());
 
         assertEquals("error response", new ErrorResponse().toString());
-    }
-
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(ErrorResponse.class).verify();
     }
 }
