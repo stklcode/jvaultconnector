@@ -3,6 +3,8 @@
 ### Fix
 * Make `HTTPVaultConnectorBuilder#withPort(Integer)` null-safe (#56)
 
+### Test
+* Tested against Vault 1.9.0
 
 ## 1.0.0 (2021-10-02)
 
