@@ -48,8 +48,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Stefan Kalscheuer
  * @since 0.1
  */
-@Tag("online")
-class HTTPVaultConnectorTest {
+class HTTPVaultConnectorIT {
     private static String VAULT_VERSION = "1.9.0";  // The vault version this test is supposed to run against.
     private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
     private static final String KEY2 = "O5OHwDleY3IiPdgw61cgHlhsrEm6tVJkrxhF6QAnILd1";

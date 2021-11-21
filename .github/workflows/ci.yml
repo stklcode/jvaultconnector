@@ -21,6 +21,8 @@ jobs:
         with:
           java-version: ${{ matrix.jdk }}
           distribution: 'temurin'
+      - name: Compile
+        run: mvn -B clean compile
       - name: Set up Vault
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
         run: |
@@ -29,14 +31,14 @@ jobs:
           unzip "vault_${{ matrix.vault }}_linux_amd64.zip"
           rm "vault_${{ matrix.vault }}_linux_amd64.zip"
           sudo mv vault /usr/bin/vault
-      - name: Test
+      - name: Test (Unit & Integration)
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
         env:
           VAULT_VERSION: ${{ matrix.vault }}
-        run: mvn -B -P coverage clean verify
-      - name: Test (offline)
+        run: mvn -B -P coverage -P integration-test verify
+      - name: Test (Unit)
         if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release/')
-        run: mvn -B -P offline-tests -P coverage clean verify
+        run: mvn -B -P coverage verify
       - name: Analysis
         if: matrix.analysis && github.event_name == 'push'
         run: >

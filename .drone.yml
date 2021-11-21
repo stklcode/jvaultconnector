@@ -16,7 +16,7 @@ steps:
   - name: unit-tests
     image: maven:3-jdk-11
     commands:
-      - mvn -B resources:testResources compiler:testCompile surefire:test -P offline-tests
+      - mvn -B test
     when:
       branch:
         - develop
@@ -32,7 +32,7 @@ steps:
       - unzip vault_1.9.0_linux_amd64.zip
       - rm vault_1.9.0_linux_amd64.zip
       - mv vault /bin/
-      - mvn -B resources:testResources compiler:testCompile surefire:test
+      - mvn -B -P integration-test verify
     when:
       branch:
         - main
