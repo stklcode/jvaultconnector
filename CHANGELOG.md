@@ -1,4 +1,4 @@
-## UNRELEASED
+## 1.0.1 (2021-11-21)
 
 ### Fix
 * Make `HTTPVaultConnectorBuilder#withPort(Integer)` null-safe (#56)
