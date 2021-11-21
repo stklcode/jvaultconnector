@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.7.0
  */
-class HTTPVaultConnectorOfflineTest {
+class HTTPVaultConnectorTest {
     private static WireMockServer wireMock;
 
     @BeforeAll
