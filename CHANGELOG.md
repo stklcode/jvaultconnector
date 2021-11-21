@@ -2,6 +2,7 @@
 
 ### Fix
 * Make `HTTPVaultConnectorBuilder#withPort(Integer)` null-safe (#56)
+* Make system-lambda dependency test-only (#58)
 
 ### Test
 * Tested against Vault 1.9.0
