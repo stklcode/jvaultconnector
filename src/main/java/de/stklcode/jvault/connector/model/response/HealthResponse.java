@@ -48,7 +48,7 @@ public final class HealthResponse implements VaultResponse {
     @JsonProperty("initialized")
     private Boolean initialized;
 
-    @JsonProperty("replication_perf_mode")
+    @JsonProperty("replication_performance_mode")
     private String replicationPerfMode;
 
     @JsonProperty("replication_dr_mode")

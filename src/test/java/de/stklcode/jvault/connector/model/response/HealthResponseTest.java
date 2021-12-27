@@ -47,7 +47,7 @@ class HealthResponseTest {
             "  \"standby\": " + STANDBY + ",\n" +
             "  \"sealed\": " + SEALED + ",\n" +
             "  \"initialized\": " + INITIALIZED + ",\n" +
-            "  \"replication_perf_mode\": \"" + REPL_PERF_MODE + "\",\n" +
+            "  \"replication_performance_mode\": \"" + REPL_PERF_MODE + "\",\n" +
             "  \"replication_dr_mode\": \"" + REPL_DR_MODE + "\",\n" +
             "  \"performance_standby\": " + PERF_STANDBY + "\n" +
             "}";

@@ -1,3 +1,12 @@
+## UNRELEASED
+
+### Fix
+* Use `replication_performance_mode`  instead of `replication_perf_mode` in health response.
+
+### Test
+* Tested against Vault 1.9.2
+
+
 ## 1.0.1 (2021-11-21)
 
 ### Fix
