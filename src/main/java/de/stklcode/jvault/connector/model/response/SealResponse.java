@@ -57,6 +57,15 @@ public final class SealResponse implements VaultResponse {
     @JsonProperty("cluster_id")
     private String clusterId;
 
+    @JsonProperty("migration")
+    private Boolean migration;
+
+    @JsonProperty("recovery_seal")
+    private Boolean recoverySeal;
+
+    @JsonProperty("storage_type")
+    private String storageType;
+
     /**
      * @return Seal type.
      * @since 0.8
@@ -131,5 +140,29 @@ public final class SealResponse implements VaultResponse {
      */
     public String getClusterId() {
         return clusterId;
+    }
+
+    /**
+     * @return Migration status (since Vault 1.4)
+     * @since 1.1
+     */
+    public Boolean getMigration() {
+        return migration;
+    }
+
+    /**
+     * @return Recovery seal status.
+     * @since 1.1
+     */
+    public Boolean getRecoverySeal() {
+        return recoverySeal;
+    }
+
+    /**
+     * @return Storage type (since Vault 1.3).
+     * @since 1.1
+     */
+    public String getStorageType() {
+        return storageType;
     }
 }

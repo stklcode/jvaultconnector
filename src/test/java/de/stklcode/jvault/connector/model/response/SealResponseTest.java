@@ -33,10 +33,13 @@ class SealResponseTest {
     private static final Integer SHARES = 5;
     private static final Integer PROGRESS_SEALED = 2;
     private static final Integer PROGRESS_UNSEALED = 0;
-    private static final String VERSION = "0.11.2";
+    private static final String VERSION = "1.8.2";
     private static final String CLUSTER_NAME = "vault-cluster-d6ec3c7f";
     private static final String CLUSTER_ID = "3e8b3fec-3749-e056-ba41-b62a63b997e8";
     private static final String NONCE = "ef05d55d-4d2c-c594-a5e8-55bc88604c24";
+    private static final Boolean MIGRATION = false;
+    private static final Boolean RECOVERY_SEAL = false;
+    private static final String STORAGE_TYPE = "file";
 
     private static final String RES_SEALED = "{\n" +
             "  \"type\": \"" + TYPE + "\",\n" +
@@ -46,7 +49,10 @@ class SealResponseTest {
             "  \"n\": " + SHARES + ",\n" +
             "  \"progress\": " + PROGRESS_SEALED + ",\n" +
             "  \"nonce\": \"\",\n" +
-            "  \"version\": \"" + VERSION + "\"\n" +
+            "  \"version\": \"" + VERSION + "\",\n" +
+            "  \"migration\": \"" + MIGRATION + "\",\n" +
+            "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
+            "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
             "}";
 
     private static final String RES_UNSEALED = "{\n" +
@@ -59,7 +65,10 @@ class SealResponseTest {
             "  \"version\": \"" + VERSION + "\",\n" +
             "  \"cluster_name\": \"" + CLUSTER_NAME + "\",\n" +
             "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
-            "  \"nonce\": \"" + NONCE + "\"\n" +
+            "  \"nonce\": \"" + NONCE + "\",\n" +
+            "  \"migration\": \"" + MIGRATION + "\",\n" +
+            "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
+            "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
             "}";
 
     /**
@@ -81,6 +90,9 @@ class SealResponseTest {
         assertEquals(PROGRESS_SEALED, res.getProgress(), "Incorrect progress");
         assertEquals("", res.getNonce(), "Nonce not empty");
         assertEquals(VERSION, res.getVersion(), "Incorrect version");
+        assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");
+        assertEquals(RECOVERY_SEAL, res.getRecoverySeal(), "Incorrect recovery seal");
+        assertEquals(STORAGE_TYPE, res.getStorageType(), "Incorrect storage type");
         // And the fields, that should not be filled.
         assertNull(res.getClusterName(), "Cluster name should not be populated");
         assertNull(res.getClusterId(), "Cluster ID should not be populated");
@@ -102,5 +114,8 @@ class SealResponseTest {
         assertEquals(VERSION, res.getVersion(), "Incorrect version");
         assertEquals(CLUSTER_NAME, res.getClusterName(), "Incorrect cluster name");
         assertEquals(CLUSTER_ID, res.getClusterId(), "Incorrect cluster ID");
+        assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");
+        assertEquals(RECOVERY_SEAL, res.getRecoverySeal(), "Incorrect recovery seal");
+        assertEquals(STORAGE_TYPE, res.getStorageType(), "Incorrect storage type");
     }
 }

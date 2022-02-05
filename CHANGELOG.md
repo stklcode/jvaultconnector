@@ -3,6 +3,9 @@
 ### Fix
 * Use `replication_performance_mode`  instead of `replication_perf_mode` in health response.
 
+### Improvements
+* Add `migration`, `recovery_seal` and `storage_type` fields to `SealReponse` model
+
 ### Test
 * Tested against Vault 1.9.2
 
