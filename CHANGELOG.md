@@ -7,7 +7,7 @@
 * Add `migration`, `recovery_seal` and `storage_type` fields to `SealReponse` model
 
 ### Test
-* Tested against Vault 1.9.2
+* Tested against Vault 1.9.4
 
 
 ## 1.0.1 (2021-11-21)
