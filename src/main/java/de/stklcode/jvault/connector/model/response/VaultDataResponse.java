@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
+import de.stklcode.jvault.connector.model.response.embedded.WrapInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,9 @@ public abstract class VaultDataResponse implements VaultResponse {
 
     @JsonProperty("warnings")
     private List<String> warnings;
+
+    @JsonProperty("wrap_info")
+    private WrapInfo wrapInfo;
 
     /**
      * Set data. To be implemented in the specific subclasses, as data can be of arbitrary structure.
@@ -76,5 +80,13 @@ public abstract class VaultDataResponse implements VaultResponse {
      */
     public final List<String> getWarnings() {
         return warnings;
+    }
+
+    /**
+     * @return Wrapping information
+     * @since 1.1
+     */
+    public final WrapInfo getWrapInfo() {
+        return wrapInfo;
     }
 }

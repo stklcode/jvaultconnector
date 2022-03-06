@@ -5,6 +5,7 @@
 
 ### Improvements
 * Add `migration`, `recovery_seal` and `storage_type` fields to `SealReponse` model
+* Add support for `wrap_info` in data response models
 
 ### Test
 * Tested against Vault 1.9.4
