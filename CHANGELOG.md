@@ -8,7 +8,7 @@
 * Add support for `wrap_info` in data response models
 
 ### Test
-* Tested against Vault 1.9.4
+* Tested against Vault 1.10.0
 
 
 ## 1.0.1 (2021-11-21)

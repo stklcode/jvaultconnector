@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @since 0.1
  */
 class HTTPVaultConnectorIT {
-    private static String VAULT_VERSION = "1.9.4";  // The vault version this test is supposed to run against.
+    private static String VAULT_VERSION = "1.10.0";  // The vault version this test is supposed to run against.
     private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
     private static final String KEY2 = "O5OHwDleY3IiPdgw61cgHlhsrEm6tVJkrxhF6QAnILd1";
     private static final String KEY3 = "mw7Bm3nbt/UWa/juDjjL2EPQ04kiJ0saC5JEXwJvXYsB";
@@ -952,7 +952,11 @@ class HTTPVaultConnectorIT {
                     .withType(Token.Type.BATCH)
                     .build();
             res = assertDoesNotThrow(() -> connector.createToken(token4), "Token creation failed");
-            assertTrue(res.getAuth().getClientToken().startsWith("b"), "Unexpected token prefix");
+            assertTrue(
+                    // Expecting batch token. "hvb." Prefix as of Vault 1.10, "b." before.
+                    res.getAuth().getClientToken().startsWith("b.") || res.getAuth().getClientToken().startsWith("hvb."),
+                    "Unexpected token prefix"
+            );
             assertEquals(1, res.getAuth().getPolicies().size(), "Invalid number of policies returned");
             assertTrue(res.getAuth().getPolicies().contains("batchpolicy"), "Custom policy policy not set");
             assertFalse(res.getAuth().isRenewable(), "Token should not be renewable");
