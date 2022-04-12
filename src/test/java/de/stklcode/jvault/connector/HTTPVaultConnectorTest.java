@@ -16,16 +16,14 @@
 
 package de.stklcode.jvault.connector;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.function.Executable;
 
 import java.io.IOException;
@@ -40,6 +38,7 @@ import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -50,21 +49,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.7.0
  */
 class HTTPVaultConnectorTest {
-    private static WireMockServer wireMock;
-
-    @BeforeAll
-    static void prepare() {
-        // Initialize HTTP mock.
-        wireMock = new WireMockServer(WireMockConfiguration.options().dynamicPort());
-        wireMock.start();
-        WireMock.configureFor("localhost", wireMock.port());
-    }
-
-    @AfterAll
-    static void tearDown() {
-        wireMock.stop();
-        wireMock = null;
-    }
+    @RegisterExtension
+    static WireMockExtension wireMock = WireMockExtension.newInstance()
+            .options(wireMockConfig().dynamicPort())
+            .build();
 
     /**
      * Test exceptions thrown during request.
@@ -108,7 +96,7 @@ class HTTPVaultConnectorTest {
         // Now simulate a failing request that succeeds on second try.
         connector = HTTPVaultConnector.builder(wireMock.url("/")).withNumberOfRetries(1).withTimeout(250).build();
 
-        WireMock.stubFor(
+        wireMock.stubFor(
                 WireMock.any(anyUrl())
                         .willReturn(aResponse().withStatus(500))
                         .willReturn(aResponse().withStatus(500))
@@ -334,7 +322,7 @@ class HTTPVaultConnectorTest {
     }
 
     private void mockHttpResponse(int status, String body, String contentType) {
-        WireMock.stubFor(
+        wireMock.stubFor(
                 WireMock.any(anyUrl()).willReturn(
                         aResponse().withStatus(status).withBody(body).withHeader("Content-Type", contentType)
                 )
