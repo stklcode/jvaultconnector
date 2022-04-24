@@ -11,6 +11,7 @@
 * Split `SercretResponse`  into `PlainSecretResponse` and `MetaSecretResponse` subclasses (common API unchanged)
 * Add missing fields to `AuthMethod` model
 * Add support for (dis)allowed policy glob patterns in `TokenRole`
+* Add request ID to data response models
 
 ### Test
 * Tested against Vault 1.10.1

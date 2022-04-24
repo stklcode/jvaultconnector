@@ -78,6 +78,7 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
         );
 
         assertNotNull(res, "Parsed response is NULL");
+        assertEquals(SECRET_REQUEST_ID, res.getRequestId(), "Incorrect request ID");
         assertEquals(SECRET_LEASE_ID, res.getLeaseId(), "Incorrect lease ID");
         assertEquals(SECRET_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
         assertEquals(SECRET_RENEWABLE, res.isRenewable(), "Incorrect renewable status");

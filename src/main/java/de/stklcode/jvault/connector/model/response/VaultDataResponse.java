@@ -29,7 +29,10 @@ import java.util.Objects;
  * @since 0.1
  */
 public abstract class VaultDataResponse implements VaultResponse {
-    private static final long serialVersionUID = 2507925101227179499L;
+    private static final long serialVersionUID = 7486270767477652184L;
+
+    @JsonProperty("request_id")
+    private String requestId;
 
     @JsonProperty("lease_id")
     private String leaseId;
@@ -45,6 +48,14 @@ public abstract class VaultDataResponse implements VaultResponse {
 
     @JsonProperty("wrap_info")
     private WrapInfo wrapInfo;
+
+    /**
+     * @return Request ID
+     * @since 1.1
+     */
+    public final String getRequestId() {
+        return requestId;
+    }
 
     /**
      * @return Lease ID
@@ -91,6 +102,7 @@ public abstract class VaultDataResponse implements VaultResponse {
         }
         VaultDataResponse that = (VaultDataResponse) o;
         return renewable == that.renewable &&
+                Objects.equals(requestId, that.requestId) &&
                 Objects.equals(leaseId, that.leaseId) &&
                 Objects.equals(leaseDuration, that.leaseDuration) &&
                 Objects.equals(warnings, that.warnings) &&
@@ -99,6 +111,6 @@ public abstract class VaultDataResponse implements VaultResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(leaseId, renewable, leaseDuration, warnings, wrapInfo);
+        return Objects.hash(requestId, leaseId, renewable, leaseDuration, warnings, wrapInfo);
     }
 }
