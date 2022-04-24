@@ -37,10 +37,18 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     private static final String ALLOWED_POLICY_2 = "apol-2";
     private static final String ALLOWED_POLICY_3 = "apol-3";
     private static final List<String> ALLOWED_POLICIES = Arrays.asList(ALLOWED_POLICY_1, ALLOWED_POLICY_2);
+    private static final String ALLOWED_POLICY_GLOB_1 = "apol-g1*";
+    private static final String ALLOWED_POLICY_GLOB_2 = "apol-g2*";
+    private static final String ALLOWED_POLICY_GLOB_3 = "apol-g3*";
+    private static final List<String> ALLOWED_POLICIES_GLOB = Arrays.asList(ALLOWED_POLICY_GLOB_2, ALLOWED_POLICY_GLOB_3);
     private static final String DISALLOWED_POLICY_1 = "dpol-1";
     private static final String DISALLOWED_POLICY_2 = "dpol-2";
     private static final String DISALLOWED_POLICY_3 = "dpol-3";
     private static final List<String> DISALLOWED_POLICIES = Arrays.asList(DISALLOWED_POLICY_2, DISALLOWED_POLICY_3);
+    private static final String DISALLOWED_POLICY_GLOB_1 = "dpol-g1*";
+    private static final String DISALLOWED_POLICY_GLOB_2 = "dpol-g2*";
+    private static final String DISALLOWED_POLICY_GLOB_3 = "dpol-g3*";
+    private static final List<String> DISALLOWED_POLICIES_GLOB = Arrays.asList(DISALLOWED_POLICY_GLOB_1, DISALLOWED_POLICY_GLOB_2);
     private static final Boolean ORPHAN = false;
     private static final Boolean RENEWABLE = true;
     private static final String PATH_SUFFIX = "ps";
@@ -61,7 +69,9 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     private static final String JSON_FULL = "{" +
             "\"name\":\"" + NAME + "\"," +
             "\"allowed_policies\":[\"" + ALLOWED_POLICY_1 + "\",\"" + ALLOWED_POLICY_2 + "\",\"" + ALLOWED_POLICY_3 + "\"]," +
+            "\"allowed_policies_glob\":[\"" + ALLOWED_POLICY_GLOB_1 + "\",\"" + ALLOWED_POLICY_GLOB_2 + "\",\"" + ALLOWED_POLICY_GLOB_3 + "\"]," +
             "\"disallowed_policies\":[\"" + DISALLOWED_POLICY_1 + "\",\"" + DISALLOWED_POLICY_2 + "\",\"" + DISALLOWED_POLICY_3 + "\"]," +
+            "\"disallowed_policies_glob\":[\"" + DISALLOWED_POLICY_GLOB_1 + "\",\"" + DISALLOWED_POLICY_GLOB_2 + "\",\"" + DISALLOWED_POLICY_GLOB_3 + "\"]," +
             "\"orphan\":" + ORPHAN + "," +
             "\"renewable\":" + RENEWABLE + "," +
             "\"path_suffix\":\"" + PATH_SUFFIX + "\"," +
@@ -83,8 +93,12 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
                 .forName(NAME)
                 .withAllowedPolicies(ALLOWED_POLICIES)
                 .withAllowedPolicy(ALLOWED_POLICY_3)
+                .withAllowedPolicyGlob(ALLOWED_POLICY_GLOB_1)
+                .withAllowedPoliciesGlob(ALLOWED_POLICIES_GLOB)
                 .withDisallowedPolicy(DISALLOWED_POLICY_1)
                 .withDisallowedPolicies(DISALLOWED_POLICIES)
+                .withDisallowedPoliciesGlob(DISALLOWED_POLICIES_GLOB)
+                .withDisallowedPolicyGlob(DISALLOWED_POLICY_GLOB_3)
                 .orphan(ORPHAN)
                 .renewable(RENEWABLE)
                 .withPathSuffix(PATH_SUFFIX)
@@ -175,8 +189,12 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
         assertEquals(NAME, role.getName());
         assertEquals(ALLOWED_POLICIES.size() + 1, role.getAllowedPolicies().size());
         assertTrue(role.getAllowedPolicies().containsAll(List.of(ALLOWED_POLICY_1, ALLOWED_POLICY_2, ALLOWED_POLICY_3)));
+        assertEquals(ALLOWED_POLICIES_GLOB.size() + 1, role.getAllowedPoliciesGlob().size());
+        assertTrue(role.getAllowedPoliciesGlob().containsAll(List.of(ALLOWED_POLICY_GLOB_1, ALLOWED_POLICY_GLOB_2, ALLOWED_POLICY_GLOB_3)));
         assertEquals(DISALLOWED_POLICIES.size() + 1, role.getDisallowedPolicies().size());
         assertTrue(role.getDisallowedPolicies().containsAll(List.of(DISALLOWED_POLICY_1, DISALLOWED_POLICY_2, DISALLOWED_POLICY_3)));
+        assertEquals(DISALLOWED_POLICIES_GLOB.size() + 1, role.getDisallowedPoliciesGlob().size());
+        assertTrue(role.getDisallowedPoliciesGlob().containsAll(List.of(DISALLOWED_POLICY_GLOB_1, DISALLOWED_POLICY_GLOB_2, DISALLOWED_POLICY_GLOB_3)));
         assertEquals(ORPHAN, role.getOrphan());
         assertEquals(RENEWABLE, role.getRenewable());
         assertEquals(PATH_SUFFIX, role.getPathSuffix());

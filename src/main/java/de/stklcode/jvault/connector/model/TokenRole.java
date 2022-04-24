@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenRole implements Serializable {
-    private static final long serialVersionUID = -6159563751115867561L;
+    private static final long serialVersionUID = -3505215215838576321L;
 
     /**
      * Get {@link Builder} instance.
@@ -53,9 +53,17 @@ public final class TokenRole implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> allowedPolicies;
 
+    @JsonProperty("allowed_policies_glob")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<String> allowedPoliciesGlob;
+
     @JsonProperty("disallowed_policies")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> disallowedPolicies;
+
+    @JsonProperty("disallowed_policies_glob")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<String> disallowedPoliciesGlob;
 
     @JsonProperty("orphan")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -106,7 +114,9 @@ public final class TokenRole implements Serializable {
     public TokenRole(final Builder builder) {
         this.name = builder.name;
         this.allowedPolicies = builder.allowedPolicies;
+        this.allowedPoliciesGlob = builder.allowedPoliciesGlob;
         this.disallowedPolicies = builder.disallowedPolicies;
+        this.disallowedPoliciesGlob = builder.disallowedPoliciesGlob;
         this.orphan = builder.orphan;
         this.renewable = builder.renewable;
         this.pathSuffix = builder.pathSuffix;
@@ -134,10 +144,26 @@ public final class TokenRole implements Serializable {
     }
 
     /**
+     * @return List of allowed policy glob patterns
+     * @since 1.1
+     */
+    public List<String> getAllowedPoliciesGlob() {
+        return allowedPoliciesGlob;
+    }
+
+    /**
      * @return List of disallowed policies
      */
     public List<String> getDisallowedPolicies() {
         return disallowedPolicies;
+    }
+
+    /**
+     * @return List of disallowed policy glob patterns
+     * @since 1.1
+     */
+    public List<String> getDisallowedPoliciesGlob() {
+        return disallowedPoliciesGlob;
     }
 
     /**
@@ -220,7 +246,9 @@ public final class TokenRole implements Serializable {
         TokenRole tokenRole = (TokenRole) o;
         return Objects.equals(name, tokenRole.name) &&
                 Objects.equals(allowedPolicies, tokenRole.allowedPolicies) &&
+                Objects.equals(allowedPoliciesGlob, tokenRole.allowedPoliciesGlob) &&
                 Objects.equals(disallowedPolicies, tokenRole.disallowedPolicies) &&
+                Objects.equals(disallowedPoliciesGlob, tokenRole.disallowedPoliciesGlob) &&
                 Objects.equals(orphan, tokenRole.orphan) &&
                 Objects.equals(renewable, tokenRole.renewable) &&
                 Objects.equals(pathSuffix, tokenRole.pathSuffix) &&
@@ -235,9 +263,9 @@ public final class TokenRole implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, allowedPolicies, disallowedPolicies, orphan, renewable, pathSuffix,
-                allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl, tokenNoDefaultPolicy, tokenNumUses,
-                tokenPeriod, tokenType);
+        return Objects.hash(name, allowedPolicies, allowedPoliciesGlob, disallowedPolicies, disallowedPoliciesGlob,
+                orphan, renewable,  pathSuffix, allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl,
+                tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
     }
 
     /**
@@ -249,7 +277,9 @@ public final class TokenRole implements Serializable {
     public static final class Builder {
         private String name;
         private List<String> allowedPolicies;
+        private List<String> allowedPoliciesGlob;
         private List<String> disallowedPolicies;
+        private List<String> disallowedPoliciesGlob;
         private Boolean orphan;
         private Boolean renewable;
         private String pathSuffix;
@@ -305,6 +335,40 @@ public final class TokenRole implements Serializable {
         }
 
         /**
+         * Add an allowed policy glob pattern.
+         *
+         * @param allowedPolicyGlob allowed policy glob pattern to add
+         * @return self
+         * @since 1.1
+         */
+        public Builder withAllowedPolicyGlob(final String allowedPolicyGlob) {
+            if (allowedPolicyGlob != null) {
+                if (this.allowedPoliciesGlob == null) {
+                    this.allowedPoliciesGlob = new ArrayList<>();
+                }
+                this.allowedPoliciesGlob.add(allowedPolicyGlob);
+            }
+            return this;
+        }
+
+        /**
+         * Add allowed policy glob patterns.
+         *
+         * @param allowedPoliciesGlob list of allowed policy glob patterns
+         * @return self
+         * @since 1.1
+         */
+        public Builder withAllowedPoliciesGlob(final List<String> allowedPoliciesGlob) {
+            if (allowedPoliciesGlob != null) {
+                if (this.allowedPoliciesGlob == null) {
+                    this.allowedPoliciesGlob = new ArrayList<>();
+                }
+                this.allowedPoliciesGlob.addAll(allowedPoliciesGlob);
+            }
+            return this;
+        }
+
+        /**
          * Add a disallowed policy.
          *
          * @param disallowedPolicy disallowed policy to add
@@ -332,6 +396,40 @@ public final class TokenRole implements Serializable {
                     this.disallowedPolicies = new ArrayList<>();
                 }
                 this.disallowedPolicies.addAll(disallowedPolicies);
+            }
+            return this;
+        }
+
+        /**
+         * Add an allowed policy glob pattern.
+         *
+         * @param disallowedPolicyGlob disallowed policy glob pattern to add
+         * @return self
+         * @since 1.1
+         */
+        public Builder withDisallowedPolicyGlob(final String disallowedPolicyGlob) {
+            if (disallowedPolicyGlob != null) {
+                if (this.disallowedPoliciesGlob == null) {
+                    this.disallowedPoliciesGlob = new ArrayList<>();
+                }
+                this.disallowedPoliciesGlob.add(disallowedPolicyGlob);
+            }
+            return this;
+        }
+
+        /**
+         * Add disallowed policy glob patterns.
+         *
+         * @param disallowedPoliciesGlob list of disallowed policy glob patterns
+         * @return self
+         * @since 1.1
+         */
+        public Builder withDisallowedPoliciesGlob(final List<String> disallowedPoliciesGlob) {
+            if (disallowedPoliciesGlob != null) {
+                if (this.disallowedPoliciesGlob == null) {
+                    this.disallowedPoliciesGlob = new ArrayList<>();
+                }
+                this.disallowedPoliciesGlob.addAll(disallowedPoliciesGlob);
             }
             return this;
         }
