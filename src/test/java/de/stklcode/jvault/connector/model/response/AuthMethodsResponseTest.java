@@ -38,9 +38,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     private static final String GH_PATH = "github/";
     private static final String GH_TYPE = "github";
+    private static final String GH_UUID = "4b42d1a4-0a0d-3c88-ae90-997e0c8b41be";
+    private static final String GH_ACCESSOR = "auth_github_badd7fd0";
     private static final String GH_DESCR = "GitHub auth";
     private static final String TK_PATH = "token/";
     private static final String TK_TYPE = "token";
+    private static final String TK_UUID = "32ea9681-6bd6-6cec-eec3-d11260ba9741";
+    private static final String TK_ACCESSOR = "auth_token_ac0dd95a";
     private static final String TK_DESCR = "token based credentials";
     private static final Integer TK_LEASE_TTL = 0;
     private static final Integer TK_MAX_LEASE_TTL = 0;
@@ -48,8 +52,13 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     private static final String RES_JSON = "{\n" +
             "  \"data\": {" +
             "    \"" + GH_PATH + "\": {\n" +
+            "      \"uuid\": \"" + GH_UUID + "\",\n" +
             "      \"type\": \"" + GH_TYPE + "\",\n" +
-            "      \"description\": \"" + GH_DESCR + "\"\n" +
+            "      \"accessor\": \"" + GH_ACCESSOR + "\",\n" +
+            "      \"description\": \"" + GH_DESCR + "\",\n" +
+            "      \"external_entropy_access\": false,\n" +
+            "      \"local\": false,\n" +
+            "      \"seal_wrap\": false\n" +
             "    },\n" +
             "    \"" + TK_PATH + "\": {\n" +
             "      \"config\": {\n" +
@@ -57,7 +66,12 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
             "        \"max_lease_ttl\": " + TK_MAX_LEASE_TTL + "\n" +
             "      },\n" +
             "      \"description\": \"" + TK_DESCR + "\",\n" +
-            "      \"type\": \"" + TK_TYPE + "\"\n" +
+            "      \"type\": \"" + TK_TYPE + "\",\n" +
+            "      \"uuid\": \"" + TK_UUID + "\",\n" +
+            "      \"accessor\": \"" + TK_ACCESSOR + "\",\n" +
+            "      \"external_entropy_access\": false,\n" +
+            "      \"local\": true,\n" +
+            "      \"seal_wrap\": false\n" +
             "    }\n" +
             "  }\n" +
             "}";
@@ -108,15 +122,31 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
         assertEquals(AuthBackend.GITHUB, method.getType(), "Incorrect parsed type for GitHub");
         assertEquals(GH_DESCR, method.getDescription(), "Incorrect description for GitHub");
         assertNull(method.getConfig(), "Unexpected config for GitHub");
+        assertEquals(GH_UUID, method.getUuid(), "Unexpected UUID for GitHub");
+        assertEquals(GH_ACCESSOR, method.getAccessor(), "Unexpected accessor for GitHub");
+        assertFalse(method.isLocal(), "Unexpected local flag for GitHub");
+        assertFalse(method.isExternalEntropyAccess(), "Unexpected external entropy flag for GitHub");
+        assertFalse(method.isSealWrap(), "Unexpected seal wrap flag for GitHub");
 
-        // Verify first method.
+        // Verify second method.
         method = supported.get(TK_PATH);
         assertEquals(TK_TYPE, method.getRawType(), "Incorrect raw type for Token");
         assertEquals(AuthBackend.TOKEN, method.getType(), "Incorrect parsed type for Token");
         assertEquals(TK_DESCR, method.getDescription(), "Incorrect description for Token");
+        assertEquals(TK_UUID, method.getUuid(), "Unexpected UUID for Token");
+        assertEquals(TK_ACCESSOR, method.getAccessor(), "Unexpected accessor for Token");
+        assertTrue(method.isLocal(), "Unexpected local flag for Token");
+        assertFalse(method.isExternalEntropyAccess(), "Unexpected external entropy flag for Token");
+        assertFalse(method.isSealWrap(), "Unexpected seal wrap flag for GitHub");
+
         assertNotNull(method.getConfig(), "Missing config for Token");
-        assertEquals(2, method.getConfig().size(), "Unexpected config size for Token");
-        assertEquals(TK_LEASE_TTL.toString(), method.getConfig().get("default_lease_ttl"), "Incorrect lease TTL config");
-        assertEquals(TK_MAX_LEASE_TTL.toString(), method.getConfig().get("max_lease_ttl"), "Incorrect max lease TTL config");
+        assertEquals(
+                Map.of(
+                        "default_lease_ttl", TK_LEASE_TTL.toString(),
+                        "max_lease_ttl", TK_MAX_LEASE_TTL.toString()
+                ),
+                method.getConfig(),
+                "Unexpected config for Token"
+        );
     }
 }

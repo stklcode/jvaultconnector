@@ -7,11 +7,12 @@
 * Add `migration`, `recovery_seal` and `storage_type` fields to `SealReponse` model
 * Add support for `wrap_info` in data response models
 * Dependency updates
-* model and response classes implement `Serializable` (#57)
-* split `SercretResponse`  into `PlainSecretResponse` and `MetaSecretResponse` subclasses (common API unchanged)
+* Model and response classes implement `Serializable` (#57)
+* Split `SercretResponse`  into `PlainSecretResponse` and `MetaSecretResponse` subclasses (common API unchanged)
+* Add missing fields to `AuthMethod` model
 
 ### Test
-* Tested against Vault 1.10.0
+* Tested against Vault 1.10.1
 
 
 ## 1.0.1 (2021-11-21)

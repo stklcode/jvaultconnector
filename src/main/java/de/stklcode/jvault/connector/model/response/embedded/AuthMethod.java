@@ -34,10 +34,13 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthMethod implements Serializable {
-    private static final long serialVersionUID = -5241997986380823391L;
+    private static final long serialVersionUID = -2718660627880077335L;
 
     private AuthBackend type;
     private String rawType;
+
+    @JsonProperty("accessor")
+    private String accessor;
 
     @JsonProperty("description")
     private String description;
@@ -45,8 +48,17 @@ public final class AuthMethod implements Serializable {
     @JsonProperty("config")
     private Map<String, String> config;
 
+    @JsonProperty("external_entropy_access")
+    private boolean externalEntropyAccess;
+
     @JsonProperty("local")
     private boolean local;
+
+    @JsonProperty("seal_wrap")
+    private boolean sealWrap;
+
+    @JsonProperty("uuid")
+    private String uuid;
 
     /**
      * @param type Backend type, passed to {@link AuthBackend#forType(String)}
@@ -72,6 +84,14 @@ public final class AuthMethod implements Serializable {
     }
 
     /**
+     * @return Accessor
+     * @since 1.1
+     */
+    public String getAccessor() {
+        return accessor;
+    }
+
+    /**
      * @return Description
      */
     public String getDescription() {
@@ -86,10 +106,34 @@ public final class AuthMethod implements Serializable {
     }
 
     /**
+     * @return Backend has access to external entropy source
+     * @since 1.1
+     */
+    public boolean isExternalEntropyAccess() {
+        return externalEntropyAccess;
+    }
+
+    /**
      * @return Is local backend
      */
     public boolean isLocal() {
         return local;
+    }
+
+    /**
+     * @return Seal wrapping enabled
+     * @since 1.1
+     */
+    public boolean isSealWrap() {
+        return sealWrap;
+    }
+
+    /**
+     * @return Backend UUID
+     * @since 1.1
+     */
+    public String getUuid() {
+        return uuid;
     }
 
     @Override
@@ -102,13 +146,17 @@ public final class AuthMethod implements Serializable {
         AuthMethod that = (AuthMethod) o;
         return local == that.local &&
                 type == that.type &&
+                externalEntropyAccess == that.externalEntropyAccess &&
+                sealWrap == that.sealWrap &&
                 Objects.equals(rawType, that.rawType) &&
+                Objects.equals(accessor, that.accessor) &&
                 Objects.equals(description, that.description) &&
-                Objects.equals(config, that.config);
+                Objects.equals(config, that.config) &&
+                Objects.equals(uuid, that.uuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, rawType, description, config, local);
+        return Objects.hash(type, rawType, accessor, description, config, externalEntropyAccess, local, sealWrap, uuid);
     }
 }
