@@ -1,4 +1,4 @@
-## UNRELEASED
+## 1.1.0 (2022-04-24)
 
 ### Fix
 * Use `replication_performance_mode`  instead of `replication_perf_mode` in health response.
