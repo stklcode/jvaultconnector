@@ -908,7 +908,8 @@ class HTTPVaultConnectorIT {
             assertFalse(res.getAuth().isOrphan(), "Root token should not be orphan");
 
             // Starting with Vault 1.0 a warning "custom ID uses weaker SHA1.." is given.
-            assertEquals(1, res.getWarnings().size(), "Token creation did not return expected warning");
+            // Starting with Vault 1.11 a second warning "Endpoint ignored unrecognized parameters" is given.
+            assertFalse(res.getWarnings().isEmpty(), "Token creation did not return expected warning");
 
             // Create token with attributes.
             Token token2 = Token.builder()
