@@ -22,16 +22,27 @@ steps:
         - develop
         - feature/*
         - fix/*
+  - name: setup-vault
+    image: alpine:latest
+    environment:
+      VAULT_VERSION: 1.11.2
+    commands:
+      - wget -q -O vault_$${VAULT_VERSION}_linux_amd64.zip https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_linux_amd64.zip
+      - wget -q -O - https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_SHA256SUMS | grep linux_amd64 | sha256sum -c
+      - unzip vault_$${VAULT_VERSION}_linux_amd64.zip
+      - rm vault_$${VAULT_VERSION}_linux_amd64.zip
+      - mkdir -p .bin
+      - mv vault .bin/
+    when:
+      branch:
+        - main
+        - release/*
   - name: unit-integration-tests
     image: maven:3-openjdk-17
     environment:
       VAULT_VERSION: 1.11.2
     commands:
-      - curl -s -o vault_$${VAULT_VERSION}_linux_amd64.zip https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_linux_amd64.zip
-      - curl -s https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_SHA256SUMS | grep linux_amd64 | sha256sum -c
-      - unzip vault_$${VAULT_VERSION}_linux_amd64.zip
-      - rm vault_$${VAULT_VERSION}_linux_amd64.zip
-      - mv vault /bin/
+      - export PATH=.bin:$${PATH}
       - mvn -B -P integration-test verify
     when:
       branch:
