@@ -40,7 +40,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>jvault-connector</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 

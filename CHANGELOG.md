@@ -1,10 +1,11 @@
-## UNRELEASED
+## 1.1.1 (2022-08-29)
 
 ### Dependencies
 * Updated Jackson to 2.13.3
 
 ### Test
 * Tested against Vault 1.11.2
+* Tested with Java 18
 
 
 ## 1.1.0 (2022-04-24)
