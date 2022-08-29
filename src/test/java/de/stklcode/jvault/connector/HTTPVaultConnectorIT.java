@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -80,11 +81,6 @@ class HTTPVaultConnectorIT {
 
         // Initialize Vault.
         VaultConfiguration config = initializeVault(tempDir, isTls);
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         // Initialize connector.
         HTTPVaultConnectorBuilder builder = HTTPVaultConnector.builder()
@@ -1222,29 +1218,36 @@ class HTTPVaultConnectorIT {
         }
 
         // Write configuration file.
-        BufferedWriter bw = null;
-        File configFile;
-        try {
-            configFile = new File(dir, "vault.conf");
-            bw = new BufferedWriter(new FileWriter(configFile));
+        File configFile = new File(dir, "vault.conf");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile))) {
             bw.write(config.toString());
         } catch (IOException e) {
             throw new IllegalStateException("Unable to generate config file", e);
-        } finally {
-            try {
-                if (bw != null)
-                    bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         // Start vault process.
         try {
-            vaultProcess = Runtime.getRuntime().exec("vault server -config " + configFile.toString());
+            vaultProcess = Runtime.getRuntime().exec("vault server -config " + configFile);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to start vault. Make sure vault binary is in your executable path", e);
         }
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            try (InputStream stdout = vaultProcess.getInputStream();
+                 InputStreamReader reader = new InputStreamReader(stdout);
+                 BufferedReader br = new BufferedReader(reader)) {
+                String line = br.readLine();
+                while (line != null) {
+                    if (line.contains("Vault server started")) {
+                        return true;
+                    } else {
+                        line = br.readLine();
+                    }
+                }
+
+                return false;
+            }
+        });
 
         return config;
     }
@@ -1270,28 +1273,14 @@ class HTTPVaultConnectorIT {
      * @return port number
      */
     private static Integer getFreePort() {
-        ServerSocket socket = null;
-        try {
-            socket = new ServerSocket(0);
+        try (ServerSocket socket = new ServerSocket(0)) {
             socket.setReuseAddress(true);
-            int port = socket.getLocalPort();
-            try {
-                socket.close();
-            } catch (IOException e) {
-                // Ignore IOException on close()
-            }
-            return port;
+
+            return socket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
+
         throw new IllegalStateException("Unable to find a free TCP port");
     }
 
