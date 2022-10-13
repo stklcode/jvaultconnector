@@ -1,3 +1,10 @@
+## unreleased
+
+### Test
+* Tested against Vault 1.12.0
+* Disable AppID tests for Vault 1.12 and above (auth method removed) 
+
+
 ## 1.1.1 (2022-08-29)
 
 ### Dependencies
