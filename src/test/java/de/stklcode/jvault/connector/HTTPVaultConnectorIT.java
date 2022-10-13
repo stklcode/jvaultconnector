@@ -552,7 +552,8 @@ class HTTPVaultConnectorIT {
 
     @Nested
     @DisplayName("App-ID Tests")
-    @EnabledIf(value = "de.stklcode.jvault.connector.HTTPVaultConnectorIT#isLegacy")
+    @EnabledIf(value = "de.stklcode.jvault.connector.HTTPVaultConnectorIT#isLegacy",
+            disabledReason = "AppID tests no longer available for Vault 1.12 and above")
     @SuppressWarnings("deprecation")
     class AppIdTests {
         private static final String APP_ID = "152AEA38-85FB-47A8-9CBD-612D645BFACA";
