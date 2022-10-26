@@ -1,4 +1,4 @@
-## unreleased
+## 1.1.2 (2022-10-26)
 
 ### Dependencies
 * Updated Jackson to 2.13.4.2
