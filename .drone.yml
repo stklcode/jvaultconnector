@@ -3,7 +3,7 @@ name: default
 
 steps:
   - name: compile
-    image: maven:3-openjdk-17
+    image: maven:3-eclipse-temurin-17
     commands:
       - mvn -B clean compile
     when:
@@ -14,7 +14,7 @@ steps:
         - fix/*
         - release/*
   - name: unit-tests
-    image: maven:3-openjdk-17
+    image: maven:3-eclipse-temurin-17
     commands:
       - mvn -B test
     when:
@@ -38,9 +38,9 @@ steps:
         - main
         - release/*
   - name: unit-integration-tests
-    image: maven:3-openjdk-17
+    image: maven:3-eclipse-temurin-17
     environment:
-      VAULT_VERSION: 1.11.2
+      VAULT_VERSION: 1.12.0
     commands:
       - export PATH=.bin:$${PATH}
       - mvn -B -P integration-test verify

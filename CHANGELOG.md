@@ -5,7 +5,8 @@
 
 ### Test
 * Tested against Vault 1.2.0 to 1.12.0
-* Disable AppID tests for Vault 1.12 and above (auth method removed) 
+* Disable AppID tests for Vault 1.12 and above (auth method removed)
+* Tested with Java 19
 
 
 ## 1.1.1 (2022-08-29)
