@@ -24,6 +24,7 @@ package de.stklcode.jvault.connector.model;
  */
 public enum AuthBackend {
     TOKEN("token"),
+    @Deprecated(since = "1.1.3", forRemoval = true)
     APPID("app-id"),
     APPROLE("approle"),
     USERPASS("userpass"),

@@ -201,7 +201,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    @Deprecated(since = "0.4", forRemoval = false)
+    @Deprecated(since = "0.4", forRemoval = true)
     public final AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
         return queryAuth(
                 PATH_AUTH_APPID + PATH_LOGIN,
@@ -242,7 +242,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    @Deprecated(since = "0.4", forRemoval = false)
+    @Deprecated(since = "0.4", forRemoval = true)
     public final boolean registerAppId(final String appID, final String policy, final String displayName)
             throws VaultConnectorException {
         requireAuth();
@@ -261,7 +261,7 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    @Deprecated(since = "0.4", forRemoval = false)
+    @Deprecated(since = "0.4", forRemoval = true)
     public final boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
         requireAuth();
 

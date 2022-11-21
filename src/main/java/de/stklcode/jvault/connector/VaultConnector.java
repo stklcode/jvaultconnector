@@ -119,9 +119,10 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param userID The User ID
      * @return The {@link AuthResponse}
      * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #authAppRole} instead.
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
+     * Consider using {@link #authAppRole} instead.
      */
-    @Deprecated(since = "0.4", forRemoval = false)
+    @Deprecated(since = "0.4", forRemoval = true)
     AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException;
 
     /**
@@ -155,9 +156,10 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param displayName Arbitrary name to display
      * @return {@code true} on success
      * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. Consider using {@link #createAppRole} instead.
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
+     * Consider using {@link #createAppRole} instead.
      */
-    @Deprecated(since = "0.4", forRemoval = false)
+    @Deprecated(since = "0.4", forRemoval = true)
     boolean registerAppId(final String appID, final String policy, final String displayName)
             throws VaultConnectorException;
 
@@ -349,10 +351,10 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param userID The User-ID
      * @return {@code true} on success
      * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
      * Consider using {@link #createAppRoleSecret} instead.
      */
-    @Deprecated(since = "0.4", forRemoval = false)
+    @Deprecated(since = "0.4", forRemoval = true)
     boolean registerUserId(final String appID, final String userID) throws VaultConnectorException;
 
     /**
@@ -364,9 +366,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @param userID      The User-ID
      * @return {@code true} on success
      * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole.
+     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
      */
-    @Deprecated(since = "0.4", forRemoval = false)
+    @Deprecated(since = "0.4", forRemoval = true)
     default boolean registerAppUserId(final String appID,
                                       final String policy,
                                       final String displayName,

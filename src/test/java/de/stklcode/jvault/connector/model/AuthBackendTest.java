@@ -33,6 +33,7 @@ class AuthBackendTest {
      * Test forType() method.
      */
     @Test
+    @SuppressWarnings("deprecation")
     void forTypeTest() {
         assertEquals(AuthBackend.TOKEN, AuthBackend.forType("token"));
         assertEquals(AuthBackend.APPID, AuthBackend.forType("app-id"));
