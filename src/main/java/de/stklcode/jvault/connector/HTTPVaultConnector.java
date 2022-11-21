@@ -41,24 +41,30 @@ import static java.util.Collections.singletonMap;
  * @since 0.1
  */
 public class HTTPVaultConnector implements VaultConnector {
-    private static final String PATH_SEAL_STATUS = "sys/seal-status";
-    private static final String PATH_SEAL = "sys/seal";
-    private static final String PATH_UNSEAL = "sys/unseal";
-    private static final String PATH_RENEW = "sys/leases/renew";
-    private static final String PATH_AUTH = "sys/auth";
-    private static final String PATH_TOKEN = "auth/token";
+    private static final String PATH_SYS = "sys";
+    private static final String PATH_SYS_AUTH = PATH_SYS + "/auth";
+    private static final String PATH_RENEW = PATH_SYS + "/leases/renew";
+    private static final String PATH_REVOKE = PATH_SYS + "/leases/revoke/";
+    private static final String PATH_HEALTH = PATH_SYS + "/health";
+    private static final String PATH_SEAL = PATH_SYS + "/seal";
+    private static final String PATH_SEAL_STATUS = PATH_SYS + "/seal-status";
+    private static final String PATH_UNSEAL = PATH_SYS + "/unseal";
+
+
+    private static final String PATH_AUTH = "auth";
+    private static final String PATH_AUTH_TOKEN = PATH_AUTH + "/token";
     private static final String PATH_LOOKUP = "/lookup";
     private static final String PATH_CREATE = "/create";
     private static final String PATH_ROLES = "/roles";
     private static final String PATH_CREATE_ORPHAN = "/create-orphan";
-    private static final String PATH_AUTH_USERPASS = "auth/userpass/login/";
-    private static final String PATH_AUTH_APPID = "auth/app-id/";
-    private static final String PATH_AUTH_APPROLE = "auth/approle/";
-    private static final String PATH_AUTH_APPROLE_ROLE = "auth/approle/role/%s%s";
-    private static final String PATH_REVOKE = "sys/leases/revoke/";
-    private static final String PATH_HEALTH = "sys/health";
+    private static final String PATH_AUTH_USERPASS = PATH_AUTH + "/userpass/login/";
+    private static final String PATH_AUTH_APPID = PATH_AUTH + "/app-id";
+    private static final String PATH_AUTH_APPROLE = PATH_AUTH + "/approle";
+    private static final String PATH_AUTH_APPROLE_ROLE = PATH_AUTH_APPROLE + "/role/%s%s";
+
     private static final String PATH_DATA = "/data/";
     private static final String PATH_METADATA = "/metadata/";
+    private static final String PATH_LOGIN = "/login";
     private static final String PATH_DELETE = "/delete/";
     private static final String PATH_UNDELETE = "/undelete/";
     private static final String PATH_DESTROY = "/destroy/";
@@ -172,7 +178,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final List<AuthBackend> getAuthBackends() throws VaultConnectorException {
         /* Issue request and parse response */
-        AuthMethodsResponse amr = request.get(PATH_AUTH, emptyMap(), token, AuthMethodsResponse.class);
+        AuthMethodsResponse amr = request.get(PATH_SYS_AUTH, emptyMap(), token, AuthMethodsResponse.class);
 
         return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
     }
@@ -182,7 +188,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* set token */
         this.token = token;
         this.tokenTTL = 0;
-        TokenResponse res = request.post(PATH_TOKEN + PATH_LOOKUP, emptyMap(), token, TokenResponse.class);
+        TokenResponse res = request.post(PATH_AUTH_TOKEN + PATH_LOOKUP, emptyMap(), token, TokenResponse.class);
         authorized = true;
 
         return res;
@@ -199,7 +205,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Deprecated(since = "0.4", forRemoval = false)
     public final AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
         return queryAuth(
-                PATH_AUTH_APPID + "login",
+                PATH_AUTH_APPID + PATH_LOGIN,
                 Map.of(
                         "app_id", appID,
                         "user_id", userID
@@ -214,7 +220,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (secretID != null) {
             payload.put("secret_id", secretID);
         }
-        return queryAuth(PATH_AUTH_APPROLE + "login", payload);
+        return queryAuth(PATH_AUTH_APPROLE + PATH_LOGIN, payload);
     }
 
     /**
@@ -245,7 +251,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(
-                PATH_AUTH_APPID + "map/app-id/" + appID,
+                PATH_AUTH_APPID + "/map/app-id/" + appID,
                 Map.of(
                         "value", policy,
                         "display_name", displayName
@@ -263,7 +269,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(
-                PATH_AUTH_APPID + "map/user-id/" + userID,
+                PATH_AUTH_APPID + "/map/user-id/" + userID,
                 singletonMap("value", appID),
                 token
         );
@@ -384,7 +390,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         SecretListResponse secrets = request.get(
-                PATH_AUTH_APPROLE + "role?list=true",
+                PATH_AUTH_APPROLE + "/role?list=true",
                 emptyMap(),
                 token,
                 SecretListResponse.class
@@ -584,12 +590,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final AuthResponse createToken(final Token token) throws VaultConnectorException {
-        return createTokenInternal(token, PATH_TOKEN + PATH_CREATE);
+        return createTokenInternal(token, PATH_AUTH_TOKEN + PATH_CREATE);
     }
 
     @Override
     public final AuthResponse createToken(final Token token, final boolean orphan) throws VaultConnectorException {
-        return createTokenInternal(token, PATH_TOKEN + PATH_CREATE_ORPHAN);
+        return createTokenInternal(token, PATH_AUTH_TOKEN + PATH_CREATE_ORPHAN);
     }
 
     @Override
@@ -597,7 +603,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (role == null || role.isEmpty()) {
             throw new InvalidRequestException("No role name specified.");
         }
-        return createTokenInternal(token, PATH_TOKEN + PATH_CREATE + "/" + role);
+        return createTokenInternal(token, PATH_AUTH_TOKEN + PATH_CREATE + "/" + role);
     }
 
     @Override
@@ -632,7 +638,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Request HTTP response and parse Secret */
         return request.get(
-                PATH_TOKEN + PATH_LOOKUP,
+                PATH_AUTH_TOKEN + PATH_LOOKUP,
                 singletonMap("token", token),
                 token,
                 TokenResponse.class
@@ -650,7 +656,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Issue request and expect code 204 with empty response.
-        request.postWithoutResponse(PATH_TOKEN + PATH_ROLES + "/" + name, role, token);
+        request.postWithoutResponse(PATH_AUTH_TOKEN + PATH_ROLES + "/" + name, role, token);
 
         return true;
     }
@@ -660,14 +666,14 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         // Request HTTP response and parse response.
-        return request.get(PATH_TOKEN + PATH_ROLES + "/" + name, emptyMap(), token, TokenRoleResponse.class);
+        return request.get(PATH_AUTH_TOKEN + PATH_ROLES + "/" + name, emptyMap(), token, TokenRoleResponse.class);
     }
 
     @Override
     public List<String> listTokenRoles() throws VaultConnectorException {
         requireAuth();
 
-        return list(PATH_TOKEN + PATH_ROLES);
+        return list(PATH_AUTH_TOKEN + PATH_ROLES);
     }
 
     @Override
@@ -679,7 +685,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Issue request and expect code 204 with empty response.
-        request.deleteWithoutResponse(PATH_TOKEN + PATH_ROLES + "/" + name, token);
+        request.deleteWithoutResponse(PATH_AUTH_TOKEN + PATH_ROLES + "/" + name, token);
 
         return true;
     }
