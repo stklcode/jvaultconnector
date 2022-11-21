@@ -145,11 +145,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SealResponse unseal(final String key, final Boolean reset) throws VaultConnectorException {
-        Map<String, String> param = new HashMap<>(2, 1);
-        param.put("key", key);
-        if (reset != null) {
-            param.put("reset", reset.toString());
-        }
+        Map<String, String> param = mapOfStrings(
+                "key", key,
+                "reset", reset
+        );
 
         return request.put(PATH_UNSEAL, param, token, SealResponse.class);
     }
@@ -215,11 +214,10 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException {
-        final Map<String, String> payload = new HashMap<>(2, 1);
-        payload.put("role_id", roleID);
-        if (secretID != null) {
-            payload.put("secret_id", secretID);
-        }
+        final Map<String, String> payload = mapOfStrings(
+                "role_id", roleID,
+                "secret_id", secretID
+        );
         return queryAuth(PATH_AUTH_APPROLE + PATH_LOGIN, payload);
     }
 
@@ -424,10 +422,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException {
         requireAuth();
         /* Request HTTP response and parse secret metadata */
-        Map<String, String> args = new HashMap<>(1, 1);
-        if (version != null) {
-            args.put("version", version.toString());
-        }
+        Map<String, String> args = mapOfStrings("version", version);
 
         return request.get(mount + PATH_DATA + key, args, token, MetaSecretResponse.class);
     }
@@ -444,11 +439,10 @@ public class HTTPVaultConnector implements VaultConnector {
     public void updateSecretMetadata(final String mount, final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException {
         requireAuth();
 
-        Map<String, Object> payload = new HashMap<>(2, 1);
-        if (maxVersions != null) {
-            payload.put("max_versions", maxVersions);
-        }
-        payload.put("cas_required", casRequired);
+        Map<String, Object> payload = mapOf(
+                "max_versions", maxVersions,
+                "cas_required", casRequired
+        );
 
         write(mount + PATH_METADATA + key, payload);
     }
@@ -462,12 +456,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Add CAS value to options map if present.
-        Map<String, Object> options;
-        if (cas != null) {
-            options = singletonMap("cas", cas);
-        } else {
-            options = emptyMap();
-        }
+        Map<String, Object> options = mapOf("cas", cas);
 
         /* Issue request and parse metadata response */
         return request.post(
@@ -578,11 +567,10 @@ public class HTTPVaultConnector implements VaultConnector {
     public final SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException {
         requireAuth();
 
-        Map<String, String> payload = new HashMap<>(2, 1);
-        payload.put("lease_id", leaseID);
-        if (increment != null) {
-            payload.put("increment", increment.toString());
-        }
+        Map<String, String> payload = mapOfStrings(
+                "lease_id", leaseID,
+                "increment", increment
+        );
 
         /* Issue request and parse secret response */
         return request.put(PATH_RENEW, payload, token, SecretResponse.class);
@@ -700,5 +688,43 @@ public class HTTPVaultConnector implements VaultConnector {
         if (!isAuthorized()) {
             throw new AuthorizationRequiredException();
         }
+    }
+
+    /**
+     * Generate a map of non-null {@link String} keys and values
+     *
+     * @param keyValues Key-value tuples as vararg.
+     * @return The map of non-null keys and values.
+     */
+    private static Map<String, String> mapOfStrings(Object... keyValues) {
+        Map<String, String> map = new HashMap<>(keyValues.length / 2, 1);
+        for (int i = 0; i < keyValues.length -1; i = i + 2) {
+            Object key = keyValues[i];
+            Object val = keyValues[i + 1];
+            if (key instanceof String && val != null) {
+                map.put((String) key, val.toString());
+            }
+        }
+
+        return map;
+    }
+
+    /**
+     * Generate a map of non-null {@link String} keys and {@link Object} values
+     *
+     * @param keyValues Key-value tuples as vararg.
+     * @return The map of non-null keys and values.
+     */
+    private static Map<String, Object> mapOf(Object... keyValues) {
+        Map<String, Object> map = new HashMap<>(keyValues.length / 2, 1);
+        for (int i = 0; i < keyValues.length; i = i + 2) {
+            Object key = keyValues[i];
+            Object val = keyValues[i + 1];
+            if (key instanceof String && val != null) {
+                map.put((String) key, val);
+            }
+        }
+
+        return map;
     }
 }
