@@ -40,7 +40,7 @@ jobs:
         if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release/')
         run: mvn -B -P coverage verify
       - name: Analysis
-        if: matrix.analysis && github.event_name == 'push'
+        if: matrix.analysis
         run: >
           mvn -B sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
