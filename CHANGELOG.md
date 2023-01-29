@@ -9,6 +9,9 @@
 ### Improvements
 * Minor internal refactoring
 
+### Test
+* Tested against Vault 1.2.0 to 1.12.2
+
 
 ## 1.1.2 (2022-10-26)
 
