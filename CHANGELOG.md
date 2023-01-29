@@ -1,7 +1,13 @@
 ## unreleased
 
 ### Deprecations
-* AppID components (deprecated since 0.4) are marked for removal with the next major release 
+* AppID components (deprecated since 0.4) are marked for removal with the next major release
+
+### Dependencies
+* Updated Jackson to 2.14.2
+
+### Improvements
+* Minor internal refactoring
 
 
 ## 1.1.2 (2022-10-26)
