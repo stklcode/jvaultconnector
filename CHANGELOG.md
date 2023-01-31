@@ -1,4 +1,4 @@
-## unreleased
+## 1.1.3 (2023-01-31)
 
 ### Deprecations
 * AppID components (deprecated since 0.4) are marked for removal with the next major release
