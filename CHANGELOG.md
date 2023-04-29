@@ -1,3 +1,9 @@
+## unreleased
+
+### Dependencies
+* Updated Jackson to 2.15.0
+
+
 ## 1.1.3 (2023-01-31)
 
 ### Deprecations
