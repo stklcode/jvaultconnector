@@ -1,5 +1,8 @@
 ## unreleased
 
+### Improvements
+* Use explicit UTF-8 encoding for parsing responses
+
 ### Dependencies
 * Updated Jackson to 2.15.2
 

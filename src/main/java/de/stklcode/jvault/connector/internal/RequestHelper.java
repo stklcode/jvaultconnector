@@ -399,7 +399,7 @@ public final class RequestHelper implements Serializable {
      * @throws InvalidResponseException on reading errors
      */
     private String handleResult(final HttpResponse<InputStream> response) throws InvalidResponseException {
-        try (var reader = new BufferedReader(new InputStreamReader(response.body()))) {
+        try (var reader = new BufferedReader(new InputStreamReader(response.body(), UTF_8))) {
             return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException ignored) {
             throw new InvalidResponseException(Error.READ_RESPONSE, 200);
@@ -414,7 +414,7 @@ public final class RequestHelper implements Serializable {
      */
     private void handleError(final HttpResponse<InputStream> response) throws VaultConnectorException {
         if (response.body() != null) {
-            try (var reader = new BufferedReader(new InputStreamReader(response.body()))) {
+            try (var reader = new BufferedReader(new InputStreamReader(response.body(), UTF_8))) {
                 var responseString = reader.lines().collect(Collectors.joining("\n"));
                 ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
                 /* Check for "permission denied" response */
