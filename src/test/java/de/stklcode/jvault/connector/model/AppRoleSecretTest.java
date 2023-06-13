@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -116,16 +115,14 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
      */
     @Test
     void jsonTest() throws NoSuchFieldException, IllegalAccessException {
-        ObjectMapper mapper = new ObjectMapper();
-
         // A simple roundtrip first. All set fields should be present afterwards..
         AppRoleSecret secret = new AppRoleSecret(TEST_ID, TEST_META, TEST_CIDR);
-        String secretJson = assertDoesNotThrow(() -> mapper.writeValueAsString(secret), "Serialization failed");
+        String secretJson = assertDoesNotThrow(() -> objectMapper.writeValueAsString(secret), "Serialization failed");
         // CIDR list is comma-separated when used as input, but List otherwise, hence convert string to list.
         String secretJson2 = commaSeparatedToList(secretJson);
 
         AppRoleSecret secret2 = assertDoesNotThrow(
-                () -> mapper.readValue(secretJson2, AppRoleSecret.class),
+                () -> objectMapper.readValue(secretJson2, AppRoleSecret.class),
                 "Deserialization failed"
         );
         assertEquals(secret2.getId(), secret.getId());
@@ -145,9 +142,9 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         assumeTrue(secret.getNumUses() == 678);
         setPrivateField(secret, "ttl", 12345);
         assumeTrue(secret.getTtl() == 12345);
-        String secretJson3 = assertDoesNotThrow(() -> mapper.writeValueAsString(secret), "Serialization failed");
+        String secretJson3 = assertDoesNotThrow(() -> objectMapper.writeValueAsString(secret), "Serialization failed");
         secret2 = assertDoesNotThrow(
-                () -> mapper.readValue(commaSeparatedToList(secretJson3), AppRoleSecret.class),
+                () -> objectMapper.readValue(commaSeparatedToList(secretJson3), AppRoleSecret.class),
                 "Deserialization failed"
         );
         assertEquals(secret2.getId(), secret.getId());
@@ -165,7 +162,7 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
                 "\"cidr_list\":[\"203.0.113.0/24\",\"198.51.100.0/24\"],\"secret_id_accessor\":\"TEST_ACCESSOR\"," +
                 "\"creation_time\":\"TEST_CREATION\",\"expiration_time\":\"TEST_EXPIRATION\"," +
                 "\"last_updated_time\":\"TEST_LASTUPDATE\",\"secret_id_num_uses\":678,\"secret_id_ttl\":12345}";
-        secret2 = assertDoesNotThrow(() -> mapper.readValue(secretJson4, AppRoleSecret.class), "Deserialization failed");
+        secret2 = assertDoesNotThrow(() -> objectMapper.readValue(secretJson4, AppRoleSecret.class), "Deserialization failed");
         assertEquals("TEST_ACCESSOR", secret2.getAccessor());
         assertEquals("TEST_CREATION", secret2.getCreationTime());
         assertEquals("TEST_EXPIRATION", secret2.getExpirationTime());

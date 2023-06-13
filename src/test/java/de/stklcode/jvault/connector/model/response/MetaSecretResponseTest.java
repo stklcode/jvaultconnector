@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -89,7 +88,7 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
     @Override
     protected MetaSecretResponse createFull() {
         try {
-            return new ObjectMapper().readValue(SECRET_JSON_V2, MetaSecretResponse.class);
+            return objectMapper.readValue(SECRET_JSON_V2, MetaSecretResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -103,7 +102,7 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
     void jsonRoundtrip() {
         // KV v2 secret.
         MetaSecretResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(SECRET_JSON_V2, MetaSecretResponse.class),
+                () -> objectMapper.readValue(SECRET_JSON_V2, MetaSecretResponse.class),
                 "SecretResponse deserialization failed"
         );
         assertSecretData(res);
@@ -117,7 +116,7 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
 
         // Deleted KV v2 secret.
         res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(SECRET_JSON_V2_2, MetaSecretResponse.class),
+                () -> objectMapper.readValue(SECRET_JSON_V2_2, MetaSecretResponse.class),
                 "SecretResponse deserialization failed"
         );
         assertSecretData(res);

@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
 import org.junit.jupiter.api.Test;
@@ -96,7 +95,7 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     @Override
     protected TokenResponse createFull() {
         try {
-            return new ObjectMapper().readValue(RES_JSON, TokenResponse.class);
+            return objectMapper.readValue(RES_JSON, TokenResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -119,7 +118,7 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     @Test
     void jsonRoundtrip() {
         TokenResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(RES_JSON, TokenResponse.class),
+                () -> objectMapper.readValue(RES_JSON, TokenResponse.class),
                 "TokenResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");

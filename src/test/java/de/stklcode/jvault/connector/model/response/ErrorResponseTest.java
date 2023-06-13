@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +43,7 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
     @Override
     protected ErrorResponse createFull() {
         try {
-            return new ObjectMapper().readValue(JSON, ErrorResponse.class);
+            return objectMapper.readValue(JSON, ErrorResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -56,16 +55,15 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
      */
     @Test
     void jsonRoundtrip() {
-        ObjectMapper om = new ObjectMapper();
         ErrorResponse res = assertDoesNotThrow(
-                () -> om.readValue(JSON, ErrorResponse.class),
+                () -> objectMapper.readValue(JSON, ErrorResponse.class),
                 "ErrorResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(List.of(ERROR_1, ERROR_2), res.getErrors(), "Unexpected error messages");
         assertEquals(
                 JSON,
-                assertDoesNotThrow(() -> om.writeValueAsString(res), "ErrorResponse serialization failed"),
+                assertDoesNotThrow(() -> objectMapper.writeValueAsString(res), "ErrorResponse serialization failed"),
                 "Unexpected JSON string after serialization"
         );
     }
@@ -74,13 +72,13 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
     @Test
     void testToString() {
         ErrorResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(JSON, ErrorResponse.class),
+                () -> objectMapper.readValue(JSON, ErrorResponse.class),
                 "ErrorResponse deserialization failed"
         );
         assertEquals(ERROR_1, res.toString());
 
         res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(JSON_EMPTY, ErrorResponse.class),
+                () -> objectMapper.readValue(JSON_EMPTY, ErrorResponse.class),
                 "ErrorResponse deserialization failed with empty list"
         );
         assertEquals("error response", res.toString());

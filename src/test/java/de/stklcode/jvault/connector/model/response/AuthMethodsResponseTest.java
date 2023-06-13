@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
@@ -83,7 +82,7 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     @Override
     protected AuthMethodsResponse createFull() {
         try {
-            return new ObjectMapper().readValue(RES_JSON, AuthMethodsResponse.class);
+            return objectMapper.readValue(RES_JSON, AuthMethodsResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -106,7 +105,7 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     @Test
     void jsonRoundtrip() {
         AuthMethodsResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(RES_JSON, AuthMethodsResponse.class),
+                () -> objectMapper.readValue(RES_JSON, AuthMethodsResponse.class),
                 "AuthResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");

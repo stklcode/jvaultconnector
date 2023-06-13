@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -103,7 +102,7 @@ class TokenTest extends AbstractModelTest<Token> {
         assertNull(token.getEntityAlias());
 
         // Optional fields should be ignored, so JSON string should be empty.
-        assertEquals("{}", new ObjectMapper().writeValueAsString(token));
+        assertEquals("{}", objectMapper.writeValueAsString(token));
 
         // Empty builder should be equal to no-arg construction.
         assertEquals(token, new Token());
@@ -129,7 +128,7 @@ class TokenTest extends AbstractModelTest<Token> {
         assertEquals(PERIOD, token.getPeriod());
 
         // Verify that all parameters are included in JSON string.
-        assertEquals(JSON_FULL, new ObjectMapper().writeValueAsString(token));
+        assertEquals(JSON_FULL, objectMapper.writeValueAsString(token));
     }
 
     /**

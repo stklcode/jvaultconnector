@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -110,7 +109,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
         assertNull(role.getTokenType());
 
         // Optional fields should be ignored, so JSON string should only contain role_name.
-        assertEquals(JSON_MIN, new ObjectMapper().writeValueAsString(role));
+        assertEquals(JSON_MIN, objectMapper.writeValueAsString(role));
     }
 
     /**
@@ -137,7 +136,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
         assertEquals(TOKEN_TYPE.value(), role.getTokenType());
 
         // Verify that all parameters are included in JSON string.
-        assertEquals(JSON_FULL, new ObjectMapper().writeValueAsString(role));
+        assertEquals(JSON_FULL, objectMapper.writeValueAsString(role));
     }
 
     /**

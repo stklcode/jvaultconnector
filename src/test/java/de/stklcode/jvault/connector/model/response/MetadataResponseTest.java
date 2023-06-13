@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -71,7 +70,7 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
     @Override
     protected MetadataResponse createFull() {
         try {
-            return new ObjectMapper().readValue(META_JSON, MetadataResponse.class);
+            return objectMapper.readValue(META_JSON, MetadataResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -84,7 +83,7 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
     @Test
     void jsonRoundtrip() {
         MetadataResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(META_JSON, MetadataResponse.class),
+                () -> objectMapper.readValue(META_JSON, MetadataResponse.class),
                 "MetadataResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");

@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
@@ -52,7 +51,7 @@ class CredentialsResponseTest extends AbstractModelTest<CredentialsResponse> {
     @Override
     protected CredentialsResponse createFull() {
         try {
-            return new ObjectMapper().readValue(JSON, CredentialsResponse.class);
+            return objectMapper.readValue(JSON, CredentialsResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -72,7 +71,7 @@ class CredentialsResponseTest extends AbstractModelTest<CredentialsResponse> {
         assertNull(res.getPassword(), "Password not present in data map should not return anything");
 
         res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(JSON, CredentialsResponse.class),
+                () -> objectMapper.readValue(JSON, CredentialsResponse.class),
                 "Deserialization of CredentialsResponse failed"
         );
         assertEquals(VAL_USER, res.getUsername(), "Incorrect username");

@@ -1,5 +1,6 @@
 package de.stklcode.jvault.connector.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public abstract class AbstractModelTest<T> {
     protected final Class<?> modelClass;
+    protected final ObjectMapper objectMapper;
 
     /**
      * Test case constructor.
@@ -24,6 +26,7 @@ public abstract class AbstractModelTest<T> {
      */
     protected AbstractModelTest(Class<T> modelClass) {
         this.modelClass = modelClass;
+        this.objectMapper = new ObjectMapper();
     }
 
     /**

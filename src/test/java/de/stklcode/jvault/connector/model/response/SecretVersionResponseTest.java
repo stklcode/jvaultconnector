@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +49,7 @@ class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse>
     @Override
     protected SecretVersionResponse createFull() {
         try {
-            return new ObjectMapper().readValue(META_JSON, SecretVersionResponse.class);
+            return objectMapper.readValue(META_JSON, SecretVersionResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -63,7 +62,7 @@ class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse>
     @Test
     void jsonRoundtrip() {
         SecretVersionResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(META_JSON, SecretVersionResponse.class),
+                () -> objectMapper.readValue(META_JSON, SecretVersionResponse.class),
                 "SecretVersionResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");

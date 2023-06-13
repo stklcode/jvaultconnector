@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -61,7 +60,7 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
     @Override
     protected HealthResponse createFull() {
         try {
-            return new ObjectMapper().readValue(RES_JSON, HealthResponse.class);
+            return objectMapper.readValue(RES_JSON, HealthResponse.class);
         } catch (JsonProcessingException e) {
             fail("Creation of full model instance failed", e);
             return null;
@@ -74,7 +73,7 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
     @Test
     void jsonRoundtrip() {
         HealthResponse res = assertDoesNotThrow(
-                () -> new ObjectMapper().readValue(RES_JSON, HealthResponse.class),
+                () -> objectMapper.readValue(RES_JSON, HealthResponse.class),
                 "Health deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
