@@ -1,7 +1,7 @@
 ## unreleased
 
 ### Dependencies
-* Updated Jackson to 2.15.0
+* Updated Jackson to 2.15.2
 
 ### Test
 * Tested against Vault 1.2.0 to 1.13.2
