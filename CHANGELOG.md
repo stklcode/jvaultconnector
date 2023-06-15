@@ -1,4 +1,4 @@
-## unreleased
+## 1.1.4 (2023-06-15)
 
 ### Fix
 * Use `[+-]XX:XX` notation for timezone in date/time parsing
