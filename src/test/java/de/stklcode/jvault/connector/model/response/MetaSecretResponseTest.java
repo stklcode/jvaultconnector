@@ -109,7 +109,7 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
         assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
         assertEquals(SECRET_META_CREATED, res.getMetadata().getCreatedTimeString(), "Incorrect creation date string");
         assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");
-        assertEquals("", res.getMetadata().getDeletionTimeString(), "Incorrect deletion date string");
+        assertNull(res.getMetadata().getDeletionTimeString(), "Incorrect deletion date string");
         assertNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
         assertFalse(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
         assertEquals(1, res.getMetadata().getVersion(), "Incorrect secret version");

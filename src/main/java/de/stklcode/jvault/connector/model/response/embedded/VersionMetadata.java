@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 /**
@@ -34,16 +33,16 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class VersionMetadata implements Serializable {
-    private static final long serialVersionUID = -5286693953873839611L;
+    private static final long serialVersionUID = -6815731513868586713L;
 
     private static final DateTimeFormatter TIME_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
 
     @JsonProperty("created_time")
-    private String createdTimeString;
+    private ZonedDateTime createdTime;
 
     @JsonProperty("deletion_time")
-    private String deletionTimeString;
+    private ZonedDateTime deletionTime;
 
     @JsonProperty("destroyed")
     private boolean destroyed;
@@ -53,46 +52,42 @@ public final class VersionMetadata implements Serializable {
 
     /**
      * @return Time of secret creation as raw string representation.
+     * @deprecated Method left for backwards compatibility only. Use {@link #getCreatedTime()} instead.
      */
+    @Deprecated(since = "1.2", forRemoval = true)
     public String getCreatedTimeString() {
-        return createdTimeString;
+        if (createdTime != null) {
+            return TIME_FORMAT.format(createdTime);
+        }
+
+        return null;
     }
 
     /**
      * @return Time of secret creation.
      */
     public ZonedDateTime getCreatedTime() {
-        if (createdTimeString != null && !createdTimeString.isEmpty()) {
-            try {
-                return ZonedDateTime.parse(createdTimeString, TIME_FORMAT);
-            } catch (DateTimeParseException e) {
-                // Ignore.
-            }
-        }
-
-        return null;
+        return createdTime;
     }
 
     /**
      * @return Time for secret deletion as raw string representation.
+     * @deprecated Method left for backwards compatibility only. Use {@link #getDeletionTime()} instead.
      */
+    @Deprecated(since = "1.2", forRemoval = true)
     public String getDeletionTimeString() {
-        return deletionTimeString;
+        if (deletionTime != null) {
+            return TIME_FORMAT.format(deletionTime);
+        }
+
+        return null;
     }
 
     /**
      * @return Time for secret deletion.
      */
     public ZonedDateTime getDeletionTime() {
-        if (deletionTimeString != null && !deletionTimeString.isEmpty()) {
-            try {
-                return ZonedDateTime.parse(deletionTimeString, TIME_FORMAT);
-            } catch (DateTimeParseException e) {
-                // Ignore.
-            }
-        }
-
-        return null;
+        return deletionTime;
     }
 
     /**
@@ -118,13 +113,13 @@ public final class VersionMetadata implements Serializable {
         }
         VersionMetadata that = (VersionMetadata) o;
         return destroyed == that.destroyed &&
-                Objects.equals(createdTimeString, that.createdTimeString) &&
-                Objects.equals(deletionTimeString, that.deletionTimeString) &&
+                Objects.equals(createdTime, that.createdTime) &&
+                Objects.equals(deletionTime, that.deletionTime) &&
                 Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(createdTimeString, deletionTimeString, destroyed, version);
+        return Objects.hash(createdTime, deletionTime, destroyed, version);
     }
 }

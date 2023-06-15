@@ -1,7 +1,13 @@
 ## unreleased
 
+### Deprecations
+* `get...TimeString()` methods on various model classes are now deprecated
+
 ### Fix
 * Fixed JSON type conversion in `SecretResponse#get(String, Class)` (#67)
+
+### Improvements
+* Parse timestamps as `ZonedDateTime` instead of `String` representation
 
 
 ## 1.1.4 (2023-06-15)

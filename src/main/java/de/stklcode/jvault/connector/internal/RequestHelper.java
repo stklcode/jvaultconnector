@@ -1,7 +1,10 @@
 package de.stklcode.jvault.connector.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.response.ErrorResponse;
 
@@ -62,7 +65,10 @@ public final class RequestHelper implements Serializable {
         this.timeout = timeout;
         this.tlsVersion = tlsVersion;
         this.trustedCaCert = trustedCaCert;
-        this.jsonMapper = new ObjectMapper();
+        this.jsonMapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
     }
 
     /**

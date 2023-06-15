@@ -33,4 +33,5 @@ module de.stklcode.jvault.connector {
     requires java.base;
     requires java.net.http;
     requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.datatype.jsr310;
 }

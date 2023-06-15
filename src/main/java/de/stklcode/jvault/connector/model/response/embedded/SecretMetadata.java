@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,13 +34,13 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretMetadata implements Serializable {
-    private static final long serialVersionUID = 1684891108903409038L;
+    private static final long serialVersionUID = -4967896264361344676L;
 
     private static final DateTimeFormatter TIME_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
 
     @JsonProperty("created_time")
-    private String createdTimeString;
+    private ZonedDateTime createdTime;
 
     @JsonProperty("current_version")
     private Integer currentVersion;
@@ -53,31 +52,29 @@ public final class SecretMetadata implements Serializable {
     private Integer oldestVersion;
 
     @JsonProperty("updated_time")
-    private String updatedTime;
+    private ZonedDateTime updatedTime;
 
     @JsonProperty("versions")
     private Map<Integer, VersionMetadata> versions;
 
     /**
      * @return Time of secret creation as raw string representation.
+     * @deprecated Method left for backwards compatibility only. Use {@link #getCreatedTime()} instead.
      */
+    @Deprecated(since = "1.2", forRemoval = true)
     public String getCreatedTimeString() {
-        return createdTimeString;
+        if (createdTime != null) {
+            return TIME_FORMAT.format(createdTime);
+        }
+
+        return null;
     }
 
     /**
      * @return Time of secret creation.
      */
     public ZonedDateTime getCreatedTime() {
-        if (createdTimeString != null && !createdTimeString.isEmpty()) {
-            try {
-                return ZonedDateTime.parse(createdTimeString, TIME_FORMAT);
-            } catch (DateTimeParseException e) {
-                // Ignore.
-            }
-        }
-
-        return null;
+        return createdTime;
     }
 
     /**
@@ -103,24 +100,22 @@ public final class SecretMetadata implements Serializable {
 
     /**
      * @return Time of secret update as raw string representation.
+     * @deprecated Method left for backwards compatibility only. Use {@link #getUpdatedTime()} instead.
      */
+    @Deprecated(since = "1.2", forRemoval = true)
     public String getUpdatedTimeString() {
-        return updatedTime;
-    }
-
-    /**
-     * @return Time of secret update..
-     */
-    public ZonedDateTime getUpdatedTime() {
-        if (updatedTime != null && !updatedTime.isEmpty()) {
-            try {
-                return ZonedDateTime.parse(updatedTime, TIME_FORMAT);
-            } catch (DateTimeParseException e) {
-                // Ignore.
-            }
+        if (updatedTime != null) {
+            return TIME_FORMAT.format(updatedTime);
         }
 
         return null;
+    }
+
+    /**
+     * @return Time of secret update.
+     */
+    public ZonedDateTime getUpdatedTime() {
+        return updatedTime;
     }
 
     /**
@@ -138,7 +133,7 @@ public final class SecretMetadata implements Serializable {
             return false;
         }
         SecretMetadata that = (SecretMetadata) o;
-        return Objects.equals(createdTimeString, that.createdTimeString) &&
+        return Objects.equals(createdTime, that.createdTime) &&
                 Objects.equals(currentVersion, that.currentVersion) &&
                 Objects.equals(maxVersions, that.maxVersions) &&
                 Objects.equals(oldestVersion, that.oldestVersion) &&
@@ -148,6 +143,6 @@ public final class SecretMetadata implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(createdTimeString, currentVersion, maxVersions, oldestVersion, updatedTime, versions);
+        return Objects.hash(createdTime, currentVersion, maxVersions, oldestVersion, updatedTime, versions);
     }
 }

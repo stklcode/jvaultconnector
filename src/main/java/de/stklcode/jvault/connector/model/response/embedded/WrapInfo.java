@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -28,7 +29,7 @@ import java.util.Objects;
  * @since 1.1
  */
 public class WrapInfo implements Serializable {
-    private static final long serialVersionUID = -7764500642913116581L;
+    private static final long serialVersionUID = 4864973237090355607L;
 
     @JsonProperty("token")
     private String token;
@@ -37,7 +38,7 @@ public class WrapInfo implements Serializable {
     private Integer ttl;
 
     @JsonProperty("creation_time")
-    private String creationTime;
+    private ZonedDateTime creationTime;
 
     @JsonProperty("creation_path")
     private String creationPath;
@@ -59,7 +60,7 @@ public class WrapInfo implements Serializable {
     /**
      * @return Creation time
      */
-    public String getCreationTime() {
+    public ZonedDateTime getCreationTime() {
         return creationTime;
     }
 

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +35,10 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenData implements Serializable {
-    private static final long serialVersionUID = 2915180734313753649L;
+    private static final long serialVersionUID = -5749716740973138916L;
+
+    private static final DateTimeFormatter TIME_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
 
     @JsonProperty("accessor")
     private String accessor;
@@ -52,7 +56,7 @@ public final class TokenData implements Serializable {
     private String entityId;
 
     @JsonProperty("expire_time")
-    private String expireTime;
+    private ZonedDateTime expireTime;
 
     @JsonProperty("explicit_max_ttl")
     private Integer explicitMaxTtl;
@@ -61,7 +65,7 @@ public final class TokenData implements Serializable {
     private String id;
 
     @JsonProperty("issue_time")
-    private String issueTime;
+    private ZonedDateTime issueTime;
 
     @JsonProperty("meta")
     private Map<String, Object> meta;
@@ -126,9 +130,15 @@ public final class TokenData implements Serializable {
     /**
      * @return Expire time as raw string value
      * @since 0.9
+     * @deprecated Method left for backwards compatibility only. Use {@link #getExpireTime()} instead.
      */
+    @Deprecated(since = "1.2", forRemoval = true)
     public String getExpireTimeString() {
-        return expireTime;
+        if (expireTime != null) {
+            return TIME_FORMAT.format(expireTime);
+        }
+
+        return null;
     }
 
     /**
@@ -136,11 +146,7 @@ public final class TokenData implements Serializable {
      * @since 0.9
      */
     public ZonedDateTime getExpireTime() {
-        if (expireTime == null) {
-            return null;
-        } else {
-            return ZonedDateTime.parse(expireTime);
-        }
+        return expireTime;
     }
 
     /**
@@ -161,9 +167,15 @@ public final class TokenData implements Serializable {
     /**
      * @return Issue time as raw string value
      * @since 0.9
+     * @deprecated Method left for backwards compatibility only. Use {@link #getIssueTime()} instead.
      */
+    @Deprecated(since = "1.2", forRemoval = true)
     public String getIssueTimeString() {
-        return issueTime;
+        if (issueTime != null) {
+            return TIME_FORMAT.format(issueTime);
+        }
+
+        return null;
     }
 
     /**
@@ -171,11 +183,7 @@ public final class TokenData implements Serializable {
      * @since 0.9
      */
     public ZonedDateTime getIssueTime() {
-        if (issueTime == null) {
-            return null;
-        } else {
-            return ZonedDateTime.parse(issueTime);
-        }
+        return issueTime;
     }
 
     /**

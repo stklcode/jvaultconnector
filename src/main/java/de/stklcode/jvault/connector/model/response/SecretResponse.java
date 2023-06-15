@@ -17,7 +17,10 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
@@ -82,7 +85,11 @@ public abstract class SecretResponse extends VaultDataResponse {
             } else if (type.isInstance(rawValue)) {
                 return type.cast(rawValue);
             } else {
-                var om = new ObjectMapper();
+                var om = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                        .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+
                 if (rawValue instanceof String) {
                     return om.readValue((String) rawValue, type);
                 } else {
