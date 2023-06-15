@@ -1,5 +1,8 @@
 ## unreleased
 
+### Fix
+* Use `[+-]XX:XX` notation for timezone in date/time parsing
+
 ### Improvements
 * Use explicit UTF-8 encoding for parsing responses
 
