@@ -10,7 +10,7 @@
 * Updated Jackson to 2.15.2
 
 ### Test
-* Tested against Vault 1.2.0 to 1.13.2
+* Tested against Vault 1.2.0 to 1.13.3
 
 
 ## 1.1.3 (2023-01-31)
