@@ -119,7 +119,8 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
                                 "    \"" + complexKey + "\": {" +
                                 "      \"field1\": \"" + complexVal.field1 + "\",\n" +
                                 "      \"field2\": " + complexVal.field2 + "\n" +
-                                "    }\n" +
+                                "    },\n" +
+                                "    \"" + complexKey + "Json\": \"" + objectMapper.writeValueAsString(complexVal).replace("\"", "\\\"") + "\"\n" +
                                 "  }\n" +
                                 "}",
                         PlainSecretResponse.class
@@ -168,6 +169,11 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
                 InvalidResponseException.class,
                 () -> res.get(complexKey, Integer.class),
                 "getting complex type as integer should fail"
+        );
+        assertEquals(
+                complexVal,
+                assertDoesNotThrow(() -> res.get(complexKey + "Json", ComplexType.class), "getting complex type from JSON string failed"),
+                "unexpected value for complex type from JSON string"
         );
     }
 

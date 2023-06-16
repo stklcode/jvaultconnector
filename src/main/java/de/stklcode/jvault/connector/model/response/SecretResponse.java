@@ -83,7 +83,11 @@ public abstract class SecretResponse extends VaultDataResponse {
                 return type.cast(rawValue);
             } else {
                 var om = new ObjectMapper();
-                return om.readValue(om.writeValueAsString(rawValue), type);
+                if (rawValue instanceof String) {
+                    return om.readValue((String) rawValue, type);
+                } else {
+                    return om.readValue(om.writeValueAsString(rawValue), type);
+                }
             }
         } catch (IOException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
