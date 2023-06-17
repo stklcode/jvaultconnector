@@ -76,6 +76,24 @@ public class HTTPVaultConnector implements VaultConnector {
     private long tokenTTL = 0;              // Expiration time for current token.
 
     /**
+     * Create connector using a {@link HTTPVaultConnectorBuilder}.
+     *
+     * @param builder The builder.
+     */
+    HTTPVaultConnector(final HTTPVaultConnectorBuilder builder) {
+        this.request = new RequestHelper(
+                ((builder.isWithTLS()) ? "https" : "http") + "://" +
+                        builder.getHost() +
+                        ((builder.getPort() != null) ? ":" + builder.getPort() : "") +
+                        builder.getPrefix(),
+                builder.getNumberOfRetries(),
+                builder.getTimeout(),
+                builder.getTlsVersion(),
+                builder.getTrustedCA()
+        );
+    }
+
+    /**
      * Get a new builder for a connector.
      *
      * @return Builder instance.
@@ -106,24 +124,6 @@ public class HTTPVaultConnector implements VaultConnector {
      */
     public static HTTPVaultConnectorBuilder builder(URI baseURL) {
         return new HTTPVaultConnectorBuilder().withBaseURL(baseURL);
-    }
-
-    /**
-     * Create connector using a {@link HTTPVaultConnectorBuilder}.
-     *
-     * @param builder The builder.
-     */
-    HTTPVaultConnector(final HTTPVaultConnectorBuilder builder) {
-        this.request = new RequestHelper(
-                ((builder.isWithTLS()) ? "https" : "http") + "://" +
-                        builder.getHost() +
-                        ((builder.getPort() != null) ? ":" + builder.getPort() : "") +
-                        builder.getPrefix(),
-                builder.getNumberOfRetries(),
-                builder.getTimeout(),
-                builder.getTlsVersion(),
-                builder.getTrustedCA()
-        );
     }
 
     @Override

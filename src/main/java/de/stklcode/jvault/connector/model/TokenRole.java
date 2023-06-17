@@ -36,15 +36,6 @@ import java.util.Objects;
 public final class TokenRole implements Serializable {
     private static final long serialVersionUID = -3505215215838576321L;
 
-    /**
-     * Get {@link Builder} instance.
-     *
-     * @return Token Role Builder.
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
     @JsonProperty("name")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String name;
@@ -127,6 +118,15 @@ public final class TokenRole implements Serializable {
         this.tokenNumUses = builder.tokenNumUses;
         this.tokenPeriod = builder.tokenPeriod;
         this.tokenType = builder.tokenType != null ? builder.tokenType.value() : null;
+    }
+
+    /**
+     * Get {@link Builder} instance.
+     *
+     * @return Token Role Builder.
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**

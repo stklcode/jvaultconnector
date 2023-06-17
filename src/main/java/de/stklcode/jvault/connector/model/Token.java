@@ -34,16 +34,6 @@ import java.util.*;
 public final class Token implements Serializable {
     private static final long serialVersionUID = 5208508683665365287L;
 
-    /**
-     * Get {@link Builder} instance.
-     *
-     * @return Token Builder.
-     * @since 0.8
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
     @JsonProperty("id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String id;
@@ -121,6 +111,16 @@ public final class Token implements Serializable {
         this.renewable = builder.renewable;
         this.period = builder.period;
         this.entityAlias = builder.entityAlias;
+    }
+
+    /**
+     * Get {@link Builder} instance.
+     *
+     * @return Token Builder.
+     * @since 0.8
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**

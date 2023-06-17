@@ -34,17 +34,6 @@ import java.util.Objects;
 public final class AppRole implements Serializable {
     private static final long serialVersionUID = -6248529625864573990L;
 
-    /**
-     * Get {@link Builder} instance.
-     *
-     * @param name Role name.
-     * @return AppRole Builder.
-     * @since 0.8
-     */
-    public static Builder builder(final String name) {
-        return new Builder(name);
-    }
-
     @JsonProperty("role_name")
     private String name;
 
@@ -132,6 +121,17 @@ public final class AppRole implements Serializable {
         this.tokenNumUses = builder.tokenNumUses;
         this.tokenPeriod = builder.tokenPeriod;
         this.tokenType = builder.tokenType != null ? builder.tokenType.value() : null;
+    }
+
+    /**
+     * Get {@link Builder} instance.
+     *
+     * @param name Role name.
+     * @return AppRole Builder.
+     * @since 0.8
+     */
+    public static Builder builder(final String name) {
+        return new Builder(name);
     }
 
     /**
