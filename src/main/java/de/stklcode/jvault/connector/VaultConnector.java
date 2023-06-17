@@ -422,7 +422,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    default SecretVersionResponse writeSecretData(final String mount, final String key, final Map<String, Object> data) throws VaultConnectorException {
+    default SecretVersionResponse writeSecretData(final String mount,
+                                                  final String key,
+                                                  final Map<String, Object> data) throws VaultConnectorException {
         return writeSecretData(mount, key, data, null);
     }
 
@@ -440,7 +442,10 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    SecretVersionResponse writeSecretData(final String mount, final String key, final Map<String, Object> data, final Integer cas) throws VaultConnectorException;
+    SecretVersionResponse writeSecretData(final String mount,
+                                          final String key,
+                                          final Map<String, Object> data,
+                                          final Integer cas) throws VaultConnectorException;
 
     /**
      * Retrieve secret data from Vault.
@@ -455,7 +460,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException;
+    SecretResponse readSecretVersion(final String mount, final String key, final Integer version)
+            throws VaultConnectorException;
 
     /**
      * Retrieve secret metadata from Vault.
@@ -484,7 +490,10 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void updateSecretMetadata(final String mount, final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException;
+    void updateSecretMetadata(final String mount,
+                              final String key,
+                              final Integer maxVersions,
+                              final boolean casRequired) throws VaultConnectorException;
 
     /**
      * List available nodes from Vault.
@@ -529,7 +538,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8 {@code options} parameter added
      */
-    void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException;
+    void write(final String key, final Map<String, Object> data, final Map<String, Object> options)
+            throws VaultConnectorException;
 
     /**
      * Delete key from Vault.
@@ -576,7 +586,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void deleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException;
+    void deleteSecretVersions(final String mount, final String key, final int... versions)
+            throws VaultConnectorException;
 
     /**
      * Undelete (restore) secret versions from Vault.
@@ -588,7 +599,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void undeleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException;
+    void undeleteSecretVersions(final String mount, final String key, final int... versions)
+            throws VaultConnectorException;
 
     /**
      * Destroy secret versions from Vault.
@@ -600,7 +612,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    void destroySecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException;
+    void destroySecretVersions(final String mount, final String key, final int... versions)
+            throws VaultConnectorException;
 
     /**
      * Revoke given lease immediately.

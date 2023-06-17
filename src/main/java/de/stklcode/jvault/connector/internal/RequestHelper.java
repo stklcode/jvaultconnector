@@ -127,7 +127,8 @@ public final class RequestHelper implements Serializable {
      * @throws VaultConnectorException on connection error
      * @since 0.8
      */
-    public void postWithoutResponse(final String path, final Object payload, final String token) throws VaultConnectorException {
+    public void postWithoutResponse(final String path, final Object payload, final String token)
+            throws VaultConnectorException {
         if (!post(path, payload, token).isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         }
@@ -143,7 +144,8 @@ public final class RequestHelper implements Serializable {
      * @throws VaultConnectorException on connection error
      * @since 0.8 Added {@code token} parameter.
      */
-    public String put(final String path, final Map<String, String> payload, final String token) throws VaultConnectorException {
+    public String put(final String path, final Map<String, String> payload, final String token)
+            throws VaultConnectorException {
         // Initialize PUT.
         var req = HttpRequest.newBuilder(URI.create(baseURL + path));
 
@@ -254,8 +256,8 @@ public final class RequestHelper implements Serializable {
 
         if (!payload.isEmpty()) {
             uriBuilder.append("?").append(
-                    payload.entrySet().stream().map(
-                            par -> URLEncoder.encode(par.getKey(), UTF_8) + "=" + URLEncoder.encode(par.getValue(), UTF_8)
+                    payload.entrySet().stream().map(par ->
+                            URLEncoder.encode(par.getKey(), UTF_8) + "=" + URLEncoder.encode(par.getValue(), UTF_8)
                     ).collect(Collectors.joining("&"))
             );
         }
@@ -386,7 +388,8 @@ public final class RequestHelper implements Serializable {
             }
 
             return sslContext;
-        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException | KeyManagementException e) {
+        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException |
+                 KeyManagementException e) {
             throw new TlsException(Error.INIT_SSL_CONTEXT, e);
         }
     }

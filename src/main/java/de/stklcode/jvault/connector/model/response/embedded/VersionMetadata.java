@@ -36,7 +36,8 @@ import java.util.Objects;
 public final class VersionMetadata implements Serializable {
     private static final long serialVersionUID = -5286693953873839611L;
 
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
+    private static final DateTimeFormatter TIME_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
 
     @JsonProperty("created_time")
     private String createdTimeString;

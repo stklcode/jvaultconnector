@@ -419,7 +419,8 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final SecretResponse readSecretVersion(final String mount, final String key, final Integer version) throws VaultConnectorException {
+    public final SecretResponse readSecretVersion(final String mount, final String key, final Integer version)
+            throws VaultConnectorException {
         requireAuth();
         /* Request HTTP response and parse secret metadata */
         Map<String, String> args = mapOfStrings("version", version);
@@ -428,7 +429,8 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException {
+    public final MetadataResponse readSecretMetadata(final String mount, final String key)
+            throws VaultConnectorException {
         requireAuth();
 
         /* Request HTTP response and parse secret metadata */
@@ -436,7 +438,10 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public void updateSecretMetadata(final String mount, final String key, final Integer maxVersions, final boolean casRequired) throws VaultConnectorException {
+    public void updateSecretMetadata(final String mount,
+                                     final String key,
+                                     final Integer maxVersions,
+                                     final boolean casRequired) throws VaultConnectorException {
         requireAuth();
 
         Map<String, Object> payload = mapOf(
@@ -448,7 +453,10 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final SecretVersionResponse writeSecretData(final String mount, final String key, final Map<String, Object> data, final Integer cas) throws VaultConnectorException {
+    public final SecretVersionResponse writeSecretData(final String mount,
+                                                       final String key,
+                                                       final Map<String, Object> data,
+                                                       final Integer cas) throws VaultConnectorException {
         requireAuth();
 
         if (key == null || key.isEmpty()) {
@@ -480,7 +488,8 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final void write(final String key, final Map<String, Object> data, final Map<String, Object> options) throws VaultConnectorException {
+    public final void write(final String key, final Map<String, Object> data, final Map<String, Object> options)
+            throws VaultConnectorException {
         requireAuth();
 
         if (key == null || key.isEmpty()) {
@@ -521,17 +530,20 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final void deleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException {
+    public final void deleteSecretVersions(final String mount, final String key, final int... versions)
+            throws VaultConnectorException {
         handleSecretVersions(mount, PATH_DELETE, key, versions);
     }
 
     @Override
-    public final void undeleteSecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException {
+    public final void undeleteSecretVersions(final String mount, final String key, final int... versions)
+            throws VaultConnectorException {
         handleSecretVersions(mount, PATH_UNDELETE, key, versions);
     }
 
     @Override
-    public final void destroySecretVersions(final String mount, final String key, final int... versions) throws VaultConnectorException {
+    public final void destroySecretVersions(final String mount, final String key, final int... versions)
+            throws VaultConnectorException {
         handleSecretVersions(mount, PATH_DESTROY, key, versions);
     }
 
@@ -545,7 +557,10 @@ public class HTTPVaultConnector implements VaultConnector {
      * @throws VaultConnectorException on error
      * @since 0.8
      */
-    private void handleSecretVersions(final String mount, final String pathPart, final String key, final int... versions) throws VaultConnectorException {
+    private void handleSecretVersions(final String mount,
+                                      final String pathPart,
+                                      final String key,
+                                      final int... versions) throws VaultConnectorException {
         requireAuth();
 
         /* Request HTTP response and expect empty result */
@@ -698,7 +713,7 @@ public class HTTPVaultConnector implements VaultConnector {
      */
     private static Map<String, String> mapOfStrings(Object... keyValues) {
         Map<String, String> map = new HashMap<>(keyValues.length / 2, 1);
-        for (int i = 0; i < keyValues.length -1; i = i + 2) {
+        for (int i = 0; i < keyValues.length - 1; i = i + 2) {
             Object key = keyValues[i];
             Object val = keyValues[i + 1];
             if (key instanceof String && val != null) {

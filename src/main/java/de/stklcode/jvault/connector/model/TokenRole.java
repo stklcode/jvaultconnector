@@ -264,7 +264,7 @@ public final class TokenRole implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(name, allowedPolicies, allowedPoliciesGlob, disallowedPolicies, disallowedPoliciesGlob,
-                orphan, renewable,  pathSuffix, allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl,
+                orphan, renewable, pathSuffix, allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl,
                 tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
     }
 

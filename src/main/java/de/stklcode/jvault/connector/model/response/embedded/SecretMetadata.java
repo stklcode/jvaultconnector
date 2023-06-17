@@ -37,7 +37,8 @@ import java.util.Objects;
 public final class SecretMetadata implements Serializable {
     private static final long serialVersionUID = 1684891108903409038L;
 
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
+    private static final DateTimeFormatter TIME_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
 
     @JsonProperty("created_time")
     private String createdTimeString;

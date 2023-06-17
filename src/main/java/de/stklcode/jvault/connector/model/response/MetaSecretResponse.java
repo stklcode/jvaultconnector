@@ -41,7 +41,7 @@ public class MetaSecretResponse extends SecretResponse {
 
     @Override
     public final Map<String, Serializable> getData() {
-        if (secret !=  null) {
+        if (secret != null) {
             return secret.getData();
         } else {
             return Collections.emptyMap();
@@ -50,7 +50,7 @@ public class MetaSecretResponse extends SecretResponse {
 
     @Override
     public final VersionMetadata getMetadata() {
-        if (secret !=  null) {
+        if (secret != null) {
             return secret.getMetadata();
         } else {
             return null;
