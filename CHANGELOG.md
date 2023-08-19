@@ -1,4 +1,4 @@
-## unreleased
+## 1.1.5 (2023-08-19)
 
 ### Fix
 * Fixed JSON type conversion in `SecretResponse#get(String, Class)` (#67)
