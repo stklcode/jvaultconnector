@@ -3,6 +3,9 @@
 ### Fix
 * Fixed JSON type conversion in `SecretResponse#get(String, Class)` (#67)
 
+### Test
+* Tested against Vault 1.2 to 1.15
+
 
 ## 1.1.4 (2023-06-15)
 
