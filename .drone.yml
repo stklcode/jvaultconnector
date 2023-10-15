@@ -3,7 +3,7 @@ name: default
 
 steps:
   - name: compile
-    image: maven:3-eclipse-temurin-17
+    image: maven:3-eclipse-temurin-21
     commands:
       - mvn -B clean compile
     when:
@@ -14,7 +14,7 @@ steps:
         - fix/*
         - release/*
   - name: unit-tests
-    image: maven:3-eclipse-temurin-17
+    image: maven:3-eclipse-temurin-21
     commands:
       - mvn -B test
     when:
@@ -38,7 +38,7 @@ steps:
         - main
         - release/*
   - name: unit-integration-tests
-    image: maven:3-eclipse-temurin-17
+    image: maven:3-eclipse-temurin-21
     environment:
       VAULT_VERSION: 1.15.0
     commands:
