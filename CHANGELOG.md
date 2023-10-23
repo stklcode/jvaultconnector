@@ -1,3 +1,9 @@
+## unreleased
+
+### Dependencies
+* Updated Jackson to 2.15.3
+
+
 ## 1.1.5 (2023-08-19)
 
 ### Fix
