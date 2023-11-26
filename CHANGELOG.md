@@ -6,6 +6,7 @@
 ### Improvements
 * Parse timestamps as `ZonedDateTime` instead of `String` representation
 * Remove redundant `java.base` requirement from _module-info.java_ (#69)
+* Close Java HTTP Client when running on Java 21 or later (#70)
 
 ### Dependencies
 * Updated Jackson to 2.16.0

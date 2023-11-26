@@ -363,6 +363,15 @@ public final class RequestHelper implements Serializable {
             }
         } catch (CompletionException e) {
             throw new ConnectionException(Error.CONNECTION, e.getCause());
+        } finally {
+            if (client instanceof AutoCloseable) {
+                // Close the client, which is supported since JDK21.
+                try {
+                    ((AutoCloseable) client).close();
+                } catch (Exception ignored) {
+                    // Ignore
+                }
+            }
         }
     }
 
