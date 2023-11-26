@@ -5,6 +5,7 @@
 
 ### Improvements
 * Parse timestamps as `ZonedDateTime` instead of `String` representation
+* Remove redundant `java.base` requirement from _module-info.java_ (#69)
 
 ### Dependencies
 * Updated Jackson to 2.16.0
