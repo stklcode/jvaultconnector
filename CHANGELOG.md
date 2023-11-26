@@ -6,6 +6,9 @@
 ### Improvements
 * Parse timestamps as `ZonedDateTime` instead of `String` representation
 
+### Dependencies
+* Updated Jackson to 2.16.0
+
 
 ## 1.1.5 (2023-08-19)
 
@@ -13,7 +16,7 @@
 * Fixed JSON type conversion in `SecretResponse#get(String, Class)` (#67)
 
 ### Test
-* Tested against Vault 1.2.0 to 1.14.0
+* Tested against Vault 1.2 to 1.15
 
 
 ## 1.1.4 (2023-06-15)
@@ -183,7 +186,7 @@ Old builders will be removed in 1.0
 * Added `entity_id`, `token_policies`, `token_type` and `orphan` flags to auth response
 * Added `entity_id`, `expire_time`, `explicit_max_ttl`, `issue_time`, `renewable` and `type` flags to token data
 * Added `explicit_max_ttl`, `period` and `entity_alias` flags to _Token_ model (#41)
-* Added `enable_local_secret_ids`, `token_bound_cidrs`, `token_explicit_max_ttl`, `token_no_default_policy`, 
+* Added `enable_local_secret_ids`, `token_bound_cidrs`, `token_explicit_max_ttl`, `token_no_default_policy`,
   `token_num_uses`, `token_period` and `token_type` flags to _AppRole_ model
 * Minor dependency updates
 
@@ -203,14 +206,14 @@ Old builders will be removed in 1.0
 ## 0.8.2 (2019-10-20)
 
 ### Fixes
-* Fixed token lookup (#31) 
+* Fixed token lookup (#31)
 
 ### Improvements
 * Updated dependencies
 
 ## 0.8.1 (2019-08-16)
 ### Fixes
-* Removed compile dependency to JUnit library (#30) 
+* Removed compile dependency to JUnit library (#30)
 
 ### Improvements
 * Updated dependencies
@@ -302,7 +305,7 @@ Old builders will be removed in 1.0
 ### Fixes
 * `SecretResponse` does not throw NPE on `get(key)` and `getData()`
 
-### Test 
+### Test
 * Tested against Vault 0.7.2
 
 
