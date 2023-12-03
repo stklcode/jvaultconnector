@@ -20,6 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -34,7 +36,8 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
     private static final Integer SHARES = 5;
     private static final Integer PROGRESS_SEALED = 2;
     private static final Integer PROGRESS_UNSEALED = 0;
-    private static final String VERSION = "1.8.2";
+    private static final String VERSION = "1.15.3";
+    private static final String BUILD_DATE = "2023-11-22T20:59:54Z";
     private static final String CLUSTER_NAME = "vault-cluster-d6ec3c7f";
     private static final String CLUSTER_ID = "3e8b3fec-3749-e056-ba41-b62a63b997e8";
     private static final String NONCE = "ef05d55d-4d2c-c594-a5e8-55bc88604c24";
@@ -51,6 +54,7 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
             "  \"progress\": " + PROGRESS_SEALED + ",\n" +
             "  \"nonce\": \"\",\n" +
             "  \"version\": \"" + VERSION + "\",\n" +
+            "  \"build_date\": \"" + BUILD_DATE + "\",\n" +
             "  \"migration\": \"" + MIGRATION + "\",\n" +
             "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
             "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
@@ -64,6 +68,7 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
             "  \"n\": " + SHARES + ",\n" +
             "  \"progress\": " + PROGRESS_UNSEALED + ",\n" +
             "  \"version\": \"" + VERSION + "\",\n" +
+            "  \"build_date\": \"" + BUILD_DATE + "\",\n" +
             "  \"cluster_name\": \"" + CLUSTER_NAME + "\",\n" +
             "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
             "  \"nonce\": \"" + NONCE + "\",\n" +
@@ -105,6 +110,7 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
         assertEquals(PROGRESS_SEALED, res.getProgress(), "Incorrect progress");
         assertEquals("", res.getNonce(), "Nonce not empty");
         assertEquals(VERSION, res.getVersion(), "Incorrect version");
+        assertEquals(ZonedDateTime.parse(BUILD_DATE), res.getBuildDate(), "Incorrect build date");
         assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");
         assertEquals(RECOVERY_SEAL, res.getRecoverySeal(), "Incorrect recovery seal");
         assertEquals(STORAGE_TYPE, res.getStorageType(), "Incorrect storage type");
@@ -127,6 +133,7 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
         assertEquals(PROGRESS_UNSEALED, res.getProgress(), "Incorrect progress");
         assertEquals(NONCE, res.getNonce(), "Incorrect nonce");
         assertEquals(VERSION, res.getVersion(), "Incorrect version");
+        assertEquals(ZonedDateTime.parse(BUILD_DATE), res.getBuildDate(), "Incorrect build date");
         assertEquals(CLUSTER_NAME, res.getClusterName(), "Incorrect cluster name");
         assertEquals(CLUSTER_ID, res.getClusterId(), "Incorrect cluster ID");
         assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");

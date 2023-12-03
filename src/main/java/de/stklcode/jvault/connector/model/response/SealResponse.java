@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SealResponse implements VaultResponse {
-    private static final long serialVersionUID = -3661916639367542617L;
+    private static final long serialVersionUID = -6000309255473305787L;
 
     @JsonProperty("type")
     private String type;
@@ -51,6 +52,9 @@ public final class SealResponse implements VaultResponse {
 
     @JsonProperty("version")
     private String version;
+
+    @JsonProperty("build_date")
+    private ZonedDateTime buildDate;
 
     @JsonProperty("nonce")
     private String nonce;
@@ -123,6 +127,14 @@ public final class SealResponse implements VaultResponse {
     }
 
     /**
+     * @return Vault build date.
+     * @since 1.2
+     */
+    public ZonedDateTime getBuildDate() {
+        return buildDate;
+    }
+
+    /**
      * @return A random nonce.
      * @since 0.8
      */
@@ -185,6 +197,7 @@ public final class SealResponse implements VaultResponse {
                 Objects.equals(numberOfShares, that.numberOfShares) &&
                 Objects.equals(progress, that.progress) &&
                 Objects.equals(version, that.version) &&
+                Objects.equals(buildDate, that.buildDate) &&
                 Objects.equals(nonce, that.nonce) &&
                 Objects.equals(clusterName, that.clusterName) &&
                 Objects.equals(clusterId, that.clusterId) &&
@@ -195,7 +208,7 @@ public final class SealResponse implements VaultResponse {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, sealed, initialized, threshold, numberOfShares, progress, version, nonce,
+        return Objects.hash(type, sealed, initialized, threshold, numberOfShares, progress, version, buildDate, nonce,
                 clusterName, clusterId, migration, recoverySeal, storageType);
     }
 }
