@@ -65,6 +65,9 @@ public final class AuthData implements Serializable {
     @JsonProperty("orphan")
     private boolean orphan;
 
+    @JsonProperty("mfa_requirement")
+    private MfaRequirement mfaRequirement;
+
     /**
      * @return Client token
      */
@@ -139,6 +142,14 @@ public final class AuthData implements Serializable {
         return orphan;
     }
 
+    /**
+     * @return multi-factor requirement
+     * @since 1.2
+     */
+    public MfaRequirement getMfaRequirement() {
+        return mfaRequirement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -157,12 +168,13 @@ public final class AuthData implements Serializable {
                 Objects.equals(metadata, authData.metadata) &&
                 Objects.equals(leaseDuration, authData.leaseDuration) &&
                 Objects.equals(entityId, authData.entityId) &&
-                Objects.equals(tokenType, authData.tokenType);
+                Objects.equals(tokenType, authData.tokenType) &&
+                Objects.equals(mfaRequirement, authData.mfaRequirement);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(clientToken, accessor, policies, tokenPolicies, metadata, leaseDuration, renewable,
-                entityId, tokenType, orphan);
+                entityId, tokenType, orphan, mfaRequirement);
     }
 }

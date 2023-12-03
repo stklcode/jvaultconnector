@@ -19,6 +19,10 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
+import de.stklcode.jvault.connector.model.response.embedded.MfaConstraintAny;
+import de.stklcode.jvault.connector.model.response.embedded.MfaMethodId;
+import de.stklcode.jvault.connector.model.response.embedded.MfaRequirement;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -44,29 +48,50 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
     private static final String AUTH_ENTITY_ID = "";
     private static final String AUTH_TOKEN_TYPE = "service";
     private static final Boolean AUTH_ORPHAN = false;
+    private static final String MFA_REQUEST_ID = "d0c9eec7-6921-8cc0-be62-202b289ef163";
+    private static final String MFA_KEY = "enforcementConfigUserpass";
+    private static final String MFA_METHOD_TYPE = "totp";
+    private static final String MFA_METHOD_ID = "820997b3-110e-c251-7e8b-ff4aa428a6e1";
+    private static final Boolean MFA_METHOD_USES_PASSCODE = true;
+    private static final String MFA_METHOD_NAME = "sample_mfa_method_name";
 
     private static final String RES_JSON = "{\n" +
-            "  \"auth\": {\n" +
-            "    \"accessor\": \"" + AUTH_ACCESSOR + "\",\n" +
-            "    \"client_token\": \"" + AUTH_CLIENT_TOKEN + "\",\n" +
-            "    \"policies\": [\n" +
-            "      \"" + AUTH_POLICY_1 + "\", \n" +
-            "      \"" + AUTH_POLICY_2 + "\"\n" +
-            "    ],\n" +
-            "    \"token_policies\": [\n" +
-            "      \"" + AUTH_POLICY_2 + "\",\n" +
-            "      \"" + AUTH_POLICY_1 + "\" \n" +
-            "    ],\n" +
-            "    \"metadata\": {\n" +
-            "      \"" + AUTH_META_KEY + "\": \"" + AUTH_META_VALUE + "\"\n" +
-            "    },\n" +
-            "    \"lease_duration\": " + AUTH_LEASE_DURATION + ",\n" +
-            "    \"renewable\": " + AUTH_RENEWABLE + ",\n" +
-            "    \"entity_id\": \"" + AUTH_ENTITY_ID + "\",\n" +
-            "    \"token_type\": \"" + AUTH_TOKEN_TYPE + "\",\n" +
-            "    \"orphan\": " + AUTH_ORPHAN + "\n" +
-            "  }\n" +
-            "}";
+        "  \"auth\": {\n" +
+        "    \"accessor\": \"" + AUTH_ACCESSOR + "\",\n" +
+        "    \"client_token\": \"" + AUTH_CLIENT_TOKEN + "\",\n" +
+        "    \"policies\": [\n" +
+        "      \"" + AUTH_POLICY_1 + "\", \n" +
+        "      \"" + AUTH_POLICY_2 + "\"\n" +
+        "    ],\n" +
+        "    \"token_policies\": [\n" +
+        "      \"" + AUTH_POLICY_2 + "\",\n" +
+        "      \"" + AUTH_POLICY_1 + "\" \n" +
+        "    ],\n" +
+        "    \"metadata\": {\n" +
+        "      \"" + AUTH_META_KEY + "\": \"" + AUTH_META_VALUE + "\"\n" +
+        "    },\n" +
+        "    \"lease_duration\": " + AUTH_LEASE_DURATION + ",\n" +
+        "    \"renewable\": " + AUTH_RENEWABLE + ",\n" +
+        "    \"entity_id\": \"" + AUTH_ENTITY_ID + "\",\n" +
+        "    \"token_type\": \"" + AUTH_TOKEN_TYPE + "\",\n" +
+        "    \"orphan\": " + AUTH_ORPHAN + ",\n" +
+        "    \"mfa_requirement\": {\n" +
+        "      \"mfa_request_id\": \"" + MFA_REQUEST_ID + "\",\n" +
+        "      \"mfa_constraints\": {\n" +
+        "        \"" + MFA_KEY + "\": {\n" +
+        "          \"any\": [\n" +
+        "            {\n" +
+        "              \"type\": \"" + MFA_METHOD_TYPE + "\",\n" +
+        "              \"id\": \"" + MFA_METHOD_ID + "\",\n" +
+        "              \"uses_passcode\": " + MFA_METHOD_USES_PASSCODE + ",\n" +
+        "              \"name\": \"" + MFA_METHOD_NAME + "\"\n" +
+        "            }\n" +
+        "          ]\n" +
+        "        }\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
 
     AuthResponseTest() {
         super(AuthResponse.class);
@@ -80,6 +105,13 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
             fail("Creation of full model instance failed", e);
             return null;
         }
+    }
+
+    @Test
+    void testEqualsHashcodeMfa() {
+        EqualsVerifier.simple().forClass(MfaRequirement.class).verify();
+        EqualsVerifier.simple().forClass(MfaConstraintAny.class).verify();
+        EqualsVerifier.simple().forClass(MfaMethodId.class).verify();
     }
 
     /**
@@ -107,5 +139,14 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
         assertEquals(2, data.getTokenPolicies().size(), "Incorrect number of token policies");
         assertTrue(data.getTokenPolicies().containsAll(Set.of(AUTH_POLICY_2, AUTH_POLICY_1)), "Incorrect token policies");
         assertEquals(Map.of(AUTH_META_KEY, AUTH_META_VALUE), data.getMetadata(), "Incorrect auth metadata");
+
+        assertEquals(MFA_REQUEST_ID, data.getMfaRequirement().getMfaRequestId(), "Incorrect MFA request ID");
+        assertEquals(Set.of(MFA_KEY), data.getMfaRequirement().getMfaConstraints().keySet(), "Incorrect MFA constraint keys");
+        var mfaConstraint = data.getMfaRequirement().getMfaConstraints().get(MFA_KEY);
+        assertEquals(1, mfaConstraint.getAny().size(), "Incorrect number of any constraints");
+        assertEquals(MFA_METHOD_TYPE, mfaConstraint.getAny().get(0).getType(), "Incorrect MFA method type");
+        assertEquals(MFA_METHOD_ID, mfaConstraint.getAny().get(0).getId(), "Incorrect MFA method type");
+        assertEquals(MFA_METHOD_USES_PASSCODE, mfaConstraint.getAny().get(0).getUsesPasscode(), "Incorrect MFA method uses passcode");
+        assertEquals(MFA_METHOD_NAME, mfaConstraint.getAny().get(0).getName(), "Incorrect MFA method uses passcode");
     }
 }
