@@ -8,6 +8,7 @@
 * Remove redundant `java.base` requirement from _module-info.java_ (#69)
 * Close Java HTTP Client when running on Java 21 or later (#70)
 * Add MFA requirements tu `AuthResponse` (#71)
+* Extend `AuthMethod` data model (#72)
 
 ### Dependencies
 * Updated Jackson to 2.16.0

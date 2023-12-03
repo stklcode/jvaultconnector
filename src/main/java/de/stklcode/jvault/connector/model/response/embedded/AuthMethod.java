@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthMethod implements Serializable {
-    private static final long serialVersionUID = -2718660627880077335L;
+    private static final long serialVersionUID = -439987082190917691L;
 
     private AuthBackend type;
     private String rawType;
@@ -42,17 +42,32 @@ public final class AuthMethod implements Serializable {
     @JsonProperty("accessor")
     private String accessor;
 
+    @JsonProperty("deprecation_status")
+    private String deprecationStatus;
+
     @JsonProperty("description")
     private String description;
 
     @JsonProperty("config")
-    private Map<String, String> config;
+    private MountConfig config;
 
     @JsonProperty("external_entropy_access")
     private boolean externalEntropyAccess;
 
     @JsonProperty("local")
     private boolean local;
+
+    @JsonProperty("options")
+    private Map<String, String> options;
+
+    @JsonProperty("plugin_version")
+    private String pluginVersion;
+
+    @JsonProperty("running_plugin_version")
+    private String runningPluginVersion;
+
+    @JsonProperty("running_sha256")
+    private String runningSha256;
 
     @JsonProperty("seal_wrap")
     private boolean sealWrap;
@@ -92,6 +107,14 @@ public final class AuthMethod implements Serializable {
     }
 
     /**
+     * @return Deprecation status
+     * @since 1.2
+     */
+    public String getDeprecationStatus() {
+        return deprecationStatus;
+    }
+
+    /**
      * @return Description
      */
     public String getDescription() {
@@ -100,8 +123,10 @@ public final class AuthMethod implements Serializable {
 
     /**
      * @return Configuration data
+     * @since 0.2
+     * @since 1.2 Returns {@link MountConfig} instead of {@link Map}
      */
-    public Map<String, String> getConfig() {
+    public MountConfig getConfig() {
         return config;
     }
 
@@ -118,6 +143,38 @@ public final class AuthMethod implements Serializable {
      */
     public boolean isLocal() {
         return local;
+    }
+
+    /**
+     * @return Options
+     * @since 1.2
+     */
+    public Map<String, String> getOptions() {
+        return options;
+    }
+
+    /**
+     * @return Plugin version
+     * @since 1.2
+     */
+    public String getPluginVersion() {
+        return pluginVersion;
+    }
+
+    /**
+     * @return Running plugin version
+     * @since 1.2
+     */
+    public String getRunningPluginVersion() {
+        return runningPluginVersion;
+    }
+
+    /**
+     * @return Running SHA256
+     * @since 1.2
+     */
+    public String getRunningSha256() {
+        return runningSha256;
     }
 
     /**
@@ -150,13 +207,19 @@ public final class AuthMethod implements Serializable {
                 sealWrap == that.sealWrap &&
                 Objects.equals(rawType, that.rawType) &&
                 Objects.equals(accessor, that.accessor) &&
+                Objects.equals(deprecationStatus, that.deprecationStatus) &&
                 Objects.equals(description, that.description) &&
                 Objects.equals(config, that.config) &&
+                Objects.equals(options, that.options) &&
+                Objects.equals(pluginVersion, that.pluginVersion) &&
+                Objects.equals(runningPluginVersion, that.runningPluginVersion) &&
+                Objects.equals(runningSha256, that.runningSha256) &&
                 Objects.equals(uuid, that.uuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, rawType, accessor, description, config, externalEntropyAccess, local, sealWrap, uuid);
+        return Objects.hash(type, rawType, accessor, deprecationStatus, description, config, externalEntropyAccess,
+            local, options, pluginVersion, runningPluginVersion, runningSha256, sealWrap, uuid);
     }
 }

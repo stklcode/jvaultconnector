@@ -46,7 +46,10 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     private static final String TK_ACCESSOR = "auth_token_ac0dd95a";
     private static final String TK_DESCR = "token based credentials";
     private static final Integer TK_LEASE_TTL = 0;
+    private static final Boolean TK_FORCE_NO_CACHE = false;
     private static final Integer TK_MAX_LEASE_TTL = 0;
+    private static final String TK_TOKEN_TYPE = "default-service";
+    private static final String TK_RUNNING_PLUGIN_VERSION = "v1.15.3+builtin.vault";
 
     private static final String RES_JSON = "{\n" +
             "  \"data\": {" +
@@ -62,9 +65,15 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
             "    \"" + TK_PATH + "\": {\n" +
             "      \"config\": {\n" +
             "        \"default_lease_ttl\": " + TK_LEASE_TTL + ",\n" +
-            "        \"max_lease_ttl\": " + TK_MAX_LEASE_TTL + "\n" +
+            "        \"force_no_cache\": " + TK_FORCE_NO_CACHE + ",\n" +
+            "        \"max_lease_ttl\": " + TK_MAX_LEASE_TTL + ",\n" +
+            "        \"token_type\": \"" + TK_TOKEN_TYPE + "\"\n" +
             "      },\n" +
             "      \"description\": \"" + TK_DESCR + "\",\n" +
+            "      \"options\": null,\n" +
+            "      \"plugin_version\": \"\",\n" +
+            "      \"running_plugin_version\": \"" + TK_RUNNING_PLUGIN_VERSION + "\",\n" +
+            "      \"running_sha256\": \"\",\n" +
             "      \"type\": \"" + TK_TYPE + "\",\n" +
             "      \"uuid\": \"" + TK_UUID + "\",\n" +
             "      \"accessor\": \"" + TK_ACCESSOR + "\",\n" +
@@ -137,15 +146,16 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
         assertTrue(method.isLocal(), "Unexpected local flag for Token");
         assertFalse(method.isExternalEntropyAccess(), "Unexpected external entropy flag for Token");
         assertFalse(method.isSealWrap(), "Unexpected seal wrap flag for GitHub");
+        assertEquals("", method.getPluginVersion(), "Unexpected plugin version");
+        assertEquals(TK_RUNNING_PLUGIN_VERSION, method.getRunningPluginVersion(), "Unexpected running plugin version");
+        assertEquals("", method.getRunningSha256(), "Unexpected running SHA256");
 
         assertNotNull(method.getConfig(), "Missing config for Token");
-        assertEquals(
-                Map.of(
-                        "default_lease_ttl", TK_LEASE_TTL.toString(),
-                        "max_lease_ttl", TK_MAX_LEASE_TTL.toString()
-                ),
-                method.getConfig(),
-                "Unexpected config for Token"
-        );
+        assertEquals(TK_LEASE_TTL, method.getConfig().getDefaultLeaseTtl(), "Unexpected default TTL");
+        assertEquals(TK_MAX_LEASE_TTL, method.getConfig().getMaxLeaseTtl(), "Unexpected max TTL");
+        assertEquals(TK_FORCE_NO_CACHE, method.getConfig().getForceNoCache(), "Unexpected force no cache flag");
+        assertEquals(TK_TOKEN_TYPE, method.getConfig().getTokenType(), "Unexpected token type");
+
+        assertNull(method.getOptions(), "Unexpected options");
     }
 }
