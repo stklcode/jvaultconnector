@@ -33,7 +33,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthData implements Serializable {
-    private static final long serialVersionUID = -6962244199229885869L;
+    private static final long serialVersionUID = 3067695351664603536L;
 
     @JsonProperty("client_token")
     private String clientToken;
