@@ -1,4 +1,4 @@
-## unreleased
+## 1.2.0 (2023-12-11)
 
 ### Deprecations
 * `get...TimeString()` methods on various model classes are now deprecated

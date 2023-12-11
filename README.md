@@ -1,8 +1,8 @@
-# Java Vault Connector 
+# Java Vault Connector
 
 [![CI Status](https://github.com/stklcode/jvaultconnector/actions/workflows/ci.yml/badge.svg)](https://github.com/stklcode/jvaultconnector/actions/workflows/ci.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=de.stklcode.jvault%3Ajvault-connector&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.stklcode.jvault%3Ajvault-connector)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/stklcode/jvaultconnector/blob/main/LICENSE.txt) 
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/stklcode/jvaultconnector/blob/main/LICENSE.txt)
 [![Maven Central](https://img.shields.io/maven-central/v/de.stklcode.jvault/jvault-connector.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.stklcode.jvault%22%20AND%20a%3A%22jvault-connector%22)
 
 ![Logo](https://raw.githubusercontent.com/stklcode/jvaultconnector/main/assets/logo.png)
@@ -40,7 +40,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>jvault-connector</artifactId>
-    <version>1.1.5</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -61,7 +61,7 @@ VaultConnector vault = HTTPVaultConnector.builder("https://example.com:8200/v1/"
  .withTrustedCA(Paths.get("/path/to/CA.pem"))
  .build();
 
-// Initialization from environment variables 
+// Initialization from environment variables
 VaultConnector vault = HTTPVaultConnector.builder()
  .fromEnv()
  .build();
