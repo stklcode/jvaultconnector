@@ -322,7 +322,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
-                        <version>9.0.2</version>
+                        <version>9.0.4</version>
                         <configuration>
                             <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
                             <nvdDatafeedUrl>${env.NVD_DATAFEED_URL}</nvdDatafeedUrl>

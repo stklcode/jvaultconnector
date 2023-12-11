@@ -36,7 +36,7 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
     private static final Integer SHARES = 5;
     private static final Integer PROGRESS_SEALED = 2;
     private static final Integer PROGRESS_UNSEALED = 0;
-    private static final String VERSION = "1.15.3";
+    private static final String VERSION = "1.15.4";
     private static final String BUILD_DATE = "2023-11-22T20:59:54Z";
     private static final String CLUSTER_NAME = "vault-cluster-d6ec3c7f";
     private static final String CLUSTER_ID = "3e8b3fec-3749-e056-ba41-b62a63b997e8";
