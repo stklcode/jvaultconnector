@@ -91,7 +91,7 @@ class HTTPVaultConnectorTest {
                 "Querying health status succeeded on invalid instance"
         );
         assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
-        assertTrue(e.getCause() instanceof IOException, "Unexpected cause");
+        assertInstanceOf(IOException.class, e.getCause(), "Unexpected cause");
 
         // Now simulate a failing request that succeeds on second try.
         connector = HTTPVaultConnector.builder(wireMock.url("/")).withNumberOfRetries(1).withTimeout(250).build();

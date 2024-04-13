@@ -909,7 +909,7 @@ class HTTPVaultConnectorIT {
             assertFalse(res.getAuth().isRenewable(), "Root token should not be renewable");
             assertFalse(res.getAuth().isOrphan(), "Root token should not be orphan");
 
-            // Starting with Vault 1.0 a warning "custom ID uses weaker SHA1.." is given.
+            // Starting with Vault 1.0 a warning "custom ID uses weaker SHA1..." is given.
             // Starting with Vault 1.11 a second warning "Endpoint ignored unrecognized parameters" is given.
             assertFalse(res.getWarnings().isEmpty(), "Token creation did not return expected warning");
 

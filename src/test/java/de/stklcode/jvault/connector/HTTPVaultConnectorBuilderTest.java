@@ -136,7 +136,7 @@ class HTTPVaultConnectorBuilderTest {
                     () -> HTTPVaultConnector.builder().fromEnv(),
                     "Creation with unknown cert path failed"
             );
-            assertTrue(e.getCause() instanceof NoSuchFileException);
+            assertInstanceOf(NoSuchFileException.class, e.getCause());
             assertEquals(VAULT_CACERT, ((NoSuchFileException) e.getCause()).getFile());
 
             return null;
