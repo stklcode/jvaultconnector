@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -60,11 +59,9 @@ class CredentialsResponseTest extends AbstractModelTest<CredentialsResponse> {
 
     /**
      * Test getter, setter and get-methods for response data.
-     *
-     * @throws InvalidResponseException Should not occur
      */
     @Test
-    void getCredentialsTest() throws InvalidResponseException {
+    void getCredentialsTest() {
         // Create empty Object.
         CredentialsResponse res = new CredentialsResponse();
         assertNull(res.getUsername(), "Username not present in data map should not return anything");

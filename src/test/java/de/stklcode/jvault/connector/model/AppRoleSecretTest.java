@@ -115,7 +115,7 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
      */
     @Test
     void jsonTest() throws NoSuchFieldException, IllegalAccessException {
-        // A simple roundtrip first. All set fields should be present afterwards..
+        // A simple roundtrip first. All set fields should be present afterward.
         AppRoleSecret secret = new AppRoleSecret(TEST_ID, TEST_META, TEST_CIDR);
         String secretJson = assertDoesNotThrow(() -> objectMapper.writeValueAsString(secret), "Serialization failed");
         // CIDR list is comma-separated when used as input, but List otherwise, hence convert string to list.
@@ -180,7 +180,7 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
     }
 
     private static String commaSeparatedToList(String json) {
-        return json.replaceAll("\"cidr_list\":\"([^\"]*)\"", "\"cidr_list\":\\[$1\\]")
+        return json.replaceAll("\"cidr_list\":\"([^\"]*)\"", "\"cidr_list\":[$1]")
                 .replaceAll("(\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+)", "\"$1\"");
     }
 }
