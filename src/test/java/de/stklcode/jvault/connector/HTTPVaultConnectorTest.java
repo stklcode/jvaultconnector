@@ -300,7 +300,7 @@ class HTTPVaultConnectorTest {
 
     private Object getPrivate(Object target, String fieldName) throws NoSuchFieldException, IllegalAccessException {
         Field field = target.getClass().getDeclaredField(fieldName);
-        if (field.isAccessible()) {
+        if (field.canAccess(target)) {
             return field.get(target);
         }
         field.setAccessible(true);
@@ -312,7 +312,7 @@ class HTTPVaultConnectorTest {
     private void setPrivate(Object target, String fieldName, Object value) {
         try {
             Field field = target.getClass().getDeclaredField(fieldName);
-            boolean accessible = field.isAccessible();
+            boolean accessible = field.canAccess(target);
             field.setAccessible(true);
             field.set(target, value);
             field.setAccessible(accessible);

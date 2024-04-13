@@ -173,7 +173,7 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
 
     private static void setPrivateField(Object object, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
         Field field = object.getClass().getDeclaredField(fieldName);
-        boolean accessible = field.isAccessible();
+        boolean accessible = field.canAccess(object);
         field.setAccessible(true);
         field.set(object, value);
         field.setAccessible(accessible);
