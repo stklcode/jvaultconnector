@@ -431,18 +431,19 @@ public final class RequestHelper implements Serializable {
      * @throws VaultConnectorException Expected exception with details to throw
      */
     private void handleError(final HttpResponse<InputStream> response) throws VaultConnectorException {
-        if (response.body() != null) {
-            try (var reader = new BufferedReader(new InputStreamReader(response.body(), UTF_8))) {
-                var responseString = reader.lines().collect(Collectors.joining("\n"));
-                ErrorResponse er = jsonMapper.readValue(responseString, ErrorResponse.class);
-                /* Check for "permission denied" response */
-                if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied")) {
-                    throw new PermissionDeniedException();
+        try (var body = response.body()) {
+            if (body != null) {
+                try (var reader = new BufferedReader(new InputStreamReader(body, UTF_8))) {
+                    ErrorResponse er = jsonMapper.readValue(reader, ErrorResponse.class);
+                    /* Check for "permission denied" response */
+                    if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied")) {
+                        throw new PermissionDeniedException();
+                    }
+                    throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), er.toString());
                 }
-                throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), er.toString());
-            } catch (IOException ignored) {
-                // Exception ignored.
             }
+        } catch (IOException ignored) {
+            // Exception ignored.
         }
     }
 }
