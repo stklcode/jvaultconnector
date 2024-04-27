@@ -1,3 +1,9 @@
+## unreleased
+
+### Removal
+* Remove deprecated `get...TimeString()` on model classes (#77)
+
+
 ## 1.3.1 (2024-10-03)
 
 ### Dependencies

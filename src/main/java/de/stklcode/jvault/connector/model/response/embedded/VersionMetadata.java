@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -36,9 +35,6 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class VersionMetadata implements Serializable {
     private static final long serialVersionUID = 8495687554714216478L;
-
-    private static final DateTimeFormatter TIME_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
 
     @JsonProperty("created_time")
     private ZonedDateTime createdTime;
@@ -56,36 +52,10 @@ public final class VersionMetadata implements Serializable {
     private HashMap<String, String> customMetadata;
 
     /**
-     * @return Time of secret creation as raw string representation.
-     * @deprecated Method left for backwards compatibility only. Use {@link #getCreatedTime()} instead.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public String getCreatedTimeString() {
-        if (createdTime != null) {
-            return TIME_FORMAT.format(createdTime);
-        }
-
-        return null;
-    }
-
-    /**
      * @return Time of secret creation.
      */
     public ZonedDateTime getCreatedTime() {
         return createdTime;
-    }
-
-    /**
-     * @return Time for secret deletion as raw string representation.
-     * @deprecated Method left for backwards compatibility only. Use {@link #getDeletionTime()} instead.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public String getDeletionTimeString() {
-        if (deletionTime != null) {
-            return TIME_FORMAT.format(deletionTime);
-        }
-
-        return null;
     }
 
     /**
