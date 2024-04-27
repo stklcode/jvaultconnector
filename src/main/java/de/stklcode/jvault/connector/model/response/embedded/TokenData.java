@@ -128,20 +128,6 @@ public final class TokenData implements Serializable {
     }
 
     /**
-     * @return Expire time as raw string value
-     * @since 0.9
-     * @deprecated Method left for backwards compatibility only. Use {@link #getExpireTime()} instead.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public String getExpireTimeString() {
-        if (expireTime != null) {
-            return TIME_FORMAT.format(expireTime);
-        }
-
-        return null;
-    }
-
-    /**
      * @return Expire time (parsed)
      * @since 0.9
      */
@@ -162,20 +148,6 @@ public final class TokenData implements Serializable {
      */
     public String getId() {
         return id;
-    }
-
-    /**
-     * @return Issue time as raw string value
-     * @since 0.9
-     * @deprecated Method left for backwards compatibility only. Use {@link #getIssueTime()} instead.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public String getIssueTimeString() {
-        if (issueTime != null) {
-            return TIME_FORMAT.format(issueTime);
-        }
-
-        return null;
     }
 
     /**

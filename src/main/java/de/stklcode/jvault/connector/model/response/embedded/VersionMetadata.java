@@ -51,36 +51,10 @@ public final class VersionMetadata implements Serializable {
     private Integer version;
 
     /**
-     * @return Time of secret creation as raw string representation.
-     * @deprecated Method left for backwards compatibility only. Use {@link #getCreatedTime()} instead.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public String getCreatedTimeString() {
-        if (createdTime != null) {
-            return TIME_FORMAT.format(createdTime);
-        }
-
-        return null;
-    }
-
-    /**
      * @return Time of secret creation.
      */
     public ZonedDateTime getCreatedTime() {
         return createdTime;
-    }
-
-    /**
-     * @return Time for secret deletion as raw string representation.
-     * @deprecated Method left for backwards compatibility only. Use {@link #getDeletionTime()} instead.
-     */
-    @Deprecated(since = "1.2", forRemoval = true)
-    public String getDeletionTimeString() {
-        if (deletionTime != null) {
-            return TIME_FORMAT.format(deletionTime);
-        }
-
-        return null;
     }
 
     /**

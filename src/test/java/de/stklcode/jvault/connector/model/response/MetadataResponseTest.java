@@ -88,18 +88,14 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
         );
         assertNotNull(res, "Parsed response is NULL");
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
-        assertEquals(V1_TIME, res.getMetadata().getCreatedTimeString(), "Incorrect created time");
         assertNotNull(res.getMetadata().getCreatedTime(), "Parting created time failed");
         assertEquals(CURRENT_VERSION, res.getMetadata().getCurrentVersion(), "Incorrect current version");
         assertEquals(MAX_VERSIONS, res.getMetadata().getMaxVersions(), "Incorrect max versions");
         assertEquals(OLDEST_VERSION, res.getMetadata().getOldestVersion(), "Incorrect oldest version");
-        assertEquals(V3_TIME, res.getMetadata().getUpdatedTimeString(), "Incorrect updated time");
         assertNotNull(res.getMetadata().getUpdatedTime(), "Parting updated time failed");
         assertEquals(3, res.getMetadata().getVersions().size(), "Incorrect number of versions");
-        assertEquals(V2_TIME, res.getMetadata().getVersions().get(1).getDeletionTimeString(), "Incorrect version 1 delete time");
         assertNotNull(res.getMetadata().getVersions().get(1).getDeletionTime(), "Parsing version delete time failed");
         assertTrue(res.getMetadata().getVersions().get(1).isDestroyed(), "Incorrect version 1 destroyed state");
-        assertEquals(V2_TIME, res.getMetadata().getVersions().get(2).getCreatedTimeString(), "Incorrect version 2 created time");
         assertNotNull(res.getMetadata().getVersions().get(2).getCreatedTime(), "Parsing version created failed");
         assertFalse(res.getMetadata().getVersions().get(3).isDestroyed(), "Incorrect version 3 destroyed state");
     }
