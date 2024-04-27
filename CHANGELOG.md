@@ -2,6 +2,7 @@
 
 ### Removal
 * Remove deprecated `get...TimeString()` on model classes (#77)
+* Drop support fpr deprecated `App-ID` auth backend (#61) (#78)
 
 
 ## 1.3.1 (2024-10-03)

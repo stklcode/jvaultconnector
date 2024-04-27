@@ -237,18 +237,6 @@ class HTTPVaultConnectorTest {
         // Now test the methods expecting a 204.
         assertThrows(
                 InvalidResponseException.class,
-                () -> connector.registerAppId("appID", "policy", "displayName"),
-                "registerAppId() with 200 response succeeded"
-        );
-
-        assertThrows(
-                InvalidResponseException.class,
-                () -> connector.registerUserId("appID", "userID"),
-                "registerUserId() with 200 response succeeded"
-        );
-
-        assertThrows(
-                InvalidResponseException.class,
                 () -> connector.createAppRole("appID", Collections.singletonList("policy")),
                 "createAppRole() with 200 response succeeded"
         );
