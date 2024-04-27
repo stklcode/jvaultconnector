@@ -496,7 +496,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throw new InvalidRequestException("Secret path must not be empty.");
         }
 
-        // By default data is directly passed as payload.
+        // By default, data is directly passed as payload.
         Object payload = data;
 
         // If options are given, split payload in two parts.

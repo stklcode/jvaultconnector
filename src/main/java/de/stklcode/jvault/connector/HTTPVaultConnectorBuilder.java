@@ -293,7 +293,7 @@ public final class HTTPVaultConnectorBuilder {
     }
 
     /**
-     * Build connector based on the {@code }VAULT_ADDR} and {@code VAULT_CACERT} (optional) environment variables.
+     * Build connector based on the {@code VAULT_ADDR} and {@code VAULT_CACERT} (optional) environment variables.
      *
      * @return self
      * @throws VaultConnectorException if Vault address from environment variables is malformed
