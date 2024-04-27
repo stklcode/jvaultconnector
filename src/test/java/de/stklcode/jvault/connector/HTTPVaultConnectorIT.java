@@ -25,7 +25,6 @@ import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.*;
@@ -61,7 +60,6 @@ class HTTPVaultConnectorIT {
     private static final String USER_VALID = "validUser";
     private static final String PASS_VALID = "validPass";
 
-    private static boolean legacy;
     private Process vaultProcess;
     private VaultConnector connector;
 
@@ -71,9 +69,6 @@ class HTTPVaultConnectorIT {
         if (System.getenv("VAULT_VERSION") != null) {
             VAULT_VERSION = System.getenv("VAULT_VERSION");
             System.out.println("Vault version set to " + VAULT_VERSION);
-        }
-        if (compareVersions(VAULT_VERSION, "1.12.0") < 0) {
-            legacy = true;
         }
     }
 
@@ -550,74 +545,6 @@ class HTTPVaultConnectorIT {
     }
 
     @Nested
-    @DisplayName("App-ID Tests")
-    @EnabledIf(value = "de.stklcode.jvault.connector.HTTPVaultConnectorIT#isLegacy",
-            disabledReason = "AppID tests no longer available for Vault 1.12 and above")
-    @SuppressWarnings("deprecation")
-    class AppIdTests {
-        private static final String APP_ID = "152AEA38-85FB-47A8-9CBD-612D645BFACA";
-        private static final String USER_ID = "5ADF8218-D7FB-4089-9E38-287465DBF37E";
-
-        /**
-         * App-ID authentication roundtrip.
-         */
-        @Test
-        @Order(10)
-        @DisplayName("Authenticate with App-ID")
-        void authAppIdTest() {
-            // Try unauthorized access first.
-            assumeFalse(connector.isAuthorized());
-
-            assertThrows(
-                    AuthorizationRequiredException.class,
-                    () -> connector.registerAppId("", "", ""),
-                    "Expected exception not thrown"
-            );
-            assertThrows(
-                    AuthorizationRequiredException.class,
-                    () -> connector.registerUserId("", ""),
-                    "Expected exception not thrown"
-            );
-        }
-
-        /**
-         * App-ID authentication roundtrip.
-         */
-        @Test
-        @Order(20)
-        @DisplayName("Register App-ID")
-        void registerAppIdTest() {
-            // Authorize.
-            authRoot();
-            assumeTrue(connector.isAuthorized());
-
-            // Register App-ID.
-            boolean res = assertDoesNotThrow(
-                    () -> connector.registerAppId(APP_ID, "user", "App Name"),
-                    "Failed to register App-ID"
-            );
-            assertTrue(res, "Failed to register App-ID");
-
-            // Register User-ID.
-            res = assertDoesNotThrow(
-                    () -> connector.registerUserId(APP_ID, USER_ID),
-                    "Failed to register App-ID"
-            );
-            assertTrue(res, "Failed to register App-ID");
-
-            connector.resetAuth();
-            assumeFalse(connector.isAuthorized());
-
-            // Authenticate with created credentials.
-            assertDoesNotThrow(
-                    () -> connector.authAppId(APP_ID, USER_ID),
-                    "Failed to authenticate using App-ID"
-            );
-            assertTrue(connector.isAuthorized(), "Authorization flag not set after App-ID login");
-        }
-    }
-
-    @Nested
     @DisplayName("AppRole Tests")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class AppRoleTests {
@@ -1079,13 +1006,9 @@ class HTTPVaultConnectorIT {
                     () -> connector.getAuthBackends(),
                     "Could not list supported auth backends"
             );
-            if (legacy) {
-                assertEquals(4, supportedBackends.size());
-                assertTrue(supportedBackends.containsAll(List.of(AuthBackend.TOKEN, AuthBackend.USERPASS, AuthBackend.APPID, AuthBackend.APPROLE)));
-            } else {
-                assertEquals(3, supportedBackends.size());
-                assertTrue(supportedBackends.containsAll(List.of(AuthBackend.TOKEN, AuthBackend.USERPASS, AuthBackend.APPROLE)));
-            }
+
+            assertEquals(3, supportedBackends.size());
+            assertTrue(supportedBackends.containsAll(List.of(AuthBackend.TOKEN, AuthBackend.USERPASS, AuthBackend.APPROLE)));
         }
 
         /**
@@ -1211,11 +1134,7 @@ class HTTPVaultConnectorIT {
      */
     private VaultConfiguration initializeVault(File dir, boolean tls) throws IllegalStateException, IOException {
         File dataDir = new File(dir, "data");
-        if (legacy) {
-            copyDirectory(new File(getClass().getResource("/data_dir_legacy").getPath()), dataDir);
-        } else {
-            copyDirectory(new File(getClass().getResource("/data_dir").getPath()), dataDir);
-        }
+        copyDirectory(new File(getClass().getResource("/data_dir").getPath()), dataDir);
 
         // Generate vault local unencrypted configuration.
         VaultConfiguration config = new VaultConfiguration()
@@ -1310,36 +1229,5 @@ class HTTPVaultConnectorIT {
         StringWriter sw = new StringWriter();
         th.printStackTrace(new PrintWriter(sw, true));
         return sw.getBuffer().toString();
-    }
-
-    /**
-     * Compare two version strings.
-     *
-     * @param version1 Version 1
-     * @param version2 Version 2
-     * @return negative value if version 1 is smaller than version2, positive value of version 1 is greater, 0 if equal
-     */
-    private static int compareVersions(String version1, String version2) {
-        int comparisonResult = 0;
-
-        String[] version1Splits = version1.split("\\.");
-        String[] version2Splits = version2.split("\\.");
-        int maxLengthOfVersionSplits = Math.max(version1Splits.length, version2Splits.length);
-
-        for (int i = 0; i < maxLengthOfVersionSplits; i++) {
-            Integer v1 = i < version1Splits.length ? Integer.parseInt(version1Splits[i]) : 0;
-            Integer v2 = i < version2Splits.length ? Integer.parseInt(version2Splits[i]) : 0;
-            int compare = v1.compareTo(v2);
-            if (compare != 0) {
-                comparisonResult = compare;
-                break;
-            }
-        }
-
-        return comparisonResult;
-    }
-
-    private static boolean isLegacy() {
-        return legacy;
     }
 }
