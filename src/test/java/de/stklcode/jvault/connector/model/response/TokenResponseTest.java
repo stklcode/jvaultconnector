@@ -136,11 +136,9 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
         assertEquals(TOKEN_TTL, data.getCreationTtl(), "Incorrect token creation TTL");
         assertEquals(TOKEN_DISPLAY_NAME, data.getName(), "Incorrect token display name");
         assertEquals(TOKEN_ENTITY_ID, data.getEntityId(), "Incorrect token entity ID");
-        assertEquals(TOKEN_EXPIRE_TIME, data.getExpireTimeString(), "Incorrect token expire time");
         assertEquals(ZonedDateTime.parse(TOKEN_EXPIRE_TIME), data.getExpireTime(), "Incorrect parsed token expire time");
         assertEquals(TOKEN_EXPLICIT_MAX_TTL, data.getExplicitMaxTtl(), "Incorrect token explicit max TTL");
         assertEquals(TOKEN_ID, data.getId(), "Incorrect token ID");
-        assertEquals(TOKEN_ISSUE_TIME, data.getIssueTimeString(), "Incorrect token issue time");
         assertEquals(ZonedDateTime.parse(TOKEN_ISSUE_TIME), data.getIssueTime(), "Incorrect parsed token issue time");
         assertEquals(Map.of(TOKEN_META_KEY, TOKEN_META_VALUE), data.getMeta(), "Incorrect token metadata");
         assertEquals(TOKEN_NUM_USES, data.getNumUses(), "Incorrect token number of uses");
