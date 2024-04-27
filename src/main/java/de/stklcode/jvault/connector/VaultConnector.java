@@ -113,19 +113,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     AuthResponse authUserPass(final String username, final String password) throws VaultConnectorException;
 
     /**
-     * Authorize to Vault using AppID method.
-     *
-     * @param appID  The App ID
-     * @param userID The User ID
-     * @return The {@link AuthResponse}
-     * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
-     * Consider using {@link #authAppRole} instead.
-     */
-    @Deprecated(since = "0.4", forRemoval = true)
-    AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException;
-
-    /**
      * Authorize to Vault using AppRole method without secret ID.
      *
      * @param roleID The role ID
@@ -147,21 +134,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.4.0
      */
     AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException;
-
-    /**
-     * Register new App-ID with policy.
-     *
-     * @param appID       The unique App-ID
-     * @param policy      The policy to associate with
-     * @param displayName Arbitrary name to display
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
-     * Consider using {@link #createAppRole} instead.
-     */
-    @Deprecated(since = "0.4", forRemoval = true)
-    boolean registerAppId(final String appID, final String policy, final String displayName)
-            throws VaultConnectorException;
 
     /**
      * Register a new AppRole role from given metamodel.
@@ -343,38 +315,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      */
     List<String> listAppRoleSecrets(final String roleName) throws VaultConnectorException;
-
-    /**
-     * Register User-ID with App-ID.
-     *
-     * @param appID  The App-ID
-     * @param userID The User-ID
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
-     * Consider using {@link #createAppRoleSecret} instead.
-     */
-    @Deprecated(since = "0.4", forRemoval = true)
-    boolean registerUserId(final String appID, final String userID) throws VaultConnectorException;
-
-    /**
-     * Register new App-ID and User-ID at once.
-     *
-     * @param appID       The App-ID
-     * @param policy      The policy to associate with
-     * @param displayName Arbitrary name to display
-     * @param userID      The User-ID
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @deprecated As of Vault 0.6.1 App-ID is superseded by AppRole. App-ID was removed in Vault 1.12.
-     */
-    @Deprecated(since = "0.4", forRemoval = true)
-    default boolean registerAppUserId(final String appID,
-                                      final String policy,
-                                      final String displayName,
-                                      final String userID) throws VaultConnectorException {
-        return registerAppId(appID, policy, userID) && registerUserId(appID, userID);
-    }
 
     /**
      * Get authorization status.

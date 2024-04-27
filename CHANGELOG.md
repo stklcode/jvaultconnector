@@ -1,3 +1,9 @@
+## unreleased
+
+### Removal
+* Drop support fpr deprecated `App-ID` auth backend (#61) (#74)
+
+
 ## 1.2.0 (2023-12-11)
 
 ### Deprecations
