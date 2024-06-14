@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         jdk: [ 11, 17, 21 ]
-        vault: [ '1.2.0', '1.11.12', '1.16.0' ]
+        vault: [ '1.2.0', '1.11.12', '1.17.0' ]
         include:
           - jdk: 21
             vault: '1.11.12'
@@ -28,9 +28,11 @@ jobs:
         run: |
           wget -q "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_linux_amd64.zip"
           wget -q -O - "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_SHA256SUMS" | grep linux_amd64 | sha256sum -c
-          unzip "vault_${{ matrix.vault }}_linux_amd64.zip"
+          tmp="$(mktemp -d)"
+          unzip "vault_${{ matrix.vault }}_linux_amd64.zip" -d "$tmp"
           rm "vault_${{ matrix.vault }}_linux_amd64.zip"
-          sudo mv vault /usr/bin/vault
+          sudo mv "$tmp/vault" /usr/bin/vault
+          rm -rf "$tmp"
       - name: Test (Unit & Integration)
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
         env:

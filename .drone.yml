@@ -25,14 +25,13 @@ steps:
   - name: setup-vault
     image: alpine:latest
     environment:
-      VAULT_VERSION: 1.16.0
+      VAULT_VERSION: 1.17.0
     commands:
       - wget -q -O vault_$${VAULT_VERSION}_linux_amd64.zip https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_linux_amd64.zip
       - wget -q -O - https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_SHA256SUMS | grep linux_amd64 | sha256sum -c
-      - unzip vault_$${VAULT_VERSION}_linux_amd64.zip
-      - rm vault_$${VAULT_VERSION}_linux_amd64.zip
       - mkdir -p .bin
-      - mv vault .bin/
+      - unzip vault_$${VAULT_VERSION}_linux_amd64.zip -d .bin
+      - rm vault_$${VAULT_VERSION}_linux_amd64.zip
     when:
       branch:
         - main
@@ -40,7 +39,7 @@ steps:
   - name: unit-integration-tests
     image: maven:3-eclipse-temurin-21
     environment:
-      VAULT_VERSION: 1.16.0
+      VAULT_VERSION: 1.17.0
     commands:
       - export PATH=.bin:$${PATH}
       - mvn -B -P integration-test verify
