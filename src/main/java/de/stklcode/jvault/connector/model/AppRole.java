@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRole implements Serializable {
-    private static final long serialVersionUID = -6248529625864573990L;
+    private static final long serialVersionUID = 693228837510483448L;
 
     @JsonProperty("role_name")
     private String name;
@@ -55,9 +55,9 @@ public final class AppRole implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer secretIdTtl;
 
-    @JsonProperty("enable_local_secret_ids")
+    @JsonProperty("local_secret_ids")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean enableLocalSecretIds;
+    private Boolean localSecretIds;
 
     @JsonProperty("token_ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -111,7 +111,7 @@ public final class AppRole implements Serializable {
         this.secretIdBoundCidrs = builder.secretIdBoundCidrs;
         this.secretIdNumUses = builder.secretIdNumUses;
         this.secretIdTtl = builder.secretIdTtl;
-        this.enableLocalSecretIds = builder.enableLocalSecretIds;
+        this.localSecretIds = builder.localSecretIds;
         this.tokenTtl = builder.tokenTtl;
         this.tokenMaxTtl = builder.tokenMaxTtl;
         this.tokenPolicies = builder.tokenPolicies;
@@ -262,9 +262,10 @@ public final class AppRole implements Serializable {
     /**
      * @return Enable local secret IDs?
      * @since 0.9
+     * @since 1.3 renamed to {@code getLocalSecretIds()}
      */
-    public Boolean getEnableLocalSecretIds() {
-        return enableLocalSecretIds;
+    public Boolean getLocalSecretIds() {
+        return localSecretIds;
     }
 
     /**
@@ -335,7 +336,7 @@ public final class AppRole implements Serializable {
                 Objects.equals(secretIdBoundCidrs, appRole.secretIdBoundCidrs) &&
                 Objects.equals(secretIdNumUses, appRole.secretIdNumUses) &&
                 Objects.equals(secretIdTtl, appRole.secretIdTtl) &&
-                Objects.equals(enableLocalSecretIds, appRole.enableLocalSecretIds) &&
+                Objects.equals(localSecretIds, appRole.localSecretIds) &&
                 Objects.equals(tokenTtl, appRole.tokenTtl) &&
                 Objects.equals(tokenMaxTtl, appRole.tokenMaxTtl) &&
                 Objects.equals(tokenPolicies, appRole.tokenPolicies) &&
@@ -350,7 +351,7 @@ public final class AppRole implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(name, id, bindSecretId, secretIdBoundCidrs, secretIdNumUses, secretIdTtl,
-                enableLocalSecretIds, tokenTtl, tokenMaxTtl, tokenPolicies, tokenBoundCidrs, tokenExplicitMaxTtl,
+                localSecretIds, tokenTtl, tokenMaxTtl, tokenPolicies, tokenBoundCidrs, tokenExplicitMaxTtl,
                 tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
     }
 
@@ -370,7 +371,7 @@ public final class AppRole implements Serializable {
         private List<String> tokenPolicies;
         private Integer secretIdNumUses;
         private Integer secretIdTtl;
-        private Boolean enableLocalSecretIds;
+        private Boolean localSecretIds;
         private Integer tokenTtl;
         private Integer tokenMaxTtl;
         private List<String> tokenBoundCidrs;
@@ -527,12 +528,13 @@ public final class AppRole implements Serializable {
         /**
          * Enable or disable local secret IDs.
          *
-         * @param enableLocalSecretIds Enable local secret IDs?
+         * @param localSecretIds Enable local secret IDs?
          * @return self
          * @since 0.9
+         * @since 1.3 renamed to {@code withLocalSecretIds()}
          */
-        public Builder withEnableLocalSecretIds(final Boolean enableLocalSecretIds) {
-            this.enableLocalSecretIds = enableLocalSecretIds;
+        public Builder withLocalSecretIds(final Boolean localSecretIds) {
+            this.localSecretIds = localSecretIds;
             return this;
         }
 

@@ -11,6 +11,9 @@
 * Add `mount_type` attribute to common response model
 * Add `auth` attribute to common response model
 
+### Fix
+* Rename `enable_local_secret_id` to `local_secret_ids` in `AppRole` model
+
 ### Dependencies
 * Updated Jackson to 2.17.1
 

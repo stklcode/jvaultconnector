@@ -43,7 +43,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
     private static final String POLICY_2 = "policy2";
     private static final Integer SECRET_ID_NUM_USES = 10;
     private static final Integer SECRET_ID_TTL = 7200;
-    private static final Boolean ENABLE_LOCAL_SECRET_IDS = false;
+    private static final Boolean LOCAL_SECRET_IDS = false;
     private static final Integer TOKEN_TTL = 4800;
     private static final Integer TOKEN_MAX_TTL = 9600;
     private static final Integer TOKEN_EXPLICIT_MAX_TTL = 14400;
@@ -52,8 +52,8 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
     private static final Integer TOKEN_PERIOD = 1234;
     private static final Token.Type TOKEN_TYPE = Token.Type.DEFAULT_SERVICE;
     private static final String JSON_MIN = "{\"role_name\":\"" + NAME + "\"}";
-    private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"role_id\":\"%s\",\"bind_secret_id\":%s,\"secret_id_bound_cidrs\":\"%s\",\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"enable_local_secret_ids\":%s,\"token_ttl\":%d,\"token_max_ttl\":%d,\"token_policies\":\"%s\",\"token_bound_cidrs\":\"%s\",\"token_explicit_max_ttl\":%d,\"token_no_default_policy\":%s,\"token_num_uses\":%d,\"token_period\":%d,\"token_type\":\"%s\"}",
-            NAME, ID, BIND_SECRET_ID, CIDR_1, SECRET_ID_NUM_USES, SECRET_ID_TTL, ENABLE_LOCAL_SECRET_IDS, TOKEN_TTL, TOKEN_MAX_TTL, POLICY, CIDR_1, TOKEN_EXPLICIT_MAX_TTL, TOKEN_NO_DEFAULT_POLICY, TOKEN_NUM_USES, TOKEN_PERIOD, TOKEN_TYPE.value());
+    private static final String JSON_FULL = String.format("{\"role_name\":\"%s\",\"role_id\":\"%s\",\"bind_secret_id\":%s,\"secret_id_bound_cidrs\":\"%s\",\"secret_id_num_uses\":%d,\"secret_id_ttl\":%d,\"local_secret_ids\":%s,\"token_ttl\":%d,\"token_max_ttl\":%d,\"token_policies\":\"%s\",\"token_bound_cidrs\":\"%s\",\"token_explicit_max_ttl\":%d,\"token_no_default_policy\":%s,\"token_num_uses\":%d,\"token_period\":%d,\"token_type\":\"%s\"}",
+            NAME, ID, BIND_SECRET_ID, CIDR_1, SECRET_ID_NUM_USES, SECRET_ID_TTL, LOCAL_SECRET_IDS, TOKEN_TTL, TOKEN_MAX_TTL, POLICY, CIDR_1, TOKEN_EXPLICIT_MAX_TTL, TOKEN_NO_DEFAULT_POLICY, TOKEN_NUM_USES, TOKEN_PERIOD, TOKEN_TYPE.value());
 
     AppRoleTest() {
         super(AppRole.class);
@@ -68,7 +68,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
                 .withTokenPolicies(POLICIES)
                 .withSecretIdNumUses(SECRET_ID_NUM_USES)
                 .withSecretIdTtl(SECRET_ID_TTL)
-                .withEnableLocalSecretIds(ENABLE_LOCAL_SECRET_IDS)
+                .withLocalSecretIds(LOCAL_SECRET_IDS)
                 .withTokenTtl(TOKEN_TTL)
                 .withTokenMaxTtl(TOKEN_MAX_TTL)
                 .withTokenBoundCidrs(BOUND_CIDR_LIST)
@@ -98,7 +98,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
         assertNull(role.getTokenPolicies());
         assertNull(role.getSecretIdNumUses());
         assertNull(role.getSecretIdTtl());
-        assertNull(role.getEnableLocalSecretIds());
+        assertNull(role.getLocalSecretIds());
         assertNull(role.getTokenTtl());
         assertNull(role.getTokenMaxTtl());
         assertNull(role.getTokenBoundCidrs());
@@ -125,7 +125,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
         assertEquals(POLICIES, role.getTokenPolicies());
         assertEquals(SECRET_ID_NUM_USES, role.getSecretIdNumUses());
         assertEquals(SECRET_ID_TTL, role.getSecretIdTtl());
-        assertEquals(ENABLE_LOCAL_SECRET_IDS, role.getEnableLocalSecretIds());
+        assertEquals(LOCAL_SECRET_IDS, role.getLocalSecretIds());
         assertEquals(TOKEN_TTL, role.getTokenTtl());
         assertEquals(TOKEN_MAX_TTL, role.getTokenMaxTtl());
         assertEquals(BOUND_CIDR_LIST, role.getTokenBoundCidrs());
