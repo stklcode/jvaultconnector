@@ -29,7 +29,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class HealthResponse implements VaultResponse {
-    private static final long serialVersionUID = 6483840078694294401L;
+    private static final long serialVersionUID = 8675155916902904516L;
 
     @JsonProperty("cluster_id")
     private String clusterID;
@@ -60,6 +60,18 @@ public final class HealthResponse implements VaultResponse {
 
     @JsonProperty("performance_standby")
     private Boolean performanceStandby;
+
+    @JsonProperty("echo_duration_ms")
+    private Long echoDurationMs;
+
+    @JsonProperty("clock_skew_ms")
+    private Long clockSkewMs;
+
+    @JsonProperty("replication_primary_canary_age_ms")
+    private Long replicationPrimaryCanaryAgeMs;
+
+    @JsonProperty("enterprise")
+    private Boolean enterprise;
 
     /**
      * @return The Cluster ID.
@@ -134,6 +146,38 @@ public final class HealthResponse implements VaultResponse {
         return performanceStandby;
     }
 
+    /**
+     * @return Heartbeat echo duration in milliseconds (since Vault 1.16)
+     * @since 1.3
+     */
+    public Long getEchoDurationMs() {
+        return echoDurationMs;
+    }
+
+    /**
+     * @return Clock skew in milliseconds (since Vault 1.16)
+     * @since 1.3
+     */
+    public Long getClockSkewMs() {
+        return clockSkewMs;
+    }
+
+    /**
+     * @return Replication primary canary age in milliseconds (since Vault 1.17)
+     * @since 1.3
+     */
+    public Long getReplicationPrimaryCanaryAgeMs() {
+        return replicationPrimaryCanaryAgeMs;
+    }
+
+    /**
+     * @return Enterprise instance? (since Vault 1.17)
+     * @since 1.3
+     */
+    public Boolean isEnterprise() {
+        return enterprise;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -151,12 +195,17 @@ public final class HealthResponse implements VaultResponse {
                 Objects.equals(initialized, that.initialized) &&
                 Objects.equals(replicationPerfMode, that.replicationPerfMode) &&
                 Objects.equals(replicationDrMode, that.replicationDrMode) &&
-                Objects.equals(performanceStandby, that.performanceStandby);
+                Objects.equals(performanceStandby, that.performanceStandby) &&
+                Objects.equals(echoDurationMs, that.echoDurationMs) &&
+                Objects.equals(clockSkewMs, that.clockSkewMs) &&
+                Objects.equals(replicationPrimaryCanaryAgeMs, that.replicationPrimaryCanaryAgeMs) &&
+                Objects.equals(enterprise, that.enterprise);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(clusterID, clusterName, version, serverTimeUTC, standby, sealed, initialized,
-                replicationPerfMode, replicationDrMode, performanceStandby);
+            replicationPerfMode, replicationDrMode, performanceStandby, echoDurationMs, clockSkewMs,
+            replicationPrimaryCanaryAgeMs, enterprise);
     }
 }

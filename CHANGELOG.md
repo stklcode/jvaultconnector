@@ -1,3 +1,17 @@
+* Simplify JSON parsing in error handler
+* Add new fields from Vault 1.16 and 1.17 to `HealthResponse`
+    * `echo_duration_ms`
+    * `clock_skew_ms`
+    * `replication_primary_canary_age_ms`
+    * `enterprise`
+
+### Dependencies
+* Updated Jackson to 2.17.1
+
+### Test
+* Tested against Vault 1.2 to 1.17
+
+
 ## 1.2.0 (2023-12-11)
 
 ### Deprecations

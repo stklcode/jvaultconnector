@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HealthResponseTest extends AbstractModelTest<HealthResponse> {
     private static final String CLUSTER_ID = "c9abceea-4f46-4dab-a688-5ce55f89e228";
     private static final String CLUSTER_NAME = "vault-cluster-5515c810";
-    private static final String VERSION = "0.9.2";
+    private static final String VERSION = "0.17.0";
     private static final Long SERVER_TIME_UTC = 1469555798L;
     private static final Boolean STANDBY = false;
     private static final Boolean SEALED = false;
@@ -39,6 +39,10 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
     private static final Boolean PERF_STANDBY = false;
     private static final String REPL_PERF_MODE = "disabled";
     private static final String REPL_DR_MODE = "disabled";
+    private static final Long ECHO_DURATION = 1L;
+    private static final Long CLOCK_SKEW = 0L;
+    private static final Long REPL_PRIM_CANARY_AGE = 2L;
+    private static final Boolean ENTERPRISE = false;
 
     private static final String RES_JSON = "{\n" +
             "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
@@ -50,7 +54,11 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
             "  \"initialized\": " + INITIALIZED + ",\n" +
             "  \"replication_performance_mode\": \"" + REPL_PERF_MODE + "\",\n" +
             "  \"replication_dr_mode\": \"" + REPL_DR_MODE + "\",\n" +
-            "  \"performance_standby\": " + PERF_STANDBY + "\n" +
+            "  \"performance_standby\": " + PERF_STANDBY + ",\n" +
+            "  \"echo_duration_ms\": " + ECHO_DURATION + ",\n" +
+            "  \"clock_skew_ms\": " + CLOCK_SKEW + ",\n" +
+            "  \"replication_primary_canary_age_ms\": " + REPL_PRIM_CANARY_AGE + ",\n" +
+            "  \"enterprise\": " + ENTERPRISE + "\n" +
             "}";
 
     HealthResponseTest() {
@@ -87,5 +95,9 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
         assertEquals(PERF_STANDBY, res.isPerformanceStandby(), "Incorrect performance standby state");
         assertEquals(REPL_PERF_MODE, res.getReplicationPerfMode(), "Incorrect replication perf mode");
         assertEquals(REPL_DR_MODE, res.getReplicationDrMode(), "Incorrect replication DR mode");
+        assertEquals(ECHO_DURATION, res.getEchoDurationMs(), "Incorrect echo duration");
+        assertEquals(CLOCK_SKEW, res.getClockSkewMs(), "Incorrect clock skew");
+        assertEquals(REPL_PRIM_CANARY_AGE, res.getReplicationPrimaryCanaryAgeMs(), "Incorrect canary age");
+        assertEquals(ENTERPRISE, res.isEnterprise(), "Incorrect enterprise flag");
     }
 }
