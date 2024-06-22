@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.stklcode.jvault.connector.model.response.embedded.AuthData;
 import de.stklcode.jvault.connector.model.response.embedded.WrapInfo;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.Objects;
  * @since 0.1
  */
 public abstract class VaultDataResponse implements VaultResponse {
-    private static final long serialVersionUID = -6396903229092254181L;
+    private static final long serialVersionUID = 4787715235558510045L;
 
     @JsonProperty("request_id")
     private String requestId;
@@ -48,6 +49,9 @@ public abstract class VaultDataResponse implements VaultResponse {
 
     @JsonProperty("wrap_info")
     private WrapInfo wrapInfo;
+
+    @JsonProperty("auth")
+    private AuthData auth;
 
     @JsonProperty("mount_type")
     private String mountType;
@@ -97,6 +101,14 @@ public abstract class VaultDataResponse implements VaultResponse {
     }
 
     /**
+     * @return Authentication information for this response
+     * @since 1.3
+     */
+    public final AuthData getAuth() {
+        return auth;
+    }
+
+    /**
      * @return Information about the type of mount this secret is from (since Vault 1.17)
      * @since 1.3
      */
@@ -117,11 +129,12 @@ public abstract class VaultDataResponse implements VaultResponse {
                 Objects.equals(leaseDuration, that.leaseDuration) &&
                 Objects.equals(warnings, that.warnings) &&
                 Objects.equals(wrapInfo, that.wrapInfo) &&
+                Objects.equals(auth, that.auth) &&
                 Objects.equals(mountType, that.mountType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, leaseId, renewable, leaseDuration, warnings, wrapInfo, mountType);
+        return Objects.hash(requestId, leaseId, renewable, leaseDuration, warnings, wrapInfo, auth, mountType);
     }
 }

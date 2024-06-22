@@ -9,6 +9,7 @@
   * `enterprise`
 * Add missing `num_uses` field to `AuthData`
 * Add `mount_type` attribute to common response model
+* Add `auth` attribute to common response model
 
 ### Dependencies
 * Updated Jackson to 2.17.1

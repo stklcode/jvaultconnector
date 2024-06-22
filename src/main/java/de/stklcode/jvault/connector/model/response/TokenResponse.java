@@ -30,13 +30,10 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenResponse extends VaultDataResponse {
-    private static final long serialVersionUID = -4053126653764241197L;
+    private static final long serialVersionUID = -4341114947980033457L;
 
     @JsonProperty("data")
     private TokenData data;
-
-    @JsonProperty("auth")
-    private Boolean auth;
 
     /**
      * @return Token data
@@ -45,12 +42,6 @@ public final class TokenResponse extends VaultDataResponse {
         return data;
     }
 
-    /**
-     * @return Auth data
-     */
-    public Boolean getAuth() {
-        return auth;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -60,11 +51,11 @@ public final class TokenResponse extends VaultDataResponse {
             return false;
         }
         TokenResponse that = (TokenResponse) o;
-        return Objects.equals(data, that.data) && Objects.equals(auth, that.auth);
+        return Objects.equals(data, that.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), data, auth);
+        return Objects.hash(super.hashCode(), data);
     }
 }
