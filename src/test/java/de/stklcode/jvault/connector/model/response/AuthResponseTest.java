@@ -48,6 +48,7 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
     private static final String AUTH_ENTITY_ID = "";
     private static final String AUTH_TOKEN_TYPE = "service";
     private static final Boolean AUTH_ORPHAN = false;
+    private static final Integer AUTH_NUM_USES = 42;
     private static final String MFA_REQUEST_ID = "d0c9eec7-6921-8cc0-be62-202b289ef163";
     private static final String MFA_KEY = "enforcementConfigUserpass";
     private static final String MFA_METHOD_TYPE = "totp";
@@ -75,6 +76,7 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
         "    \"entity_id\": \"" + AUTH_ENTITY_ID + "\",\n" +
         "    \"token_type\": \"" + AUTH_TOKEN_TYPE + "\",\n" +
         "    \"orphan\": " + AUTH_ORPHAN + ",\n" +
+        "    \"num_uses\": " + AUTH_NUM_USES + ",\n" +
         "    \"mfa_requirement\": {\n" +
         "      \"mfa_request_id\": \"" + MFA_REQUEST_ID + "\",\n" +
         "      \"mfa_constraints\": {\n" +
@@ -134,6 +136,7 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
         assertEquals(AUTH_ORPHAN, data.isOrphan(), "Incorrect auth orphan flag");
         assertEquals(AUTH_TOKEN_TYPE, data.getTokenType(), "Incorrect auth token type");
         assertEquals(AUTH_ENTITY_ID, data.getEntityId(), "Incorrect auth entity id");
+        assertEquals(AUTH_NUM_USES, data.getNumUses(), "Incorrect auth num uses");
         assertEquals(2, data.getPolicies().size(), "Incorrect number of policies");
         assertTrue(data.getPolicies().containsAll(Set.of(AUTH_POLICY_1, AUTH_POLICY_2)));
         assertEquals(2, data.getTokenPolicies().size(), "Incorrect number of token policies");

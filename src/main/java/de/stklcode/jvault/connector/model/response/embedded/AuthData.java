@@ -33,7 +33,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthData implements Serializable {
-    private static final long serialVersionUID = 3067695351664603536L;
+    private static final long serialVersionUID = 5969334512309655317L;
 
     @JsonProperty("client_token")
     private String clientToken;
@@ -64,6 +64,9 @@ public final class AuthData implements Serializable {
 
     @JsonProperty("orphan")
     private boolean orphan;
+
+    @JsonProperty("num_uses")
+    private Integer numUses;
 
     @JsonProperty("mfa_requirement")
     private MfaRequirement mfaRequirement;
@@ -135,6 +138,14 @@ public final class AuthData implements Serializable {
     }
 
     /**
+     * @return allowed number of uses for the issued token
+     * @since 1.3
+     */
+    public Integer getNumUses() {
+        return numUses;
+    }
+
+    /**
      * @return Token is orphan
      * @since 0.9
      */
@@ -169,12 +180,13 @@ public final class AuthData implements Serializable {
                 Objects.equals(leaseDuration, authData.leaseDuration) &&
                 Objects.equals(entityId, authData.entityId) &&
                 Objects.equals(tokenType, authData.tokenType) &&
+                Objects.equals(numUses, authData.numUses) &&
                 Objects.equals(mfaRequirement, authData.mfaRequirement);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(clientToken, accessor, policies, tokenPolicies, metadata, leaseDuration, renewable,
-                entityId, tokenType, orphan, mfaRequirement);
+                entityId, tokenType, orphan, numUses, mfaRequirement);
     }
 }
