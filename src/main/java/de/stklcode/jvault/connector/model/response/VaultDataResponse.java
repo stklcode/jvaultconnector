@@ -29,7 +29,7 @@ import java.util.Objects;
  * @since 0.1
  */
 public abstract class VaultDataResponse implements VaultResponse {
-    private static final long serialVersionUID = 7486270767477652184L;
+    private static final long serialVersionUID = -6396903229092254181L;
 
     @JsonProperty("request_id")
     private String requestId;
@@ -48,6 +48,9 @@ public abstract class VaultDataResponse implements VaultResponse {
 
     @JsonProperty("wrap_info")
     private WrapInfo wrapInfo;
+
+    @JsonProperty("mount_type")
+    private String mountType;
 
     /**
      * @return Request ID
@@ -93,6 +96,13 @@ public abstract class VaultDataResponse implements VaultResponse {
         return wrapInfo;
     }
 
+    /**
+     * @return Information about the type of mount this secret is from (since Vault 1.17)
+     * @since 1.3
+     */
+    public final String getMountType() {
+        return mountType;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -106,11 +116,12 @@ public abstract class VaultDataResponse implements VaultResponse {
                 Objects.equals(leaseId, that.leaseId) &&
                 Objects.equals(leaseDuration, that.leaseDuration) &&
                 Objects.equals(warnings, that.warnings) &&
-                Objects.equals(wrapInfo, that.wrapInfo);
+                Objects.equals(wrapInfo, that.wrapInfo) &&
+                Objects.equals(mountType, that.mountType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, leaseId, renewable, leaseDuration, warnings, wrapInfo);
+        return Objects.hash(requestId, leaseId, renewable, leaseDuration, warnings, wrapInfo, mountType);
     }
 }

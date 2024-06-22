@@ -55,6 +55,7 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     private static final String TOKEN_ID = "my-token";
     private static final String TOKEN_ISSUE_TIME = "2018-04-17T11:35:54.466476078-04:00";
     private static final String TOKEN_TYPE = "service";
+    private static final String MOUNT_TYPE = "token";
 
     private static final String RES_JSON = "{\n" +
             "  \"lease_id\": \"\",\n" +
@@ -85,7 +86,8 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
             "    \"type\": \"" + TOKEN_TYPE + "\"\n" +
             "  },\n" +
             "  \"warnings\": null,\n" +
-            "  \"auth\": null\n" +
+            "  \"auth\": null,\n" +
+            "  \"mount_type\": \"" + MOUNT_TYPE + "\"\n" +
             "}";
 
     TokenResponseTest() {
@@ -125,6 +127,7 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
         assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
         assertEquals(RES_RENEWABLE, res.isRenewable(), "Incorrect response renewable flag");
         assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect response lease duration");
+        assertEquals(MOUNT_TYPE, res.getMountType(), "Incorrect mount type");
         // Extract token data.
         TokenData data = res.getData();
         assertNotNull(data, "Token data is NULL");
