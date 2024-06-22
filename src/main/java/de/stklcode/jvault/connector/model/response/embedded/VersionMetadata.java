@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -33,7 +35,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class VersionMetadata implements Serializable {
-    private static final long serialVersionUID = -6815731513868586713L;
+    private static final long serialVersionUID = 8495687554714216478L;
 
     private static final DateTimeFormatter TIME_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
@@ -49,6 +51,9 @@ public final class VersionMetadata implements Serializable {
 
     @JsonProperty("version")
     private Integer version;
+
+    @JsonProperty("custom_metadata")
+    private HashMap<String, String> customMetadata;
 
     /**
      * @return Time of secret creation as raw string representation.
@@ -104,6 +109,14 @@ public final class VersionMetadata implements Serializable {
         return version;
     }
 
+    /**
+     * @return Custom metadata.
+     * @since 1.3
+     */
+    public Map<String, String> getCustomMetadata() {
+        return customMetadata;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -115,11 +128,12 @@ public final class VersionMetadata implements Serializable {
         return destroyed == that.destroyed &&
                 Objects.equals(createdTime, that.createdTime) &&
                 Objects.equals(deletionTime, that.deletionTime) &&
-                Objects.equals(version, that.version);
+                Objects.equals(version, that.version) &&
+                Objects.equals(customMetadata, that.customMetadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(createdTime, deletionTime, destroyed, version);
+        return Objects.hash(createdTime, deletionTime, destroyed, version, customMetadata);
     }
 }

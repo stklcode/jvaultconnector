@@ -21,6 +21,7 @@ import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,6 +43,9 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
     private static final String SECRET_META_CREATED = "2018-03-22T02:24:06.945319214Z";
     private static final String SECRET_META_DELETED = "2018-03-23T03:25:07.056420325Z";
     private static final List<String> SECRET_WARNINGS = null;
+    private static final String CUSTOM_META_KEY = "foo";
+    private static final String CUSTOM_META_VAL = "bar";
+
     private static final String SECRET_JSON_V2 = "{\n" +
             "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
             "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
@@ -54,6 +58,7 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
             "      },\n" +
             "      \"metadata\": {\n" +
             "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
+            "          \"custom_metadata\": null,\n" +
             "          \"deletion_time\": \"\",\n" +
             "          \"destroyed\": false,\n" +
             "          \"version\": 1\n" +
@@ -73,6 +78,9 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
             "      },\n" +
             "      \"metadata\": {\n" +
             "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
+            "          \"custom_metadata\": {" +
+            "            \"" + CUSTOM_META_KEY + "\": \"" + CUSTOM_META_VAL + "\"" +
+            "          },\n" +
             "          \"deletion_time\": \"" + SECRET_META_DELETED + "\",\n" +
             "          \"destroyed\": true,\n" +
             "          \"version\": 2\n" +
@@ -113,6 +121,7 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
         assertNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
         assertFalse(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
         assertEquals(1, res.getMetadata().getVersion(), "Incorrect secret version");
+        assertNull(res.getMetadata().getCustomMetadata(), "Incorrect custom metadata");
 
         // Deleted KV v2 secret.
         res = assertDoesNotThrow(
@@ -127,6 +136,7 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
         assertNotNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
         assertTrue(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
         assertEquals(2, res.getMetadata().getVersion(), "Incorrect secret version");
+        assertEquals(Map.of(CUSTOM_META_KEY, CUSTOM_META_VAL), res.getMetadata().getCustomMetadata(), "Incorrect custom metadata");
     }
 
     private void assertSecretData(SecretResponse res) {

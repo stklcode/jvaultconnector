@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -34,7 +35,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretMetadata implements Serializable {
-    private static final long serialVersionUID = -4967896264361344676L;
+    private static final long serialVersionUID = -905059942871916214L;
 
     private static final DateTimeFormatter TIME_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX");
@@ -56,6 +57,15 @@ public final class SecretMetadata implements Serializable {
 
     @JsonProperty("versions")
     private Map<Integer, VersionMetadata> versions;
+
+    @JsonProperty("cas_required")
+    private Boolean casRequired;
+
+    @JsonProperty("custom_metadata")
+    private HashMap<String, String> customMetadata;
+
+    @JsonProperty("delete_version_after")
+    private String deleteVersionAfter;
 
     /**
      * @return Time of secret creation as raw string representation.
@@ -125,6 +135,30 @@ public final class SecretMetadata implements Serializable {
         return versions;
     }
 
+    /**
+     * @return CAS required?
+     * @since 1.3
+     */
+    public Boolean isCasRequired() {
+        return casRequired;
+    }
+
+    /**
+     * @return Custom metadata.
+     * @since 1.3
+     */
+    public Map<String, String> getCustomMetadata() {
+        return customMetadata;
+    }
+
+    /**
+     * @return time duration to delete version
+     * @since 1.3
+     */
+    public String getDeleteVersionAfter() {
+        return deleteVersionAfter;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -138,11 +172,15 @@ public final class SecretMetadata implements Serializable {
                 Objects.equals(maxVersions, that.maxVersions) &&
                 Objects.equals(oldestVersion, that.oldestVersion) &&
                 Objects.equals(updatedTime, that.updatedTime) &&
-                Objects.equals(versions, that.versions);
+                Objects.equals(versions, that.versions) &&
+                Objects.equals(casRequired, that.casRequired) &&
+                Objects.equals(customMetadata, that.customMetadata) &&
+                Objects.equals(deleteVersionAfter, that.deleteVersionAfter);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(createdTime, currentVersion, maxVersions, oldestVersion, updatedTime, versions);
+        return Objects.hash(createdTime, currentVersion, maxVersions, oldestVersion, updatedTime, versions, casRequired,
+            customMetadata, deleteVersionAfter);
     }
 }

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -35,11 +37,20 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
     private static final Integer CURRENT_VERSION = 3;
     private static final Integer MAX_VERSIONS = 0;
     private static final Integer OLDEST_VERSION = 1;
+    private static final Boolean CAS_REQUIRED = false;
+    private static final String CUSTOM_META_KEY = "test";
+    private static final String CUSTOM_META_VAL = "123";
+    private static final String DELETE_VERSION_AFTER = "0s";
 
     private static final String META_JSON = "{\n" +
             "  \"data\": {\n" +
+            "    \"cas_required\": " + CAS_REQUIRED + ",\n" +
             "    \"created_time\": \"" + V1_TIME + "\",\n" +
             "    \"current_version\": " + CURRENT_VERSION + ",\n" +
+            "    \"custom_metadata\": {" +
+            "      \"" + CUSTOM_META_KEY + "\": \"" + CUSTOM_META_VAL + "\"" +
+            "    },\n" +
+            "    \"delete_version_after\": \"" + DELETE_VERSION_AFTER + "\"," +
             "    \"max_versions\": " + MAX_VERSIONS + ",\n" +
             "    \"oldest_version\": " + OLDEST_VERSION + ",\n" +
             "    \"updated_time\": \"" + V3_TIME + "\",\n" +
@@ -88,11 +99,14 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
         );
         assertNotNull(res, "Parsed response is NULL");
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
+        assertEquals(CAS_REQUIRED, res.getMetadata().isCasRequired(), "Incorrect CAS required flag");
         assertEquals(V1_TIME, res.getMetadata().getCreatedTimeString(), "Incorrect created time");
         assertNotNull(res.getMetadata().getCreatedTime(), "Parting created time failed");
         assertEquals(CURRENT_VERSION, res.getMetadata().getCurrentVersion(), "Incorrect current version");
         assertEquals(MAX_VERSIONS, res.getMetadata().getMaxVersions(), "Incorrect max versions");
         assertEquals(OLDEST_VERSION, res.getMetadata().getOldestVersion(), "Incorrect oldest version");
+        assertEquals(Map.of(CUSTOM_META_KEY, CUSTOM_META_VAL), res.getMetadata().getCustomMetadata(), "Incorrect custom metadata");
+        assertEquals(DELETE_VERSION_AFTER, res.getMetadata().getDeleteVersionAfter(), "Incorrect delete version after");
         assertEquals(V3_TIME, res.getMetadata().getUpdatedTimeString(), "Incorrect updated time");
         assertNotNull(res.getMetadata().getUpdatedTime(), "Parting updated time failed");
         assertEquals(3, res.getMetadata().getVersions().size(), "Incorrect number of versions");
