@@ -41,7 +41,7 @@ steps:
     environment:
       VAULT_VERSION: 1.17.0
     commands:
-      - export PATH=.bin:$${PATH}
+      - export PATH=$${DRONE_WORKSPACE}/.bin:$${PATH}
       - mvn -B -P integration-test verify
     when:
       branch:

@@ -129,15 +129,14 @@ class HTTPVaultConnectorBuilderTest {
         });
 
         // Provide CA certificate.
-        String VAULT_CACERT = tempDir.toString() + "/doesnotexist";
-        withVaultEnv(VAULT_ADDR, VAULT_CACERT, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
+        String vaultCacert = tempDir.toString() + "/doesnotexist";
+        withVaultEnv(VAULT_ADDR, vaultCacert, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             TlsException e = assertThrows(
                     TlsException.class,
                     () -> HTTPVaultConnector.builder().fromEnv(),
                     "Creation with unknown cert path failed"
             );
-            assertInstanceOf(NoSuchFileException.class, e.getCause());
-            assertEquals(VAULT_CACERT, ((NoSuchFileException) e.getCause()).getFile());
+            assertEquals(vaultCacert, assertInstanceOf(NoSuchFileException.class, e.getCause()).getFile());
 
             return null;
         });
@@ -165,11 +164,11 @@ class HTTPVaultConnectorBuilderTest {
         });
     }
 
-    private SystemLambda.WithEnvironmentVariables withVaultEnv(String vault_addr, String vault_cacert, String vault_max_retries, String vault_token) {
-        return withEnvironmentVariable("VAULT_ADDR", vault_addr)
-                .and("VAULT_CACERT", vault_cacert)
-                .and("VAULT_MAX_RETRIES", vault_max_retries)
-                .and("VAULT_TOKEN", vault_token);
+    private SystemLambda.WithEnvironmentVariables withVaultEnv(String vaultAddr, String vaultCacert, String vaultMaxRetries, String vaultToken) {
+        return withEnvironmentVariable("VAULT_ADDR", vaultAddr)
+                .and("VAULT_CACERT", vaultCacert)
+                .and("VAULT_MAX_RETRIES", vaultMaxRetries)
+                .and("VAULT_TOKEN", vaultToken);
     }
 
     private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) throws NoSuchFieldException, IllegalAccessException {

@@ -31,11 +31,13 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.awaitility.Awaitility.await;
@@ -129,13 +131,11 @@ class HTTPVaultConnectorIT {
         @Test
         @Order(10)
         @DisplayName("Read secrets")
-        @SuppressWarnings("deprecation")
         void readSecretTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
 
             // Try to read path user has no permission to read.
-            SecretResponse res = null;
             final String invalidPath = "secret/invalid/path";
 
             VaultConnectorException e = assertThrows(
@@ -151,7 +151,7 @@ class HTTPVaultConnectorIT {
             assertFalse(Pattern.compile("[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}").matcher(stackTrace(e)).find());
 
             // Try to read accessible path with known value.
-            res = assertDoesNotThrow(
+            SecretResponse res = assertDoesNotThrow(
                     () -> connector.read(SECRET_PATH + "/" + SECRET_KEY),
                     "Valid secret path could not be read"
             );
@@ -216,7 +216,6 @@ class HTTPVaultConnectorIT {
         @Test
         @Order(30)
         @DisplayName("Write secrets")
-        @SuppressWarnings("deprecation")
         void writeSecretTest() {
             authUser();
             assumeTrue(connector.isAuthorized());
@@ -610,7 +609,7 @@ class HTTPVaultConnectorIT {
             assumeFalse(connector.isAuthorized());
 
             // Authenticate with created credentials.
-            AuthResponse resp = assertDoesNotThrow(
+            assertDoesNotThrow(
                     () -> connector.authAppId(APP_ID, USER_ID),
                     "Failed to authenticate using App-ID"
             );
@@ -1234,15 +1233,17 @@ class HTTPVaultConnectorIT {
 
         // Write configuration file.
         File configFile = new File(dir, "vault.conf");
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile))) {
-            bw.write(config.toString());
+        try {
+            Files.write(configFile.toPath(), config.toString().getBytes(UTF_8));
         } catch (IOException e) {
             throw new IllegalStateException("Unable to generate config file", e);
         }
 
         // Start vault process.
         try {
-            vaultProcess = Runtime.getRuntime().exec("vault server -config " + configFile);
+            vaultProcess = new ProcessBuilder("vault", "server", "-config", configFile.toString())
+                .directory(dir)
+                .start();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to start vault. Make sure vault binary is in your executable path", e);
         }
