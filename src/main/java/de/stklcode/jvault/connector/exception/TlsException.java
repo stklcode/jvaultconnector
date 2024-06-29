@@ -23,6 +23,8 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.4.0
  */
 public class TlsException extends VaultConnectorException {
+    private static final long serialVersionUID = -5139276834988258086L;
+
     /**
      * Constructs a new empty exception.
      */

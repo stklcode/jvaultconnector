@@ -23,4 +23,5 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public class AuthorizationRequiredException extends VaultConnectorException {
+    private static final long serialVersionUID = 2629577936657393880L;
 }

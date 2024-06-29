@@ -24,6 +24,8 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public final class InvalidResponseException extends VaultConnectorException {
+    private static final long serialVersionUID = 2003151038614163479L;
+
     private final Integer statusCode;
     private final String response;
 

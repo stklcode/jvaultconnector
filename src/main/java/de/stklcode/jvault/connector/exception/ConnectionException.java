@@ -23,6 +23,8 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public class ConnectionException extends VaultConnectorException {
+    private static final long serialVersionUID = 3005430116002990418L;
+
     /**
      * Constructs a new empty exception.
      */

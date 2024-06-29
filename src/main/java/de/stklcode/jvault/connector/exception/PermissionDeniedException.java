@@ -23,6 +23,8 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public class PermissionDeniedException extends VaultConnectorException {
+    private static final long serialVersionUID = -7149134015090750776L;
+
     /**
      * Constructs a new empty exception.
      */
