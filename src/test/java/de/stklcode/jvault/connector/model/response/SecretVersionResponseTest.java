@@ -67,8 +67,6 @@ class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse>
         );
         assertNotNull(res, "Parsed response is NULL");
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
-        assertEquals(CREATION_TIME, res.getMetadata().getCreatedTimeString(), "Incorrect created time");
-        assertEquals(DELETION_TIME, res.getMetadata().getDeletionTimeString(), "Incorrect deletion time");
         assertFalse(res.getMetadata().isDestroyed(), "Incorrect destroyed state");
         assertEquals(VERSION, res.getMetadata().getVersion(), "Incorrect version");
     }
