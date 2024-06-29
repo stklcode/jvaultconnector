@@ -58,7 +58,6 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_ROLES = "/roles";
     private static final String PATH_CREATE_ORPHAN = "/create-orphan";
     private static final String PATH_AUTH_USERPASS = PATH_AUTH + "/userpass/login/";
-    private static final String PATH_AUTH_APPID = PATH_AUTH + "/app-id";
     private static final String PATH_AUTH_APPROLE = PATH_AUTH + "/approle";
     private static final String PATH_AUTH_APPROLE_ROLE = PATH_AUTH_APPROLE + "/role/%s%s";
 
@@ -201,18 +200,6 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    @Deprecated(since = "0.4", forRemoval = true)
-    public final AuthResponse authAppId(final String appID, final String userID) throws VaultConnectorException {
-        return queryAuth(
-                PATH_AUTH_APPID + PATH_LOGIN,
-                Map.of(
-                        "app_id", appID,
-                        "user_id", userID
-                )
-        );
-    }
-
-    @Override
     public final AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException {
         final Map<String, String> payload = mapOfStrings(
                 "role_id", roleID,
@@ -239,40 +226,6 @@ public class HTTPVaultConnector implements VaultConnector {
         this.authorized = true;
 
         return auth;
-    }
-
-    @Override
-    @Deprecated(since = "0.4", forRemoval = true)
-    public final boolean registerAppId(final String appID, final String policy, final String displayName)
-            throws VaultConnectorException {
-        requireAuth();
-
-        /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(
-                PATH_AUTH_APPID + "/map/app-id/" + appID,
-                Map.of(
-                        "value", policy,
-                        "display_name", displayName
-                ),
-                token
-        );
-
-        return true;
-    }
-
-    @Override
-    @Deprecated(since = "0.4", forRemoval = true)
-    public final boolean registerUserId(final String appID, final String userID) throws VaultConnectorException {
-        requireAuth();
-
-        /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(
-                PATH_AUTH_APPID + "/map/user-id/" + userID,
-                singletonMap("value", appID),
-                token
-        );
-
-        return true;
     }
 
     @Override
