@@ -11,6 +11,7 @@
 * Add `mount_type` attribute to common response model
 * Add `auth` attribute to common response model
 * Add `custom_metadata`, `cas_required` and `delete_version_after` fields for KVv2 metadata
+* Generate and attach CycloneDX SBOM
 
 ### Fix
 * Rename `enable_local_secret_id` to `local_secret_ids` in `AppRole` model
