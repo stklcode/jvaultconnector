@@ -1,4 +1,4 @@
-## unreleased
+## 1.3.0 (2024-06-29)
 
 ### Improvements
 * Simplify JSON parsing in error handler
