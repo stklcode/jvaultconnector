@@ -3,6 +3,9 @@
 ### Dependencies
 * Updated Jackson to 2.17.2
 
+### Fix
+* Remove `Automatic-Module-Name` from JAR manifest (#79)
+
 
 ## 1.3.0 (2024-06-29)
 
