@@ -25,7 +25,7 @@ steps:
   - name: setup-vault
     image: alpine:latest
     environment:
-      VAULT_VERSION: 1.17.1
+      VAULT_VERSION: 1.17.6
     commands:
       - wget -q -O vault_$${VAULT_VERSION}_linux_amd64.zip https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_linux_amd64.zip
       - wget -q -O - https://releases.hashicorp.com/vault/$${VAULT_VERSION}/vault_$${VAULT_VERSION}_SHA256SUMS | grep linux_amd64 | sha256sum -c
@@ -39,7 +39,7 @@ steps:
   - name: unit-integration-tests
     image: maven:3-eclipse-temurin-21
     environment:
-      VAULT_VERSION: 1.17.1
+      VAULT_VERSION: 1.17.6
     commands:
       - export PATH=$${DRONE_WORKSPACE}/.bin:$${PATH}
       - mvn -B -P integration-test verify
