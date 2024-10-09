@@ -24,7 +24,7 @@ jobs:
       - name: Compile
         run: mvn -B clean compile
       - name: Set up Vault
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+        if: github.ref_name == 'main' || github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
         run: |
           wget -q "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_linux_amd64.zip"
           wget -q -O - "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_SHA256SUMS" | grep linux_amd64 | sha256sum -c
@@ -34,12 +34,12 @@ jobs:
           sudo mv "$tmp/vault" /usr/bin/vault
           rm -rf "$tmp"
       - name: Test (Unit & Integration)
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+        if: github.ref_name == 'main'|| github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
         env:
           VAULT_VERSION: ${{ matrix.vault }}
         run: mvn -B -P coverage -P integration-test verify
       - name: Test (Unit)
-        if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/heads/release/')
+        if: github.ref_name != 'main' && github.base_ref != 'main' && !startsWith(github.ref_name, 'release/')
         run: mvn -B -P coverage verify
       - name: Analysis
         if: matrix.analysis
