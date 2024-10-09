@@ -6,10 +6,10 @@ jobs:
     strategy:
       matrix:
         jdk: [ 11, 17, 21 ]
-        vault: [ '1.2.0', '1.11.12', '1.17.6' ]
+        vault: [ '1.2.0', '1.11.12', '1.18.0' ]
         include:
           - jdk: 21
-            vault: '1.17.6'
+            vault: '1.18.0'
             analysis: true
     steps:
       - name: Checkout
