@@ -31,6 +31,7 @@ module de.stklcode.jvault.connector {
     opens de.stklcode.jvault.connector.model.response.embedded to com.fasterxml.jackson.databind;
 
     requires java.net.http;
+    requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
 }

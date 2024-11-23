@@ -4,6 +4,9 @@
 * Remove deprecated `get...TimeString()` on model classes (#77)
 * Drop support fpr deprecated `App-ID` auth backend (#61) (#78)
 
+### Fix
+* Add jackson-annotations requirement to module-info (#84)
+
 ### Dependencies
 * Updated Jackson to 2.18.1 (#83)
 
