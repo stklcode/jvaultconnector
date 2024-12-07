@@ -10,6 +10,9 @@
 ### Dependencies
 * Updated Jackson to 2.18.2 (#85)
 
+### Test
+* Tested against Vault 1.2 to 1.18
+
 
 ## 1.3.1 (2024-10-03)
 
