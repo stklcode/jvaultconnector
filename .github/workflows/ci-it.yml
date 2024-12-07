@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build-with-it:
+    if: github.ref_name == 'main' || github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jdk: [ 11, 17, 21 ]
+        vault: [ '1.2.0', '1.11.12', '1.18.0' ]
+        include:
+          - jdk: 21
+            vault: '1.18.0'
+            analysis: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: 'temurin'
+      - name: Compile
+        run: ./mvnw -B clean compile
+      - name: Set up Vault
+        run: |
+          wget -q "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_linux_amd64.zip"
+          wget -q -O - "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_SHA256SUMS" | grep linux_amd64 | sha256sum -c
+          tmp="$(mktemp -d)"
+          unzip "vault_${{ matrix.vault }}_linux_amd64.zip" -d "$tmp"
+          rm "vault_${{ matrix.vault }}_linux_amd64.zip"
+          sudo mv "$tmp/vault" /usr/bin/vault
+          rm -rf "$tmp"
+      - name: Test (Unit & Integration)
+        env:
+          VAULT_VERSION: ${{ matrix.vault }}
+        run: ./mvnw -B -P coverage -P integration-test verify
+      - name: Analysis
+        if: matrix.analysis && env.SONAR_TOKEN != ''
+        run: >
+          ./mvnw -B sonar:sonar
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=stklcode-github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

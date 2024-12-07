@@ -1,15 +1,23 @@
 name: CI
-on: [ push, pull_request ]
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+  pull_request:
+    branches:
+      - '**'
+      - '!main'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         jdk: [ 11, 17, 21 ]
-        vault: [ '1.2.0', '1.11.12', '1.18.0' ]
         include:
           - jdk: 21
-            vault: '1.18.0'
             analysis: true
     steps:
       - name: Checkout
@@ -23,26 +31,10 @@ jobs:
           distribution: 'temurin'
       - name: Compile
         run: ./mvnw -B clean compile
-      - name: Set up Vault
-        if: github.ref_name == 'main' || github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
-        run: |
-          wget -q "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_linux_amd64.zip"
-          wget -q -O - "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_SHA256SUMS" | grep linux_amd64 | sha256sum -c
-          tmp="$(mktemp -d)"
-          unzip "vault_${{ matrix.vault }}_linux_amd64.zip" -d "$tmp"
-          rm "vault_${{ matrix.vault }}_linux_amd64.zip"
-          sudo mv "$tmp/vault" /usr/bin/vault
-          rm -rf "$tmp"
-      - name: Test (Unit & Integration)
-        if: github.ref_name == 'main'|| github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
-        env:
-          VAULT_VERSION: ${{ matrix.vault }}
-        run: ./mvnw -B -P coverage -P integration-test verify
       - name: Test (Unit)
-        if: github.ref_name != 'main' && github.base_ref != 'main' && !startsWith(github.ref_name, 'release/')
         run: ./mvnw -B -P coverage verify
       - name: Analysis
-        if: matrix.analysis
+        if: matrix.analysis && env.SONAR_TOKEN != ''
         run: >
           ./mvnw -B sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
