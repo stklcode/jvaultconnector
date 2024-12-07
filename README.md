@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/stklcode/jvaultconnector/blob/main/LICENSE.txt)
 [![Maven Central Version](https://img.shields.io/maven-central/v/de.stklcode.jvault/jvault-connector)](https://central.sonatype.com/artifact/de.stklcode.jvault/jvault-connector)
 
-![Logo](https://raw.githubusercontent.com/stklcode/jvaultconnector/main/assets/logo.png)
+![Logo](assets/logo.png)
 
 Java Vault Connector is a connector library for [Vault](https://www.vaultproject.io) by [Hashicorp](https://www.hashicorp.com) written in Java. The connector allows simple usage of Vault's secret store in own applications.
 
@@ -18,7 +18,6 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * Token
     * Username/Password
     * AppRole (register and authenticate)
-    * AppID (register and authenticate) [_deprecated_]
 * Tokens
     * Creation and lookup of tokens and token roles
     * TokenBuilder for speaking creation of complex configurations
@@ -40,7 +39,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
 <dependency>
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>jvault-connector</artifactId>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
