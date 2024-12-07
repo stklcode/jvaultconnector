@@ -5,7 +5,7 @@ steps:
   - name: compile
     image: maven:3-eclipse-temurin-21
     commands:
-      - mvn -B clean compile
+      - ./mvnw -B clean compile
     when:
       branch:
         - main
@@ -16,7 +16,7 @@ steps:
   - name: unit-tests
     image: maven:3-eclipse-temurin-21
     commands:
-      - mvn -B test
+      - ./mvnw -B test
     when:
       branch:
         - develop
@@ -42,7 +42,7 @@ steps:
       VAULT_VERSION: 1.18.0
     commands:
       - export PATH=$${DRONE_WORKSPACE}/.bin:$${PATH}
-      - mvn -B -P integration-test verify
+      - ./mvnw -B -P integration-test verify
     when:
       branch:
         - main

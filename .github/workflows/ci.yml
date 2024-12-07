@@ -22,7 +22,7 @@ jobs:
           java-version: ${{ matrix.jdk }}
           distribution: 'temurin'
       - name: Compile
-        run: mvn -B clean compile
+        run: ./mvnw -B clean compile
       - name: Set up Vault
         if: github.ref_name == 'main' || github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
         run: |
@@ -37,14 +37,14 @@ jobs:
         if: github.ref_name == 'main'|| github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
         env:
           VAULT_VERSION: ${{ matrix.vault }}
-        run: mvn -B -P coverage -P integration-test verify
+        run: ./mvnw -B -P coverage -P integration-test verify
       - name: Test (Unit)
         if: github.ref_name != 'main' && github.base_ref != 'main' && !startsWith(github.ref_name, 'release/')
-        run: mvn -B -P coverage verify
+        run: ./mvnw -B -P coverage verify
       - name: Analysis
         if: matrix.analysis
         run: >
-          mvn -B sonar:sonar
+          ./mvnw -B sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=stklcode-github
         env:
