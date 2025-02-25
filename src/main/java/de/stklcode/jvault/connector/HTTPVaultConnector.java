@@ -674,12 +674,11 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final TransitResponse transitHash(final String algorithm, final String input) throws VaultConnectorException {
-        return transitHash(algorithm, input, "hex");
-    }
-
-    @Override
     public final TransitResponse transitHash(final String algorithm, final String input, final String format) throws VaultConnectorException {
+        if (format != null && !"hex".equals(format) && !"base64".equals(format)) {
+            throw new IllegalArgumentException("Unsupported format " + format);
+        }
+
         requireAuth();
 
         Map<String, Object> payload = mapOf(
