@@ -21,10 +21,7 @@ import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Vault Connector interface.
@@ -673,6 +670,82 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.9
      */
     boolean deleteTokenRole(final String name) throws VaultConnectorException;
+
+    /**
+     * Encrypt plaintext via transit engine from Vault.
+     *
+     * @param keyName   Transit key name
+     * @param plaintext Text to encrypt (Base64 encoded)
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    TransitResponse transitEncrypt(final String keyName, final String plaintext) throws VaultConnectorException;
+
+    /**
+     * Encrypt plaintext via transit engine from Vault.
+     *
+     * @param keyName   Transit key name
+     * @param plaintext Binary data to encrypt
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    default TransitResponse transitEncrypt(final String keyName, final byte[] plaintext)
+        throws VaultConnectorException {
+        return transitEncrypt(keyName, Base64.getEncoder().encodeToString(plaintext));
+    }
+
+    /**
+     * Decrypt ciphertext via transit engine from Vault.
+     *
+     * @param keyName    Transit key name
+     * @param ciphertext Text to decrypt
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    TransitResponse transitDecrypt(final String keyName, final String ciphertext) throws VaultConnectorException;
+
+    /**
+     * Hash data in hex format via transit engine from Vault.
+     *
+     * @param algorithm Specifies the hash algorithm to use
+     * @param input     Data to hash
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    default TransitResponse transitHash(final String algorithm, final String input) throws VaultConnectorException {
+        return transitHash(algorithm, input, "hex");
+    }
+
+    /**
+     * Hash data via transit engine from Vault.
+     *
+     * @param algorithm Specifies the hash algorithm to use
+     * @param input Data to hash (Base64 encoded)
+     * @param format Specifies the output encoding (hex/base64)
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    TransitResponse transitHash(final String algorithm, final String input, final String format)
+        throws VaultConnectorException;
+
+    /**
+     * Hash data via transit engine from Vault.
+     *
+     * @param algorithm Specifies the hash algorithm to use
+     * @param input     Data to hash
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    default TransitResponse transitHash(final String algorithm, final byte[] input, final String format)
+        throws VaultConnectorException {
+        return transitHash(algorithm, Base64.getEncoder().encodeToString(input), format);
+    }
 
     /**
      * Read credentials for MySQL backend at default mount point.

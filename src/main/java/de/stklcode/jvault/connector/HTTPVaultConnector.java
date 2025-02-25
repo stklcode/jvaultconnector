@@ -68,6 +68,11 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_UNDELETE = "/undelete/";
     private static final String PATH_DESTROY = "/destroy/";
 
+    private static final String PATH_TRANSIT = "transit";
+    private static final String PATH_TRANSIT_ENCRYPT = PATH_TRANSIT + "/encrypt/";
+    private static final String PATH_TRANSIT_DECRYPT = PATH_TRANSIT + "/decrypt/";
+    private static final String PATH_TRANSIT_HASH = PATH_TRANSIT + "/hash/";
+
     private final RequestHelper request;
 
     private boolean authorized = false;     // Authorization status.
@@ -644,6 +649,47 @@ public class HTTPVaultConnector implements VaultConnector {
         request.deleteWithoutResponse(PATH_AUTH_TOKEN + PATH_ROLES + "/" + name, token);
 
         return true;
+    }
+
+    @Override
+    public final TransitResponse transitEncrypt(final String keyName, final String plaintext)
+        throws VaultConnectorException {
+        requireAuth();
+
+        Map<String, Object> payload = mapOf(
+            "plaintext", plaintext
+        );
+
+        return request.post(PATH_TRANSIT_ENCRYPT + keyName, payload, token, TransitResponse.class);
+    }
+
+    @Override
+    public final TransitResponse transitDecrypt(final String keyName, final String ciphertext)
+        throws VaultConnectorException {
+        requireAuth();
+
+        Map<String, Object> payload = mapOf(
+            "ciphertext", ciphertext
+        );
+
+        return request.post(PATH_TRANSIT_DECRYPT + keyName, payload, token, TransitResponse.class);
+    }
+
+    @Override
+    public final TransitResponse transitHash(final String algorithm, final String input, final String format)
+        throws VaultConnectorException {
+        if (format != null && !"hex".equals(format) && !"base64".equals(format)) {
+            throw new IllegalArgumentException("Unsupported format " + format);
+        }
+
+        requireAuth();
+
+        Map<String, Object> payload = mapOf(
+            "input", input,
+            "format", format
+        );
+
+        return request.post(PATH_TRANSIT_HASH + algorithm, payload, token, TransitResponse.class);
     }
 
     /**

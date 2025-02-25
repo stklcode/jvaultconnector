@@ -4,6 +4,7 @@
 * `read...Credentials()` methods for specific database mounts (#92)
 
 ### Features
+* Support Vault transit API (#89)
 * Support PEM certificate string from `VAULT_CACERT` environment variable (#93)
 
 ### Dependencies
