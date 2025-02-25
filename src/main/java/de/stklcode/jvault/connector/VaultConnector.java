@@ -675,47 +675,49 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     boolean deleteTokenRole(final String name) throws VaultConnectorException;
 
     /**
-     * encrypt plaintext via transit engine from Vault.
+     * Encrypt plaintext via transit engine from Vault.
      *
-     * @param name Transit key name
-     * @param plaintext Text to encrypt
+     * @param keyName   Transit key name
+     * @param plaintext Text to encrypt (Base64 encoded)
      * @return Transit response
      * @throws VaultConnectorException on error
-     * @since 1.4.1
+     * @since 1.5.0
      */
-    TransitResponse transitEncrypt(final String name, final String plaintext) throws VaultConnectorException;
+    TransitResponse transitEncrypt(final String keyName, final String plaintext) throws VaultConnectorException;
 
     /**
-     * decrypt ciphertext via transit engine from Vault.
+     * Decrypt ciphertext via transit engine from Vault.
      *
-     * @param name Transit key name
+     * @param keyName    Transit key name
      * @param ciphertext Text to decrypt
      * @return Transit response
      * @throws VaultConnectorException on error
-     * @since 1.4.1
+     * @since 1.5.0
      */
-    TransitResponse transitDecrypt(final String name, final String ciphertext) throws VaultConnectorException;
+    TransitResponse transitDecrypt(final String keyName, final String ciphertext) throws VaultConnectorException;
 
     /**
-     * hash data in hex format via transit engine from Vault.
+     * Hash data in hex format via transit engine from Vault.
      *
      * @param algorithm Specifies the hash algorithm to use
-     * @param input Data to hash
+     * @param input     Data to hash
      * @return Transit response
      * @throws VaultConnectorException on error
-     * @since 1.4.1
+     * @since 1.5.0
      */
-    TransitResponse transitHash(final String algorithm, final String input) throws VaultConnectorException;
+    default TransitResponse transitHash(final String algorithm, final String input) throws VaultConnectorException {
+        return transitHash(algorithm, input, "hex");
+    }
 
     /**
      * hash data via transit engine from Vault.
      *
      * @param algorithm Specifies the hash algorithm to use
-     * @param input Data to hash
+     * @param input Data to hash (Base64 encoded)
      * @param format Specifies the output encoding (hex/base64)
      * @return Transit response
      * @throws VaultConnectorException on error
-     * @since 1.4.1
+     * @since 1.5.0
      */
     TransitResponse transitHash(final String algorithm, final String input, final String format) throws VaultConnectorException;
 
