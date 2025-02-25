@@ -675,6 +675,51 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     boolean deleteTokenRole(final String name) throws VaultConnectorException;
 
     /**
+     * encrypt plaintext via transit engine from Vault.
+     *
+     * @param name Transit key name
+     * @param plaintext Text to encrypt
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.4.1
+     */
+    TransitResponse transitEncrypt(final String name, final String plaintext) throws VaultConnectorException;
+
+    /**
+     * decrypt ciphertext via transit engine from Vault.
+     *
+     * @param name Transit key name
+     * @param ciphertext Text to decrypt
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.4.1
+     */
+    TransitResponse transitDecrypt(final String name, final String ciphertext) throws VaultConnectorException;
+
+    /**
+     * hash data in hex format via transit engine from Vault.
+     *
+     * @param algorithm Specifies the hash algorithm to use
+     * @param input Data to hash
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.4.1
+     */
+    TransitResponse transitHash(final String algorithm, final String input) throws VaultConnectorException;
+
+    /**
+     * hash data via transit engine from Vault.
+     *
+     * @param algorithm Specifies the hash algorithm to use
+     * @param input Data to hash
+     * @param format Specifies the output encoding (hex/base64)
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.4.1
+     */
+    TransitResponse transitHash(final String algorithm, final String input, final String format) throws VaultConnectorException;
+
+    /**
      * Read credentials for MySQL backend at default mount point.
      *
      * @param role the role name
