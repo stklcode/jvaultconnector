@@ -675,6 +675,53 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     boolean deleteTokenRole(final String name) throws VaultConnectorException;
 
     /**
+     * Encrypt plaintext via transit engine from Vault.
+     *
+     * @param keyName   Transit key name
+     * @param plaintext Text to encrypt (Base64 encoded)
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    TransitResponse transitEncrypt(final String keyName, final String plaintext) throws VaultConnectorException;
+
+    /**
+     * Decrypt ciphertext via transit engine from Vault.
+     *
+     * @param keyName    Transit key name
+     * @param ciphertext Text to decrypt
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    TransitResponse transitDecrypt(final String keyName, final String ciphertext) throws VaultConnectorException;
+
+    /**
+     * Hash data in hex format via transit engine from Vault.
+     *
+     * @param algorithm Specifies the hash algorithm to use
+     * @param input     Data to hash
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    default TransitResponse transitHash(final String algorithm, final String input) throws VaultConnectorException {
+        return transitHash(algorithm, input, "hex");
+    }
+
+    /**
+     * hash data via transit engine from Vault.
+     *
+     * @param algorithm Specifies the hash algorithm to use
+     * @param input Data to hash (Base64 encoded)
+     * @param format Specifies the output encoding (hex/base64)
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    TransitResponse transitHash(final String algorithm, final String input, final String format) throws VaultConnectorException;
+
+    /**
      * Read credentials for MySQL backend at default mount point.
      *
      * @param role the role name
