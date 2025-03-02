@@ -990,6 +990,68 @@ class HTTPVaultConnectorIT {
     }
 
     @Nested
+    @DisplayName("Transit Tests")
+    class TransitTests {
+
+        @Test
+        @DisplayName("Transit encryption")
+        void transitEncryptTest() {
+            assertDoesNotThrow(() -> connector.authToken(TOKEN_ROOT));
+            assumeTrue(connector.isAuthorized());
+
+            TransitResponse transitResponse = assertDoesNotThrow(
+                () -> connector.transitEncrypt("my-key", "dGVzdCBtZQo="),
+                "Failed to encrypt via transit"
+            );
+            assertNotNull(transitResponse.getCiphertext());
+            assertTrue(transitResponse.getCiphertext().startsWith("vault:v1:"));
+
+            transitResponse = assertDoesNotThrow(
+                () -> connector.transitEncrypt("my-key", "test".getBytes(UTF_8)),
+                "Failed to encrypt binary data via transit"
+            );
+            assertNotNull(transitResponse.getCiphertext());
+            assertTrue(transitResponse.getCiphertext().startsWith("vault:v1:"));
+
+        }
+
+        @Test
+        @DisplayName("Transit decryption")
+        void transitDecryptTest() {
+            assertDoesNotThrow(() -> connector.authToken(TOKEN_ROOT));
+            assumeTrue(connector.isAuthorized());
+
+            TransitResponse transitResponse = assertDoesNotThrow(
+                () -> connector.transitDecrypt("my-key", "vault:v1:oWRLHHjAgjPIrY9cYwIV3BRBO665qVYjSK4roVWFwbG8jgdN"),
+                "Failed to decrypt via transit"
+            );
+
+            assertEquals("dGVzdCBtZQo=", transitResponse.getPlaintext());
+        }
+
+        @Test
+        @DisplayName("Transit hash")
+        void transitHashText() {
+            assertDoesNotThrow(() -> connector.authToken(TOKEN_ROOT));
+            assumeTrue(connector.isAuthorized());
+
+            TransitResponse transitResponse = assertDoesNotThrow(
+                () -> connector.transitHash("sha2-512", "dGVzdCBtZQo="),
+                "Failed to hash via transit"
+            );
+
+            assertEquals("b759bc369a1503c2871ae39c01def2664d8029f089b6827732fa03c4ef981958f14f8d1e5e800c83bcf4114fb4c0661eb07bf18bc4fed5aed679057f74c3844f", transitResponse.getSum());
+
+            TransitResponse transitResponseBase64 = assertDoesNotThrow(
+                () -> connector.transitHash("sha2-512", "dGVzdCBtZQo=", "base64"),
+                "Failed to hash via transit"
+            );
+
+            assertEquals("t1m8NpoVA8KHGuOcAd7yZk2AKfCJtoJ3MvoDxO+YGVjxT40eXoAMg7z0EU+0wGYesHvxi8T+1a7WeQV/dMOETw==", transitResponseBase64.getSum());
+        }
+    }
+
+    @Nested
     @DisplayName("Misc Tests")
     class MiscTests {
         /**
