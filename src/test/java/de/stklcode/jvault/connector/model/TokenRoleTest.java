@@ -173,7 +173,7 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
         assertNull(role.getTokenType());
 
         // Empty builder should be equal to no-arg construction.
-        assertEquals(role, new TokenRole());
+        assertEquals(new TokenRole(), role);
 
         // Optional fields should be ignored, so JSON string should be empty.
         assertEquals("{}", objectMapper.writeValueAsString(role));

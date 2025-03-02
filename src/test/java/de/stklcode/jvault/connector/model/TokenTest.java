@@ -105,7 +105,7 @@ class TokenTest extends AbstractModelTest<Token> {
         assertEquals("{}", objectMapper.writeValueAsString(token));
 
         // Empty builder should be equal to no-arg construction.
-        assertEquals(token, new Token());
+        assertEquals(new Token(), token);
     }
 
     /**
