@@ -1,3 +1,9 @@
+## unreleased
+
+### Dependencies
+* Updated Jackson to 2.18.3 (#90)
+
+
 ## 1.4.0 (2024-12-07)
 
 ### Removal
