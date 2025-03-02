@@ -21,10 +21,7 @@ import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Vault Connector interface.
@@ -684,6 +681,19 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 1.5.0
      */
     TransitResponse transitEncrypt(final String keyName, final String plaintext) throws VaultConnectorException;
+
+    /**
+     * Encrypt plaintext via transit engine from Vault.
+     *
+     * @param keyName   Transit key name
+     * @param plaintext Binary data to encrypt
+     * @return Transit response
+     * @throws VaultConnectorException on error
+     * @since 1.5.0
+     */
+    default TransitResponse transitEncrypt(final String keyName, final byte[] plaintext) throws VaultConnectorException {
+        return transitEncrypt(keyName, Base64.getEncoder().encodeToString(plaintext));
+    }
 
     /**
      * Decrypt ciphertext via transit engine from Vault.
