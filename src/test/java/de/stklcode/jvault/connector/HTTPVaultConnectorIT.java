@@ -1003,9 +1003,16 @@ class HTTPVaultConnectorIT {
                 () -> connector.transitEncrypt("my-key", "dGVzdCBtZQo="),
                 "Failed to encrypt via transit"
             );
-
             assertNotNull(transitResponse.getCiphertext());
             assertTrue(transitResponse.getCiphertext().startsWith("vault:v1:"));
+
+            transitResponse = assertDoesNotThrow(
+                () -> connector.transitEncrypt("my-key", "test".getBytes(UTF_8)),
+                "Failed to encrypt binary data via transit"
+            );
+            assertNotNull(transitResponse.getCiphertext());
+            assertTrue(transitResponse.getCiphertext().startsWith("vault:v1:"));
+
         }
 
         @Test
