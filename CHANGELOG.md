@@ -1,5 +1,8 @@
 ## unreleased
 
+### Deprecations
+* `read...Credentials()` methods for specific database mounts (#92)
+
 ### Dependencies
 * Updated Jackson to 2.18.3 (#90)
 
