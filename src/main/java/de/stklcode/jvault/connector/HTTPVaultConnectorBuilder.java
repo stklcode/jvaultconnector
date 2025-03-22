@@ -301,7 +301,7 @@ public final class HTTPVaultConnectorBuilder {
      */
     public HTTPVaultConnectorBuilder fromEnv() throws VaultConnectorException {
         /* Parse URL from environment variable */
-        if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).trim().isEmpty()) {
+        if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).isBlank()) {
             try {
                 var url = new URL(System.getenv(ENV_VAULT_ADDR));
                 this.host = url.getHost();
@@ -325,7 +325,7 @@ public final class HTTPVaultConnectorBuilder {
         token = System.getenv(ENV_VAULT_TOKEN);
 
         /* Parse certificate, if set */
-        if (System.getenv(ENV_VAULT_CACERT) != null && !System.getenv(ENV_VAULT_CACERT).trim().isEmpty()) {
+        if (System.getenv(ENV_VAULT_CACERT) != null && !System.getenv(ENV_VAULT_CACERT).isBlank()) {
             return withTrustedCA(Paths.get(System.getenv(ENV_VAULT_CACERT)));
         }
         return this;
