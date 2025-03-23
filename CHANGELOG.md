@@ -3,6 +3,9 @@
 ### Deprecations
 * `read...Credentials()` methods for specific database mounts (#92)
 
+### Features
+* Support PEM certificate string from `VAULT_CACERT` environment variable (#93)
+
 ### Dependencies
 * Updated Jackson to 2.18.3 (#90)
 

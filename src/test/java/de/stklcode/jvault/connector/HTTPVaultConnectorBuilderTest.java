@@ -25,7 +25,10 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.junit.jupiter.api.Assertions.*;
@@ -128,19 +131,6 @@ class HTTPVaultConnectorBuilderTest {
             return null;
         });
 
-        // Provide CA certificate.
-        String vaultCacert = tempDir.toString() + "/doesnotexist";
-        withVaultEnv(VAULT_ADDR, vaultCacert, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
-            TlsException e = assertThrows(
-                    TlsException.class,
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Creation with unknown cert path failed"
-            );
-            assertEquals(vaultCacert, assertInstanceOf(NoSuchFileException.class, e.getCause()).getFile());
-
-            return null;
-        });
-
         // Automatic authentication.
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
@@ -159,6 +149,59 @@ class HTTPVaultConnectorBuilderTest {
                     () -> HTTPVaultConnector.builder().fromEnv(),
                     "Invalid URL from environment should raise an exception"
             );
+
+            return null;
+        });
+    }
+
+    /**
+     * Test CA certificate handling from environment variables
+     */
+    @Test
+    void testCertificateFromEnv() throws Exception {
+        // From direct PEM content
+        String pem = Files.readString(Paths.get(getClass().getResource("/tls/ca.pem").toURI()));
+        AtomicReference<Object> certFromPem = new AtomicReference<>();
+        withVaultEnv(VAULT_ADDR, pem, null, null).execute(() -> {
+            HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
+                    () -> HTTPVaultConnector.builder().fromEnv(),
+                    "Builder with PEM certificate from environment failed"
+            );
+            HTTPVaultConnector connector = builder.build();
+
+            certFromPem.set(getRequestHelperPrivate(connector, "trustedCaCert"));
+            assertNotNull(certFromPem.get(), "Trusted CA cert from PEM not set");
+
+            return null;
+        });
+
+        // From file path
+        String file = Paths.get(getClass().getResource("/tls/ca.pem").toURI()).toString();
+        AtomicReference<Object> certFromFile = new AtomicReference<>();
+        withVaultEnv(VAULT_ADDR, file, null, null).execute(() -> {
+            HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
+                    () -> HTTPVaultConnector.builder().fromEnv(),
+                    "Builder with certificate path from environment failed"
+            );
+            HTTPVaultConnector connector = builder.build();
+
+            certFromFile.set(getRequestHelperPrivate(connector, "trustedCaCert"));
+            assertNotNull(certFromFile.get(), "Trusted CA cert from file not set");
+
+            return null;
+        });
+
+        assertEquals(certFromPem.get(), certFromFile.get(), "Certificates from PEM and file should be equal");
+
+        // Non-existing path CA certificate path
+        String doesNotExist = tempDir.toString() + "/doesnotexist";
+        withVaultEnv(VAULT_ADDR, doesNotExist, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
+            TlsException e = assertThrows(
+                    TlsException.class,
+                    () -> HTTPVaultConnector.builder().fromEnv(),
+                    "Creation with unknown cert path failed"
+            );
+            assertEquals(doesNotExist, assertInstanceOf(NoSuchFileException.class, e.getCause()).getFile());
 
             return null;
         });

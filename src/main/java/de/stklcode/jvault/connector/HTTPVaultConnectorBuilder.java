@@ -20,11 +20,13 @@ import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -326,7 +328,11 @@ public final class HTTPVaultConnectorBuilder {
 
         /* Parse certificate, if set */
         if (System.getenv(ENV_VAULT_CACERT) != null && !System.getenv(ENV_VAULT_CACERT).isBlank()) {
-            return withTrustedCA(Paths.get(System.getenv(ENV_VAULT_CACERT)));
+            X509Certificate cert = certificateFromString(System.getenv(ENV_VAULT_CACERT));
+            if (cert == null) {
+                cert = certificateFromFile(Paths.get(System.getenv(ENV_VAULT_CACERT)));
+            }
+            return withTrustedCA(cert);
         }
         return this;
     }
@@ -396,6 +402,28 @@ public final class HTTPVaultConnectorBuilder {
         HTTPVaultConnector con = build();
         con.authToken(token);
         return con;
+    }
+
+    /**
+     * Read given certificate file to X.509 certificate.
+     *
+     * @param cert Certificate string (optionally PEM)
+     * @return X.509 Certificate object if parseable, else {@code null}
+     * @throws TlsException on error
+     * @since 1.5.0
+     */
+    private X509Certificate certificateFromString(final String cert) throws TlsException {
+        // Check if PEM header is present in given string
+        if (cert.contains("-BEGIN ") && cert.contains("-END")) {
+            try (var is = new ByteArrayInputStream(cert.getBytes(StandardCharsets.UTF_8))) {
+                return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
+            } catch (IOException | CertificateException e) {
+                throw new TlsException("Unable to read certificate.", e);
+            }
+        }
+
+        // Not am PEM string, skip
+        return null;
     }
 
     /**
