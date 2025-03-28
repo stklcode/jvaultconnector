@@ -7,6 +7,9 @@
 * Support Vault transit API (#89)
 * Support PEM certificate string from `VAULT_CACERT` environment variable (#93)
 
+### Improvements
+* Replace deprecated `java.net.URL` usage with `java.net.URI` (#94)
+
 ### Dependencies
 * Updated Jackson to 2.18.3 (#90)
 

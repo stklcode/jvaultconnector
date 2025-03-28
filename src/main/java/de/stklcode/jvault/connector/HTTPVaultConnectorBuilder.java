@@ -22,10 +22,8 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -305,11 +303,11 @@ public final class HTTPVaultConnectorBuilder {
         /* Parse URL from environment variable */
         if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).isBlank()) {
             try {
-                var url = new URL(System.getenv(ENV_VAULT_ADDR));
-                this.host = url.getHost();
-                this.port = url.getPort();
-                this.tls = url.getProtocol().equals("https");
-            } catch (MalformedURLException e) {
+                var uri = new URI(System.getenv(ENV_VAULT_ADDR));
+                this.host = uri.getHost();
+                this.port = uri.getPort();
+                this.tls = uri.getScheme().equalsIgnoreCase("https");
+            } catch (URISyntaxException e) {
                 throw new ConnectionException("URL provided in environment variable malformed", e);
             }
         }
