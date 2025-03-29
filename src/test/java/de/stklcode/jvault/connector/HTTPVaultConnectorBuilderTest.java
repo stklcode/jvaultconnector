@@ -41,6 +41,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class HTTPVaultConnectorBuilderTest {
     private static final String VAULT_ADDR = "https://localhost:8201";
+    private static final String VAULT_ADDR_2 = "http://localhost";
+    private static final String VAULT_ADDR_3 = "https://localhost/vault/";
     private static final Integer VAULT_MAX_RETRIES = 13;
     private static final String VAULT_TOKEN = "00001111-2222-3333-4444-555566667777";
 
@@ -113,6 +115,22 @@ class HTTPVaultConnectorBuilderTest {
             assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
             assertEquals(0, getRequestHelperPrivate(connector, "retries"), "Non-default number of retries, when none set");
 
+            return null;
+        });
+        withVaultEnv(VAULT_ADDR_2, null, null, null).execute(() -> {
+            HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
+                    () -> HTTPVaultConnector.builder().fromEnv(),
+                    "Factory creation from minimal environment failed"
+            );
+            assertEquals(VAULT_ADDR_2 + "/v1/", getRequestHelperPrivate(builder.build(), "baseURL"), "URL without port not set correctly");
+            return null;
+        });
+        withVaultEnv(VAULT_ADDR_3, null, null, null).execute(() -> {
+            HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
+                    () -> HTTPVaultConnector.builder().fromEnv(),
+                    "Factory creation from minimal environment failed"
+            );
+            assertEquals(VAULT_ADDR_3, getRequestHelperPrivate(builder.build(), "baseURL"), "URL with custom path not set correctly");
             return null;
         });
 

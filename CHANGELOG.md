@@ -10,6 +10,9 @@
 ### Improvements
 * Replace deprecated `java.net.URL` usage with `java.net.URI` (#94)
 
+### Fix
+* Fix initialization from environment without explicit port
+
 ### Dependencies
 * Updated Jackson to 2.18.3 (#90)
 

@@ -31,7 +31,6 @@ import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Objects;
 
 /**
  * Vault Connector Builder implementation for HTTP Vault connectors.
@@ -96,10 +95,14 @@ public final class HTTPVaultConnectorBuilder {
      * @since 1.0
      */
     public HTTPVaultConnectorBuilder withBaseURL(final URI baseURL) {
-        return withTLS(!("http".equalsIgnoreCase(Objects.requireNonNullElse(baseURL.getScheme(), ""))))
+        String path = baseURL.getPath();
+        if (path == null || path.isBlank()) {
+            path = DEFAULT_PREFIX;
+        }
+        return withTLS(!("http".equalsIgnoreCase(baseURL.getScheme())))
                 .withHost(baseURL.getHost())
                 .withPort(baseURL.getPort())
-                .withPrefix(baseURL.getPath());
+                .withPrefix(path);
     }
 
     /**
@@ -303,10 +306,7 @@ public final class HTTPVaultConnectorBuilder {
         /* Parse URL from environment variable */
         if (System.getenv(ENV_VAULT_ADDR) != null && !System.getenv(ENV_VAULT_ADDR).isBlank()) {
             try {
-                var uri = new URI(System.getenv(ENV_VAULT_ADDR));
-                this.host = uri.getHost();
-                this.port = uri.getPort();
-                this.tls = uri.getScheme().equalsIgnoreCase("https");
+                withBaseURL(System.getenv(ENV_VAULT_ADDR));
             } catch (URISyntaxException e) {
                 throw new ConnectionException("URL provided in environment variable malformed", e);
             }
@@ -315,7 +315,7 @@ public final class HTTPVaultConnectorBuilder {
         /* Read number of retries */
         if (System.getenv(ENV_VAULT_MAX_RETRIES) != null) {
             try {
-                numberOfRetries = Integer.parseInt(System.getenv(ENV_VAULT_MAX_RETRIES));
+                withNumberOfRetries(Integer.parseInt(System.getenv(ENV_VAULT_MAX_RETRIES)));
             } catch (NumberFormatException ignored) {
                 /* Ignore malformed values. */
             }
