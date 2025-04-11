@@ -187,19 +187,19 @@ public final class HealthResponse implements VaultResponse {
         }
         HealthResponse that = (HealthResponse) o;
         return Objects.equals(clusterID, that.clusterID) &&
-                Objects.equals(clusterName, that.clusterName) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(serverTimeUTC, that.serverTimeUTC) &&
-                Objects.equals(standby, that.standby) &&
-                Objects.equals(sealed, that.sealed) &&
-                Objects.equals(initialized, that.initialized) &&
-                Objects.equals(replicationPerfMode, that.replicationPerfMode) &&
-                Objects.equals(replicationDrMode, that.replicationDrMode) &&
-                Objects.equals(performanceStandby, that.performanceStandby) &&
-                Objects.equals(echoDurationMs, that.echoDurationMs) &&
-                Objects.equals(clockSkewMs, that.clockSkewMs) &&
-                Objects.equals(replicationPrimaryCanaryAgeMs, that.replicationPrimaryCanaryAgeMs) &&
-                Objects.equals(enterprise, that.enterprise);
+            Objects.equals(clusterName, that.clusterName) &&
+            Objects.equals(version, that.version) &&
+            Objects.equals(serverTimeUTC, that.serverTimeUTC) &&
+            Objects.equals(standby, that.standby) &&
+            Objects.equals(sealed, that.sealed) &&
+            Objects.equals(initialized, that.initialized) &&
+            Objects.equals(replicationPerfMode, that.replicationPerfMode) &&
+            Objects.equals(replicationDrMode, that.replicationDrMode) &&
+            Objects.equals(performanceStandby, that.performanceStandby) &&
+            Objects.equals(echoDurationMs, that.echoDurationMs) &&
+            Objects.equals(clockSkewMs, that.clockSkewMs) &&
+            Objects.equals(replicationPrimaryCanaryAgeMs, that.replicationPrimaryCanaryAgeMs) &&
+            Objects.equals(enterprise, that.enterprise);
     }
 
     @Override

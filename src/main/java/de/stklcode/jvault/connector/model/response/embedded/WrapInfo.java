@@ -80,9 +80,9 @@ public class WrapInfo implements Serializable {
         }
         WrapInfo that = (WrapInfo) o;
         return Objects.equals(token, that.token) &&
-                Objects.equals(ttl, that.ttl) &&
-                Objects.equals(creationTime, that.creationTime) &&
-                Objects.equals(creationPath, that.creationPath);
+            Objects.equals(ttl, that.ttl) &&
+            Objects.equals(creationTime, that.creationTime) &&
+            Objects.equals(creationPath, that.creationPath);
     }
 
     @Override

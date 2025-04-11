@@ -191,24 +191,24 @@ public final class SealResponse implements VaultResponse {
         }
         SealResponse that = (SealResponse) o;
         return sealed == that.sealed &&
-                initialized == that.initialized &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(threshold, that.threshold) &&
-                Objects.equals(numberOfShares, that.numberOfShares) &&
-                Objects.equals(progress, that.progress) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(buildDate, that.buildDate) &&
-                Objects.equals(nonce, that.nonce) &&
-                Objects.equals(clusterName, that.clusterName) &&
-                Objects.equals(clusterId, that.clusterId) &&
-                Objects.equals(migration, that.migration) &&
-                Objects.equals(recoverySeal, that.recoverySeal) &&
-                Objects.equals(storageType, that.storageType);
+            initialized == that.initialized &&
+            Objects.equals(type, that.type) &&
+            Objects.equals(threshold, that.threshold) &&
+            Objects.equals(numberOfShares, that.numberOfShares) &&
+            Objects.equals(progress, that.progress) &&
+            Objects.equals(version, that.version) &&
+            Objects.equals(buildDate, that.buildDate) &&
+            Objects.equals(nonce, that.nonce) &&
+            Objects.equals(clusterName, that.clusterName) &&
+            Objects.equals(clusterId, that.clusterId) &&
+            Objects.equals(migration, that.migration) &&
+            Objects.equals(recoverySeal, that.recoverySeal) &&
+            Objects.equals(storageType, that.storageType);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(type, sealed, initialized, threshold, numberOfShares, progress, version, buildDate, nonce,
-                clusterName, clusterId, migration, recoverySeal, storageType);
+            clusterName, clusterId, migration, recoverySeal, storageType);
     }
 }

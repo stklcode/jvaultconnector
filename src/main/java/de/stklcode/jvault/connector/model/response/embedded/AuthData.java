@@ -171,22 +171,22 @@ public final class AuthData implements Serializable {
         }
         AuthData authData = (AuthData) o;
         return renewable == authData.renewable &&
-                orphan == authData.orphan &&
-                Objects.equals(clientToken, authData.clientToken) &&
-                Objects.equals(accessor, authData.accessor) &&
-                Objects.equals(policies, authData.policies) &&
-                Objects.equals(tokenPolicies, authData.tokenPolicies) &&
-                Objects.equals(metadata, authData.metadata) &&
-                Objects.equals(leaseDuration, authData.leaseDuration) &&
-                Objects.equals(entityId, authData.entityId) &&
-                Objects.equals(tokenType, authData.tokenType) &&
-                Objects.equals(numUses, authData.numUses) &&
-                Objects.equals(mfaRequirement, authData.mfaRequirement);
+            orphan == authData.orphan &&
+            Objects.equals(clientToken, authData.clientToken) &&
+            Objects.equals(accessor, authData.accessor) &&
+            Objects.equals(policies, authData.policies) &&
+            Objects.equals(tokenPolicies, authData.tokenPolicies) &&
+            Objects.equals(metadata, authData.metadata) &&
+            Objects.equals(leaseDuration, authData.leaseDuration) &&
+            Objects.equals(entityId, authData.entityId) &&
+            Objects.equals(tokenType, authData.tokenType) &&
+            Objects.equals(numUses, authData.numUses) &&
+            Objects.equals(mfaRequirement, authData.mfaRequirement);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(clientToken, accessor, policies, tokenPolicies, metadata, leaseDuration, renewable,
-                entityId, tokenType, orphan, numUses, mfaRequirement);
+            entityId, tokenType, orphan, numUses, mfaRequirement);
     }
 }

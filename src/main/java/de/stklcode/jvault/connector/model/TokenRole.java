@@ -245,27 +245,27 @@ public final class TokenRole implements Serializable {
         }
         TokenRole tokenRole = (TokenRole) o;
         return Objects.equals(name, tokenRole.name) &&
-                Objects.equals(allowedPolicies, tokenRole.allowedPolicies) &&
-                Objects.equals(allowedPoliciesGlob, tokenRole.allowedPoliciesGlob) &&
-                Objects.equals(disallowedPolicies, tokenRole.disallowedPolicies) &&
-                Objects.equals(disallowedPoliciesGlob, tokenRole.disallowedPoliciesGlob) &&
-                Objects.equals(orphan, tokenRole.orphan) &&
-                Objects.equals(renewable, tokenRole.renewable) &&
-                Objects.equals(pathSuffix, tokenRole.pathSuffix) &&
-                Objects.equals(allowedEntityAliases, tokenRole.allowedEntityAliases) &&
-                Objects.equals(tokenBoundCidrs, tokenRole.tokenBoundCidrs) &&
-                Objects.equals(tokenExplicitMaxTtl, tokenRole.tokenExplicitMaxTtl) &&
-                Objects.equals(tokenNoDefaultPolicy, tokenRole.tokenNoDefaultPolicy) &&
-                Objects.equals(tokenNumUses, tokenRole.tokenNumUses) &&
-                Objects.equals(tokenPeriod, tokenRole.tokenPeriod) &&
-                Objects.equals(tokenType, tokenRole.tokenType);
+            Objects.equals(allowedPolicies, tokenRole.allowedPolicies) &&
+            Objects.equals(allowedPoliciesGlob, tokenRole.allowedPoliciesGlob) &&
+            Objects.equals(disallowedPolicies, tokenRole.disallowedPolicies) &&
+            Objects.equals(disallowedPoliciesGlob, tokenRole.disallowedPoliciesGlob) &&
+            Objects.equals(orphan, tokenRole.orphan) &&
+            Objects.equals(renewable, tokenRole.renewable) &&
+            Objects.equals(pathSuffix, tokenRole.pathSuffix) &&
+            Objects.equals(allowedEntityAliases, tokenRole.allowedEntityAliases) &&
+            Objects.equals(tokenBoundCidrs, tokenRole.tokenBoundCidrs) &&
+            Objects.equals(tokenExplicitMaxTtl, tokenRole.tokenExplicitMaxTtl) &&
+            Objects.equals(tokenNoDefaultPolicy, tokenRole.tokenNoDefaultPolicy) &&
+            Objects.equals(tokenNumUses, tokenRole.tokenNumUses) &&
+            Objects.equals(tokenPeriod, tokenRole.tokenPeriod) &&
+            Objects.equals(tokenType, tokenRole.tokenType);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(name, allowedPolicies, allowedPoliciesGlob, disallowedPolicies, disallowedPoliciesGlob,
-                orphan, renewable, pathSuffix, allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl,
-                tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
+            orphan, renewable, pathSuffix, allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl,
+            tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
     }
 
     /**

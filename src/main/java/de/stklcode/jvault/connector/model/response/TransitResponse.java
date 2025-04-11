@@ -16,10 +16,10 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import java.util.Map;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * Response entity for transit operations.

@@ -96,10 +96,10 @@ public final class VersionMetadata implements Serializable {
         }
         VersionMetadata that = (VersionMetadata) o;
         return destroyed == that.destroyed &&
-                Objects.equals(createdTime, that.createdTime) &&
-                Objects.equals(deletionTime, that.deletionTime) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(customMetadata, that.customMetadata);
+            Objects.equals(createdTime, that.createdTime) &&
+            Objects.equals(deletionTime, that.deletionTime) &&
+            Objects.equals(version, that.version) &&
+            Objects.equals(customMetadata, that.customMetadata);
     }
 
     @Override

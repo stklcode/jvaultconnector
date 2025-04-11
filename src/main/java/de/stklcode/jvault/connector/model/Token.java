@@ -227,24 +227,24 @@ public final class Token implements Serializable {
         }
         Token token = (Token) o;
         return Objects.equals(id, token.id) &&
-                Objects.equals(type, token.type) &&
-                Objects.equals(displayName, token.displayName) &&
-                Objects.equals(noParent, token.noParent) &&
-                Objects.equals(noDefaultPolicy, token.noDefaultPolicy) &&
-                Objects.equals(ttl, token.ttl) &&
-                Objects.equals(explicitMaxTtl, token.explicitMaxTtl) &&
-                Objects.equals(numUses, token.numUses) &&
-                Objects.equals(policies, token.policies) &&
-                Objects.equals(meta, token.meta) &&
-                Objects.equals(renewable, token.renewable) &&
-                Objects.equals(period, token.period) &&
-                Objects.equals(entityAlias, token.entityAlias);
+            Objects.equals(type, token.type) &&
+            Objects.equals(displayName, token.displayName) &&
+            Objects.equals(noParent, token.noParent) &&
+            Objects.equals(noDefaultPolicy, token.noDefaultPolicy) &&
+            Objects.equals(ttl, token.ttl) &&
+            Objects.equals(explicitMaxTtl, token.explicitMaxTtl) &&
+            Objects.equals(numUses, token.numUses) &&
+            Objects.equals(policies, token.policies) &&
+            Objects.equals(meta, token.meta) &&
+            Objects.equals(renewable, token.renewable) &&
+            Objects.equals(period, token.period) &&
+            Objects.equals(entityAlias, token.entityAlias);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, type, displayName, noParent, noDefaultPolicy, ttl, explicitMaxTtl, numUses, policies,
-                meta, renewable, period, entityAlias);
+            meta, renewable, period, entityAlias);
     }
 
     /**

@@ -222,27 +222,27 @@ public final class TokenData implements Serializable {
         }
         TokenData tokenData = (TokenData) o;
         return orphan == tokenData.orphan &&
-                renewable == tokenData.renewable &&
-                Objects.equals(accessor, tokenData.accessor) &&
-                Objects.equals(creationTime, tokenData.creationTime) &&
-                Objects.equals(creationTtl, tokenData.creationTtl) &&
-                Objects.equals(name, tokenData.name) &&
-                Objects.equals(entityId, tokenData.entityId) &&
-                Objects.equals(expireTime, tokenData.expireTime) &&
-                Objects.equals(explicitMaxTtl, tokenData.explicitMaxTtl) &&
-                Objects.equals(id, tokenData.id) &&
-                Objects.equals(issueTime, tokenData.issueTime) &&
-                Objects.equals(meta, tokenData.meta) &&
-                Objects.equals(numUses, tokenData.numUses) &&
-                Objects.equals(path, tokenData.path) &&
-                Objects.equals(policies, tokenData.policies) &&
-                Objects.equals(ttl, tokenData.ttl) &&
-                Objects.equals(type, tokenData.type);
+            renewable == tokenData.renewable &&
+            Objects.equals(accessor, tokenData.accessor) &&
+            Objects.equals(creationTime, tokenData.creationTime) &&
+            Objects.equals(creationTtl, tokenData.creationTtl) &&
+            Objects.equals(name, tokenData.name) &&
+            Objects.equals(entityId, tokenData.entityId) &&
+            Objects.equals(expireTime, tokenData.expireTime) &&
+            Objects.equals(explicitMaxTtl, tokenData.explicitMaxTtl) &&
+            Objects.equals(id, tokenData.id) &&
+            Objects.equals(issueTime, tokenData.issueTime) &&
+            Objects.equals(meta, tokenData.meta) &&
+            Objects.equals(numUses, tokenData.numUses) &&
+            Objects.equals(path, tokenData.path) &&
+            Objects.equals(policies, tokenData.policies) &&
+            Objects.equals(ttl, tokenData.ttl) &&
+            Objects.equals(type, tokenData.type);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(accessor, creationTime, creationTtl, name, entityId, expireTime, explicitMaxTtl, id,
-                issueTime, meta, numUses, orphan, path, policies, renewable, ttl, type);
+            issueTime, meta, numUses, orphan, path, policies, renewable, ttl, type);
     }
 }

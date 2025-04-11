@@ -181,19 +181,19 @@ public final class AppRoleSecret implements Serializable {
         }
         AppRoleSecret that = (AppRoleSecret) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(accessor, that.accessor) &&
-                Objects.equals(metadata, that.metadata) &&
-                Objects.equals(cidrList, that.cidrList) &&
-                Objects.equals(creationTime, that.creationTime) &&
-                Objects.equals(expirationTime, that.expirationTime) &&
-                Objects.equals(lastUpdatedTime, that.lastUpdatedTime) &&
-                Objects.equals(numUses, that.numUses) &&
-                Objects.equals(ttl, that.ttl);
+            Objects.equals(accessor, that.accessor) &&
+            Objects.equals(metadata, that.metadata) &&
+            Objects.equals(cidrList, that.cidrList) &&
+            Objects.equals(creationTime, that.creationTime) &&
+            Objects.equals(expirationTime, that.expirationTime) &&
+            Objects.equals(lastUpdatedTime, that.lastUpdatedTime) &&
+            Objects.equals(numUses, that.numUses) &&
+            Objects.equals(ttl, that.ttl);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, accessor, metadata, cidrList, creationTime, expirationTime, lastUpdatedTime, numUses,
-                ttl);
+            ttl);
     }
 }

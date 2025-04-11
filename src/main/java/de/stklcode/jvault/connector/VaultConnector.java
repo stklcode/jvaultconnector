@@ -191,7 +191,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.4.0
      */
     default boolean createAppRole(final String roleName, final List<String> policies, final String roleID)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         return createAppRole(AppRole.builder(roleName).withTokenPolicies(policies).withId(roleID).build());
     }
 
@@ -257,7 +257,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.4.0
      */
     default AppRoleSecretResponse createAppRoleSecret(final String roleName, final String secretID)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         return createAppRoleSecret(roleName, new AppRoleSecret(secretID));
     }
 
@@ -271,7 +271,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.4.0
      */
     AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret)
-            throws VaultConnectorException;
+        throws VaultConnectorException;
 
     /**
      * Lookup an AppRole secret.
@@ -283,7 +283,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.4.0
      */
     AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID)
-            throws VaultConnectorException;
+        throws VaultConnectorException;
 
     /**
      * Destroy an AppRole secret.
@@ -398,7 +398,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8
      */
     SecretResponse readSecretVersion(final String mount, final String key, final Integer version)
-            throws VaultConnectorException;
+        throws VaultConnectorException;
 
     /**
      * Retrieve secret metadata from Vault.
@@ -476,7 +476,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8 {@code options} parameter added
      */
     void write(final String key, final Map<String, Object> data, final Map<String, Object> options)
-            throws VaultConnectorException;
+        throws VaultConnectorException;
 
     /**
      * Delete key from Vault.
@@ -524,7 +524,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8
      */
     void deleteSecretVersions(final String mount, final String key, final int... versions)
-            throws VaultConnectorException;
+        throws VaultConnectorException;
 
     /**
      * Undelete (restore) secret versions from Vault.
@@ -537,7 +537,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8
      */
     void undeleteSecretVersions(final String mount, final String key, final int... versions)
-            throws VaultConnectorException;
+        throws VaultConnectorException;
 
     /**
      * Destroy secret versions from Vault.
@@ -550,7 +550,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.8
      */
     void destroySecretVersions(final String mount, final String key, final int... versions)
-            throws VaultConnectorException;
+        throws VaultConnectorException;
 
     /**
      * Revoke given lease immediately.
@@ -724,8 +724,8 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Hash data via transit engine from Vault.
      *
      * @param algorithm Specifies the hash algorithm to use
-     * @param input Data to hash (Base64 encoded)
-     * @param format Specifies the output encoding (hex/base64)
+     * @param input     Data to hash (Base64 encoded)
+     * @param format    Specifies the output encoding (hex/base64)
      * @return Transit response
      * @throws VaultConnectorException on error
      * @since 1.5.0
@@ -813,7 +813,7 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.5.0
      */
     default CredentialsResponse readDbCredentials(final String role, final String mount)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         return (CredentialsResponse) read(mount + "/creds/" + role);
     }
 }

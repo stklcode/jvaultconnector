@@ -202,19 +202,19 @@ public final class AuthMethod implements Serializable {
         }
         AuthMethod that = (AuthMethod) o;
         return local == that.local &&
-                type == that.type &&
-                externalEntropyAccess == that.externalEntropyAccess &&
-                sealWrap == that.sealWrap &&
-                Objects.equals(rawType, that.rawType) &&
-                Objects.equals(accessor, that.accessor) &&
-                Objects.equals(deprecationStatus, that.deprecationStatus) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(config, that.config) &&
-                Objects.equals(options, that.options) &&
-                Objects.equals(pluginVersion, that.pluginVersion) &&
-                Objects.equals(runningPluginVersion, that.runningPluginVersion) &&
-                Objects.equals(runningSha256, that.runningSha256) &&
-                Objects.equals(uuid, that.uuid);
+            type == that.type &&
+            externalEntropyAccess == that.externalEntropyAccess &&
+            sealWrap == that.sealWrap &&
+            Objects.equals(rawType, that.rawType) &&
+            Objects.equals(accessor, that.accessor) &&
+            Objects.equals(deprecationStatus, that.deprecationStatus) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(config, that.config) &&
+            Objects.equals(options, that.options) &&
+            Objects.equals(pluginVersion, that.pluginVersion) &&
+            Objects.equals(runningPluginVersion, that.runningPluginVersion) &&
+            Objects.equals(runningSha256, that.runningSha256) &&
+            Objects.equals(uuid, that.uuid);
     }
 
     @Override

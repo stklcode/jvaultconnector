@@ -100,9 +100,9 @@ public final class HTTPVaultConnectorBuilder {
             path = DEFAULT_PREFIX;
         }
         return withTLS(!("http".equalsIgnoreCase(baseURL.getScheme())))
-                .withHost(baseURL.getHost())
-                .withPort(baseURL.getPort())
-                .withPrefix(path);
+            .withHost(baseURL.getHost())
+            .withPort(baseURL.getPort())
+            .withPrefix(path);
     }
 
     /**

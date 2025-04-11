@@ -66,9 +66,9 @@ public final class RequestHelper implements Serializable {
         this.tlsVersion = tlsVersion;
         this.trustedCaCert = trustedCaCert;
         this.jsonMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+            .registerModule(new JavaTimeModule())
+            .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
     }
 
     /**
@@ -115,7 +115,7 @@ public final class RequestHelper implements Serializable {
      * @since 0.8
      */
     public <T> T post(final String path, final Object payload, final String token, final Class<T> target)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         try {
             String response = post(path, payload, token);
             return jsonMapper.readValue(response, target);
@@ -134,7 +134,7 @@ public final class RequestHelper implements Serializable {
      * @since 0.8
      */
     public void postWithoutResponse(final String path, final Object payload, final String token)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         if (!post(path, payload, token).isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         }
@@ -151,7 +151,7 @@ public final class RequestHelper implements Serializable {
      * @since 0.8 Added {@code token} parameter.
      */
     public String put(final String path, final Map<String, String> payload, final String token)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         // Initialize PUT.
         var req = HttpRequest.newBuilder(URI.create(baseURL + path));
 
@@ -185,7 +185,7 @@ public final class RequestHelper implements Serializable {
      * @since 0.8
      */
     public <T> T put(final String path, final Map<String, String> payload, final String token, final Class<T> target)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         try {
             String response = put(path, payload, token);
             return jsonMapper.readValue(response, target);
@@ -204,7 +204,7 @@ public final class RequestHelper implements Serializable {
      * @since 0.8
      */
     public void putWithoutResponse(final String path, final Map<String, String> payload, final String token)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         if (!put(path, payload, token).isEmpty()) {
             throw new InvalidResponseException(Error.UNEXPECTED_RESPONSE);
         }
@@ -256,15 +256,15 @@ public final class RequestHelper implements Serializable {
      * @since 0.8 Added {@code token} parameter.
      */
     public String get(final String path, final Map<String, String> payload, final String token)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         // Add parameters to URI.
         var uriBuilder = new StringBuilder(baseURL + path);
 
         if (!payload.isEmpty()) {
             uriBuilder.append("?").append(
-                    payload.entrySet().stream().map(par ->
-                            URLEncoder.encode(par.getKey(), UTF_8) + "=" + URLEncoder.encode(par.getValue(), UTF_8)
-                    ).collect(Collectors.joining("&"))
+                payload.entrySet().stream().map(par ->
+                    URLEncoder.encode(par.getKey(), UTF_8) + "=" + URLEncoder.encode(par.getValue(), UTF_8)
+                ).collect(Collectors.joining("&"))
             );
         }
 
@@ -297,7 +297,7 @@ public final class RequestHelper implements Serializable {
      * @since 0.8
      */
     public <T> T get(final String path, final Map<String, String> payload, final String token, final Class<T> target)
-            throws VaultConnectorException {
+        throws VaultConnectorException {
         try {
             String response = get(path, payload, token);
             return jsonMapper.readValue(response, target);
@@ -333,8 +333,8 @@ public final class RequestHelper implements Serializable {
         // Execute request.
         try {
             HttpResponse<InputStream> response = client.sendAsync(
-                    requestBuilder.build(),
-                    HttpResponse.BodyHandlers.ofInputStream()
+                requestBuilder.build(),
+                HttpResponse.BodyHandlers.ofInputStream()
             ).join();
 
             /* Check if response is valid */

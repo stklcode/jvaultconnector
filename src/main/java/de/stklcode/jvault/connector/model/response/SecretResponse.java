@@ -86,9 +86,9 @@ public abstract class SecretResponse extends VaultDataResponse {
                 return type.cast(rawValue);
             } else {
                 var om = new ObjectMapper()
-                        .registerModule(new JavaTimeModule())
-                        .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                        .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+                    .registerModule(new JavaTimeModule())
+                    .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
 
                 if (rawValue instanceof String) {
                     return om.readValue((String) rawValue, type);

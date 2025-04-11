@@ -138,14 +138,14 @@ public final class SecretMetadata implements Serializable {
         }
         SecretMetadata that = (SecretMetadata) o;
         return Objects.equals(createdTime, that.createdTime) &&
-                Objects.equals(currentVersion, that.currentVersion) &&
-                Objects.equals(maxVersions, that.maxVersions) &&
-                Objects.equals(oldestVersion, that.oldestVersion) &&
-                Objects.equals(updatedTime, that.updatedTime) &&
-                Objects.equals(versions, that.versions) &&
-                Objects.equals(casRequired, that.casRequired) &&
-                Objects.equals(customMetadata, that.customMetadata) &&
-                Objects.equals(deleteVersionAfter, that.deleteVersionAfter);
+            Objects.equals(currentVersion, that.currentVersion) &&
+            Objects.equals(maxVersions, that.maxVersions) &&
+            Objects.equals(oldestVersion, that.oldestVersion) &&
+            Objects.equals(updatedTime, that.updatedTime) &&
+            Objects.equals(versions, that.versions) &&
+            Objects.equals(casRequired, that.casRequired) &&
+            Objects.equals(customMetadata, that.customMetadata) &&
+            Objects.equals(deleteVersionAfter, that.deleteVersionAfter);
     }
 
     @Override

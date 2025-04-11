@@ -115,6 +115,7 @@ public abstract class VaultDataResponse implements VaultResponse {
     public final String getMountType() {
         return mountType;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -124,13 +125,13 @@ public abstract class VaultDataResponse implements VaultResponse {
         }
         VaultDataResponse that = (VaultDataResponse) o;
         return renewable == that.renewable &&
-                Objects.equals(requestId, that.requestId) &&
-                Objects.equals(leaseId, that.leaseId) &&
-                Objects.equals(leaseDuration, that.leaseDuration) &&
-                Objects.equals(warnings, that.warnings) &&
-                Objects.equals(wrapInfo, that.wrapInfo) &&
-                Objects.equals(auth, that.auth) &&
-                Objects.equals(mountType, that.mountType);
+            Objects.equals(requestId, that.requestId) &&
+            Objects.equals(leaseId, that.leaseId) &&
+            Objects.equals(leaseDuration, that.leaseDuration) &&
+            Objects.equals(warnings, that.warnings) &&
+            Objects.equals(wrapInfo, that.wrapInfo) &&
+            Objects.equals(auth, that.auth) &&
+            Objects.equals(mountType, that.mountType);
     }
 
     @Override
