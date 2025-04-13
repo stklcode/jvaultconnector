@@ -1,4 +1,4 @@
-## unreleased
+## 1.5.0 (2025-04-13)
 
 ### Deprecations
 * `read...Credentials()` methods for specific database mounts (#92)

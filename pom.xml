@@ -4,7 +4,7 @@
 
     <groupId>de.stklcode.jvault</groupId>
     <artifactId>jvault-connector</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.0</version>
 
     <packaging>jar</packaging>
 
@@ -33,6 +33,7 @@
         <connection>scm:git:git://github.com/stklcode/jvaultconnector.git</connection>
         <developerConnection>scm:git:git@github.com:stklcode/jvaultconnector.git</developerConnection>
         <url>https://github.com/stklcode/jvaultconnector</url>
+        <tag>v1.5.0</tag>
     </scm>
 
     <issueManagement>
@@ -42,6 +43,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.outputTimestamp>2025-04-13T09:25:23Z</project.build.outputTimestamp>
         <argLine></argLine>
     </properties>
 
