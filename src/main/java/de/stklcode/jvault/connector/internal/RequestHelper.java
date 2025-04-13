@@ -2,8 +2,8 @@ package de.stklcode.jvault.connector.internal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.response.ErrorResponse;
@@ -44,7 +44,7 @@ public final class RequestHelper implements Serializable {
     private final int retries;                      // Number of retries on 5xx errors.
     private final String tlsVersion;                // TLS version (#22).
     private final X509Certificate trustedCaCert;    // Trusted CA certificate.
-    private final ObjectMapper jsonMapper;
+    private final JsonMapper jsonMapper;
 
     /**
      * Constructor of the request helper.
@@ -65,10 +65,11 @@ public final class RequestHelper implements Serializable {
         this.timeout = timeout;
         this.tlsVersion = tlsVersion;
         this.trustedCaCert = trustedCaCert;
-        this.jsonMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
+        this.jsonMapper = JsonMapper.builder()
+            .addModule(new JavaTimeModule())
             .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .build();
     }
 
     /**
