@@ -17,13 +17,13 @@
 package de.stklcode.jvault.connector;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.function.Executable;
 
 import java.io.IOException;
@@ -36,9 +36,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -48,26 +46,23 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  * @since 0.7.0
  */
+@WireMockTest
 class HTTPVaultConnectorTest {
-    @RegisterExtension
-    static WireMockExtension wireMock = WireMockExtension.newInstance()
-            .options(wireMockConfig().dynamicPort())
-            .build();
 
     /**
      * Test exceptions thrown during request.
      */
     @Test
-    void requestExceptionTest() throws IOException, URISyntaxException {
-        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.url("/")).withTimeout(250).build();
+    void requestExceptionTest(WireMockRuntimeInfo wireMock) throws IOException, URISyntaxException {
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build();
 
         // Test invalid response code.
         final int responseCode = 400;
         mockHttpResponse(responseCode, "", "application/json");
         VaultConnectorException e = assertThrows(
-                InvalidResponseException.class,
-                connector::getHealth,
-                "Querying health status succeeded on invalid instance"
+            InvalidResponseException.class,
+            connector::getHealth,
+            "Querying health status succeeded on invalid instance"
         );
         assertEquals("Invalid response code", e.getMessage(), "Unexpected exception message");
         assertEquals(responseCode, ((InvalidResponseException) e).getStatusCode(), "Unexpected status code in exception");
@@ -76,9 +71,9 @@ class HTTPVaultConnectorTest {
         // Simulate permission denied response.
         mockHttpResponse(responseCode, "{\"errors\":[\"permission denied\"]}", "application/json");
         assertThrows(
-                PermissionDeniedException.class,
-                connector::getHealth,
-                "Querying health status succeeded on invalid instance"
+            PermissionDeniedException.class,
+            connector::getHealth,
+            "Querying health status succeeded on invalid instance"
         );
 
         // Test exception thrown during request.
@@ -86,22 +81,22 @@ class HTTPVaultConnectorTest {
             connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort() + "/").withTimeout(250).build();
         }
         e = assertThrows(
-                ConnectionException.class,
-                connector::getHealth,
-                "Querying health status succeeded on invalid instance"
+            ConnectionException.class,
+            connector::getHealth,
+            "Querying health status succeeded on invalid instance"
         );
         assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
         assertInstanceOf(IOException.class, e.getCause(), "Unexpected cause");
 
         // Now simulate a failing request that succeeds on second try.
-        connector = HTTPVaultConnector.builder(wireMock.url("/")).withNumberOfRetries(1).withTimeout(250).build();
+        connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withNumberOfRetries(1).withTimeout(250).build();
 
-        wireMock.stubFor(
-                WireMock.any(anyUrl())
-                        .willReturn(aResponse().withStatus(500))
-                        .willReturn(aResponse().withStatus(500))
-                        .willReturn(aResponse().withStatus(500))
-                        .willReturn(aResponse().withStatus(200).withBody("{}").withHeader("Content-Type", "application/json"))
+        stubFor(
+            WireMock.any(anyUrl())
+                .willReturn(aResponse().withStatus(500))
+                .willReturn(aResponse().withStatus(500))
+                .willReturn(aResponse().withStatus(500))
+                .willReturn(aResponse().withStatus(200).withBody("{}").withHeader("Content-Type", "application/json"))
         );
         assertDoesNotThrow(connector::getHealth, "Request failed unexpectedly");
     }
@@ -164,9 +159,9 @@ class HTTPVaultConnectorTest {
             connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort()).withTimeout(250).build();
         }
         ConnectionException e = assertThrows(
-                ConnectionException.class,
-                connector::sealStatus,
-                "Querying seal status succeeded on invalid instance"
+            ConnectionException.class,
+            connector::sealStatus,
+            "Querying seal status succeeded on invalid instance"
         );
         assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
     }
@@ -182,9 +177,9 @@ class HTTPVaultConnectorTest {
             connector = HTTPVaultConnector.builder("http://localhost:" + s.getLocalPort() + "/").withTimeout(250).build();
         }
         ConnectionException e = assertThrows(
-                ConnectionException.class,
-                connector::getHealth,
-                "Querying health status succeeded on invalid instance"
+            ConnectionException.class,
+            connector::getHealth,
+            "Querying health status succeeded on invalid instance"
         );
         assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
     }
@@ -193,8 +188,8 @@ class HTTPVaultConnectorTest {
      * Test behavior on unparsable responses.
      */
     @Test
-    void parseExceptionTest() throws URISyntaxException {
-        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.url("/")).withTimeout(250).build();
+    void parseExceptionTest(WireMockRuntimeInfo wireMock) throws URISyntaxException {
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build();
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
@@ -227,8 +222,8 @@ class HTTPVaultConnectorTest {
      * Test requests that expect an empty response with code 204, but receive a 200 body.
      */
     @Test
-    void nonEmpty204ResponseTest() throws URISyntaxException {
-        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.url("/")).withTimeout(250).build();
+    void nonEmpty204ResponseTest(WireMockRuntimeInfo wireMock) throws URISyntaxException {
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build();
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
@@ -236,45 +231,45 @@ class HTTPVaultConnectorTest {
 
         // Now test the methods expecting a 204.
         assertThrows(
-                InvalidResponseException.class,
-                () -> connector.createAppRole("appID", Collections.singletonList("policy")),
-                "createAppRole() with 200 response succeeded"
+            InvalidResponseException.class,
+            () -> connector.createAppRole("appID", Collections.singletonList("policy")),
+            "createAppRole() with 200 response succeeded"
         );
 
         assertThrows(
-                InvalidResponseException.class,
-                () -> connector.deleteAppRole("roleName"),
-                "deleteAppRole() with 200 response succeeded"
+            InvalidResponseException.class,
+            () -> connector.deleteAppRole("roleName"),
+            "deleteAppRole() with 200 response succeeded"
         );
 
         assertThrows(
-                InvalidResponseException.class,
-                () -> connector.setAppRoleID("roleName", "roleID"),
-                "setAppRoleID() with 200 response succeeded"
+            InvalidResponseException.class,
+            () -> connector.setAppRoleID("roleName", "roleID"),
+            "setAppRoleID() with 200 response succeeded"
         );
 
         assertThrows(
-                InvalidResponseException.class,
-                () -> connector.destroyAppRoleSecret("roleName", "secretID"),
-                "destroyAppRoleSecret() with 200 response succeeded"
+            InvalidResponseException.class,
+            () -> connector.destroyAppRoleSecret("roleName", "secretID"),
+            "destroyAppRoleSecret() with 200 response succeeded"
         );
 
         assertThrows(
-                InvalidResponseException.class,
-                () -> connector.destroyAppRoleSecret("roleName", "secretUD"),
-                "destroyAppRoleSecret() with 200 response succeeded"
+            InvalidResponseException.class,
+            () -> connector.destroyAppRoleSecret("roleName", "secretUD"),
+            "destroyAppRoleSecret() with 200 response succeeded"
         );
 
         assertThrows(
-                InvalidResponseException.class,
-                () -> connector.delete("key"),
-                "delete() with 200 response succeeded"
+            InvalidResponseException.class,
+            () -> connector.delete("key"),
+            "delete() with 200 response succeeded"
         );
 
         assertThrows(
-                InvalidResponseException.class,
-                () -> connector.revoke("leaseID"),
-                "destroyAppRoleSecret() with 200 response succeeded"
+            InvalidResponseException.class,
+            () -> connector.revoke("leaseID"),
+            "destroyAppRoleSecret() with 200 response succeeded"
         );
     }
 
@@ -310,10 +305,10 @@ class HTTPVaultConnectorTest {
     }
 
     private void mockHttpResponse(int status, String body, String contentType) {
-        wireMock.stubFor(
-                WireMock.any(anyUrl()).willReturn(
-                        aResponse().withStatus(status).withBody(body).withHeader("Content-Type", contentType)
-                )
+        stubFor(
+            WireMock.any(anyUrl()).willReturn(
+                aResponse().withStatus(status).withBody(body).withHeader("Content-Type", contentType)
+            )
         );
     }
 }
