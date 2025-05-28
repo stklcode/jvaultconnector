@@ -54,6 +54,7 @@ public class HTTPVaultConnector implements VaultConnector {
     private static final String PATH_AUTH = "auth";
     private static final String PATH_AUTH_TOKEN = PATH_AUTH + "/token";
     private static final String PATH_LOOKUP = "/lookup";
+    private static final String PATH_LOOKUP_SELF = "/lookup-self";
     private static final String PATH_CREATE = "/create";
     private static final String PATH_ROLES = "/roles";
     private static final String PATH_CREATE_ORPHAN = "/create-orphan";
@@ -191,7 +192,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* set token */
         this.token = token;
         this.tokenTTL = 0;
-        TokenResponse res = request.post(PATH_AUTH_TOKEN + PATH_LOOKUP, emptyMap(), token, TokenResponse.class);
+        TokenResponse res = request.get(PATH_AUTH_TOKEN + PATH_LOOKUP_SELF, emptyMap(), token, TokenResponse.class);
         authorized = true;
 
         return res;
