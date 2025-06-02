@@ -1,3 +1,12 @@
+## 1.5.1 (2025-06-02)
+
+### Improvements
+* Use `lookup-self` for token check instead of `lookup` (#98) (#99)
+
+### Dependencies
+* Updated Jackson to 2.19.0 (#97)
+
+
 ## 1.5.0 (2025-04-13)
 
 ### Deprecations
