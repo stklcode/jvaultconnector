@@ -18,6 +18,8 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serial;
+
 /**
  * Vault response from credentials lookup. Simple wrapper for data objects containing username and password fields.
  *
@@ -26,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class CredentialsResponse extends PlainSecretResponse {
+    @Serial
     private static final long serialVersionUID = -1439692963299045425L;
 
     /**

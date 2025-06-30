@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRoleSecret implements Serializable {
+    @Serial
     private static final long serialVersionUID = 3079272087137299819L;
 
     @JsonProperty("secret_id")

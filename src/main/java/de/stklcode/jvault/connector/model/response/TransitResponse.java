@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import java.io.Serial;
 import java.util.Map;
 import java.util.Objects;
 
@@ -29,6 +30,7 @@ import java.util.Objects;
  */
 public class TransitResponse extends VaultDataResponse {
 
+    @Serial
     private static final long serialVersionUID = 6873804240772242771L;
 
     private String ciphertext;

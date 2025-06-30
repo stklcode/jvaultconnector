@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when trying to send malformed request.
  *
@@ -23,6 +25,7 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public class InvalidRequestException extends VaultConnectorException {
+    @Serial
     private static final long serialVersionUID = -6712239648281809159L;
 
     /**

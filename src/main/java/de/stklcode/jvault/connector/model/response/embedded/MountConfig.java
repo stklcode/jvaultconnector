@@ -3,6 +3,8 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +17,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MountConfig implements Serializable {
+    @Serial
     private static final long serialVersionUID = 7241631159224756605L;
 
     @JsonProperty("default_lease_ttl")

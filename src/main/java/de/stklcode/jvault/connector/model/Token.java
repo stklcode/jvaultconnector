@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
@@ -32,6 +33,7 @@ import java.util.*;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class Token implements Serializable {
+    @Serial
     private static final long serialVersionUID = 7003016071684507115L;
 
     @JsonProperty("id")

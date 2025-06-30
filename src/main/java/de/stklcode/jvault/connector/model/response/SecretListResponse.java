@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.SecretListWrapper;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -32,8 +33,9 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretListResponse extends VaultDataResponse {
-
+    @Serial
     private static final long serialVersionUID = 8597121175002967213L;
+
     @JsonProperty("data")
     private SecretListWrapper data;
 

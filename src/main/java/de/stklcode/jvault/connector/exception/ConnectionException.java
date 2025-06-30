@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown on problems with connection to Vault backend.
  *
@@ -23,6 +25,7 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public class ConnectionException extends VaultConnectorException {
+    @Serial
     private static final long serialVersionUID = 3005430116002990418L;
 
     /**

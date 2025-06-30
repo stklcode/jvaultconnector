@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class SecretMetadata implements Serializable {
+    @Serial
     private static final long serialVersionUID = -905059942871916214L;
 
     @JsonProperty("created_time")

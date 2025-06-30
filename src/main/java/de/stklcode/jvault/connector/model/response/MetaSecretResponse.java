@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.SecretWrapper;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -34,6 +35,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MetaSecretResponse extends SecretResponse {
+    @Serial
     private static final long serialVersionUID = -1076542846391240162L;
 
     @JsonProperty("data")

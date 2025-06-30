@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
+import java.io.Serial;
 import java.util.Objects;
 
 /**
@@ -30,6 +31,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretVersionResponse extends VaultDataResponse {
+    @Serial
     private static final long serialVersionUID = 2748635005258576174L;
 
     @JsonProperty("data")

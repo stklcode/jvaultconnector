@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.exception;
 
+import java.io.Serial;
+
 /**
  * Abstract Exception class for Vault Connector internal exceptions.
  *
@@ -23,6 +25,7 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public abstract class VaultConnectorException extends Exception {
+    @Serial
     private static final long serialVersionUID = -2612477894310906036L;
 
     /**

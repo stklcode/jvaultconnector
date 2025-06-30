@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +33,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthMethodsResponse extends VaultDataResponse {
+    @Serial
     private static final long serialVersionUID = -1802724129533405375L;
 
     @JsonProperty("data")

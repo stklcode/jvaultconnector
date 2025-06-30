@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
 import de.stklcode.jvault.connector.model.response.embedded.WrapInfo;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +31,7 @@ import java.util.Objects;
  * @since 0.1
  */
 public abstract class VaultDataResponse implements VaultResponse {
+    @Serial
     private static final long serialVersionUID = 4787715235558510045L;
 
     @JsonProperty("request_id")

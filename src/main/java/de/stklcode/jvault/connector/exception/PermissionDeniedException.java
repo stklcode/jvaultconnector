@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when trying to access a path the current user/token does not have permission to access.
  *
@@ -23,6 +25,7 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public class PermissionDeniedException extends VaultConnectorException {
+    @Serial
     private static final long serialVersionUID = -7149134015090750776L;
 
     /**

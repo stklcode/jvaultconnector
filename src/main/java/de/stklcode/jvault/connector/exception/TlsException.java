@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown on errors with TLS connection.
  *
@@ -23,6 +25,7 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.4.0
  */
 public class TlsException extends VaultConnectorException {
+    @Serial
     private static final long serialVersionUID = -5139276834988258086L;
 
     /**

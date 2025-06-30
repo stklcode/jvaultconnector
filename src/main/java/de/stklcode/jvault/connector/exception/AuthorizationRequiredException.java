@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown trying to do a request without any authorization handles.
  *
@@ -23,5 +25,6 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public class AuthorizationRequiredException extends VaultConnectorException {
+    @Serial
     private static final long serialVersionUID = 2629577936657393880L;
 }

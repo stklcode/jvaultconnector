@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +31,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class ErrorResponse implements VaultResponse {
+    @Serial
     private static final long serialVersionUID = -6227368087842549149L;
 
     @JsonProperty("errors")

@@ -3,6 +3,7 @@ package de.stklcode.jvault.connector.model.response.embedded;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecretWrapper implements Serializable {
+    @Serial
     private static final long serialVersionUID = 8600413181758893378L;
 
     @JsonProperty("data")

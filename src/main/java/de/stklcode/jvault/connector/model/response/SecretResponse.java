@@ -25,6 +25,7 @@ import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class SecretResponse extends VaultDataResponse {
+    @Serial
     private static final long serialVersionUID = 5198088815871692951L;
 
     /**

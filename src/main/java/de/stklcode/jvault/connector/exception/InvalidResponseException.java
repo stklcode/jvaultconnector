@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when response from vault returned with erroneous status code or payload could not be parsed
  * to entity class.
@@ -24,6 +26,7 @@ package de.stklcode.jvault.connector.exception;
  * @since 0.1
  */
 public final class InvalidResponseException extends VaultConnectorException {
+    @Serial
     private static final long serialVersionUID = 2003151038614163479L;
 
     private final Integer statusCode;

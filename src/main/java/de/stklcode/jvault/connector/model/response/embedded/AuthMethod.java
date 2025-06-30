@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import de.stklcode.jvault.connector.model.AuthBackend;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +35,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AuthMethod implements Serializable {
+    @Serial
     private static final long serialVersionUID = -439987082190917691L;
 
     private AuthBackend type;

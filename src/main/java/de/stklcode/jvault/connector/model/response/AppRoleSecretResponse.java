@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.AppRoleSecret;
 
+import java.io.Serial;
 import java.util.Objects;
 
 /**
@@ -30,6 +31,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRoleSecretResponse extends VaultDataResponse {
+    @Serial
     private static final long serialVersionUID = -2484103304072370585L;
 
     @JsonProperty("data")

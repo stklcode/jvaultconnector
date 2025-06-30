@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model.response.embedded;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import java.util.Objects;
  * @since 1.1
  */
 public class WrapInfo implements Serializable {
+    @Serial
     private static final long serialVersionUID = 4864973237090355607L;
 
     @JsonProperty("token")

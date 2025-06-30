@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.TokenRole;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
 
+import java.io.Serial;
 import java.util.Objects;
 
 /**
@@ -31,6 +32,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenRoleResponse extends VaultDataResponse {
+    @Serial
     private static final long serialVersionUID = 5265363857731948626L;
 
     @JsonProperty("data")
