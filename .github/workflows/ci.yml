@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        jdk: [ 11, 17, 21 ]
+        jdk: [ 17, 21 ]
         include:
           - jdk: 21
             analysis: true

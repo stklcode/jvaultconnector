@@ -1,3 +1,9 @@
+## unreleased
+
+### Breaking
+* Requires Java 17 or later (#100) (#111)
+
+
 ## 1.5.3 (2025-09-09)
 
 ### Dependencies
