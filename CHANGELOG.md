@@ -3,6 +3,9 @@
 ### Dependencies
 * Updated Jackson to 2.19.1 (#101)
 
+### Fix
+* Use `Long` for numeric TTL fields (#103) (#104)
+
 ### Test
 * Tested against Vault 1.2 to 1.20 (#102)
 

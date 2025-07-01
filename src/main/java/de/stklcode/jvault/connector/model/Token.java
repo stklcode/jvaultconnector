@@ -32,7 +32,7 @@ import java.util.*;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class Token implements Serializable {
-    private static final long serialVersionUID = 5208508683665365287L;
+    private static final long serialVersionUID = 7003016071684507115L;
 
     @JsonProperty("id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -56,11 +56,11 @@ public final class Token implements Serializable {
 
     @JsonProperty("ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer ttl;
+    private Long ttl;
 
     @JsonProperty("explicit_max_ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer explicitMaxTtl;
+    private Long explicitMaxTtl;
 
     @JsonProperty("num_uses")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -162,7 +162,7 @@ public final class Token implements Serializable {
     /**
      * @return Time-to-live in seconds
      */
-    public Integer getTtl() {
+    public Long getTtl() {
         return ttl;
     }
 
@@ -170,7 +170,7 @@ public final class Token implements Serializable {
      * @return Explicit maximum time-to-live in seconds
      * @since 0.9
      */
-    public Integer getExplicitMaxTtl() {
+    public Long getExplicitMaxTtl() {
         return explicitMaxTtl;
     }
 
@@ -282,8 +282,8 @@ public final class Token implements Serializable {
         private String displayName;
         private Boolean noParent;
         private Boolean noDefaultPolicy;
-        private Integer ttl;
-        private Integer explicitMaxTtl;
+        private Long ttl;
+        private Long explicitMaxTtl;
         private Integer numUses;
         private List<String> policies;
         private Map<String, String> meta;
@@ -331,7 +331,7 @@ public final class Token implements Serializable {
          * @param ttl the ttl
          * @return self
          */
-        public Builder withTtl(final Integer ttl) {
+        public Builder withTtl(final Long ttl) {
             this.ttl = ttl;
             return this;
         }
@@ -342,7 +342,7 @@ public final class Token implements Serializable {
          * @param explicitMaxTtl the explicit max. TTL
          * @return self
          */
-        public Builder withExplicitMaxTtl(final Integer explicitMaxTtl) {
+        public Builder withExplicitMaxTtl(final Long explicitMaxTtl) {
             this.explicitMaxTtl = explicitMaxTtl;
             return this;
         }

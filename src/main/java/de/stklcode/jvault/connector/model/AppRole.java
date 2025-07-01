@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRole implements Serializable {
-    private static final long serialVersionUID = 693228837510483448L;
+    private static final long serialVersionUID = 1546673231280751679L;
 
     @JsonProperty("role_name")
     private String name;
@@ -53,7 +53,7 @@ public final class AppRole implements Serializable {
 
     @JsonProperty("secret_id_ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer secretIdTtl;
+    private Long secretIdTtl;
 
     @JsonProperty("local_secret_ids")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -61,11 +61,11 @@ public final class AppRole implements Serializable {
 
     @JsonProperty("token_ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenTtl;
+    private Long tokenTtl;
 
     @JsonProperty("token_max_ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenMaxTtl;
+    private Long tokenMaxTtl;
 
     private List<String> tokenPolicies;
 
@@ -75,7 +75,7 @@ public final class AppRole implements Serializable {
 
     @JsonProperty("token_explicit_max_ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenExplicitMaxTtl;
+    private Long tokenExplicitMaxTtl;
 
     @JsonProperty("token_no_default_policy")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -255,7 +255,7 @@ public final class AppRole implements Serializable {
     /**
      * @return maximum TTL in seconds for secrets
      */
-    public Integer getSecretIdTtl() {
+    public Long getSecretIdTtl() {
         return secretIdTtl;
     }
 
@@ -271,14 +271,14 @@ public final class AppRole implements Serializable {
     /**
      * @return token TTL in seconds
      */
-    public Integer getTokenTtl() {
+    public Long getTokenTtl() {
         return tokenTtl;
     }
 
     /**
      * @return maximum token TTL in seconds, including renewals
      */
-    public Integer getTokenMaxTtl() {
+    public Long getTokenMaxTtl() {
         return tokenMaxTtl;
     }
 
@@ -286,7 +286,7 @@ public final class AppRole implements Serializable {
      * @return explicit maximum token TTL in seconds, including renewals
      * @since 0.9
      */
-    public Integer getTokenExplicitMaxTtl() {
+    public Long getTokenExplicitMaxTtl() {
         return tokenExplicitMaxTtl;
     }
 
@@ -370,12 +370,12 @@ public final class AppRole implements Serializable {
         private List<String> secretIdBoundCidrs;
         private List<String> tokenPolicies;
         private Integer secretIdNumUses;
-        private Integer secretIdTtl;
+        private Long secretIdTtl;
         private Boolean localSecretIds;
-        private Integer tokenTtl;
-        private Integer tokenMaxTtl;
+        private Long tokenTtl;
+        private Long tokenMaxTtl;
         private List<String> tokenBoundCidrs;
-        private Integer tokenExplicitMaxTtl;
+        private Long tokenExplicitMaxTtl;
         private Boolean tokenNoDefaultPolicy;
         private Integer tokenNumUses;
         private Integer tokenPeriod;
@@ -520,7 +520,7 @@ public final class AppRole implements Serializable {
          * @param secretIdTtl the TTL
          * @return self
          */
-        public Builder withSecretIdTtl(final Integer secretIdTtl) {
+        public Builder withSecretIdTtl(final Long secretIdTtl) {
             this.secretIdTtl = secretIdTtl;
             return this;
         }
@@ -544,7 +544,7 @@ public final class AppRole implements Serializable {
          * @param tokenTtl the TTL
          * @return self
          */
-        public Builder withTokenTtl(final Integer tokenTtl) {
+        public Builder withTokenTtl(final Long tokenTtl) {
             this.tokenTtl = tokenTtl;
             return this;
         }
@@ -555,7 +555,7 @@ public final class AppRole implements Serializable {
          * @param tokenMaxTtl the TTL
          * @return self
          */
-        public Builder withTokenMaxTtl(final Integer tokenMaxTtl) {
+        public Builder withTokenMaxTtl(final Long tokenMaxTtl) {
             this.tokenMaxTtl = tokenMaxTtl;
             return this;
         }
@@ -596,7 +596,7 @@ public final class AppRole implements Serializable {
          * @param tokenExplicitMaxTtl the TTL
          * @return self
          */
-        public Builder withTokenExplicitMaxTtl(final Integer tokenExplicitMaxTtl) {
+        public Builder withTokenExplicitMaxTtl(final Long tokenExplicitMaxTtl) {
             this.tokenExplicitMaxTtl = tokenExplicitMaxTtl;
             return this;
         }

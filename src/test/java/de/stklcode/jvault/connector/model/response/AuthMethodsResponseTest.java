@@ -45,9 +45,9 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     private static final String TK_UUID = "32ea9681-6bd6-6cec-eec3-d11260ba9741";
     private static final String TK_ACCESSOR = "auth_token_ac0dd95a";
     private static final String TK_DESCR = "token based credentials";
-    private static final Integer TK_LEASE_TTL = 0;
+    private static final Long TK_LEASE_TTL = 0L;
     private static final Boolean TK_FORCE_NO_CACHE = false;
-    private static final Integer TK_MAX_LEASE_TTL = 0;
+    private static final Long TK_MAX_LEASE_TTL = 0L;
     private static final String TK_TOKEN_TYPE = "default-service";
     private static final String TK_RUNNING_PLUGIN_VERSION = "v1.15.3+builtin.vault";
 

@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenRole implements Serializable {
-    private static final long serialVersionUID = -3505215215838576321L;
+    private static final long serialVersionUID = -4856948364869438439L;
 
     @JsonProperty("name")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -78,7 +78,7 @@ public final class TokenRole implements Serializable {
 
     @JsonProperty("token_explicit_max_ttl")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenExplicitMaxTtl;
+    private Long tokenExplicitMaxTtl;
 
     @JsonProperty("token_no_default_policy")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -204,7 +204,7 @@ public final class TokenRole implements Serializable {
     /**
      * @return Token explicit maximum TTL
      */
-    public Integer getTokenExplicitMaxTtl() {
+    public Long getTokenExplicitMaxTtl() {
         return tokenExplicitMaxTtl;
     }
 
@@ -285,7 +285,7 @@ public final class TokenRole implements Serializable {
         private String pathSuffix;
         private List<String> allowedEntityAliases;
         private List<String> tokenBoundCidrs;
-        private Integer tokenExplicitMaxTtl;
+        private Long tokenExplicitMaxTtl;
         private Boolean tokenNoDefaultPolicy;
         private Integer tokenNumUses;
         private Integer tokenPeriod;
@@ -537,7 +537,7 @@ public final class TokenRole implements Serializable {
          * @param tokenExplicitMaxTtl explicit maximum TTL
          * @return self
          */
-        public Builder withTokenExplicitMaxTtl(final Integer tokenExplicitMaxTtl) {
+        public Builder withTokenExplicitMaxTtl(final Long tokenExplicitMaxTtl) {
             this.tokenExplicitMaxTtl = tokenExplicitMaxTtl;
             return this;
         }

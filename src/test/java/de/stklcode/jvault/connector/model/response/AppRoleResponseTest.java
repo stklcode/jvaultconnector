@@ -32,9 +32,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 0.6.2
  */
 class AppRoleResponseTest extends AbstractModelTest<AppRoleResponse> {
-    private static final Integer ROLE_TOKEN_TTL = 1200;
-    private static final Integer ROLE_TOKEN_MAX_TTL = 1800;
-    private static final Integer ROLE_SECRET_TTL = 600;
+    private static final Long ROLE_TOKEN_TTL = 1200L;
+    private static final Long ROLE_TOKEN_MAX_TTL = 1800L;
+    private static final Long ROLE_SECRET_TTL = 600L;
     private static final Integer ROLE_SECRET_NUM_USES = 40;
     private static final String ROLE_POLICY = "default";
     private static final Integer ROLE_PERIOD = 0;

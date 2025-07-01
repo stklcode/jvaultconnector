@@ -15,13 +15,13 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MountConfig implements Serializable {
-    private static final long serialVersionUID = -8653909672663717792L;
+    private static final long serialVersionUID = 7241631159224756605L;
 
     @JsonProperty("default_lease_ttl")
-    private Integer defaultLeaseTtl;
+    private Long defaultLeaseTtl;
 
     @JsonProperty("max_lease_ttl")
-    private Integer maxLeaseTtl;
+    private Long maxLeaseTtl;
 
     @JsonProperty("force_no_cache")
     private Boolean forceNoCache;
@@ -56,14 +56,14 @@ public class MountConfig implements Serializable {
     /**
      * @return Default lease TTL
      */
-    public Integer getDefaultLeaseTtl() {
+    public Long getDefaultLeaseTtl() {
         return defaultLeaseTtl;
     }
 
     /**
      * @return Maximum lease TTL
      */
-    public Integer getMaxLeaseTtl() {
+    public Long getMaxLeaseTtl() {
         return maxLeaseTtl;
     }
 
