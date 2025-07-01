@@ -42,11 +42,11 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
     private static final String POLICY = "policy";
     private static final String POLICY_2 = "policy2";
     private static final Integer SECRET_ID_NUM_USES = 10;
-    private static final Integer SECRET_ID_TTL = 7200;
+    private static final Long SECRET_ID_TTL = 7200L;
     private static final Boolean LOCAL_SECRET_IDS = false;
-    private static final Integer TOKEN_TTL = 4800;
-    private static final Integer TOKEN_MAX_TTL = 9600;
-    private static final Integer TOKEN_EXPLICIT_MAX_TTL = 14400;
+    private static final Long TOKEN_TTL = 4800L;
+    private static final Long TOKEN_MAX_TTL = 9600L;
+    private static final Long TOKEN_EXPLICIT_MAX_TTL = 14400L;
     private static final Boolean TOKEN_NO_DEFAULT_POLICY = false;
     private static final Integer TOKEN_NUM_USES = 42;
     private static final Integer TOKEN_PERIOD = 1234;

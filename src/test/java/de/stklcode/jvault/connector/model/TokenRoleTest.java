@@ -59,7 +59,7 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     private static final String TOKEN_BOUND_CIDR_2 = "198.51.100.0/24";
     private static final String TOKEN_BOUND_CIDR_3 = "203.0.113.0/24";
     private static final List<String> TOKEN_BOUND_CIDRS = Arrays.asList(TOKEN_BOUND_CIDR_2, TOKEN_BOUND_CIDR_1);
-    private static final Integer TOKEN_EXPLICIT_MAX_TTL = 1234;
+    private static final Long TOKEN_EXPLICIT_MAX_TTL = 1234L;
     private static final Boolean TOKEN_NO_DEFAULT_POLICY = false;
     private static final Integer TOKEN_NUM_USES = 5;
     private static final Integer TOKEN_PERIOD = 2345;

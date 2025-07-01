@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Stefan Kalscheuer
  */
 class MountConfigTest extends AbstractModelTest<MountConfig> {
-    private static final Integer DEFAULT_LEASE_TTL = 1800;
-    private static final Integer MAX_LEASE_TTL = 3600;
+    private static final Long DEFAULT_LEASE_TTL = 1800L;
+    private static final Long MAX_LEASE_TTL = 3600L;
     private static final Boolean FORCE_NO_CACHE = false;
     private static final String TOKEN_TYPE = "default-service";
     private static final String AUDIT_NON_HMAC_REQ_KEYS_1 = "req1";

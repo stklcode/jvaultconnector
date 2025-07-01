@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class TokenData implements Serializable {
-    private static final long serialVersionUID = -5749716740973138916L;
+    private static final long serialVersionUID = -4168046151053509784L;
 
     @JsonProperty("accessor")
     private String accessor;
@@ -43,7 +43,7 @@ public final class TokenData implements Serializable {
     private Integer creationTime;
 
     @JsonProperty("creation_ttl")
-    private Integer creationTtl;
+    private Long creationTtl;
 
     @JsonProperty("display_name")
     private String name;
@@ -55,7 +55,7 @@ public final class TokenData implements Serializable {
     private ZonedDateTime expireTime;
 
     @JsonProperty("explicit_max_ttl")
-    private Integer explicitMaxTtl;
+    private Long explicitMaxTtl;
 
     @JsonProperty("id")
     private String id;
@@ -82,7 +82,7 @@ public final class TokenData implements Serializable {
     private boolean renewable;
 
     @JsonProperty("ttl")
-    private Integer ttl;
+    private Long ttl;
 
     @JsonProperty("type")
     private String type;
@@ -104,7 +104,7 @@ public final class TokenData implements Serializable {
     /**
      * @return Creation TTL (in seconds)
      */
-    public Integer getCreationTtl() {
+    public Long getCreationTtl() {
         return creationTtl;
     }
 
@@ -135,7 +135,7 @@ public final class TokenData implements Serializable {
      * @return Explicit maximum TTL
      * @since 0.9
      */
-    public Integer getExplicitMaxTtl() {
+    public Long getExplicitMaxTtl() {
         return explicitMaxTtl;
     }
 
@@ -202,7 +202,7 @@ public final class TokenData implements Serializable {
     /**
      * @return Token TTL (in seconds)
      */
-    public Integer getTtl() {
+    public Long getTtl() {
         return ttl;
     }
 

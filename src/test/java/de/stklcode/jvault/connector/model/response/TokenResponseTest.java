@@ -35,8 +35,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     private static final Integer TOKEN_CREATION_TIME = 1457533232;
-    private static final Integer TOKEN_TTL = 2764800;
-    private static final Integer TOKEN_EXPLICIT_MAX_TTL = 0;
+    private static final Long TOKEN_TTL = 2764800L;
+    private static final Long TOKEN_EXPLICIT_MAX_TTL = 0L;
     private static final String TOKEN_DISPLAY_NAME = "token";
     private static final String TOKEN_META_KEY = "foo";
     private static final String TOKEN_META_VALUE = "bar";
@@ -47,7 +47,7 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     private static final String TOKEN_POLICY_1 = "default";
     private static final String TOKEN_POLICY_2 = "web";
     private static final Boolean RES_RENEWABLE = false;
-    private static final Integer RES_TTL = 2591976;
+    private static final Long RES_TTL = 2591976L;
     private static final Integer RES_LEASE_DURATION = 0;
     private static final String TOKEN_ACCESSOR = "VKvzT2fKHFsZFUus9LyoXCvu";
     private static final String TOKEN_ENTITY_ID = "7d2e3179-f69b-450c-7179-ac8ee8bd8ca9";

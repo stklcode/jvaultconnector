@@ -862,7 +862,7 @@ class HTTPVaultConnectorIT {
                     .withDefaultPolicy()
                     .withMeta("test", "success")
                     .withMeta("key", "value")
-                    .withTtl(1234)
+                    .withTtl(1234L)
                     .build();
             InvalidResponseException e = assertThrows(
                     InvalidResponseException.class,

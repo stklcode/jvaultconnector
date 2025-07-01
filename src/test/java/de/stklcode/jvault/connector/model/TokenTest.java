@@ -35,8 +35,8 @@ class TokenTest extends AbstractModelTest<Token> {
     private static final String DISPLAY_NAME = "display-name";
     private static final Boolean NO_PARENT = false;
     private static final Boolean NO_DEFAULT_POLICY = false;
-    private static final Integer TTL = 123;
-    private static final Integer EXPLICIT_MAX_TTL = 456;
+    private static final Long TTL = 123L;
+    private static final Long EXPLICIT_MAX_TTL = 456L;
     private static final Integer NUM_USES = 4;
     private static final List<String> POLICIES = new ArrayList<>();
     private static final String POLICY = "policy";
