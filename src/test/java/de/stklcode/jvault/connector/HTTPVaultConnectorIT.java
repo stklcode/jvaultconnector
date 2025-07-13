@@ -1222,7 +1222,7 @@ class HTTPVaultConnectorIT {
         // Write configuration file.
         File configFile = new File(dir, "vault.conf");
         try {
-            Files.write(configFile.toPath(), config.toString().getBytes(UTF_8));
+            Files.writeString(configFile.toPath(), config.toString(), UTF_8);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to generate config file", e);
         }
