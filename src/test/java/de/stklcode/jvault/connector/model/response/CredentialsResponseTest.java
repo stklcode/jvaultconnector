@@ -31,16 +31,16 @@ class CredentialsResponseTest extends AbstractModelTest<CredentialsResponse> {
     private static final String VAL_USER = "testUserName";
     private static final String VAL_PASS = "5up3r5ecr3tP455";
     private static final String JSON = "{\n" +
-            "    \"request_id\": \"68315073-6658-e3ff-2da7-67939fb91bbd\",\n" +
-            "    \"lease_id\": \"\",\n" +
-            "    \"lease_duration\": 2764800,\n" +
-            "    \"renewable\": false,\n" +
-            "    \"data\": {\n" +
-            "        \"username\": \"" + VAL_USER + "\",\n" +
-            "        \"password\": \"" + VAL_PASS + "\"\n" +
-            "    },\n" +
-            "    \"warnings\": null\n" +
-            "}";
+        "    \"request_id\": \"68315073-6658-e3ff-2da7-67939fb91bbd\",\n" +
+        "    \"lease_id\": \"\",\n" +
+        "    \"lease_duration\": 2764800,\n" +
+        "    \"renewable\": false,\n" +
+        "    \"data\": {\n" +
+        "        \"username\": \"" + VAL_USER + "\",\n" +
+        "        \"password\": \"" + VAL_PASS + "\"\n" +
+        "    },\n" +
+        "    \"warnings\": null\n" +
+        "}";
 
     CredentialsResponseTest() {
         super(CredentialsResponse.class);
@@ -65,8 +65,8 @@ class CredentialsResponseTest extends AbstractModelTest<CredentialsResponse> {
         assertNull(res.getPassword(), "Password not present in data map should not return anything");
 
         res = assertDoesNotThrow(
-                () -> objectMapper.readValue(JSON, CredentialsResponse.class),
-                "Deserialization of CredentialsResponse failed"
+            () -> objectMapper.readValue(JSON, CredentialsResponse.class),
+            "Deserialization of CredentialsResponse failed"
         );
         assertEquals(VAL_USER, res.getUsername(), "Incorrect username");
         assertEquals(VAL_PASS, res.getPassword(), "Incorrect password");

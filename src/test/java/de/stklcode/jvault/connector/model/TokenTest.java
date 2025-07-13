@@ -59,20 +59,20 @@ class TokenTest extends AbstractModelTest<Token> {
     @Override
     protected Token createFull() {
         return Token.builder()
-                .withId(ID)
-                .withType(Token.Type.SERVICE)
-                .withDisplayName(DISPLAY_NAME)
-                .withNoParent(NO_PARENT)
-                .withNoDefaultPolicy(NO_DEFAULT_POLICY)
-                .withTtl(TTL)
-                .withExplicitMaxTtl(EXPLICIT_MAX_TTL)
-                .withNumUses(NUM_USES)
-                .withPolicies(POLICIES)
-                .withMeta(META)
-                .withRenewable(RENEWABLE)
-                .withPeriod(PERIOD)
-                .withEntityAlias(ENTITY_ALIAS)
-                .build();
+            .withId(ID)
+            .withType(Token.Type.SERVICE)
+            .withDisplayName(DISPLAY_NAME)
+            .withNoParent(NO_PARENT)
+            .withNoDefaultPolicy(NO_DEFAULT_POLICY)
+            .withTtl(TTL)
+            .withExplicitMaxTtl(EXPLICIT_MAX_TTL)
+            .withNumUses(NUM_USES)
+            .withPolicies(POLICIES)
+            .withMeta(META)
+            .withRenewable(RENEWABLE)
+            .withPeriod(PERIOD)
+            .withEntityAlias(ENTITY_ALIAS)
+            .build();
     }
 
     @BeforeAll
@@ -159,9 +159,9 @@ class TokenTest extends AbstractModelTest<Token> {
         assertEquals(1, token.getPolicies().size());
         assertEquals(List.of(POLICY_2), token.getPolicies());
         token = Token.builder()
-                .withPolicies(POLICY, POLICY_2)
-                .withPolicy(POLICY_3)
-                .build();
+            .withPolicies(POLICY, POLICY_2)
+            .withPolicy(POLICY_3)
+            .build();
         assertEquals(3, token.getPolicies().size());
         assertTrue(token.getPolicies().containsAll(List.of(POLICY, POLICY_2, POLICY_3)));
 
@@ -171,9 +171,9 @@ class TokenTest extends AbstractModelTest<Token> {
         assertEquals(Set.of(META_KEY_2), token.getMeta().keySet());
         assertEquals(META_VALUE_2, token.getMeta().get(META_KEY_2));
         token = Token.builder()
-                .withMeta(META)
-                .withMeta(META_KEY_2, META_VALUE_2)
-                .build();
+            .withMeta(META)
+            .withMeta(META_KEY_2, META_VALUE_2)
+            .build();
         assertEquals(2, token.getMeta().size());
         assertEquals(META_VALUE, token.getMeta().get(META_KEY));
         assertEquals(META_VALUE_2, token.getMeta().get(META_KEY_2));

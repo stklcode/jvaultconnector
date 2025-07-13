@@ -42,16 +42,16 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
     private static final String SECRET_DATA_V2 = "world";
     private static final List<String> SECRET_WARNINGS = null;
     private static final String SECRET_JSON = "{\n" +
-            "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
-            "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
-            "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
-            "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
-            "    \"data\": {\n" +
-            "        \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
-            "        \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
-            "    },\n" +
-            "    \"warnings\": " + SECRET_WARNINGS + "\n" +
-            "}";
+        "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
+        "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
+        "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
+        "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
+        "    \"data\": {\n" +
+        "        \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
+        "        \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
+        "    },\n" +
+        "    \"warnings\": " + SECRET_WARNINGS + "\n" +
+        "}";
 
     PlainSecretResponseTest() {
         super(PlainSecretResponse.class);
@@ -71,8 +71,8 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
     @Test
     void jsonRoundtrip() {
         SecretResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(SECRET_JSON, PlainSecretResponse.class),
-                "SecretResponse deserialization failed"
+            () -> objectMapper.readValue(SECRET_JSON, PlainSecretResponse.class),
+            "SecretResponse deserialization failed"
         );
 
         assertNotNull(res, "Parsed response is NULL");
@@ -103,74 +103,74 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
         final var complexVal = new ComplexType("val1", 678);
 
         SecretResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(
-                        "{\n" +
-                                "  \"request_id\": \"req-id\",\n" +
-                                "  \"lease_id\": \"lea-id\",\n" +
-                                "  \"lease_duration\": " + 123456 + ",\n" +
-                                "  \"renewable\": true,\n" +
-                                "  \"data\": {\n" +
-                                "    \"" + stringKey + "\": \"" + stringVal + "\",\n" +
-                                "    \"" + numberKey + "\": \"" + numberVal + "\",\n" +
-                                "    \"" + listKey + "\": [\"" + String.join("\", \"", listVal) + "\"],\n" +
-                                "    \"" + complexKey + "\": {" +
-                                "      \"field1\": \"" + complexVal.field1 + "\",\n" +
-                                "      \"field2\": " + complexVal.field2 + "\n" +
-                                "    },\n" +
-                                "    \"" + complexKey + "Json\": \"" + objectMapper.writeValueAsString(complexVal).replace("\"", "\\\"") + "\"\n" +
-                                "  }\n" +
-                                "}",
-                        PlainSecretResponse.class
-                ),
-                "SecretResponse deserialization failed"
+            () -> objectMapper.readValue(
+                "{\n" +
+                    "  \"request_id\": \"req-id\",\n" +
+                    "  \"lease_id\": \"lea-id\",\n" +
+                    "  \"lease_duration\": " + 123456 + ",\n" +
+                    "  \"renewable\": true,\n" +
+                    "  \"data\": {\n" +
+                    "    \"" + stringKey + "\": \"" + stringVal + "\",\n" +
+                    "    \"" + numberKey + "\": \"" + numberVal + "\",\n" +
+                    "    \"" + listKey + "\": [\"" + String.join("\", \"", listVal) + "\"],\n" +
+                    "    \"" + complexKey + "\": {" +
+                    "      \"field1\": \"" + complexVal.field1 + "\",\n" +
+                    "      \"field2\": " + complexVal.field2 + "\n" +
+                    "    },\n" +
+                    "    \"" + complexKey + "Json\": \"" + objectMapper.writeValueAsString(complexVal).replace("\"", "\\\"") + "\"\n" +
+                    "  }\n" +
+                    "}",
+                PlainSecretResponse.class
+            ),
+            "SecretResponse deserialization failed"
         );
 
         assertEquals(stringVal, res.get(stringKey), "unexpected value for string (implicit)");
         assertEquals(
-                stringVal,
-                assertDoesNotThrow(() -> res.get(stringKey, String.class), "getting string failed"),
-                "unexpected value for string (explicit)"
+            stringVal,
+            assertDoesNotThrow(() -> res.get(stringKey, String.class), "getting string failed"),
+            "unexpected value for string (explicit)"
         );
 
         assertEquals(String.valueOf(numberVal), res.get(numberKey), "unexpected value for number (implicit)");
         assertEquals(
-                numberVal,
-                assertDoesNotThrow(() -> res.get(numberKey, Double.class), "getting number failed"),
-                "unexpected value for number (explicit)"
+            numberVal,
+            assertDoesNotThrow(() -> res.get(numberKey, Double.class), "getting number failed"),
+            "unexpected value for number (explicit)"
         );
         assertEquals(
-                String.valueOf(numberVal),
-                assertDoesNotThrow(() -> res.get(numberKey, String.class), "getting number as string failed"),
-                "unexpected value for number as string (explicit)"
+            String.valueOf(numberVal),
+            assertDoesNotThrow(() -> res.get(numberKey, String.class), "getting number as string failed"),
+            "unexpected value for number as string (explicit)"
         );
 
         assertEquals(listVal, res.get(listKey), "unexpected value for list (implicit)");
         assertEquals(
-                listVal,
-                assertDoesNotThrow(() -> res.get(listKey, ArrayList.class), "getting list failed"),
-                "unexpected value for list (explicit)"
+            listVal,
+            assertDoesNotThrow(() -> res.get(listKey, ArrayList.class), "getting list failed"),
+            "unexpected value for list (explicit)"
         );
 
         assertEquals(complexVal.toMap(), res.get(complexKey), "unexpected value for complex type (implicit)");
         assertEquals(
-                complexVal.toMap(),
-                assertDoesNotThrow(() -> res.get(complexKey, HashMap.class), "getting complex type as map failed"),
-                "unexpected value for complex type as map (explicit)"
+            complexVal.toMap(),
+            assertDoesNotThrow(() -> res.get(complexKey, HashMap.class), "getting complex type as map failed"),
+            "unexpected value for complex type as map (explicit)"
         );
         assertEquals(
-                complexVal,
-                assertDoesNotThrow(() -> res.get(complexKey, ComplexType.class), "getting complex type failed"),
-                "unexpected value for complex type (explicit)"
+            complexVal,
+            assertDoesNotThrow(() -> res.get(complexKey, ComplexType.class), "getting complex type failed"),
+            "unexpected value for complex type (explicit)"
         );
         assertThrows(
-                InvalidResponseException.class,
-                () -> res.get(complexKey, Integer.class),
-                "getting complex type as integer should fail"
+            InvalidResponseException.class,
+            () -> res.get(complexKey, Integer.class),
+            "getting complex type as integer should fail"
         );
         assertEquals(
-                complexVal,
-                assertDoesNotThrow(() -> res.get(complexKey + "Json", ComplexType.class), "getting complex type from JSON string failed"),
-                "unexpected value for complex type from JSON string"
+            complexVal,
+            assertDoesNotThrow(() -> res.get(complexKey + "Json", ComplexType.class), "getting complex type from JSON string failed"),
+            "unexpected value for complex type from JSON string"
         );
     }
 
@@ -196,8 +196,8 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
 
         private Map<String, Object> toMap() {
             return Map.of(
-                    "field1", field1,
-                    "field2", field2
+                "field1", field1,
+                "field2", field2
             );
         }
 

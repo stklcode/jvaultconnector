@@ -35,8 +35,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
     private static final String TEST_ID = "abc123";
     private static final Map<String, Object> TEST_META = Map.of(
-            "foo", "bar",
-            "number", 1337
+        "foo", "bar",
+        "number", 1337
     );
     private static final List<String> TEST_CIDR = List.of("203.0.113.0/24", "198.51.100.0/24");
 
@@ -122,8 +122,8 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         String secretJson2 = commaSeparatedToList(secretJson);
 
         AppRoleSecret secret2 = assertDoesNotThrow(
-                () -> objectMapper.readValue(secretJson2, AppRoleSecret.class),
-                "Deserialization failed"
+            () -> objectMapper.readValue(secretJson2, AppRoleSecret.class),
+            "Deserialization failed"
         );
         assertEquals(secret2.getId(), secret.getId());
         assertEquals(secret2.getMetadata(), secret.getMetadata());
@@ -144,8 +144,8 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         assumeTrue(secret.getTtl() == 12345);
         String secretJson3 = assertDoesNotThrow(() -> objectMapper.writeValueAsString(secret), "Serialization failed");
         secret2 = assertDoesNotThrow(
-                () -> objectMapper.readValue(commaSeparatedToList(secretJson3), AppRoleSecret.class),
-                "Deserialization failed"
+            () -> objectMapper.readValue(commaSeparatedToList(secretJson3), AppRoleSecret.class),
+            "Deserialization failed"
         );
         assertEquals(secret2.getId(), secret.getId());
         assertEquals(secret2.getMetadata(), secret.getMetadata());
@@ -159,9 +159,9 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
 
         // Those fields should be deserialized from JSON though.
         String secretJson4 = "{\"secret_id\":\"abc123\",\"metadata\":{\"number\":1337,\"foo\":\"bar\"}," +
-                "\"cidr_list\":[\"203.0.113.0/24\",\"198.51.100.0/24\"],\"secret_id_accessor\":\"TEST_ACCESSOR\"," +
-                "\"creation_time\":\"TEST_CREATION\",\"expiration_time\":\"TEST_EXPIRATION\"," +
-                "\"last_updated_time\":\"TEST_LASTUPDATE\",\"secret_id_num_uses\":678,\"secret_id_ttl\":12345}";
+            "\"cidr_list\":[\"203.0.113.0/24\",\"198.51.100.0/24\"],\"secret_id_accessor\":\"TEST_ACCESSOR\"," +
+            "\"creation_time\":\"TEST_CREATION\",\"expiration_time\":\"TEST_EXPIRATION\"," +
+            "\"last_updated_time\":\"TEST_LASTUPDATE\",\"secret_id_num_uses\":678,\"secret_id_ttl\":12345}";
         secret2 = assertDoesNotThrow(() -> objectMapper.readValue(secretJson4, AppRoleSecret.class), "Deserialization failed");
         assertEquals("TEST_ACCESSOR", secret2.getAccessor());
         assertEquals("TEST_CREATION", secret2.getCreationTime());
@@ -181,6 +181,6 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
 
     private static String commaSeparatedToList(String json) {
         return json.replaceAll("\"cidr_list\":\"([^\"]*)\"", "\"cidr_list\":[$1]")
-                .replaceAll("(\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+)", "\"$1\"");
+            .replaceAll("(\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+)", "\"$1\"");
     }
 }

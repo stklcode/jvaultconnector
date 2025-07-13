@@ -40,25 +40,25 @@ class AppRoleResponseTest extends AbstractModelTest<AppRoleResponse> {
     private static final Boolean ROLE_BIND_SECRET = true;
 
     private static final String RES_JSON = "{\n" +
-            "  \"auth\": null,\n" +
-            "  \"warnings\": null,\n" +
-            "  \"wrap_info\": null,\n" +
-            "  \"data\": {\n" +
-            "    \"token_ttl\": " + ROLE_TOKEN_TTL + ",\n" +
-            "    \"token_max_ttl\": " + ROLE_TOKEN_MAX_TTL + ",\n" +
-            "    \"secret_id_ttl\": " + ROLE_SECRET_TTL + ",\n" +
-            "    \"secret_id_num_uses\": " + ROLE_SECRET_NUM_USES + ",\n" +
-            "    \"token_policies\": [\n" +
-            "      \"" + ROLE_POLICY + "\"\n" +
-            "    ],\n" +
-            "    \"token_period\": " + ROLE_PERIOD + ",\n" +
-            "    \"bind_secret_id\": " + ROLE_BIND_SECRET + ",\n" +
-            "    \"bound_cidr_list\": \"\"\n" +
-            "  },\n" +
-            "  \"lease_duration\": 0,\n" +
-            "  \"renewable\": false,\n" +
-            "  \"lease_id\": \"\"\n" +
-            "}";
+        "  \"auth\": null,\n" +
+        "  \"warnings\": null,\n" +
+        "  \"wrap_info\": null,\n" +
+        "  \"data\": {\n" +
+        "    \"token_ttl\": " + ROLE_TOKEN_TTL + ",\n" +
+        "    \"token_max_ttl\": " + ROLE_TOKEN_MAX_TTL + ",\n" +
+        "    \"secret_id_ttl\": " + ROLE_SECRET_TTL + ",\n" +
+        "    \"secret_id_num_uses\": " + ROLE_SECRET_NUM_USES + ",\n" +
+        "    \"token_policies\": [\n" +
+        "      \"" + ROLE_POLICY + "\"\n" +
+        "    ],\n" +
+        "    \"token_period\": " + ROLE_PERIOD + ",\n" +
+        "    \"bind_secret_id\": " + ROLE_BIND_SECRET + ",\n" +
+        "    \"bound_cidr_list\": \"\"\n" +
+        "  },\n" +
+        "  \"lease_duration\": 0,\n" +
+        "  \"renewable\": false,\n" +
+        "  \"lease_id\": \"\"\n" +
+        "}";
 
     AppRoleResponseTest() {
         super(AppRoleResponse.class);
@@ -88,8 +88,8 @@ class AppRoleResponseTest extends AbstractModelTest<AppRoleResponse> {
     @Test
     void jsonRoundtrip() {
         AppRoleResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(RES_JSON, AppRoleResponse.class),
-                "AuthResponse deserialization failed"
+            () -> objectMapper.readValue(RES_JSON, AppRoleResponse.class),
+            "AuthResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         // Extract role data.

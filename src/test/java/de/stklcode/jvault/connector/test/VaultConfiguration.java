@@ -93,14 +93,14 @@ public class VaultConfiguration {
     @Override
     public String toString() {
         return "storage \"file\" {\n" +
-                "  path = \"" + dataLocation + "\"\n" +
-                "}\n" +
-                "listener \"tcp\" {\n" +
-                "  address = \"" + host + ":" + port + "\"\n" +
-                ((disableTLS) ? "  tls_disable = 1\n" : "") +
-                ((certFile != null) ? "  tls_cert_file = \"" + certFile + "\"\n" : "") +
-                ((keyFile != null) ? "  tls_key_file = \"" + keyFile + "\"\n" : "") +
-                "}\n" +
-                ((disableMlock) ? "disable_mlock = true" : "");
+            "  path = \"" + dataLocation + "\"\n" +
+            "}\n" +
+            "listener \"tcp\" {\n" +
+            "  address = \"" + host + ":" + port + "\"\n" +
+            ((disableTLS) ? "  tls_disable = 1\n" : "") +
+            ((certFile != null) ? "  tls_cert_file = \"" + certFile + "\"\n" : "") +
+            ((keyFile != null) ? "  tls_key_file = \"" + keyFile + "\"\n" : "") +
+            "}\n" +
+            ((disableMlock) ? "disable_mlock = true" : "");
     }
 }

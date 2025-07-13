@@ -46,11 +46,9 @@ class TransitResponseTest extends AbstractModelTest<TransitResponse> {
                         "\"sum\": \"" + SUM + "\""
                 ),
                 TransitResponse.class
-            );
-        } catch (JsonProcessingException e) {
-            fail("Creation of full model failed", e);
-            return null;
-        }
+            ),
+            "Creation of full model failed"
+        );
     }
 
     @Test

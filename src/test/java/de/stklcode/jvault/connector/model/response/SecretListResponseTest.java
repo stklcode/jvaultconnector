@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * JUnit Test for {@link SecretListResponse} model.
@@ -33,17 +34,17 @@ class SecretListResponseTest extends AbstractModelTest<SecretListResponse> {
     private static final String KEY1 = "key1";
     private static final String KEY2 = "key-2";
     private static final String JSON = "{\n" +
-            "  \"auth\": null,\n" +
-            "  \"data\": {\n" +
-            "    \"keys\": [" +
-            "      \"" + KEY1 + "\",\n" +
-            "      \"" + KEY2 + "\"\n" +
-            "    ]\n" +
-            "  },\n" +
-            "  \"lease_duration\": 2764800,\n" +
-            "  \"lease_id\": \"\",\n" +
-            "  \"renewable\": false\n" +
-            "}";
+        "  \"auth\": null,\n" +
+        "  \"data\": {\n" +
+        "    \"keys\": [" +
+        "      \"" + KEY1 + "\",\n" +
+        "      \"" + KEY2 + "\"\n" +
+        "    ]\n" +
+        "  },\n" +
+        "  \"lease_duration\": 2764800,\n" +
+        "  \"lease_id\": \"\",\n" +
+        "  \"renewable\": false\n" +
+        "}";
 
     SecretListResponseTest() {
         super(SecretListResponse.class);
@@ -63,8 +64,8 @@ class SecretListResponseTest extends AbstractModelTest<SecretListResponse> {
     @Test
     void getKeysTest() {
         SecretListResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(JSON, SecretListResponse.class),
-                "SecretListResponse deserialization failed"
+            () -> objectMapper.readValue(JSON, SecretListResponse.class),
+            "SecretListResponse deserialization failed"
         );
 
         assertEquals(List.of(KEY1, KEY2), res.getKeys(), "Unexpected secret keys");

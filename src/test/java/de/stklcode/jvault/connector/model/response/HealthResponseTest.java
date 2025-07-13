@@ -44,21 +44,21 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
     private static final Boolean ENTERPRISE = false;
 
     private static final String RES_JSON = "{\n" +
-            "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
-            "  \"cluster_name\": \"" + CLUSTER_NAME + "\",\n" +
-            "  \"version\": \"" + VERSION + "\",\n" +
-            "  \"server_time_utc\": " + SERVER_TIME_UTC + ",\n" +
-            "  \"standby\": " + STANDBY + ",\n" +
-            "  \"sealed\": " + SEALED + ",\n" +
-            "  \"initialized\": " + INITIALIZED + ",\n" +
-            "  \"replication_performance_mode\": \"" + REPL_PERF_MODE + "\",\n" +
-            "  \"replication_dr_mode\": \"" + REPL_DR_MODE + "\",\n" +
-            "  \"performance_standby\": " + PERF_STANDBY + ",\n" +
-            "  \"echo_duration_ms\": " + ECHO_DURATION + ",\n" +
-            "  \"clock_skew_ms\": " + CLOCK_SKEW + ",\n" +
-            "  \"replication_primary_canary_age_ms\": " + REPL_PRIM_CANARY_AGE + ",\n" +
-            "  \"enterprise\": " + ENTERPRISE + "\n" +
-            "}";
+        "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
+        "  \"cluster_name\": \"" + CLUSTER_NAME + "\",\n" +
+        "  \"version\": \"" + VERSION + "\",\n" +
+        "  \"server_time_utc\": " + SERVER_TIME_UTC + ",\n" +
+        "  \"standby\": " + STANDBY + ",\n" +
+        "  \"sealed\": " + SEALED + ",\n" +
+        "  \"initialized\": " + INITIALIZED + ",\n" +
+        "  \"replication_performance_mode\": \"" + REPL_PERF_MODE + "\",\n" +
+        "  \"replication_dr_mode\": \"" + REPL_DR_MODE + "\",\n" +
+        "  \"performance_standby\": " + PERF_STANDBY + ",\n" +
+        "  \"echo_duration_ms\": " + ECHO_DURATION + ",\n" +
+        "  \"clock_skew_ms\": " + CLOCK_SKEW + ",\n" +
+        "  \"replication_primary_canary_age_ms\": " + REPL_PRIM_CANARY_AGE + ",\n" +
+        "  \"enterprise\": " + ENTERPRISE + "\n" +
+        "}";
 
     HealthResponseTest() {
         super(HealthResponse.class);
@@ -78,8 +78,8 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
     @Test
     void jsonRoundtrip() {
         HealthResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(RES_JSON, HealthResponse.class),
-                "Health deserialization failed"
+            () -> objectMapper.readValue(RES_JSON, HealthResponse.class),
+            "Health deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(CLUSTER_ID, res.getClusterID(), "Incorrect cluster ID");

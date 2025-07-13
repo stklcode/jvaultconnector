@@ -53,15 +53,15 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
     @Test
     void jsonRoundtrip() {
         ErrorResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(JSON, ErrorResponse.class),
-                "ErrorResponse deserialization failed"
+            () -> objectMapper.readValue(JSON, ErrorResponse.class),
+            "ErrorResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(List.of(ERROR_1, ERROR_2), res.getErrors(), "Unexpected error messages");
         assertEquals(
-                JSON,
-                assertDoesNotThrow(() -> objectMapper.writeValueAsString(res), "ErrorResponse serialization failed"),
-                "Unexpected JSON string after serialization"
+            JSON,
+            assertDoesNotThrow(() -> objectMapper.writeValueAsString(res), "ErrorResponse serialization failed"),
+            "Unexpected JSON string after serialization"
         );
     }
 
@@ -69,14 +69,14 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
     @Test
     void testToString() {
         ErrorResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(JSON, ErrorResponse.class),
-                "ErrorResponse deserialization failed"
+            () -> objectMapper.readValue(JSON, ErrorResponse.class),
+            "ErrorResponse deserialization failed"
         );
         assertEquals(ERROR_1, res.toString());
 
         res = assertDoesNotThrow(
-                () -> objectMapper.readValue(JSON_EMPTY, ErrorResponse.class),
-                "ErrorResponse deserialization failed with empty list"
+            () -> objectMapper.readValue(JSON_EMPTY, ErrorResponse.class),
+            "ErrorResponse deserialization failed with empty list"
         );
         assertEquals("error response", res.toString());
 

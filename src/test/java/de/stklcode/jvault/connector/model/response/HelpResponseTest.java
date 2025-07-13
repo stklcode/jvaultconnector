@@ -49,15 +49,15 @@ class HelpResponseTest extends AbstractModelTest<HelpResponse> {
     @Test
     void jsonRoundtrip() {
         HelpResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(JSON, HelpResponse.class),
-                "HelpResponse deserialization failed"
+            () -> objectMapper.readValue(JSON, HelpResponse.class),
+            "HelpResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(HELP, res.getHelp(), "Unexpected help text");
         assertEquals(
-                JSON,
-                assertDoesNotThrow(() -> objectMapper.writeValueAsString(res), "HelpResponse serialization failed"),
-                "Unexpected JSON string after serialization"
+            JSON,
+            assertDoesNotThrow(() -> objectMapper.writeValueAsString(res), "HelpResponse serialization failed"),
+            "Unexpected JSON string after serialization"
         );
     }
 }

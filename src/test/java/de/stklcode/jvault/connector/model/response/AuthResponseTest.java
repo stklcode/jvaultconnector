@@ -119,8 +119,8 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
     @Test
     void jsonRoundtrip() {
         AuthResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(RES_JSON, AuthResponse.class),
-                "AuthResponse deserialization failed"
+            () -> objectMapper.readValue(RES_JSON, AuthResponse.class),
+            "AuthResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         // Extract auth data.

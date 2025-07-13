@@ -57,37 +57,37 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     private static final String MOUNT_TYPE = "token";
 
     private static final String RES_JSON = "{\n" +
-            "  \"lease_id\": \"\",\n" +
-            "  \"renewable\": " + RES_RENEWABLE + ",\n" +
-            "  \"lease_duration\": " + RES_LEASE_DURATION + ",\n" +
-            "  \"data\": {\n" +
-            "    \"accessor\": \"" + TOKEN_ACCESSOR + "\",\n" +
-            "    \"creation_time\": " + TOKEN_CREATION_TIME + ",\n" +
-            "    \"creation_ttl\": " + TOKEN_TTL + ",\n" +
-            "    \"display_name\": \"" + TOKEN_DISPLAY_NAME + "\",\n" +
-            "    \"entity_id\": \"" + TOKEN_ENTITY_ID + "\",\n" +
-            "    \"expire_time\": \"" + TOKEN_EXPIRE_TIME + "\",\n" +
-            "    \"explicit_max_ttl\": \"" + TOKEN_EXPLICIT_MAX_TTL + "\",\n" +
-            "    \"id\": \"" + TOKEN_ID + "\",\n" +
-            "    \"issue_time\": \"" + TOKEN_ISSUE_TIME + "\",\n" +
-            "    \"meta\": {\n" +
-            "      \"" + TOKEN_META_KEY + "\": \"" + TOKEN_META_VALUE + "\"\n" +
-            "    },\n" +
-            "    \"num_uses\": " + TOKEN_NUM_USES + ",\n" +
-            "    \"orphan\": " + TOKEN_ORPHAN + ",\n" +
-            "    \"path\": \"" + TOKEN_PATH + "\",\n" +
-            "    \"policies\": [\n" +
-            "      \"" + TOKEN_POLICY_1 + "\", \n" +
-            "      \"" + TOKEN_POLICY_2 + "\"\n" +
-            "    ],\n" +
-            "    \"renewable\": " + TOKEN_RENEWABLE + ",\n" +
-            "    \"ttl\": " + RES_TTL + ",\n" +
-            "    \"type\": \"" + TOKEN_TYPE + "\"\n" +
-            "  },\n" +
-            "  \"warnings\": null,\n" +
-            "  \"auth\": null,\n" +
-            "  \"mount_type\": \"" + MOUNT_TYPE + "\"\n" +
-            "}";
+        "  \"lease_id\": \"\",\n" +
+        "  \"renewable\": " + RES_RENEWABLE + ",\n" +
+        "  \"lease_duration\": " + RES_LEASE_DURATION + ",\n" +
+        "  \"data\": {\n" +
+        "    \"accessor\": \"" + TOKEN_ACCESSOR + "\",\n" +
+        "    \"creation_time\": " + TOKEN_CREATION_TIME + ",\n" +
+        "    \"creation_ttl\": " + TOKEN_TTL + ",\n" +
+        "    \"display_name\": \"" + TOKEN_DISPLAY_NAME + "\",\n" +
+        "    \"entity_id\": \"" + TOKEN_ENTITY_ID + "\",\n" +
+        "    \"expire_time\": \"" + TOKEN_EXPIRE_TIME + "\",\n" +
+        "    \"explicit_max_ttl\": \"" + TOKEN_EXPLICIT_MAX_TTL + "\",\n" +
+        "    \"id\": \"" + TOKEN_ID + "\",\n" +
+        "    \"issue_time\": \"" + TOKEN_ISSUE_TIME + "\",\n" +
+        "    \"meta\": {\n" +
+        "      \"" + TOKEN_META_KEY + "\": \"" + TOKEN_META_VALUE + "\"\n" +
+        "    },\n" +
+        "    \"num_uses\": " + TOKEN_NUM_USES + ",\n" +
+        "    \"orphan\": " + TOKEN_ORPHAN + ",\n" +
+        "    \"path\": \"" + TOKEN_PATH + "\",\n" +
+        "    \"policies\": [\n" +
+        "      \"" + TOKEN_POLICY_1 + "\", \n" +
+        "      \"" + TOKEN_POLICY_2 + "\"\n" +
+        "    ],\n" +
+        "    \"renewable\": " + TOKEN_RENEWABLE + ",\n" +
+        "    \"ttl\": " + RES_TTL + ",\n" +
+        "    \"type\": \"" + TOKEN_TYPE + "\"\n" +
+        "  },\n" +
+        "  \"warnings\": null,\n" +
+        "  \"auth\": null,\n" +
+        "  \"mount_type\": \"" + MOUNT_TYPE + "\"\n" +
+        "}";
 
     TokenResponseTest() {
         super(TokenResponse.class);
@@ -117,8 +117,8 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
     @Test
     void jsonRoundtrip() {
         TokenResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(RES_JSON, TokenResponse.class),
-                "TokenResponse deserialization failed"
+            () -> objectMapper.readValue(RES_JSON, TokenResponse.class),
+            "TokenResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");

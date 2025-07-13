@@ -63,12 +63,12 @@ class HTTPVaultConnectorBuilderTest {
 
         // Specify all options.
         HTTPVaultConnectorBuilder builder = HTTPVaultConnector.builder()
-                .withHost("vault2.example.com")
-                .withoutTLS()
-                .withPort(1234)
-                .withPrefix("/foo/")
-                .withTimeout(5678)
-                .withNumberOfRetries(9);
+            .withHost("vault2.example.com")
+            .withoutTLS()
+            .withPort(1234)
+            .withPrefix("/foo/")
+            .withTimeout(5678)
+            .withNumberOfRetries(9);
         connector = builder.build();
 
         assertEquals("http://vault2.example.com:1234/foo/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
@@ -79,13 +79,13 @@ class HTTPVaultConnectorBuilderTest {
 
         // Initialization from URL.
         assertThrows(
-                URISyntaxException.class,
-                () -> HTTPVaultConnector.builder().withBaseURL("foo:/\\1nv4l1d_UrL"),
-                "Initialization from invalid URL should fail"
+            URISyntaxException.class,
+            () -> HTTPVaultConnector.builder().withBaseURL("foo:/\\1nv4l1d_UrL"),
+            "Initialization from invalid URL should fail"
         );
         connector = assertDoesNotThrow(
-                () -> HTTPVaultConnector.builder().withBaseURL("https://vault3.example.com:5678/bar/").build(),
-                "Initialization from valid URL should not fail"
+            () -> HTTPVaultConnector.builder().withBaseURL("https://vault3.example.com:5678/bar/").build(),
+            "Initialization from valid URL should not fail"
         );
         assertEquals("https://vault3.example.com:5678/bar/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
 
@@ -106,8 +106,8 @@ class HTTPVaultConnectorBuilderTest {
         // Provide address only should be enough.
         withVaultEnv(VAULT_ADDR, null, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Factory creation from minimal environment failed"
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Factory creation from minimal environment failed"
             );
             HTTPVaultConnector connector = builder.build();
 
@@ -119,16 +119,16 @@ class HTTPVaultConnectorBuilderTest {
         });
         withVaultEnv(VAULT_ADDR_2, null, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Factory creation from minimal environment failed"
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Factory creation from minimal environment failed"
             );
             assertEquals(VAULT_ADDR_2 + "/v1/", getRequestHelperPrivate(builder.build(), "baseURL"), "URL without port not set correctly");
             return null;
         });
         withVaultEnv(VAULT_ADDR_3, null, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Factory creation from minimal environment failed"
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Factory creation from minimal environment failed"
             );
             assertEquals(VAULT_ADDR_3, getRequestHelperPrivate(builder.build(), "baseURL"), "URL with custom path not set correctly");
             return null;
@@ -137,8 +137,8 @@ class HTTPVaultConnectorBuilderTest {
         // Provide address and number of retries.
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Factory creation from environment failed"
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Factory creation from environment failed"
             );
             HTTPVaultConnector connector = builder.build();
 
@@ -152,8 +152,8 @@ class HTTPVaultConnectorBuilderTest {
         // Automatic authentication.
         withVaultEnv(VAULT_ADDR, null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Factory creation from minimal environment failed"
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Factory creation from minimal environment failed"
             );
             assertEquals(VAULT_TOKEN, getPrivate(builder, "token"), "Token not set correctly");
 
@@ -163,9 +163,9 @@ class HTTPVaultConnectorBuilderTest {
         // Invalid URL.
         withVaultEnv("This is not a valid URL!", null, VAULT_MAX_RETRIES.toString(), VAULT_TOKEN).execute(() -> {
             assertThrows(
-                    ConnectionException.class,
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Invalid URL from environment should raise an exception"
+                ConnectionException.class,
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Invalid URL from environment should raise an exception"
             );
 
             return null;
@@ -182,8 +182,8 @@ class HTTPVaultConnectorBuilderTest {
         AtomicReference<Object> certFromPem = new AtomicReference<>();
         withVaultEnv(VAULT_ADDR, pem, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Builder with PEM certificate from environment failed"
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Builder with PEM certificate from environment failed"
             );
             HTTPVaultConnector connector = builder.build();
 
@@ -198,8 +198,8 @@ class HTTPVaultConnectorBuilderTest {
         AtomicReference<Object> certFromFile = new AtomicReference<>();
         withVaultEnv(VAULT_ADDR, file, null, null).execute(() -> {
             HTTPVaultConnectorBuilder builder = assertDoesNotThrow(
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Builder with certificate path from environment failed"
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Builder with certificate path from environment failed"
             );
             HTTPVaultConnector connector = builder.build();
 
@@ -215,9 +215,9 @@ class HTTPVaultConnectorBuilderTest {
         String doesNotExist = tempDir.toString() + "/doesnotexist";
         withVaultEnv(VAULT_ADDR, doesNotExist, VAULT_MAX_RETRIES.toString(), null).execute(() -> {
             TlsException e = assertThrows(
-                    TlsException.class,
-                    () -> HTTPVaultConnector.builder().fromEnv(),
-                    "Creation with unknown cert path failed"
+                TlsException.class,
+                () -> HTTPVaultConnector.builder().fromEnv(),
+                "Creation with unknown cert path failed"
             );
             assertEquals(doesNotExist, assertInstanceOf(NoSuchFileException.class, e.getCause()).getFile());
 
@@ -227,9 +227,9 @@ class HTTPVaultConnectorBuilderTest {
 
     private SystemLambda.WithEnvironmentVariables withVaultEnv(String vaultAddr, String vaultCacert, String vaultMaxRetries, String vaultToken) {
         return withEnvironmentVariable("VAULT_ADDR", vaultAddr)
-                .and("VAULT_CACERT", vaultCacert)
-                .and("VAULT_MAX_RETRIES", vaultMaxRetries)
-                .and("VAULT_TOKEN", vaultToken);
+            .and("VAULT_CACERT", vaultCacert)
+            .and("VAULT_MAX_RETRIES", vaultMaxRetries)
+            .and("VAULT_TOKEN", vaultToken);
     }
 
     private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) throws NoSuchFieldException, IllegalAccessException {

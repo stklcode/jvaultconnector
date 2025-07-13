@@ -33,13 +33,13 @@ class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse>
     private static final Integer VERSION = 42;
 
     private static final String META_JSON = "{\n" +
-            "  \"data\": {\n" +
-            "    \"created_time\": \"" + CREATION_TIME + "\",\n" +
-            "    \"deletion_time\": \"" + DELETION_TIME + "\",\n" +
-            "    \"destroyed\": false,\n" +
-            "    \"version\": " + VERSION + "\n" +
-            "  }\n" +
-            "}";
+        "  \"data\": {\n" +
+        "    \"created_time\": \"" + CREATION_TIME + "\",\n" +
+        "    \"deletion_time\": \"" + DELETION_TIME + "\",\n" +
+        "    \"destroyed\": false,\n" +
+        "    \"version\": " + VERSION + "\n" +
+        "  }\n" +
+        "}";
 
     SecretVersionResponseTest() {
         super(SecretVersionResponse.class);
@@ -59,8 +59,8 @@ class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse>
     @Test
     void jsonRoundtrip() {
         SecretVersionResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(META_JSON, SecretVersionResponse.class),
-                "SecretVersionResponse deserialization failed"
+            () -> objectMapper.readValue(META_JSON, SecretVersionResponse.class),
+            "SecretVersionResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");

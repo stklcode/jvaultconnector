@@ -45,36 +45,36 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
     private static final String STORAGE_TYPE = "file";
 
     private static final String RES_SEALED = "{\n" +
-            "  \"type\": \"" + TYPE + "\",\n" +
-            "  \"sealed\": true,\n" +
-            "  \"initialized\": true,\n" +
-            "  \"t\": " + THRESHOLD + ",\n" +
-            "  \"n\": " + SHARES + ",\n" +
-            "  \"progress\": " + PROGRESS_SEALED + ",\n" +
-            "  \"nonce\": \"\",\n" +
-            "  \"version\": \"" + VERSION + "\",\n" +
-            "  \"build_date\": \"" + BUILD_DATE + "\",\n" +
-            "  \"migration\": \"" + MIGRATION + "\",\n" +
-            "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
-            "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
-            "}";
+        "  \"type\": \"" + TYPE + "\",\n" +
+        "  \"sealed\": true,\n" +
+        "  \"initialized\": true,\n" +
+        "  \"t\": " + THRESHOLD + ",\n" +
+        "  \"n\": " + SHARES + ",\n" +
+        "  \"progress\": " + PROGRESS_SEALED + ",\n" +
+        "  \"nonce\": \"\",\n" +
+        "  \"version\": \"" + VERSION + "\",\n" +
+        "  \"build_date\": \"" + BUILD_DATE + "\",\n" +
+        "  \"migration\": \"" + MIGRATION + "\",\n" +
+        "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
+        "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
+        "}";
 
     private static final String RES_UNSEALED = "{\n" +
-            "  \"type\": \"" + TYPE + "\",\n" +
-            "  \"sealed\": false,\n" +
-            "  \"initialized\": true,\n" +
-            "  \"t\": " + THRESHOLD + ",\n" +
-            "  \"n\": " + SHARES + ",\n" +
-            "  \"progress\": " + PROGRESS_UNSEALED + ",\n" +
-            "  \"version\": \"" + VERSION + "\",\n" +
-            "  \"build_date\": \"" + BUILD_DATE + "\",\n" +
-            "  \"cluster_name\": \"" + CLUSTER_NAME + "\",\n" +
-            "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
-            "  \"nonce\": \"" + NONCE + "\",\n" +
-            "  \"migration\": \"" + MIGRATION + "\",\n" +
-            "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
-            "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
-            "}";
+        "  \"type\": \"" + TYPE + "\",\n" +
+        "  \"sealed\": false,\n" +
+        "  \"initialized\": true,\n" +
+        "  \"t\": " + THRESHOLD + ",\n" +
+        "  \"n\": " + SHARES + ",\n" +
+        "  \"progress\": " + PROGRESS_UNSEALED + ",\n" +
+        "  \"version\": \"" + VERSION + "\",\n" +
+        "  \"build_date\": \"" + BUILD_DATE + "\",\n" +
+        "  \"cluster_name\": \"" + CLUSTER_NAME + "\",\n" +
+        "  \"cluster_id\": \"" + CLUSTER_ID + "\",\n" +
+        "  \"nonce\": \"" + NONCE + "\",\n" +
+        "  \"migration\": \"" + MIGRATION + "\",\n" +
+        "  \"recovery_seal\": \"" + RECOVERY_SEAL + "\",\n" +
+        "  \"storage_type\": \"" + STORAGE_TYPE + "\"\n" +
+        "}";
 
     SealResponseTest() {
         super(SealResponse.class);
@@ -95,8 +95,8 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
     void jsonRoundtripSealed() {
         // First test sealed Vault's response.
         SealResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(RES_SEALED, SealResponse.class),
-                "SealResponse deserialization failed"
+            () -> objectMapper.readValue(RES_SEALED, SealResponse.class),
+            "SealResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(TYPE, res.getType(), "Incorrect seal type");
@@ -118,8 +118,8 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
 
         // Not test unsealed Vault's response.
         res = assertDoesNotThrow(
-                () -> objectMapper.readValue(RES_UNSEALED, SealResponse.class),
-                "SealResponse deserialization failed"
+            () -> objectMapper.readValue(RES_UNSEALED, SealResponse.class),
+            "SealResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertEquals(TYPE, res.getType(), "Incorrect seal type");

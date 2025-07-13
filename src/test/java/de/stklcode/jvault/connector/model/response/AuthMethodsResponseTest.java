@@ -51,37 +51,37 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     private static final String TK_RUNNING_PLUGIN_VERSION = "v1.15.3+builtin.vault";
 
     private static final String RES_JSON = "{\n" +
-            "  \"data\": {" +
-            "    \"" + GH_PATH + "\": {\n" +
-            "      \"uuid\": \"" + GH_UUID + "\",\n" +
-            "      \"type\": \"" + GH_TYPE + "\",\n" +
-            "      \"accessor\": \"" + GH_ACCESSOR + "\",\n" +
-            "      \"description\": \"" + GH_DESCR + "\",\n" +
-            "      \"external_entropy_access\": false,\n" +
-            "      \"local\": false,\n" +
-            "      \"seal_wrap\": false\n" +
-            "    },\n" +
-            "    \"" + TK_PATH + "\": {\n" +
-            "      \"config\": {\n" +
-            "        \"default_lease_ttl\": " + TK_LEASE_TTL + ",\n" +
-            "        \"force_no_cache\": " + TK_FORCE_NO_CACHE + ",\n" +
-            "        \"max_lease_ttl\": " + TK_MAX_LEASE_TTL + ",\n" +
-            "        \"token_type\": \"" + TK_TOKEN_TYPE + "\"\n" +
-            "      },\n" +
-            "      \"description\": \"" + TK_DESCR + "\",\n" +
-            "      \"options\": null,\n" +
-            "      \"plugin_version\": \"\",\n" +
-            "      \"running_plugin_version\": \"" + TK_RUNNING_PLUGIN_VERSION + "\",\n" +
-            "      \"running_sha256\": \"\",\n" +
-            "      \"type\": \"" + TK_TYPE + "\",\n" +
-            "      \"uuid\": \"" + TK_UUID + "\",\n" +
-            "      \"accessor\": \"" + TK_ACCESSOR + "\",\n" +
-            "      \"external_entropy_access\": false,\n" +
-            "      \"local\": true,\n" +
-            "      \"seal_wrap\": false\n" +
-            "    }\n" +
-            "  }\n" +
-            "}";
+        "  \"data\": {" +
+        "    \"" + GH_PATH + "\": {\n" +
+        "      \"uuid\": \"" + GH_UUID + "\",\n" +
+        "      \"type\": \"" + GH_TYPE + "\",\n" +
+        "      \"accessor\": \"" + GH_ACCESSOR + "\",\n" +
+        "      \"description\": \"" + GH_DESCR + "\",\n" +
+        "      \"external_entropy_access\": false,\n" +
+        "      \"local\": false,\n" +
+        "      \"seal_wrap\": false\n" +
+        "    },\n" +
+        "    \"" + TK_PATH + "\": {\n" +
+        "      \"config\": {\n" +
+        "        \"default_lease_ttl\": " + TK_LEASE_TTL + ",\n" +
+        "        \"force_no_cache\": " + TK_FORCE_NO_CACHE + ",\n" +
+        "        \"max_lease_ttl\": " + TK_MAX_LEASE_TTL + ",\n" +
+        "        \"token_type\": \"" + TK_TOKEN_TYPE + "\"\n" +
+        "      },\n" +
+        "      \"description\": \"" + TK_DESCR + "\",\n" +
+        "      \"options\": null,\n" +
+        "      \"plugin_version\": \"\",\n" +
+        "      \"running_plugin_version\": \"" + TK_RUNNING_PLUGIN_VERSION + "\",\n" +
+        "      \"running_sha256\": \"\",\n" +
+        "      \"type\": \"" + TK_TYPE + "\",\n" +
+        "      \"uuid\": \"" + TK_UUID + "\",\n" +
+        "      \"accessor\": \"" + TK_ACCESSOR + "\",\n" +
+        "      \"external_entropy_access\": false,\n" +
+        "      \"local\": true,\n" +
+        "      \"seal_wrap\": false\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
 
     AuthMethodsResponseTest() {
         super(AuthMethodsResponse.class);
@@ -111,8 +111,8 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
     @Test
     void jsonRoundtrip() {
         AuthMethodsResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(RES_JSON, AuthMethodsResponse.class),
-                "AuthResponse deserialization failed"
+            () -> objectMapper.readValue(RES_JSON, AuthMethodsResponse.class),
+            "AuthResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         // Extract auth data.

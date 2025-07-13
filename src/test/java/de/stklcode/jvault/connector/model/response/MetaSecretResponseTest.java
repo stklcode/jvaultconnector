@@ -46,47 +46,47 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
     private static final String CUSTOM_META_VAL = "bar";
 
     private static final String SECRET_JSON_V2 = "{\n" +
-            "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
-            "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
-            "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
-            "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
-            "    \"data\": {\n" +
-            "      \"data\": {\n" +
-            "          \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
-            "          \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
-            "      },\n" +
-            "      \"metadata\": {\n" +
-            "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
-            "          \"custom_metadata\": null,\n" +
-            "          \"deletion_time\": \"\",\n" +
-            "          \"destroyed\": false,\n" +
-            "          \"version\": 1\n" +
-            "      }\n" +
-            "    },\n" +
-            "    \"warnings\": " + SECRET_WARNINGS + "\n" +
-            "}";
+        "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
+        "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
+        "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
+        "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
+        "    \"data\": {\n" +
+        "      \"data\": {\n" +
+        "          \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
+        "          \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
+        "      },\n" +
+        "      \"metadata\": {\n" +
+        "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
+        "          \"custom_metadata\": null,\n" +
+        "          \"deletion_time\": \"\",\n" +
+        "          \"destroyed\": false,\n" +
+        "          \"version\": 1\n" +
+        "      }\n" +
+        "    },\n" +
+        "    \"warnings\": " + SECRET_WARNINGS + "\n" +
+        "}";
     private static final String SECRET_JSON_V2_2 = "{\n" +
-            "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
-            "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
-            "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
-            "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
-            "    \"data\": {\n" +
-            "      \"data\": {\n" +
-            "          \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
-            "          \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
-            "      },\n" +
-            "      \"metadata\": {\n" +
-            "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
-            "          \"custom_metadata\": {" +
-            "            \"" + CUSTOM_META_KEY + "\": \"" + CUSTOM_META_VAL + "\"" +
-            "          },\n" +
-            "          \"deletion_time\": \"" + SECRET_META_DELETED + "\",\n" +
-            "          \"destroyed\": true,\n" +
-            "          \"version\": 2\n" +
-            "      }\n" +
-            "    },\n" +
-            "    \"warnings\": " + SECRET_WARNINGS + "\n" +
-            "}";
+        "    \"request_id\": \"" + SECRET_REQUEST_ID + "\",\n" +
+        "    \"lease_id\": \"" + SECRET_LEASE_ID + "\",\n" +
+        "    \"lease_duration\": " + SECRET_LEASE_DURATION + ",\n" +
+        "    \"renewable\": " + SECRET_RENEWABLE + ",\n" +
+        "    \"data\": {\n" +
+        "      \"data\": {\n" +
+        "          \"" + SECRET_DATA_K1 + "\": \"" + SECRET_DATA_V1 + "\",\n" +
+        "          \"" + SECRET_DATA_K2 + "\": \"" + SECRET_DATA_V2 + "\"\n" +
+        "      },\n" +
+        "      \"metadata\": {\n" +
+        "          \"created_time\": \"" + SECRET_META_CREATED + "\",\n" +
+        "          \"custom_metadata\": {" +
+        "            \"" + CUSTOM_META_KEY + "\": \"" + CUSTOM_META_VAL + "\"" +
+        "          },\n" +
+        "          \"deletion_time\": \"" + SECRET_META_DELETED + "\",\n" +
+        "          \"destroyed\": true,\n" +
+        "          \"version\": 2\n" +
+        "      }\n" +
+        "    },\n" +
+        "    \"warnings\": " + SECRET_WARNINGS + "\n" +
+        "}";
 
     MetaSecretResponseTest() {
         super(MetaSecretResponse.class);
@@ -107,8 +107,8 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
     void jsonRoundtrip() {
         // KV v2 secret.
         MetaSecretResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(SECRET_JSON_V2, MetaSecretResponse.class),
-                "SecretResponse deserialization failed"
+            () -> objectMapper.readValue(SECRET_JSON_V2, MetaSecretResponse.class),
+            "SecretResponse deserialization failed"
         );
         assertSecretData(res);
         assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
@@ -120,8 +120,8 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
 
         // Deleted KV v2 secret.
         res = assertDoesNotThrow(
-                () -> objectMapper.readValue(SECRET_JSON_V2_2, MetaSecretResponse.class),
-                "SecretResponse deserialization failed"
+            () -> objectMapper.readValue(SECRET_JSON_V2_2, MetaSecretResponse.class),
+            "SecretResponse deserialization failed"
         );
         assertSecretData(res);
         assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");

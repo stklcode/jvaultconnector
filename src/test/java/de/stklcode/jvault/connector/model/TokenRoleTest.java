@@ -66,21 +66,21 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     private static final Token.Type TOKEN_TYPE = Token.Type.SERVICE;
 
     private static final String JSON_FULL = "{" +
-            "\"name\":\"" + NAME + "\"," +
-            "\"allowed_policies\":[\"" + ALLOWED_POLICY_1 + "\",\"" + ALLOWED_POLICY_2 + "\",\"" + ALLOWED_POLICY_3 + "\"]," +
-            "\"allowed_policies_glob\":[\"" + ALLOWED_POLICY_GLOB_1 + "\",\"" + ALLOWED_POLICY_GLOB_2 + "\",\"" + ALLOWED_POLICY_GLOB_3 + "\"]," +
-            "\"disallowed_policies\":[\"" + DISALLOWED_POLICY_1 + "\",\"" + DISALLOWED_POLICY_2 + "\",\"" + DISALLOWED_POLICY_3 + "\"]," +
-            "\"disallowed_policies_glob\":[\"" + DISALLOWED_POLICY_GLOB_1 + "\",\"" + DISALLOWED_POLICY_GLOB_2 + "\",\"" + DISALLOWED_POLICY_GLOB_3 + "\"]," +
-            "\"orphan\":" + ORPHAN + "," +
-            "\"renewable\":" + RENEWABLE + "," +
-            "\"path_suffix\":\"" + PATH_SUFFIX + "\"," +
-            "\"allowed_entity_aliases\":[\"" + ALLOWED_ENTITY_ALIAS_1 + "\",\"" + ALLOWED_ENTITY_ALIAS_3 + "\",\"" + ALLOWED_ENTITY_ALIAS_2 + "\"]," +
-            "\"token_bound_cidrs\":[\"" + TOKEN_BOUND_CIDR_3 + "\",\"" + TOKEN_BOUND_CIDR_2 + "\",\"" + TOKEN_BOUND_CIDR_1 + "\"]," +
-            "\"token_explicit_max_ttl\":" + TOKEN_EXPLICIT_MAX_TTL + "," +
-            "\"token_no_default_policy\":" + TOKEN_NO_DEFAULT_POLICY + "," +
-            "\"token_num_uses\":" + TOKEN_NUM_USES + "," +
-            "\"token_period\":" + TOKEN_PERIOD + "," +
-            "\"token_type\":\"" + TOKEN_TYPE.value() + "\"}";
+        "\"name\":\"" + NAME + "\"," +
+        "\"allowed_policies\":[\"" + ALLOWED_POLICY_1 + "\",\"" + ALLOWED_POLICY_2 + "\",\"" + ALLOWED_POLICY_3 + "\"]," +
+        "\"allowed_policies_glob\":[\"" + ALLOWED_POLICY_GLOB_1 + "\",\"" + ALLOWED_POLICY_GLOB_2 + "\",\"" + ALLOWED_POLICY_GLOB_3 + "\"]," +
+        "\"disallowed_policies\":[\"" + DISALLOWED_POLICY_1 + "\",\"" + DISALLOWED_POLICY_2 + "\",\"" + DISALLOWED_POLICY_3 + "\"]," +
+        "\"disallowed_policies_glob\":[\"" + DISALLOWED_POLICY_GLOB_1 + "\",\"" + DISALLOWED_POLICY_GLOB_2 + "\",\"" + DISALLOWED_POLICY_GLOB_3 + "\"]," +
+        "\"orphan\":" + ORPHAN + "," +
+        "\"renewable\":" + RENEWABLE + "," +
+        "\"path_suffix\":\"" + PATH_SUFFIX + "\"," +
+        "\"allowed_entity_aliases\":[\"" + ALLOWED_ENTITY_ALIAS_1 + "\",\"" + ALLOWED_ENTITY_ALIAS_3 + "\",\"" + ALLOWED_ENTITY_ALIAS_2 + "\"]," +
+        "\"token_bound_cidrs\":[\"" + TOKEN_BOUND_CIDR_3 + "\",\"" + TOKEN_BOUND_CIDR_2 + "\",\"" + TOKEN_BOUND_CIDR_1 + "\"]," +
+        "\"token_explicit_max_ttl\":" + TOKEN_EXPLICIT_MAX_TTL + "," +
+        "\"token_no_default_policy\":" + TOKEN_NO_DEFAULT_POLICY + "," +
+        "\"token_num_uses\":" + TOKEN_NUM_USES + "," +
+        "\"token_period\":" + TOKEN_PERIOD + "," +
+        "\"token_type\":\"" + TOKEN_TYPE.value() + "\"}";
 
     TokenRoleTest() {
         super(TokenRole.class);
@@ -89,28 +89,28 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     @Override
     protected TokenRole createFull() {
         return TokenRole.builder()
-                .forName(NAME)
-                .withAllowedPolicies(ALLOWED_POLICIES)
-                .withAllowedPolicy(ALLOWED_POLICY_3)
-                .withAllowedPolicyGlob(ALLOWED_POLICY_GLOB_1)
-                .withAllowedPoliciesGlob(ALLOWED_POLICIES_GLOB)
-                .withDisallowedPolicy(DISALLOWED_POLICY_1)
-                .withDisallowedPolicies(DISALLOWED_POLICIES)
-                .withDisallowedPoliciesGlob(DISALLOWED_POLICIES_GLOB)
-                .withDisallowedPolicyGlob(DISALLOWED_POLICY_GLOB_3)
-                .orphan(ORPHAN)
-                .renewable(RENEWABLE)
-                .withPathSuffix(PATH_SUFFIX)
-                .withAllowedEntityAliases(ALLOWED_ENTITY_ALIASES)
-                .withAllowedEntityAlias(ALLOWED_ENTITY_ALIAS_2)
-                .withTokenBoundCidr(TOKEN_BOUND_CIDR_3)
-                .withTokenBoundCidrs(TOKEN_BOUND_CIDRS)
-                .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
-                .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
-                .withTokenNumUses(TOKEN_NUM_USES)
-                .withTokenPeriod(TOKEN_PERIOD)
-                .withTokenType(TOKEN_TYPE)
-                .build();
+            .forName(NAME)
+            .withAllowedPolicies(ALLOWED_POLICIES)
+            .withAllowedPolicy(ALLOWED_POLICY_3)
+            .withAllowedPolicyGlob(ALLOWED_POLICY_GLOB_1)
+            .withAllowedPoliciesGlob(ALLOWED_POLICIES_GLOB)
+            .withDisallowedPolicy(DISALLOWED_POLICY_1)
+            .withDisallowedPolicies(DISALLOWED_POLICIES)
+            .withDisallowedPoliciesGlob(DISALLOWED_POLICIES_GLOB)
+            .withDisallowedPolicyGlob(DISALLOWED_POLICY_GLOB_3)
+            .orphan(ORPHAN)
+            .renewable(RENEWABLE)
+            .withPathSuffix(PATH_SUFFIX)
+            .withAllowedEntityAliases(ALLOWED_ENTITY_ALIASES)
+            .withAllowedEntityAlias(ALLOWED_ENTITY_ALIAS_2)
+            .withTokenBoundCidr(TOKEN_BOUND_CIDR_3)
+            .withTokenBoundCidrs(TOKEN_BOUND_CIDRS)
+            .withTokenExplicitMaxTtl(TOKEN_EXPLICIT_MAX_TTL)
+            .withTokenNoDefaultPolicy(TOKEN_NO_DEFAULT_POLICY)
+            .withTokenNumUses(TOKEN_NUM_USES)
+            .withTokenPeriod(TOKEN_PERIOD)
+            .withTokenType(TOKEN_TYPE)
+            .build();
     }
 
     /**
@@ -141,24 +141,24 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     @Test
     void buildNullTest() throws JsonProcessingException {
         TokenRole role = TokenRole.builder()
-                .forName(null)
-                .withAllowedPolicies(null)
-                .withAllowedPolicy(null)
-                .withDisallowedPolicy(null)
-                .withDisallowedPolicies(null)
-                .orphan(null)
-                .renewable(null)
-                .withPathSuffix(null)
-                .withAllowedEntityAliases(null)
-                .withAllowedEntityAlias(null)
-                .withTokenBoundCidr(null)
-                .withTokenBoundCidrs(null)
-                .withTokenExplicitMaxTtl(null)
-                .withTokenNoDefaultPolicy(null)
-                .withTokenNumUses(null)
-                .withTokenPeriod(null)
-                .withTokenType(null)
-                .build();
+            .forName(null)
+            .withAllowedPolicies(null)
+            .withAllowedPolicy(null)
+            .withDisallowedPolicy(null)
+            .withDisallowedPolicies(null)
+            .orphan(null)
+            .renewable(null)
+            .withPathSuffix(null)
+            .withAllowedEntityAliases(null)
+            .withAllowedEntityAlias(null)
+            .withTokenBoundCidr(null)
+            .withTokenBoundCidrs(null)
+            .withTokenExplicitMaxTtl(null)
+            .withTokenNoDefaultPolicy(null)
+            .withTokenNumUses(null)
+            .withTokenPeriod(null)
+            .withTokenType(null)
+            .build();
 
         assertNull(role.getAllowedPolicies());
         assertNull(role.getDisallowedPolicies());

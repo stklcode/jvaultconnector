@@ -42,36 +42,36 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
     private static final String DELETE_VERSION_AFTER = "0s";
 
     private static final String META_JSON = "{\n" +
-            "  \"data\": {\n" +
-            "    \"cas_required\": " + CAS_REQUIRED + ",\n" +
-            "    \"created_time\": \"" + V1_TIME + "\",\n" +
-            "    \"current_version\": " + CURRENT_VERSION + ",\n" +
-            "    \"custom_metadata\": {" +
-            "      \"" + CUSTOM_META_KEY + "\": \"" + CUSTOM_META_VAL + "\"" +
-            "    },\n" +
-            "    \"delete_version_after\": \"" + DELETE_VERSION_AFTER + "\"," +
-            "    \"max_versions\": " + MAX_VERSIONS + ",\n" +
-            "    \"oldest_version\": " + OLDEST_VERSION + ",\n" +
-            "    \"updated_time\": \"" + V3_TIME + "\",\n" +
-            "    \"versions\": {\n" +
-            "      \"1\": {\n" +
-            "        \"created_time\": \"" + V1_TIME + "\",\n" +
-            "        \"deletion_time\": \"" + V2_TIME + "\",\n" +
-            "        \"destroyed\": true\n" +
-            "      },\n" +
-            "      \"2\": {\n" +
-            "        \"created_time\": \"" + V2_TIME + "\",\n" +
-            "        \"deletion_time\": \"\",\n" +
-            "        \"destroyed\": false\n" +
-            "      },\n" +
-            "      \"3\": {\n" +
-            "        \"created_time\": \"" + V3_TIME + "\",\n" +
-            "        \"deletion_time\": \"\",\n" +
-            "        \"destroyed\": false\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}";
+        "  \"data\": {\n" +
+        "    \"cas_required\": " + CAS_REQUIRED + ",\n" +
+        "    \"created_time\": \"" + V1_TIME + "\",\n" +
+        "    \"current_version\": " + CURRENT_VERSION + ",\n" +
+        "    \"custom_metadata\": {" +
+        "      \"" + CUSTOM_META_KEY + "\": \"" + CUSTOM_META_VAL + "\"" +
+        "    },\n" +
+        "    \"delete_version_after\": \"" + DELETE_VERSION_AFTER + "\"," +
+        "    \"max_versions\": " + MAX_VERSIONS + ",\n" +
+        "    \"oldest_version\": " + OLDEST_VERSION + ",\n" +
+        "    \"updated_time\": \"" + V3_TIME + "\",\n" +
+        "    \"versions\": {\n" +
+        "      \"1\": {\n" +
+        "        \"created_time\": \"" + V1_TIME + "\",\n" +
+        "        \"deletion_time\": \"" + V2_TIME + "\",\n" +
+        "        \"destroyed\": true\n" +
+        "      },\n" +
+        "      \"2\": {\n" +
+        "        \"created_time\": \"" + V2_TIME + "\",\n" +
+        "        \"deletion_time\": \"\",\n" +
+        "        \"destroyed\": false\n" +
+        "      },\n" +
+        "      \"3\": {\n" +
+        "        \"created_time\": \"" + V3_TIME + "\",\n" +
+        "        \"deletion_time\": \"\",\n" +
+        "        \"destroyed\": false\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}";
 
     MetadataResponseTest() {
         super(MetadataResponse.class);
@@ -91,8 +91,8 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
     @Test
     void jsonRoundtrip() {
         MetadataResponse res = assertDoesNotThrow(
-                () -> objectMapper.readValue(META_JSON, MetadataResponse.class),
-                "MetadataResponse deserialization failed"
+            () -> objectMapper.readValue(META_JSON, MetadataResponse.class),
+            "MetadataResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
