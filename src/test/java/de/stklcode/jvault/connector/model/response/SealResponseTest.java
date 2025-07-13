@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -83,12 +82,10 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
 
     @Override
     protected SealResponse createFull() {
-        try {
-            return objectMapper.readValue(RES_UNSEALED, SealResponse.class);
-        } catch (JsonProcessingException e) {
-            fail("Creation of full model instance failed", e);
-            return null;
-        }
+        return assertDoesNotThrow(
+            () -> objectMapper.readValue(RES_UNSEALED, SealResponse.class),
+            "Creation of full model instance failed"
+        );
     }
 
     /**

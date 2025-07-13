@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -39,8 +38,8 @@ class TransitResponseTest extends AbstractModelTest<TransitResponse> {
 
     @Override
     protected TransitResponse createFull() {
-        try {
-            return objectMapper.readValue(
+        return assertDoesNotThrow(
+            () -> objectMapper.readValue(
                 json(
                     "\"ciphertext\": \"" + CIPHERTEXT + "\", " +
                         "\"plaintext\": \"" + PLAINTEXT + "\", " +

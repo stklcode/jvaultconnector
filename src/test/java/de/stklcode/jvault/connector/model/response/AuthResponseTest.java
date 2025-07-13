@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
 import de.stklcode.jvault.connector.model.response.embedded.MfaConstraintAny;
@@ -101,12 +100,10 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
 
     @Override
     protected AuthResponse createFull() {
-        try {
-            return objectMapper.readValue(RES_JSON, AuthResponse.class);
-        } catch (JsonProcessingException e) {
-            fail("Creation of full model instance failed", e);
-            return null;
-        }
+        return assertDoesNotThrow(
+            () -> objectMapper.readValue(RES_JSON, AuthResponse.class),
+            "Creation of full model instance failed"
+        );
     }
 
     @Test

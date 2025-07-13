@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.AppRole;
 import org.junit.jupiter.api.Test;
@@ -67,12 +66,10 @@ class AppRoleResponseTest extends AbstractModelTest<AppRoleResponse> {
 
     @Override
     protected AppRoleResponse createFull() {
-        try {
-            return objectMapper.readValue(RES_JSON, AppRoleResponse.class);
-        } catch (JsonProcessingException e) {
-            fail("Creation of full model instance failed", e);
-            return null;
-        }
+        return assertDoesNotThrow(
+            () -> objectMapper.readValue(RES_JSON, AppRoleResponse.class),
+            "Creation of full model instance failed"
+        );
     }
 
     /**

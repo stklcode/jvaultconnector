@@ -1,6 +1,5 @@
 package de.stklcode.jvault.connector.model.response.embedded;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
 
@@ -62,12 +61,10 @@ class MountConfigTest extends AbstractModelTest<MountConfig> {
 
     @Override
     protected MountConfig createFull() {
-        try {
-            return objectMapper.readValue(RES_JSON, MountConfig.class);
-        } catch (JsonProcessingException e) {
-            fail("Creation of full model instance failed", e);
-            return null;
-        }
+        return assertDoesNotThrow(
+            () -> objectMapper.readValue(RES_JSON, MountConfig.class),
+            "Creation of full model instance failed"
+        );
     }
 
     /**
