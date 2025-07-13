@@ -43,7 +43,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <argLine />
     </properties>
 
     <dependencies>
@@ -129,7 +128,6 @@
                     <version>3.5.3</version>
                     <configuration>
                         <argLine>
-                            @{argLine}
                             --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.test=com.fasterxml.jackson.databind
                         </argLine>
                     </configuration>
@@ -160,15 +158,7 @@
                     <version>3.5.3</version>
                     <configuration>
                         <argLine>
-                            @{argLine}
                             --add-opens java.base/java.util=ALL-UNNAMED
-                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector=ALL-UNNAMED
-                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.exception=ALL-UNNAMED
-                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.model=ALL-UNNAMED
-                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.model.response=ALL-UNNAMED
-                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.model.response.embedded=ALL-UNNAMED
-                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.test=com.fasterxml.jackson.databind
-                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.test=com.fasterxml.jackson.datatype.jsr310
                         </argLine>
                     </configuration>
                 </plugin>
