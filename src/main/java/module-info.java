@@ -26,12 +26,11 @@ module de.stklcode.jvault.connector {
     exports de.stklcode.jvault.connector.model.response;
     exports de.stklcode.jvault.connector.model.response.embedded;
 
-    opens de.stklcode.jvault.connector.model to com.fasterxml.jackson.databind;
-    opens de.stklcode.jvault.connector.model.response to com.fasterxml.jackson.databind;
-    opens de.stklcode.jvault.connector.model.response.embedded to com.fasterxml.jackson.databind;
+    opens de.stklcode.jvault.connector.model to tools.jackson.databind;
+    opens de.stklcode.jvault.connector.model.response to tools.jackson.databind;
+    opens de.stklcode.jvault.connector.model.response.embedded to tools.jackson.databind;
 
     requires java.net.http;
     requires com.fasterxml.jackson.annotation;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.datatype.jsr310;
+    requires tools.jackson.databind;
 }

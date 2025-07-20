@@ -47,14 +47,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.20.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.20.0</version>
+            <version>3.0.0</version>
         </dependency>
 
         <dependency>
@@ -129,8 +124,7 @@
                     <configuration>
                         <argLine>
                             @{argLine}
-                            --add-opens
-                            de.stklcode.jvault.connector/de.stklcode.jvault.connector.test=com.fasterxml.jackson.databind
+                            --add-opens de.stklcode.jvault.connector/de.stklcode.jvault.connector.test=tools.jackson.databind
                         </argLine>
                     </configuration>
                 </plugin>

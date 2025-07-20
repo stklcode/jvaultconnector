@@ -2,6 +2,7 @@
 
 ### Breaking
 * Requires Java 17 or later (#100) (#111)
+* Required Jackson 3
 * Modified interface structure
 
 ### Improvements
@@ -9,9 +10,11 @@
 
   Use `connector.sys()`, `.kv2()`, `.token()`, `.appRole()` and `.transit()` to access respective feature sets.
 
-
 ### Removal
 * Remove deprecated `read...Credentials()` methods (#112)
+
+### Dependencies
+* Updated Jackson to 3.0.0 (#116)
 
 
 ## 1.5.3 (2025-09-09)

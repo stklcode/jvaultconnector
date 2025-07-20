@@ -1,12 +1,11 @@
 package de.stklcode.jvault.connector.internal;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.response.ErrorResponse;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -67,9 +66,8 @@ public final class RequestHelper implements Serializable {
         this.tlsVersion = tlsVersion;
         this.trustedCaCert = trustedCaCert;
         this.jsonMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .build();
     }
 
@@ -90,7 +88,7 @@ public final class RequestHelper implements Serializable {
         // Generate JSON from payload.
         try {
             req.POST(HttpRequest.BodyPublishers.ofString(jsonMapper.writeValueAsString(payload), UTF_8));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new InvalidRequestException(Error.PARSE_RESPONSE, e);
         }
 
@@ -121,7 +119,7 @@ public final class RequestHelper implements Serializable {
         try {
             String response = post(path, payload, token);
             return jsonMapper.readValue(response, target);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
@@ -160,7 +158,7 @@ public final class RequestHelper implements Serializable {
         // Generate JSON from payload.
         try {
             req.PUT(HttpRequest.BodyPublishers.ofString(jsonMapper.writeValueAsString(payload), UTF_8));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new InvalidRequestException("Payload serialization failed", e);
         }
 
@@ -191,7 +189,7 @@ public final class RequestHelper implements Serializable {
         try {
             String response = put(path, payload, token);
             return jsonMapper.readValue(response, target);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
@@ -303,7 +301,7 @@ public final class RequestHelper implements Serializable {
         try {
             String response = get(path, payload, token);
             return jsonMapper.readValue(response, target);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
     }
@@ -455,7 +453,7 @@ public final class RequestHelper implements Serializable {
                     throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), er.toString());
                 }
             }
-        } catch (IOException ignored) {
+        } catch (IOException | JacksonException ignored) {
             // Exception ignored.
         }
     }
