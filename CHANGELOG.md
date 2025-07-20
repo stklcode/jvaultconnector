@@ -2,9 +2,13 @@
 
 ### Breaking
 * Requires Java 17 or later (#100) (#111)
+* Required Jackson 3
 
 ### Removal
 * Remove deprecated `read...Credentials()` methods (#112)
+
+### Dependencies
+* Updated Jackson to 3.0.0
 
 
 ## 1.5.3 (2025-09-09)
