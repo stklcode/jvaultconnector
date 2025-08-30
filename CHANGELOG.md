@@ -3,6 +3,9 @@
 ### Dependencies
 * Updated Jackson to 2.20.0 (#106)
 
+### Improvements
+* Extract API paths into a utility class (#108)
+
 ### Fix
 * Prevent potential off-by-1 error in internal `mapOf()` helper (#107)
 
