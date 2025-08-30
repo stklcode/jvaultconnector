@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static de.stklcode.jvault.connector.internal.VaultApiPath.*;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 
@@ -41,39 +42,6 @@ import static java.util.Collections.singletonMap;
  * @since 0.1
  */
 public class HTTPVaultConnector implements VaultConnector {
-    private static final String PATH_SYS = "sys";
-    private static final String PATH_SYS_AUTH = PATH_SYS + "/auth";
-    private static final String PATH_RENEW = PATH_SYS + "/leases/renew";
-    private static final String PATH_REVOKE = PATH_SYS + "/leases/revoke/";
-    private static final String PATH_HEALTH = PATH_SYS + "/health";
-    private static final String PATH_SEAL = PATH_SYS + "/seal";
-    private static final String PATH_SEAL_STATUS = PATH_SYS + "/seal-status";
-    private static final String PATH_UNSEAL = PATH_SYS + "/unseal";
-
-
-    private static final String PATH_AUTH = "auth";
-    private static final String PATH_AUTH_TOKEN = PATH_AUTH + "/token";
-    private static final String PATH_LOOKUP = "/lookup";
-    private static final String PATH_LOOKUP_SELF = "/lookup-self";
-    private static final String PATH_CREATE = "/create";
-    private static final String PATH_ROLES = "/roles";
-    private static final String PATH_CREATE_ORPHAN = "/create-orphan";
-    private static final String PATH_AUTH_USERPASS = PATH_AUTH + "/userpass/login/";
-    private static final String PATH_AUTH_APPROLE = PATH_AUTH + "/approle";
-    private static final String PATH_AUTH_APPROLE_ROLE = PATH_AUTH_APPROLE + "/role/%s%s";
-
-    private static final String PATH_DATA = "/data/";
-    private static final String PATH_METADATA = "/metadata/";
-    private static final String PATH_LOGIN = "/login";
-    private static final String PATH_DELETE = "/delete/";
-    private static final String PATH_UNDELETE = "/undelete/";
-    private static final String PATH_DESTROY = "/destroy/";
-
-    private static final String PATH_TRANSIT = "transit";
-    private static final String PATH_TRANSIT_ENCRYPT = PATH_TRANSIT + "/encrypt/";
-    private static final String PATH_TRANSIT_DECRYPT = PATH_TRANSIT + "/decrypt/";
-    private static final String PATH_TRANSIT_HASH = PATH_TRANSIT + "/hash/";
-
     private final RequestHelper request;
 
     private boolean authorized = false;     // Authorization status.
@@ -140,12 +108,12 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final SealResponse sealStatus() throws VaultConnectorException {
-        return request.get(PATH_SEAL_STATUS, emptyMap(), token, SealResponse.class);
+        return request.get(SYS_SEAL_STATUS, emptyMap(), token, SealResponse.class);
     }
 
     @Override
     public final void seal() throws VaultConnectorException {
-        request.put(PATH_SEAL, emptyMap(), token);
+        request.put(SYS_SEAL, emptyMap(), token);
     }
 
     @Override
@@ -155,14 +123,14 @@ public class HTTPVaultConnector implements VaultConnector {
             "reset", reset
         );
 
-        return request.put(PATH_UNSEAL, param, token, SealResponse.class);
+        return request.put(SYS_UNSEAL, param, token, SealResponse.class);
     }
 
     @Override
     public HealthResponse getHealth() throws VaultConnectorException {
 
         return request.get(
-            PATH_HEALTH,
+            SYS_HEALTH,
             // Force status code to be 200, so we don't need to modify the request sequence.
             Map.of(
                 "standbycode", "200",   // Default: 429.
@@ -182,7 +150,7 @@ public class HTTPVaultConnector implements VaultConnector {
     @Override
     public final List<AuthBackend> getAuthBackends() throws VaultConnectorException {
         /* Issue request and parse response */
-        AuthMethodsResponse amr = request.get(PATH_SYS_AUTH, emptyMap(), token, AuthMethodsResponse.class);
+        AuthMethodsResponse amr = request.get(SYS_AUTH, emptyMap(), token, AuthMethodsResponse.class);
 
         return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
     }
@@ -192,7 +160,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* set token */
         this.token = token;
         this.tokenTTL = 0;
-        TokenResponse res = request.get(PATH_AUTH_TOKEN + PATH_LOOKUP_SELF, emptyMap(), token, TokenResponse.class);
+        TokenResponse res = request.get(AUTH_TOKEN + TOKEN_LOOKUP_SELF, emptyMap(), token, TokenResponse.class);
         authorized = true;
 
         return res;
@@ -202,7 +170,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final AuthResponse authUserPass(final String username, final String password)
         throws VaultConnectorException {
         final Map<String, String> payload = singletonMap("password", password);
-        return queryAuth(PATH_AUTH_USERPASS + username, payload);
+        return queryAuth(AUTH_USERPASS_LOGIN + username, payload);
     }
 
     @Override
@@ -211,7 +179,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "role_id", roleID,
             "secret_id", secretID
         );
-        return queryAuth(PATH_AUTH_APPROLE + PATH_LOGIN, payload);
+        return queryAuth(AUTH_APPROLE + LOGIN, payload);
     }
 
     /**
@@ -239,7 +207,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(String.format(PATH_AUTH_APPROLE_ROLE, role.getName(), ""), role, token);
+        request.postWithoutResponse(String.format(AUTH_APPROLE_ROLE, role.getName(), ""), role, token);
 
         /* Set custom ID if provided */
         return !(role.getId() != null && !role.getId().isEmpty()) || setAppRoleID(role.getName(), role.getId());
@@ -250,7 +218,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
         /* Request HTTP response and parse Secret */
         return request.get(
-            String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""),
+            String.format(AUTH_APPROLE_ROLE, roleName, ""),
             emptyMap(),
             token,
             AppRoleResponse.class
@@ -262,7 +230,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.deleteWithoutResponse(String.format(PATH_AUTH_APPROLE_ROLE, roleName, ""), token);
+        request.deleteWithoutResponse(String.format(AUTH_APPROLE_ROLE, roleName, ""), token);
 
         return true;
     }
@@ -272,7 +240,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
         /* Issue request, parse response and extract Role ID */
         return request.get(
-            String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"),
+            String.format(AUTH_APPROLE_ROLE, roleName, "/role-id"),
             emptyMap(),
             token,
             RawDataResponse.class
@@ -285,7 +253,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(
-            String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/role-id"),
+            String.format(AUTH_APPROLE_ROLE, roleName, "/role-id"),
             singletonMap("role_id", roleID),
             token
         );
@@ -300,14 +268,14 @@ public class HTTPVaultConnector implements VaultConnector {
 
         if (secret.getId() != null && !secret.getId().isEmpty()) {
             return request.post(
-                String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/custom-secret-id"),
+                String.format(AUTH_APPROLE_ROLE, roleName, "/custom-secret-id"),
                 secret,
                 token,
                 AppRoleSecretResponse.class
             );
         } else {
             return request.post(
-                String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id"),
+                String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id"),
                 secret, token,
                 AppRoleSecretResponse.class
             );
@@ -321,7 +289,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and parse secret response */
         return request.post(
-            String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id/lookup"),
+            String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id/lookup"),
             new AppRoleSecret(secretID),
             token,
             AppRoleSecretResponse.class
@@ -335,7 +303,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(
-            String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id/destroy"),
+            String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id/destroy"),
             new AppRoleSecret(secretID),
             token);
 
@@ -347,7 +315,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         SecretListResponse secrets = request.get(
-            PATH_AUTH_APPROLE + "/role?list=true",
+            AUTH_APPROLE + "/role?list=true",
             emptyMap(),
             token,
             SecretListResponse.class
@@ -361,7 +329,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         SecretListResponse secrets = request.get(
-            String.format(PATH_AUTH_APPROLE_ROLE, roleName, "/secret-id?list=true"),
+            String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id?list=true"),
             emptyMap(),
             token,
             SecretListResponse.class
@@ -384,7 +352,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Request HTTP response and parse secret metadata */
         Map<String, String> args = mapOfStrings("version", version);
 
-        return request.get(mount + PATH_DATA + key, args, token, MetaSecretResponse.class);
+        return request.get(mount + SECRET_DATA + key, args, token, MetaSecretResponse.class);
     }
 
     @Override
@@ -393,7 +361,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Request HTTP response and parse secret metadata */
-        return request.get(mount + PATH_METADATA + key, emptyMap(), token, MetadataResponse.class);
+        return request.get(mount + SECRET_METADATA + key, emptyMap(), token, MetadataResponse.class);
     }
 
     @Override
@@ -408,7 +376,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "cas_required", casRequired
         );
 
-        write(mount + PATH_METADATA + key, payload);
+        write(mount + SECRET_METADATA + key, payload);
     }
 
     @Override
@@ -427,7 +395,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and parse metadata response */
         return request.post(
-            mount + PATH_DATA + key,
+            mount + SECRET_DATA + key,
             Map.of(
                 "data", data,
                 "options", options
@@ -480,30 +448,30 @@ public class HTTPVaultConnector implements VaultConnector {
 
     @Override
     public final void deleteLatestSecretVersion(final String mount, final String key) throws VaultConnectorException {
-        delete(mount + PATH_DATA + key);
+        delete(mount + SECRET_DATA + key);
     }
 
     @Override
     public final void deleteAllSecretVersions(final String mount, final String key) throws VaultConnectorException {
-        delete(mount + PATH_METADATA + key);
+        delete(mount + SECRET_METADATA + key);
     }
 
     @Override
     public final void deleteSecretVersions(final String mount, final String key, final int... versions)
         throws VaultConnectorException {
-        handleSecretVersions(mount, PATH_DELETE, key, versions);
+        handleSecretVersions(mount, SECRET_DELETE, key, versions);
     }
 
     @Override
     public final void undeleteSecretVersions(final String mount, final String key, final int... versions)
         throws VaultConnectorException {
-        handleSecretVersions(mount, PATH_UNDELETE, key, versions);
+        handleSecretVersions(mount, SECRET_UNDELETE, key, versions);
     }
 
     @Override
     public final void destroySecretVersions(final String mount, final String key, final int... versions)
         throws VaultConnectorException {
-        handleSecretVersions(mount, PATH_DESTROY, key, versions);
+        handleSecretVersions(mount, SECRET_DESTROY, key, versions);
     }
 
     /**
@@ -534,7 +502,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.putWithoutResponse(PATH_REVOKE + leaseID, emptyMap(), token);
+        request.putWithoutResponse(SYS_LEASES_REVOKE + leaseID, emptyMap(), token);
     }
 
     @Override
@@ -547,17 +515,17 @@ public class HTTPVaultConnector implements VaultConnector {
         );
 
         /* Issue request and parse secret response */
-        return request.put(PATH_RENEW, payload, token, SecretResponse.class);
+        return request.put(SYS_LEASES_RENEW, payload, token, SecretResponse.class);
     }
 
     @Override
     public final AuthResponse createToken(final Token token) throws VaultConnectorException {
-        return createTokenInternal(token, PATH_AUTH_TOKEN + PATH_CREATE);
+        return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE);
     }
 
     @Override
     public final AuthResponse createToken(final Token token, final boolean orphan) throws VaultConnectorException {
-        return createTokenInternal(token, PATH_AUTH_TOKEN + PATH_CREATE_ORPHAN);
+        return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE_ORPHAN);
     }
 
     @Override
@@ -565,7 +533,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (role == null || role.isEmpty()) {
             throw new InvalidRequestException("No role name specified.");
         }
-        return createTokenInternal(token, PATH_AUTH_TOKEN + PATH_CREATE + "/" + role);
+        return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE + "/" + role);
     }
 
     @Override
@@ -600,7 +568,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Request HTTP response and parse Secret */
         return request.get(
-            PATH_AUTH_TOKEN + PATH_LOOKUP,
+            AUTH_TOKEN + TOKEN_LOOKUP,
             singletonMap("token", token),
             token,
             TokenResponse.class
@@ -618,7 +586,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Issue request and expect code 204 with empty response.
-        request.postWithoutResponse(PATH_AUTH_TOKEN + PATH_ROLES + "/" + name, role, token);
+        request.postWithoutResponse(AUTH_TOKEN + TOKEN_ROLES + "/" + name, role, token);
 
         return true;
     }
@@ -628,14 +596,14 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         // Request HTTP response and parse response.
-        return request.get(PATH_AUTH_TOKEN + PATH_ROLES + "/" + name, emptyMap(), token, TokenRoleResponse.class);
+        return request.get(AUTH_TOKEN + TOKEN_ROLES + "/" + name, emptyMap(), token, TokenRoleResponse.class);
     }
 
     @Override
     public List<String> listTokenRoles() throws VaultConnectorException {
         requireAuth();
 
-        return list(PATH_AUTH_TOKEN + PATH_ROLES);
+        return list(AUTH_TOKEN + TOKEN_ROLES);
     }
 
     @Override
@@ -647,7 +615,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Issue request and expect code 204 with empty response.
-        request.deleteWithoutResponse(PATH_AUTH_TOKEN + PATH_ROLES + "/" + name, token);
+        request.deleteWithoutResponse(AUTH_TOKEN + TOKEN_ROLES + "/" + name, token);
 
         return true;
     }
@@ -661,7 +629,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "plaintext", plaintext
         );
 
-        return request.post(PATH_TRANSIT_ENCRYPT + keyName, payload, token, TransitResponse.class);
+        return request.post(TRANSIT_ENCRYPT + keyName, payload, token, TransitResponse.class);
     }
 
     @Override
@@ -673,7 +641,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "ciphertext", ciphertext
         );
 
-        return request.post(PATH_TRANSIT_DECRYPT + keyName, payload, token, TransitResponse.class);
+        return request.post(TRANSIT_DECRYPT + keyName, payload, token, TransitResponse.class);
     }
 
     @Override
@@ -690,7 +658,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "format", format
         );
 
-        return request.post(PATH_TRANSIT_HASH + algorithm, payload, token, TransitResponse.class);
+        return request.post(TRANSIT_HASH + algorithm, payload, token, TransitResponse.class);
     }
 
     /**
