@@ -732,7 +732,7 @@ public class HTTPVaultConnector implements VaultConnector {
      */
     private static Map<String, Object> mapOf(Object... keyValues) {
         Map<String, Object> map = new HashMap<>(keyValues.length / 2, 1);
-        for (int i = 0; i < keyValues.length; i = i + 2) {
+        for (int i = 0; i < keyValues.length - 1; i = i + 2) {
             Object key = keyValues[i];
             Object val = keyValues[i + 1];
             if (key instanceof String && val != null) {
