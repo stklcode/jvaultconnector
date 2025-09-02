@@ -2,6 +2,13 @@
 
 ### Breaking
 * Requires Java 17 or later (#100) (#111)
+* Modified interface structure
+
+### Improvements
+* Split client interface to group feature sets together (#113)
+
+  Use `connector.sys()`, `.kv2()`, `.token()`, `.appRole()` and `.transit()` to access respective feature sets.
+
 
 ### Removal
 * Remove deprecated `read...Credentials()` methods (#112)

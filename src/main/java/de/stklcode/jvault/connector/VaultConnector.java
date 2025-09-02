@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
-import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 
 import java.io.Serializable;
@@ -36,59 +35,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * Reset authorization information.
      */
     void resetAuth();
-
-    /**
-     * Retrieve status of vault seal.
-     *
-     * @return Seal status
-     * @throws VaultConnectorException on error
-     */
-    SealResponse sealStatus() throws VaultConnectorException;
-
-    /**
-     * Seal vault.
-     *
-     * @throws VaultConnectorException on error
-     */
-    void seal() throws VaultConnectorException;
-
-    /**
-     * Unseal vault.
-     *
-     * @param key   A single master share key
-     * @param reset Discard previously provided keys (optional)
-     * @return Response with seal status
-     * @throws VaultConnectorException on error
-     */
-    SealResponse unseal(final String key, final Boolean reset) throws VaultConnectorException;
-
-    /**
-     * Unseal vault.
-     *
-     * @param key A single master share key
-     * @return Response with seal status
-     * @throws VaultConnectorException on error
-     */
-    default SealResponse unseal(final String key) throws VaultConnectorException {
-        return unseal(key, null);
-    }
-
-    /**
-     * Query server health information.
-     *
-     * @return Health information.
-     * @throws VaultConnectorException on error
-     * @since 0.7.0
-     */
-    HealthResponse getHealth() throws VaultConnectorException;
-
-    /**
-     * Get all available authentication backends.
-     *
-     * @return List of backends
-     * @throws VaultConnectorException on error
-     */
-    List<AuthBackend> getAuthBackends() throws VaultConnectorException;
 
     /**
      * Authorize to Vault using token.
@@ -133,187 +79,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     AuthResponse authAppRole(final String roleID, final String secretID) throws VaultConnectorException;
 
     /**
-     * Register a new AppRole role from given metamodel.
-     *
-     * @param role The role
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    boolean createAppRole(final AppRole role) throws VaultConnectorException;
-
-    /**
-     * Register new AppRole role with default policy.
-     *
-     * @param roleName The role name
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    default boolean createAppRole(final String roleName) throws VaultConnectorException {
-        return createAppRole(roleName, new ArrayList<>());
-    }
-
-    /**
-     * Register new AppRole role with policies.
-     *
-     * @param roleName The role name
-     * @param policies The policies to associate with
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    default boolean createAppRole(final String roleName, final List<String> policies) throws VaultConnectorException {
-        return createAppRole(roleName, policies, null);
-    }
-
-    /**
-     * Register new AppRole role with default policy and custom ID.
-     *
-     * @param roleName The role name
-     * @param roleID   A custom role ID
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    default boolean createAppRole(final String roleName, final String roleID) throws VaultConnectorException {
-        return createAppRole(roleName, new ArrayList<>(), roleID);
-    }
-
-    /**
-     * Register new AppRole role with policies and custom ID.
-     *
-     * @param roleName The role name
-     * @param policies The policies to associate with
-     * @param roleID   A custom role ID
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    default boolean createAppRole(final String roleName, final List<String> policies, final String roleID)
-        throws VaultConnectorException {
-        return createAppRole(AppRole.builder(roleName).withTokenPolicies(policies).withId(roleID).build());
-    }
-
-    /**
-     * Delete AppRole role from Vault.
-     *
-     * @param roleName The role name
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     */
-    boolean deleteAppRole(final String roleName) throws VaultConnectorException;
-
-    /**
-     * Lookup an AppRole role.
-     *
-     * @param roleName The role name
-     * @return Result of the lookup
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    AppRoleResponse lookupAppRole(final String roleName) throws VaultConnectorException;
-
-    /**
-     * Retrieve ID for an AppRole role.
-     *
-     * @param roleName The role name
-     * @return The role ID
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    String getAppRoleID(final String roleName) throws VaultConnectorException;
-
-    /**
-     * Set custom ID for an AppRole role.
-     *
-     * @param roleName The role name
-     * @param roleID   The role ID
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    boolean setAppRoleID(final String roleName, final String roleID) throws VaultConnectorException;
-
-    /**
-     * Register new random generated AppRole secret.
-     *
-     * @param roleName The role name
-     * @return The secret ID
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    default AppRoleSecretResponse createAppRoleSecret(final String roleName) throws VaultConnectorException {
-        return createAppRoleSecret(roleName, new AppRoleSecret());
-    }
-
-    /**
-     * Register new AppRole secret with custom ID.
-     *
-     * @param roleName The role name
-     * @param secretID A custom secret ID
-     * @return The secret ID
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    default AppRoleSecretResponse createAppRoleSecret(final String roleName, final String secretID)
-        throws VaultConnectorException {
-        return createAppRoleSecret(roleName, new AppRoleSecret(secretID));
-    }
-
-    /**
-     * Register new AppRole secret with custom ID.
-     *
-     * @param roleName The role name
-     * @param secret   The secret meta object
-     * @return The secret ID
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    AppRoleSecretResponse createAppRoleSecret(final String roleName, final AppRoleSecret secret)
-        throws VaultConnectorException;
-
-    /**
-     * Lookup an AppRole secret.
-     *
-     * @param roleName The role name
-     * @param secretID The secret ID
-     * @return Result of the lookup
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    AppRoleSecretResponse lookupAppRoleSecret(final String roleName, final String secretID)
-        throws VaultConnectorException;
-
-    /**
-     * Destroy an AppRole secret.
-     *
-     * @param roleName The role name
-     * @param secretID The secret meta object
-     * @return The secret ID
-     * @throws VaultConnectorException on error
-     * @since 0.4.0
-     */
-    boolean destroyAppRoleSecret(final String roleName, final String secretID) throws VaultConnectorException;
-
-    /**
-     * List existing (accessible) AppRole roles.
-     *
-     * @return List of roles
-     * @throws VaultConnectorException on error
-     */
-    List<String> listAppRoles() throws VaultConnectorException;
-
-    /**
-     * List existing (accessible) secret IDs for AppRole role.
-     *
-     * @param roleName The role name
-     * @return List of roles
-     * @throws VaultConnectorException on error
-     */
-    List<String> listAppRoleSecrets(final String roleName) throws VaultConnectorException;
-
-    /**
      * Get authorization status.
      *
      * @return TRUE, if successfully authorized
@@ -329,108 +94,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @since 0.5.0
      */
     SecretResponse read(final String key) throws VaultConnectorException;
-
-    /**
-     * Retrieve the latest secret data for specific version from Vault.
-     * <br>
-     * Path {@code <mount>/data/<key>} is read here.
-     * Only available for KV v2 secrets.
-     *
-     * @param mount Secret store mount point (without leading or trailing slash).
-     * @param key   Secret identifier
-     * @return Secret response
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default SecretResponse readSecretData(final String mount, final String key) throws VaultConnectorException {
-        return readSecretVersion(mount, key, null);
-    }
-
-    /**
-     * Write secret to Vault.
-     * <br>
-     * Path {@code <mount>/data/<key>} is written here.
-     * Only available for KV v2 secrets.
-     *
-     * @param mount Secret store mount point (without leading or trailing slash).
-     * @param key   Secret identifier
-     * @param data  Secret content. Value must be be JSON serializable.
-     * @return Metadata for the created/updated secret.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    default SecretVersionResponse writeSecretData(final String mount,
-                                                  final String key,
-                                                  final Map<String, Object> data) throws VaultConnectorException {
-        return writeSecretData(mount, key, data, null);
-    }
-
-    /**
-     * Write secret to Vault.
-     * <br>
-     * Path {@code <mount>/data/<key>} is written here.
-     * Only available for KV v2 secrets.
-     *
-     * @param mount Secret store mount point (without leading or trailing slash).
-     * @param key   Secret identifier
-     * @param data  Secret content. Value must be be JSON serializable.
-     * @param cas   Use Check-And-Set operation, i.e. only allow writing if current version matches this value.
-     * @return Metadata for the created/updated secret.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    SecretVersionResponse writeSecretData(final String mount,
-                                          final String key,
-                                          final Map<String, Object> data,
-                                          final Integer cas) throws VaultConnectorException;
-
-    /**
-     * Retrieve secret data from Vault.
-     * <br>
-     * Path {@code <mount>/data/<key>} is read here.
-     * Only available for KV v2 secrets.
-     *
-     * @param mount   Secret store mount point (without leading or trailing slash).
-     * @param key     Secret identifier
-     * @param version Version to read. If {@code null} or zero, the latest version will be returned.
-     * @return Secret response.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    SecretResponse readSecretVersion(final String mount, final String key, final Integer version)
-        throws VaultConnectorException;
-
-    /**
-     * Retrieve secret metadata from Vault.
-     * <br>
-     * Path {@code <mount>/metadata/<key>} is read here.
-     * Only available for KV v2 secrets.
-     *
-     * @param mount Secret store mount point (without leading or trailing slash).
-     * @param key   Secret identifier
-     * @return Metadata response
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    MetadataResponse readSecretMetadata(final String mount, final String key) throws VaultConnectorException;
-
-    /**
-     * Update secret metadata.
-     * <br>
-     * Path {@code <mount>/metadata/<key>} is written here.
-     * Only available for KV v2 secrets.
-     *
-     * @param mount       Secret store mount point (without leading or trailing slash).
-     * @param key         Secret identifier
-     * @param maxVersions Maximum number of versions (fallback to backend default if {@code null})
-     * @param casRequired Specify if Check-And-Set is required for this secret.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    void updateSecretMetadata(final String mount,
-                              final String key,
-                              final Integer maxVersions,
-                              final boolean casRequired) throws VaultConnectorException;
 
     /**
      * List available nodes from Vault.
@@ -488,71 +151,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     void delete(final String key) throws VaultConnectorException;
 
     /**
-     * Delete latest version of a secret from Vault.
-     * <br>
-     * Only available for KV v2 stores.
-     *
-     * @param mount Secret store mount point (without leading or trailing slash).
-     * @param key   Secret path.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    void deleteLatestSecretVersion(final String mount, final String key) throws VaultConnectorException;
-
-    /**
-     * Delete latest version of a secret from Vault.
-     * <br>
-     * Prefix {@code secret/} is automatically added to path.
-     * Only available for KV v2 stores.
-     *
-     * @param mount Secret store mount point (without leading or trailing slash).
-     * @param key   Secret path.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    void deleteAllSecretVersions(final String mount, final String key) throws VaultConnectorException;
-
-    /**
-     * Delete secret versions from Vault.
-     * <br>
-     * Only available for KV v2 stores.
-     *
-     * @param mount    Secret store mount point (without leading or trailing slash).
-     * @param key      Secret path.
-     * @param versions Versions of the secret to delete.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    void deleteSecretVersions(final String mount, final String key, final int... versions)
-        throws VaultConnectorException;
-
-    /**
-     * Undelete (restore) secret versions from Vault.
-     * Only available for KV v2 stores.
-     *
-     * @param mount    Secret store mount point (without leading or trailing slash).
-     * @param key      Secret path.
-     * @param versions Versions of the secret to undelete.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    void undeleteSecretVersions(final String mount, final String key, final int... versions)
-        throws VaultConnectorException;
-
-    /**
-     * Destroy secret versions from Vault.
-     * Only available for KV v2 stores.
-     *
-     * @param mount    Secret store mount point (without leading or trailing slash).
-     * @param key      Secret path.
-     * @param versions Versions of the secret to destroy.
-     * @throws VaultConnectorException on error
-     * @since 0.8
-     */
-    void destroySecretVersions(final String mount, final String key, final int... versions)
-        throws VaultConnectorException;
-
-    /**
      * Revoke given lease immediately.
      *
      * @param leaseID the lease ID
@@ -582,170 +180,44 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     SecretResponse renew(final String leaseID, final Integer increment) throws VaultConnectorException;
 
     /**
-     * Create a new token.
+     * Get client for KV v2 API.
      *
-     * @param token the token
-     * @return the result response
-     * @throws VaultConnectorException on error
+     * @return KV v2 client
+     * @since 2.0.0
      */
-    AuthResponse createToken(final Token token) throws VaultConnectorException;
+    KV2Client kv2();
 
     /**
-     * Create a new token.
+     * Get client for token API.
      *
-     * @param token  the token
-     * @param orphan create orphan token
-     * @return the result response
-     * @throws VaultConnectorException on error
+     * @return Token client
+     * @since 2.0.0
      */
-    AuthResponse createToken(final Token token, boolean orphan) throws VaultConnectorException;
+    TokenClient token();
 
     /**
-     * Create a new token for specific role.
+     * Get client for AppRole API.
      *
-     * @param token the token
-     * @param role  the role name
-     * @return the result response
-     * @throws VaultConnectorException on error
+     * @return AppRole client
+     * @since 2.0.0
      */
-    AuthResponse createToken(final Token token, final String role) throws VaultConnectorException;
+    AppRoleClient appRole();
 
     /**
-     * Lookup token information.
+     * Get client for transit API.
      *
-     * @param token the token
-     * @return the result response
-     * @throws VaultConnectorException on error
+     * @return Transit client
+     * @since 2.0.0
      */
-    TokenResponse lookupToken(final String token) throws VaultConnectorException;
+    TransitClient transit();
 
     /**
-     * Create a new or update an existing token role.
+     * Get client for system API.
      *
-     * @param role the role entity (name must be set)
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.9
+     * @return System client
+     * @since 2.0.0
      */
-    default boolean createOrUpdateTokenRole(final TokenRole role) throws VaultConnectorException {
-        return createOrUpdateTokenRole(role.getName(), role);
-    }
-
-    /**
-     * Create a new or update an existing token role.
-     *
-     * @param name the role name (overrides name possibly set in role entity)
-     * @param role the role entity
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.9
-     */
-    boolean createOrUpdateTokenRole(final String name, final TokenRole role) throws VaultConnectorException;
-
-    /**
-     * Lookup token information.
-     *
-     * @param name the role name
-     * @return the result response
-     * @throws VaultConnectorException on error
-     * @since 0.9
-     */
-    TokenRoleResponse readTokenRole(final String name) throws VaultConnectorException;
-
-    /**
-     * List available token roles from Vault.
-     *
-     * @return List of token roles
-     * @throws VaultConnectorException on error
-     * @since 0.9
-     */
-    List<String> listTokenRoles() throws VaultConnectorException;
-
-    /**
-     * Delete a token role.
-     *
-     * @param name the role name to delete
-     * @return {@code true} on success
-     * @throws VaultConnectorException on error
-     * @since 0.9
-     */
-    boolean deleteTokenRole(final String name) throws VaultConnectorException;
-
-    /**
-     * Encrypt plaintext via transit engine from Vault.
-     *
-     * @param keyName   Transit key name
-     * @param plaintext Text to encrypt (Base64 encoded)
-     * @return Transit response
-     * @throws VaultConnectorException on error
-     * @since 1.5.0
-     */
-    TransitResponse transitEncrypt(final String keyName, final String plaintext) throws VaultConnectorException;
-
-    /**
-     * Encrypt plaintext via transit engine from Vault.
-     *
-     * @param keyName   Transit key name
-     * @param plaintext Binary data to encrypt
-     * @return Transit response
-     * @throws VaultConnectorException on error
-     * @since 1.5.0
-     */
-    default TransitResponse transitEncrypt(final String keyName, final byte[] plaintext)
-        throws VaultConnectorException {
-        return transitEncrypt(keyName, Base64.getEncoder().encodeToString(plaintext));
-    }
-
-    /**
-     * Decrypt ciphertext via transit engine from Vault.
-     *
-     * @param keyName    Transit key name
-     * @param ciphertext Text to decrypt
-     * @return Transit response
-     * @throws VaultConnectorException on error
-     * @since 1.5.0
-     */
-    TransitResponse transitDecrypt(final String keyName, final String ciphertext) throws VaultConnectorException;
-
-    /**
-     * Hash data in hex format via transit engine from Vault.
-     *
-     * @param algorithm Specifies the hash algorithm to use
-     * @param input     Data to hash
-     * @return Transit response
-     * @throws VaultConnectorException on error
-     * @since 1.5.0
-     */
-    default TransitResponse transitHash(final String algorithm, final String input) throws VaultConnectorException {
-        return transitHash(algorithm, input, "hex");
-    }
-
-    /**
-     * Hash data via transit engine from Vault.
-     *
-     * @param algorithm Specifies the hash algorithm to use
-     * @param input     Data to hash (Base64 encoded)
-     * @param format    Specifies the output encoding (hex/base64)
-     * @return Transit response
-     * @throws VaultConnectorException on error
-     * @since 1.5.0
-     */
-    TransitResponse transitHash(final String algorithm, final String input, final String format)
-        throws VaultConnectorException;
-
-    /**
-     * Hash data via transit engine from Vault.
-     *
-     * @param algorithm Specifies the hash algorithm to use
-     * @param input     Data to hash
-     * @return Transit response
-     * @throws VaultConnectorException on error
-     * @since 1.5.0
-     */
-    default TransitResponse transitHash(final String algorithm, final byte[] input, final String format)
-        throws VaultConnectorException {
-        return transitHash(algorithm, Base64.getEncoder().encodeToString(input), format);
-    }
+    SysClient sys();
 
     /**
      * Read credentials for database backends.
@@ -760,4 +232,5 @@ public interface VaultConnector extends AutoCloseable, Serializable {
         throws VaultConnectorException {
         return (CredentialsResponse) read(mount + "/creds/" + role);
     }
+
 }

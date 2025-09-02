@@ -54,51 +54,51 @@ class HTTPVaultConnectorTest {
      */
     @Test
     void requestExceptionTest(WireMockRuntimeInfo wireMock) throws IOException, URISyntaxException {
-        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build();
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build()) {
+            // Test invalid response code.
+            final int responseCode = 400;
+            mockHttpResponse(responseCode, "", "application/json");
+            VaultConnectorException e = assertThrows(
+                InvalidResponseException.class,
+                () -> connector.sys().getHealth(),
+                "Querying health status succeeded on invalid instance"
+            );
+            assertEquals("Invalid response code", e.getMessage(), "Unexpected exception message");
+            assertEquals(responseCode, ((InvalidResponseException) e).getStatusCode(), "Unexpected status code in exception");
+            assertNull(((InvalidResponseException) e).getResponse(), "Response message where none was expected");
 
-        // Test invalid response code.
-        final int responseCode = 400;
-        mockHttpResponse(responseCode, "", "application/json");
-        VaultConnectorException e = assertThrows(
-            InvalidResponseException.class,
-            connector::getHealth,
-            "Querying health status succeeded on invalid instance"
-        );
-        assertEquals("Invalid response code", e.getMessage(), "Unexpected exception message");
-        assertEquals(responseCode, ((InvalidResponseException) e).getStatusCode(), "Unexpected status code in exception");
-        assertNull(((InvalidResponseException) e).getResponse(), "Response message where none was expected");
-
-        // Simulate permission denied response.
-        mockHttpResponse(responseCode, "{\"errors\":[\"permission denied\"]}", "application/json");
-        assertThrows(
-            PermissionDeniedException.class,
-            connector::getHealth,
-            "Querying health status succeeded on invalid instance"
-        );
+            // Simulate permission denied response.
+            mockHttpResponse(responseCode, "{\"errors\":[\"permission denied\"]}", "application/json");
+            assertThrows(
+                PermissionDeniedException.class,
+                () -> connector.sys().getHealth(),
+                "Querying health status succeeded on invalid instance"
+            );
+        }
 
         // Test exception thrown during request.
-        try (ServerSocket s = new ServerSocket(0)) {
-            connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort() + "/").withTimeout(250).build();
+        try (ServerSocket s = new ServerSocket(0);
+             var connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort() + "/").withTimeout(250).build()) {
+            var e = assertThrows(
+                ConnectionException.class,
+                () -> connector.sys().getHealth(),
+                "Querying health status succeeded on invalid instance"
+            );
+            assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
+            assertInstanceOf(IOException.class, e.getCause(), "Unexpected cause");
         }
-        e = assertThrows(
-            ConnectionException.class,
-            connector::getHealth,
-            "Querying health status succeeded on invalid instance"
-        );
-        assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
-        assertInstanceOf(IOException.class, e.getCause(), "Unexpected cause");
 
         // Now simulate a failing request that succeeds on second try.
-        connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withNumberOfRetries(1).withTimeout(250).build();
-
-        stubFor(
-            WireMock.any(anyUrl())
-                .willReturn(aResponse().withStatus(500))
-                .willReturn(aResponse().withStatus(500))
-                .willReturn(aResponse().withStatus(500))
-                .willReturn(aResponse().withStatus(200).withBody("{}").withHeader("Content-Type", "application/json"))
-        );
-        assertDoesNotThrow(connector::getHealth, "Request failed unexpectedly");
+        try (var connector3 = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withNumberOfRetries(1).withTimeout(250).build()) {
+            stubFor(
+                WireMock.any(anyUrl())
+                    .willReturn(aResponse().withStatus(500))
+                    .willReturn(aResponse().withStatus(500))
+                    .willReturn(aResponse().withStatus(500))
+                    .willReturn(aResponse().withStatus(200).withBody("{}").withHeader("Content-Type", "application/json"))
+            );
+            assertDoesNotThrow(() -> connector3.sys().getHealth(), "Request failed unexpectedly");
+        }
     }
 
     /**
@@ -160,7 +160,7 @@ class HTTPVaultConnectorTest {
         }
         ConnectionException e = assertThrows(
             ConnectionException.class,
-            connector::sealStatus,
+            () -> connector.sys().sealStatus(),
             "Querying seal status succeeded on invalid instance"
         );
         assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
@@ -178,7 +178,7 @@ class HTTPVaultConnectorTest {
         }
         ConnectionException e = assertThrows(
             ConnectionException.class,
-            connector::getHealth,
+            () -> connector.sys().getHealth(),
             "Querying health status succeeded on invalid instance"
         );
         assertEquals("Unable to connect to Vault server", e.getMessage(), "Unexpected exception message");
@@ -196,21 +196,21 @@ class HTTPVaultConnectorTest {
         mockHttpResponse(200, "invalid", "application/json");
 
         // Now test the methods.
-        assertParseError(connector::sealStatus, "sealStatus() succeeded on invalid instance");
-        assertParseError(() -> connector.unseal("key"), "unseal() succeeded on invalid instance");
-        assertParseError(connector::getHealth, "getHealth() succeeded on invalid instance");
-        assertParseError(connector::getAuthBackends, "getAuthBackends() succeeded on invalid instance");
+        assertParseError(() -> connector.sys().sealStatus(), "sys().sealStatus() succeeded on invalid instance");
+        assertParseError(() -> connector.sys().unseal("key"), "sys().unseal() succeeded on invalid instance");
+        assertParseError(() -> connector.sys().getHealth(), "sys().getHealth() succeeded on invalid instance");
+        assertParseError(() -> connector.sys().getAuthBackends(), "sys().getAuthBackends() succeeded on invalid instance");
         assertParseError(() -> connector.authToken("token"), "authToken() succeeded on invalid instance");
-        assertParseError(() -> connector.lookupAppRole("roleName"), "lookupAppRole() succeeded on invalid instance");
-        assertParseError(() -> connector.getAppRoleID("roleName"), "getAppRoleID() succeeded on invalid instance");
-        assertParseError(() -> connector.createAppRoleSecret("roleName"), "createAppRoleSecret() succeeded on invalid instance");
-        assertParseError(() -> connector.lookupAppRoleSecret("roleName", "secretID"), "lookupAppRoleSecret() succeeded on invalid instance");
-        assertParseError(connector::listAppRoles, "listAppRoles() succeeded on invalid instance");
-        assertParseError(() -> connector.listAppRoleSecrets("roleName"), "listAppRoleSecrets() succeeded on invalid instance");
+        assertParseError(() -> connector.appRole().lookup("roleName"), "appRole().lookup() succeeded on invalid instance");
+        assertParseError(() -> connector.appRole().getRoleID("roleName"), "appRole().getRoleID() succeeded on invalid instance");
+        assertParseError(() -> connector.appRole().createSecret("roleName"), "appRole().createSecret() succeeded on invalid instance");
+        assertParseError(() -> connector.appRole().lookupSecret("roleName", "secretID"), "appRole().lookupSecret() succeeded on invalid instance");
+        assertParseError(() -> connector.appRole().listRoles(), "appRole().listRoles() succeeded on invalid instance");
+        assertParseError(() -> connector.appRole().listSecrets("roleName"), "appRole().listSecrets() succeeded on invalid instance");
         assertParseError(() -> connector.read("key"), "read() succeeded on invalid instance");
         assertParseError(() -> connector.list("path"), "list() succeeded on invalid instance");
         assertParseError(() -> connector.renew("leaseID"), "renew() succeeded on invalid instance");
-        assertParseError(() -> connector.lookupToken("token"), "lookupToken() succeeded on invalid instance");
+        assertParseError(() -> connector.token().lookup("token"), "token().lookup() succeeded on invalid instance");
     }
 
     private void assertParseError(Executable executable, String message) {
@@ -232,32 +232,32 @@ class HTTPVaultConnectorTest {
         // Now test the methods expecting a 204.
         assertThrows(
             InvalidResponseException.class,
-            () -> connector.createAppRole("appID", Collections.singletonList("policy")),
-            "createAppRole() with 200 response succeeded"
+            () -> connector.appRole().create("appID", Collections.singletonList("policy")),
+            "appRole().create() with 200 response succeeded"
         );
 
         assertThrows(
             InvalidResponseException.class,
-            () -> connector.deleteAppRole("roleName"),
-            "deleteAppRole() with 200 response succeeded"
+            () -> connector.delete("roleName"),
+            "appRole().delete() with 200 response succeeded"
         );
 
         assertThrows(
             InvalidResponseException.class,
-            () -> connector.setAppRoleID("roleName", "roleID"),
-            "setAppRoleID() with 200 response succeeded"
+            () -> connector.appRole().setRoleID("roleName", "roleID"),
+            "appRole().setRoleID() with 200 response succeeded"
         );
 
         assertThrows(
             InvalidResponseException.class,
-            () -> connector.destroyAppRoleSecret("roleName", "secretID"),
-            "destroyAppRoleSecret() with 200 response succeeded"
+            () -> connector.appRole().destroySecret("roleName", "secretID"),
+            "appRole().destroySecret() with 200 response succeeded"
         );
 
         assertThrows(
             InvalidResponseException.class,
-            () -> connector.destroyAppRoleSecret("roleName", "secretUD"),
-            "destroyAppRoleSecret() with 200 response succeeded"
+            () -> connector.appRole().destroySecret("roleName", "secretUD"),
+            "appRole().destroySecret() with 200 response succeeded"
         );
 
         assertThrows(

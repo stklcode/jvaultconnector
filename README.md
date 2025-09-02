@@ -109,11 +109,11 @@ Token token = Token.builder()
                    .withDisplayName("new test token")
                    .withPolicies("pol1", "pol2")
                    .build();
-vault.createToken(token);
+vault.token().create(token);
 
 // Create AppRole credentials
-vault.createAppRole("testrole", policyList);
-AppRoleSecretResponse secret = vault.createAppRoleSecret("testrole");
+vault.appRole().create("testrole", policyList);
+AppRoleSecretResponse secret = vault.appRole().createSecret("testrole");
 ```
 
 ## Links
