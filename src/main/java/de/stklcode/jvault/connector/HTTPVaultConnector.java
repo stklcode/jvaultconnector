@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static de.stklcode.jvault.connector.internal.RequestHelper.encode;
 import static de.stklcode.jvault.connector.internal.VaultApiPath.*;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
@@ -170,7 +171,7 @@ public class HTTPVaultConnector implements VaultConnector {
     public final AuthResponse authUserPass(final String username, final String password)
         throws VaultConnectorException {
         final Map<String, String> payload = singletonMap("password", password);
-        return queryAuth(AUTH_USERPASS_LOGIN + username, payload);
+        return queryAuth(AUTH_USERPASS_LOGIN + encode(username), payload);
     }
 
     @Override
@@ -179,7 +180,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "role_id", roleID,
             "secret_id", secretID
         );
-        return queryAuth(AUTH_APPROLE + LOGIN, payload);
+        return queryAuth(AUTH_APPROLE + "login", payload);
     }
 
     /**
@@ -207,7 +208,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(String.format(AUTH_APPROLE_ROLE, role.getName(), ""), role, token);
+        request.postWithoutResponse(AUTH_APPROLE_ROLE + encode(role.getName()), role, token);
 
         /* Set custom ID if provided */
         return !(role.getId() != null && !role.getId().isEmpty()) || setAppRoleID(role.getName(), role.getId());
@@ -218,7 +219,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
         /* Request HTTP response and parse Secret */
         return request.get(
-            String.format(AUTH_APPROLE_ROLE, roleName, ""),
+            AUTH_APPROLE_ROLE + encode(roleName),
             emptyMap(),
             token,
             AppRoleResponse.class
@@ -230,7 +231,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.deleteWithoutResponse(String.format(AUTH_APPROLE_ROLE, roleName, ""), token);
+        request.deleteWithoutResponse(AUTH_APPROLE_ROLE + encode(roleName), token);
 
         return true;
     }
@@ -240,7 +241,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
         /* Issue request, parse response and extract Role ID */
         return request.get(
-            String.format(AUTH_APPROLE_ROLE, roleName, "/role-id"),
+            AUTH_APPROLE_ROLE + encode(roleName) + "/role-id",
             emptyMap(),
             token,
             RawDataResponse.class
@@ -253,7 +254,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(
-            String.format(AUTH_APPROLE_ROLE, roleName, "/role-id"),
+            AUTH_APPROLE_ROLE + encode(roleName) + "/role-id",
             singletonMap("role_id", roleID),
             token
         );
@@ -268,14 +269,14 @@ public class HTTPVaultConnector implements VaultConnector {
 
         if (secret.getId() != null && !secret.getId().isEmpty()) {
             return request.post(
-                String.format(AUTH_APPROLE_ROLE, roleName, "/custom-secret-id"),
+                AUTH_APPROLE_ROLE + encode(roleName) + "/custom-secret-id",
                 secret,
                 token,
                 AppRoleSecretResponse.class
             );
         } else {
             return request.post(
-                String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id"),
+                AUTH_APPROLE_ROLE + encode(roleName) + "/secret-id",
                 secret, token,
                 AppRoleSecretResponse.class
             );
@@ -289,7 +290,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and parse secret response */
         return request.post(
-            String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id/lookup"),
+            AUTH_APPROLE_ROLE + encode(roleName) + "/secret-id/lookup",
             new AppRoleSecret(secretID),
             token,
             AppRoleSecretResponse.class
@@ -303,7 +304,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         /* Issue request and expect code 204 with empty response */
         request.postWithoutResponse(
-            String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id/destroy"),
+            AUTH_APPROLE_ROLE + encode(roleName) + "/secret-id/destroy",
             new AppRoleSecret(secretID),
             token);
 
@@ -315,7 +316,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         SecretListResponse secrets = request.get(
-            AUTH_APPROLE + "/role?list=true",
+            AUTH_APPROLE + "role?list=true",
             emptyMap(),
             token,
             SecretListResponse.class
@@ -329,7 +330,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         SecretListResponse secrets = request.get(
-            String.format(AUTH_APPROLE_ROLE, roleName, "/secret-id?list=true"),
+            AUTH_APPROLE_ROLE + encode(roleName) + "/secret-id?list=true",
             emptyMap(),
             token,
             SecretListResponse.class
@@ -502,7 +503,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.putWithoutResponse(SYS_LEASES_REVOKE + leaseID, emptyMap(), token);
+        request.putWithoutResponse(SYS_LEASES_REVOKE + encode(leaseID), emptyMap(), token);
     }
 
     @Override
@@ -533,7 +534,7 @@ public class HTTPVaultConnector implements VaultConnector {
         if (role == null || role.isEmpty()) {
             throw new InvalidRequestException("No role name specified.");
         }
-        return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE + "/" + role);
+        return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE + "/" + encode(role));
     }
 
     @Override
@@ -586,7 +587,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Issue request and expect code 204 with empty response.
-        request.postWithoutResponse(AUTH_TOKEN + TOKEN_ROLES + "/" + name, role, token);
+        request.postWithoutResponse(AUTH_TOKEN + TOKEN_ROLES + "/" + encode(name), role, token);
 
         return true;
     }
@@ -596,7 +597,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         // Request HTTP response and parse response.
-        return request.get(AUTH_TOKEN + TOKEN_ROLES + "/" + name, emptyMap(), token, TokenRoleResponse.class);
+        return request.get(AUTH_TOKEN + TOKEN_ROLES + "/" + encode(name), emptyMap(), token, TokenRoleResponse.class);
     }
 
     @Override
@@ -615,7 +616,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         // Issue request and expect code 204 with empty response.
-        request.deleteWithoutResponse(AUTH_TOKEN + TOKEN_ROLES + "/" + name, token);
+        request.deleteWithoutResponse(AUTH_TOKEN + TOKEN_ROLES + "/" + encode(name), token);
 
         return true;
     }
@@ -629,7 +630,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "plaintext", plaintext
         );
 
-        return request.post(TRANSIT_ENCRYPT + keyName, payload, token, TransitResponse.class);
+        return request.post(TRANSIT_ENCRYPT + encode(keyName), payload, token, TransitResponse.class);
     }
 
     @Override
@@ -641,7 +642,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "ciphertext", ciphertext
         );
 
-        return request.post(TRANSIT_DECRYPT + keyName, payload, token, TransitResponse.class);
+        return request.post(TRANSIT_DECRYPT + encode(keyName), payload, token, TransitResponse.class);
     }
 
     @Override
@@ -658,7 +659,7 @@ public class HTTPVaultConnector implements VaultConnector {
             "format", format
         );
 
-        return request.post(TRANSIT_HASH + algorithm, payload, token, TransitResponse.class);
+        return request.post(TRANSIT_HASH + encode(algorithm), payload, token, TransitResponse.class);
     }
 
     /**

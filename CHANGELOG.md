@@ -5,6 +5,7 @@
 
 ### Improvements
 * Extract API paths into a utility class (#108)
+* Encode user-provided URL parts (#109)
 
 ### Fix
 * Prevent potential off-by-1 error in internal `mapOf()` helper (#107)

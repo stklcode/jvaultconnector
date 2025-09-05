@@ -40,8 +40,8 @@ public final class VaultApiPath {
     // Auth paths
     public static final String AUTH_TOKEN = AUTH + "/token";
     public static final String AUTH_USERPASS_LOGIN = AUTH + "/userpass/login/";
-    public static final String AUTH_APPROLE = AUTH + "/approle";
-    public static final String AUTH_APPROLE_ROLE = AUTH_APPROLE + "/role/%s%s";
+    public static final String AUTH_APPROLE = AUTH + "/approle/";
+    public static final String AUTH_APPROLE_ROLE = AUTH_APPROLE + "role/";
 
     // Token operations
     public static final String TOKEN_LOOKUP = "/lookup";
@@ -56,9 +56,6 @@ public final class VaultApiPath {
     public static final String SECRET_DELETE = "/delete/";
     public static final String SECRET_UNDELETE = "/undelete/";
     public static final String SECRET_DESTROY = "/destroy/";
-
-    // Generic paths
-    public static final String LOGIN = "/login";
 
     // Transit engine paths
     public static final String TRANSIT_ENCRYPT = TRANSIT + "/encrypt/";

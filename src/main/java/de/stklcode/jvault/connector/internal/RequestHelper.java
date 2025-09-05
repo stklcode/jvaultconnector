@@ -25,6 +25,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
@@ -263,9 +264,9 @@ public final class RequestHelper implements Serializable {
 
         if (!payload.isEmpty()) {
             uriBuilder.append("?").append(
-                payload.entrySet().stream().map(par ->
-                    URLEncoder.encode(par.getKey(), UTF_8) + "=" + URLEncoder.encode(par.getValue(), UTF_8)
-                ).collect(Collectors.joining("&"))
+                payload.entrySet().stream()
+                    .map(par -> encode(par.getKey()) + "=" + encode(par.getValue()))
+                    .collect(Collectors.joining("&"))
             );
         }
 
@@ -305,6 +306,17 @@ public final class RequestHelper implements Serializable {
         } catch (IOException e) {
             throw new InvalidResponseException(Error.PARSE_RESPONSE, e);
         }
+    }
+
+    /**
+     * Encode URL part.
+     *
+     * @param part Path part to URL-encode and insert into the template
+     * @return Encoded URL part
+     * @since 1.5.3
+     */
+    public static String encode(final String part) {
+        return URLEncoder.encode(Objects.requireNonNullElse(part, ""), UTF_8);
     }
 
     /**
