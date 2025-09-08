@@ -39,6 +39,7 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         "number", 1337
     );
     private static final List<String> TEST_CIDR = List.of("203.0.113.0/24", "198.51.100.0/24");
+    private static final List<String> TEST_TOKEN_CIDR = List.of("192.0.2.0/24", "198.51.100.0/24");
 
     AppRoleSecretTest() {
         super(AppRoleSecret.class);
@@ -61,6 +62,8 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         assertNull(secret.getMetadata());
         assertNull(secret.getCidrList());
         assertEquals("", secret.getCidrListString());
+        assertNull(secret.getTokenBoundCidrs());
+        assertEquals("", secret.getTokenBoundCidrsString());
         assertNull(secret.getCreationTime());
         assertNull(secret.getExpirationTime());
         assertNull(secret.getLastUpdatedTime());
@@ -74,6 +77,8 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         assertNull(secret.getMetadata());
         assertNull(secret.getCidrList());
         assertEquals("", secret.getCidrListString());
+        assertNull(secret.getTokenBoundCidrs());
+        assertEquals("", secret.getTokenBoundCidrsString());
         assertNull(secret.getCreationTime());
         assertNull(secret.getExpirationTime());
         assertNull(secret.getLastUpdatedTime());
@@ -87,6 +92,8 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         assertEquals(TEST_META, secret.getMetadata());
         assertEquals(TEST_CIDR, secret.getCidrList());
         assertEquals(String.join(",", TEST_CIDR), secret.getCidrListString());
+        assertNull(secret.getTokenBoundCidrs());
+        assertEquals("", secret.getTokenBoundCidrsString());
         assertNull(secret.getCreationTime());
         assertNull(secret.getExpirationTime());
         assertNull(secret.getLastUpdatedTime());
@@ -108,6 +115,15 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         secret.setCidrList(null);
         assertNull(secret.getCidrList());
         assertEquals("", secret.getCidrListString());
+
+        assertNull(secret.getTokenBoundCidrs());
+        assertEquals("", secret.getTokenBoundCidrsString());
+        secret.setTokenBoundCidrs(TEST_TOKEN_CIDR);
+        assertEquals(TEST_TOKEN_CIDR, secret.getTokenBoundCidrs());
+        assertEquals(String.join(",", TEST_TOKEN_CIDR), secret.getTokenBoundCidrsString());
+        secret.setTokenBoundCidrs(null);
+        assertNull(secret.getTokenBoundCidrs());
+        assertEquals("", secret.getTokenBoundCidrsString());
     }
 
     /**
@@ -159,7 +175,8 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
 
         // Those fields should be deserialized from JSON though.
         String secretJson4 = "{\"secret_id\":\"abc123\",\"metadata\":{\"number\":1337,\"foo\":\"bar\"}," +
-            "\"cidr_list\":[\"203.0.113.0/24\",\"198.51.100.0/24\"],\"secret_id_accessor\":\"TEST_ACCESSOR\"," +
+            "\"cidr_list\":[\"203.0.113.0/24\",\"198.51.100.0/24\"],\"cidr_list\":[\"192.0.2.0/24\",\"198.51.100.0/24\"]," +
+            "\"secret_id_accessor\":\"TEST_ACCESSOR\"," +
             "\"creation_time\":\"TEST_CREATION\",\"expiration_time\":\"TEST_EXPIRATION\"," +
             "\"last_updated_time\":\"TEST_LASTUPDATE\",\"secret_id_num_uses\":678,\"secret_id_ttl\":12345}";
         secret2 = assertDoesNotThrow(() -> objectMapper.readValue(secretJson4, AppRoleSecret.class), "Deserialization failed");
@@ -181,6 +198,7 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
 
     private static String commaSeparatedToList(String json) {
         return json.replaceAll("\"cidr_list\":\"([^\"]*)\"", "\"cidr_list\":[$1]")
+            .replaceAll("\"token_bound_cidrs\":\"([^\"]*)\"", "\"token_bound_cidrs\":[$1]")
             .replaceAll("(\\d+\\.\\d+\\.\\d+\\.\\d+/\\d+)", "\"$1\"");
     }
 }

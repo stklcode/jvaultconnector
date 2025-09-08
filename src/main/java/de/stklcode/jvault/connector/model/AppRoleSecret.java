@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AppRoleSecret implements Serializable {
-    private static final long serialVersionUID = -3401074170145792641L;
+    private static final long serialVersionUID = 3079272087137299819L;
 
     @JsonProperty("secret_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -46,6 +46,8 @@ public final class AppRoleSecret implements Serializable {
     private Map<String, Object> metadata;
 
     private List<String> cidrList;
+
+    private List<String> tokenBoundCidrs;
 
     @JsonProperty(value = "creation_time", access = JsonProperty.Access.WRITE_ONLY)
     private String creationTime;
@@ -138,6 +140,36 @@ public final class AppRoleSecret implements Serializable {
     }
 
     /**
+     * @return list of bound CIDR subnets of associated tokens
+     * @since 1.5.3
+     */
+    public List<String> getTokenBoundCidrs() {
+        return tokenBoundCidrs;
+    }
+
+    /**
+     * @param boundCidrList list of subnets in CIDR notation to bind role to
+     * @since 1.5.3
+     */
+    @JsonSetter("token_bound_cidrs")
+    public void setTokenBoundCidrs(final List<String> boundCidrList) {
+        this.tokenBoundCidrs = boundCidrList;
+    }
+
+    /**
+     * @return list of subnets in CIDR notation as comma-separated {@link String}
+     * @since 1.5.3
+     */
+    @JsonGetter("token_bound_cidrs")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public String getTokenBoundCidrsString() {
+        if (tokenBoundCidrs == null || tokenBoundCidrs.isEmpty()) {
+            return "";
+        }
+        return String.join(",", tokenBoundCidrs);
+    }
+
+    /**
      * @return Creation time
      */
     public String getCreationTime() {
@@ -184,6 +216,7 @@ public final class AppRoleSecret implements Serializable {
             Objects.equals(accessor, that.accessor) &&
             Objects.equals(metadata, that.metadata) &&
             Objects.equals(cidrList, that.cidrList) &&
+            Objects.equals(tokenBoundCidrs, that.tokenBoundCidrs) &&
             Objects.equals(creationTime, that.creationTime) &&
             Objects.equals(expirationTime, that.expirationTime) &&
             Objects.equals(lastUpdatedTime, that.lastUpdatedTime) &&
@@ -193,7 +226,7 @@ public final class AppRoleSecret implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, accessor, metadata, cidrList, creationTime, expirationTime, lastUpdatedTime, numUses,
-            ttl);
+        return Objects.hash(id, accessor, metadata, cidrList, tokenBoundCidrs, creationTime, expirationTime,
+            lastUpdatedTime, numUses, ttl);
     }
 }

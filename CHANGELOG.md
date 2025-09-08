@@ -6,6 +6,7 @@
 ### Improvements
 * Extract API paths into a utility class (#108)
 * Encode user-provided URL parts (#109)
+* Add `token_bound_cidrs` field to `AppRoleSecret` model (#110)
 
 ### Fix
 * Prevent potential off-by-1 error in internal `mapOf()` helper (#107)
