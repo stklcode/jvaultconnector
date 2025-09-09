@@ -1,4 +1,4 @@
-## unreleased
+## 1.5.3 (2025-09-09)
 
 ### Dependencies
 * Updated Jackson to 2.20.0 (#106)
@@ -10,6 +10,7 @@
 
 ### Fix
 * Prevent potential off-by-1 error in internal `mapOf()` helper (#107)
+
 
 ## 1.5.2 (2025-07-16)
 
