@@ -93,8 +93,8 @@ public abstract class SecretResponse extends VaultDataResponse {
                     .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                     .build();
 
-                if (rawValue instanceof String) {
-                    return om.readValue((String) rawValue, type);
+                if (rawValue instanceof String stringValue) {
+                    return om.readValue(stringValue, type);
                 } else {
                     return om.readValue(om.writeValueAsString(rawValue), type);
                 }
