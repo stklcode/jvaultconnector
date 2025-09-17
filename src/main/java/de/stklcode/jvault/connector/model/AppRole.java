@@ -19,7 +19,6 @@ package de.stklcode.jvault.connector.model;
 import com.fasterxml.jackson.annotation.*;
 
 import java.io.Serial;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
