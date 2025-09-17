@@ -3,6 +3,9 @@
 ### Breaking
 * Requires Java 17 or later (#100) (#111)
 
+### Removal
+* Remove deprecated `read...Credentials()` methods (#112)
+
 
 ## 1.5.3 (2025-09-09)
 

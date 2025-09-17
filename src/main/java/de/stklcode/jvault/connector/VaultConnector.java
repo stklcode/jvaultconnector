@@ -748,62 +748,6 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     }
 
     /**
-     * Read credentials for MySQL backend at default mount point.
-     *
-     * @param role the role name
-     * @return the credentials response
-     * @throws VaultConnectorException on error
-     * @since 0.5.0
-     * @deprecated use {@link #readDbCredentials(String, String)} your MySQL mountpoint
-     */
-    @Deprecated(since = "1.5.0", forRemoval = true)
-    default CredentialsResponse readMySqlCredentials(final String role) throws VaultConnectorException {
-        return readDbCredentials(role, "mysql");
-    }
-
-    /**
-     * Read credentials for PostgreSQL backend at default mount point.
-     *
-     * @param role the role name
-     * @return the credentials response
-     * @throws VaultConnectorException on error
-     * @since 0.5.0
-     * @deprecated use {@link #readDbCredentials(String, String)} your PostgreSQL mountpoint
-     */
-    @Deprecated(since = "1.5.0", forRemoval = true)
-    default CredentialsResponse readPostgreSqlCredentials(final String role) throws VaultConnectorException {
-        return readDbCredentials(role, "postgresql");
-    }
-
-    /**
-     * Read credentials for MSSQL backend at default mount point.
-     *
-     * @param role the role name
-     * @return the credentials response
-     * @throws VaultConnectorException on error
-     * @since 0.5.0
-     * @deprecated use {@link #readDbCredentials(String, String)} your MSSQL mountpoint
-     */
-    @Deprecated(since = "1.5.0", forRemoval = true)
-    default CredentialsResponse readMsSqlCredentials(final String role) throws VaultConnectorException {
-        return readDbCredentials(role, "mssql");
-    }
-
-    /**
-     * Read credentials for MongoDB backend at default mount point.
-     *
-     * @param role the role name
-     * @return the credentials response
-     * @throws VaultConnectorException on error
-     * @since 0.5.0
-     * @deprecated use {@link #readDbCredentials(String, String)} your MongoDB mountpoint
-     */
-    @Deprecated(since = "1.5.0", forRemoval = true)
-    default CredentialsResponse readMongoDbCredentials(final String role) throws VaultConnectorException {
-        return readDbCredentials(role, "mongodb");
-    }
-
-    /**
      * Read credentials for database backends.
      *
      * @param role  the role name
