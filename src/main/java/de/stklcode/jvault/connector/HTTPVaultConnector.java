@@ -29,7 +29,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static de.stklcode.jvault.connector.internal.RequestHelper.encode;
 import static de.stklcode.jvault.connector.internal.VaultApiPath.*;
@@ -153,7 +152,7 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Issue request and parse response */
         AuthMethodsResponse amr = request.get(SYS_AUTH, emptyMap(), token, AuthMethodsResponse.class);
 
-        return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).collect(Collectors.toList());
+        return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).toList();
     }
 
     @Override
@@ -685,8 +684,8 @@ public class HTTPVaultConnector implements VaultConnector {
         for (int i = 0; i < keyValues.length - 1; i = i + 2) {
             Object key = keyValues[i];
             Object val = keyValues[i + 1];
-            if (key instanceof String && val != null) {
-                map.put((String) key, val.toString());
+            if (key instanceof String keyStr && val != null) {
+                map.put(keyStr, val.toString());
             }
         }
 
@@ -704,8 +703,8 @@ public class HTTPVaultConnector implements VaultConnector {
         for (int i = 0; i < keyValues.length - 1; i = i + 2) {
             Object key = keyValues[i];
             Object val = keyValues[i + 1];
-            if (key instanceof String && val != null) {
-                map.put((String) key, val);
+            if (key instanceof String keyStr && val != null) {
+                map.put(keyStr, val);
             }
         }
 
