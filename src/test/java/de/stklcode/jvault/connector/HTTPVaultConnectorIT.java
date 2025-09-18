@@ -52,7 +52,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @since 0.1
  */
 class HTTPVaultConnectorIT {
-    private static String VAULT_VERSION = "1.21.0";  // The vault version this test is supposed to run against.
+    private static String VAULT_VERSION = "1.21.3";  // The vault version this test is supposed to run against.
     private static final String KEY1 = "+5n9tlpFnTNBAyutYQLT0o5J0AQ6Lt85u2KrEOan4gzb";
     private static final String KEY2 = "4SSSIsllqY+c//t1M9IhBwzVSeBWgh0E0UbjacUD9/5g";
     private static final String KEY3 = "O7AMGCi9Blt7gHHJdFjz1sHZHsUIOnvdFIV+AN2NwCxv";
@@ -1242,7 +1242,7 @@ class HTTPVaultConnectorIT {
                  BufferedReader br = new BufferedReader(reader)) {
                 String line = br.readLine();
                 while (line != null) {
-                    if (line.contains("Vault server started")) {
+                    if (line.contains("server started")) {
                         return true;
                     } else {
                         line = br.readLine();

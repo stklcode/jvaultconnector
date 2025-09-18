@@ -20,6 +20,7 @@
 
 ### Test
 * Tested against Vault 1.3 to 1.21 (#117)
+* Tested against OpenBao 2.5 (#122)
 
 
 ## 1.5.3 (2025-09-09)

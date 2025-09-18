@@ -15,36 +15,57 @@ jobs:
     strategy:
       matrix:
         jdk: [ 17, 21, 25 ]
-        vault: [ '1.3.0', '1.21.0' ]
+        vault: [ '1.3.0', '1.21.3', 'bao-2.5.0' ]
         include:
           - jdk: 21
-            vault: '1.21.0'
+            vault: '1.21.3'
             analysis: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.jdk }}
           distribution: 'temurin'
+
       - name: Compile
         run: ./mvnw -B clean compile
+
       - name: Set up Vault
+        if: ${{ !startsWith(matrix.vault, 'bao') }}
         run: |
-          wget -q "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_linux_amd64.zip"
-          wget -q -O - "https://releases.hashicorp.com/vault/${{ matrix.vault }}/vault_${{ matrix.vault }}_SHA256SUMS" | grep linux_amd64 | sha256sum -c
+          VAULT_VERSION="${{ matrix.vault }}"
+          echo "Installing Vault $VAULT_VERSION ..."
+          wget -q "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip"
+          wget -q -O - "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS" | grep linux_amd64 | sha256sum -c
           tmp="$(mktemp -d)"
-          unzip "vault_${{ matrix.vault }}_linux_amd64.zip" -d "$tmp"
-          rm "vault_${{ matrix.vault }}_linux_amd64.zip"
+          unzip "vault_${VAULT_VERSION}_linux_amd64.zip" -d "$tmp"
+          rm "vault_${VAULT_VERSION}_linux_amd64.zip"
           sudo mv "$tmp/vault" /usr/bin/vault
           rm -rf "$tmp"
+          echo "VAULT_VERSION=${VAULT_VERSION}" | tee -a "$GITHUB_ENV"
+
+      - name: Set up OpenBao
+        if: ${{ startsWith(matrix.vault, 'bao') }}
+        run: |
+          VAULT_VERSION="${{ matrix.vault }}"
+          VAULT_VERSION="${VAULT_VERSION##bao-}"
+          echo "Installing OpenBao $VAULT_VERSION ..."
+          wget -q "https://github.com/openbao/openbao/releases/download/v${VAULT_VERSION}/bao_${VAULT_VERSION}_Linux_x86_64.tar.gz"
+          tmp="$(mktemp -d)"
+          tar -xzf "bao_${VAULT_VERSION}_Linux_x86_64.tar.gz" -C "$tmp"
+          rm "bao_${VAULT_VERSION}_Linux_x86_64.tar.gz"
+          sudo mv "$tmp/bao" /usr/bin/vault
+          rm -rf "$tmp"
+          echo "VAULT_VERSION=${VAULT_VERSION}" | tee -a "$GITHUB_ENV"
+
       - name: Test (Unit & Integration)
-        env:
-          VAULT_VERSION: ${{ matrix.vault }}
         run: ./mvnw -B -P coverage -P integration-test verify
+
       - name: Analysis
         if: matrix.analysis && env.SONAR_TOKEN != ''
         run: >
