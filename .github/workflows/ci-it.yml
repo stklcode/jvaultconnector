@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        jdk: [ 17, 21 ]
+        jdk: [ 17, 21, 25 ]
         vault: [ '1.2.0', '1.20.3' ]
         include:
           - jdk: 21
