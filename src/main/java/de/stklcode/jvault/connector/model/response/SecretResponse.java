@@ -17,14 +17,12 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
@@ -88,9 +86,8 @@ public abstract class SecretResponse extends VaultDataResponse {
                 return type.cast(rawValue);
             } else {
                 var om = JsonMapper.builder()
-                    .addModule(new JavaTimeModule())
-                    .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                    .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                    .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                     .build();
 
                 if (rawValue instanceof String stringValue) {
@@ -99,7 +96,7 @@ public abstract class SecretResponse extends VaultDataResponse {
                     return om.readValue(om.writeValueAsString(rawValue), type);
                 }
             }
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
         }
     }
