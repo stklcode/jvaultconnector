@@ -14,7 +14,7 @@
 * Remove deprecated `read...Credentials()` methods (#112)
 
 ### Dependencies
-* Updated Jackson to 3.0.0 (#116)
+* Updated Jackson to 3.0.1 (#116)
 
 
 ## 1.5.3 (2025-09-09)
