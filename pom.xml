@@ -136,7 +136,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -167,12 +167,12 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.13</version>
+                    <version>0.8.14</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.2.0.4988</version>
+                    <version>5.3.0.6276</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -356,7 +356,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
-                        <version>12.1.6</version>
+                        <version>12.1.9</version>
                         <configuration>
                             <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
                             <nvdDatafeedUrl>${env.NVD_DATAFEED_URL}</nvdDatafeedUrl>
