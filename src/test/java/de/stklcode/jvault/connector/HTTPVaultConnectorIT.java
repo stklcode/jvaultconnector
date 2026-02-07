@@ -53,9 +53,9 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  */
 class HTTPVaultConnectorIT {
     private static String VAULT_VERSION = "1.21.0";  // The vault version this test is supposed to run against.
-    private static final String KEY1 = "E38bkCm0VhUvpdCKGQpcohhD9XmcHJ/2hreOSY019Lho";
-    private static final String KEY2 = "O5OHwDleY3IiPdgw61cgHlhsrEm6tVJkrxhF6QAnILd1";
-    private static final String KEY3 = "mw7Bm3nbt/UWa/juDjjL2EPQ04kiJ0saC5JEXwJvXYsB";
+    private static final String KEY1 = "+5n9tlpFnTNBAyutYQLT0o5J0AQ6Lt85u2KrEOan4gzb";
+    private static final String KEY2 = "4SSSIsllqY+c//t1M9IhBwzVSeBWgh0E0UbjacUD9/5g";
+    private static final String KEY3 = "O7AMGCi9Blt7gHHJdFjz1sHZHsUIOnvdFIV+AN2NwCxv";
     private static final String TOKEN_ROOT = "30ug6wfy2wvlhhe5h7x0pbkx";
     private static final String USER_VALID = "validUser";
     private static final String PASS_VALID = "validPass";

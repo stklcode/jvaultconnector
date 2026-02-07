@@ -2,8 +2,9 @@
 
 ### Breaking
 * Requires Java 17 or later (#100) (#111)
-* Required Jackson 3
+* Requires Jackson 3
 * Modified interface structure
+* Requires Vault 1.3 (#121)
 
 ### Improvements
 * Split client interface to group feature sets together (#113)
@@ -18,7 +19,7 @@
 * Updated Jackson to 3.0.3 (#118)
 
 ### Test
-* Tested against Vault 1.2 to 1.21 (#117)
+* Tested against Vault 1.3 to 1.21 (#117)
 
 
 ## 1.5.3 (2025-09-09)
