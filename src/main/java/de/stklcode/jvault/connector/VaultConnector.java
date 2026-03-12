@@ -220,6 +220,14 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     SysClient sys();
 
     /**
+     * Get client for PKI API.
+     *
+     * @return PKI client
+     * @since 2.0.0
+     */
+    PkiClient pki();
+
+    /**
      * Read credentials for database backends.
      *
      * @param role  the role name

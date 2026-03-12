@@ -253,6 +253,11 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public PkiClientImpl pki() {
+        return new PkiClientImpl();
+    }
+
+    @Override
     public final void close() {
         authorized = false;
         token = null;
@@ -762,6 +767,42 @@ public class HTTPVaultConnector implements VaultConnector {
             AuthMethodsResponse amr = request.get(SYS_AUTH, emptyMap(), token, AuthMethodsResponse.class);
 
             return amr.supportedMethods().values().stream().map(AuthMethod::type).toList();
+        }
+    }
+
+    /**
+     * Sub-client for PKI methods.
+     */
+    public class PkiClientImpl implements PkiClient {
+
+        @Override
+        public PkiResponse generateCertificateAndKey(final String name, final PkiRequest pkiRequest) throws VaultConnectorException {
+            return request.post(PKI_ISSUE + encode(name), pkiRequest, token, PkiResponse.class);
+        }
+
+        @Override
+        public PkiResponse generateCertificateAndKey(final String issuer, final String name, final PkiRequest pkiRequest) throws VaultConnectorException {
+            return request.post(PKI_ISSUER_ISSUE.formatted(encode(issuer), encode(name)), pkiRequest, token, PkiResponse.class);
+        }
+
+        @Override
+        public PkiRevocationResponse revokeBySerial(String serial) throws VaultConnectorException {
+            return request.post(PKI_REVOKE, Map.of("serial_number", serial), token, PkiRevocationResponse.class);
+        }
+
+        @Override
+        public PkiRevocationResponse revokeCertificate(String certificate) throws VaultConnectorException {
+            return request.post(PKI_REVOKE, Map.of("certificate", certificate), token, PkiRevocationResponse.class);
+        }
+
+        @Override
+        public PkiCaResponse readCaCert() throws VaultConnectorException {
+            return request.get(PKI_CA_CERT, emptyMap(), token, PkiCaResponse.class);
+        }
+
+        @Override
+        public PkiCaResponse readIssuerCert(String issuer) throws VaultConnectorException {
+            return request.get(PKI_ISSUER_CERT.formatted(encode(issuer)), emptyMap(), token, PkiCaResponse.class);
         }
     }
 }

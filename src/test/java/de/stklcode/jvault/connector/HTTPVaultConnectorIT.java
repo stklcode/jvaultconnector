@@ -17,10 +17,7 @@
 package de.stklcode.jvault.connector;
 
 import de.stklcode.jvault.connector.exception.*;
-import de.stklcode.jvault.connector.model.AppRole;
-import de.stklcode.jvault.connector.model.AuthBackend;
-import de.stklcode.jvault.connector.model.Token;
-import de.stklcode.jvault.connector.model.TokenRole;
+import de.stklcode.jvault.connector.model.*;
 import de.stklcode.jvault.connector.model.response.*;
 import de.stklcode.jvault.connector.test.Credentials;
 import de.stklcode.jvault.connector.test.VaultConfiguration;
@@ -32,6 +29,15 @@ import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -1059,6 +1065,196 @@ class HTTPVaultConnectorIT {
     }
 
     @Nested
+    @DisplayName("PKI Tests")
+    class PkiTests {
+
+        private static final String PKI_CA_PEM = """
+            -----BEGIN CERTIFICATE-----
+            MIIDLTCCAhWgAwIBAgIUQJcpa6gCLJWt+TowyNwVrdrjKlgwDQYJKoZIhvcNAQEL
+            BQAwHjEcMBoGA1UEAxMTSlZhdWx0IFRlc3QgUm9vdCBDQTAeFw0yNjA3MTQxODIw
+            MzlaFw0yNjA4MTUxODIxMDlaMB4xHDAaBgNVBAMTE0pWYXVsdCBUZXN0IFJvb3Qg
+            Q0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDI0guomBRZlG9pJOBO
+            y6lRqV7W616f6OS4mWryfICmE7C9emRahsjmlQSQGWO2mct3pwRyLFgSWpusiIkh
+            jssnHM1qyaWeFv1EcjUByQM8xf8KFKqxxw5mX7jH0P0qfGOljvBAlpRa0HzPEYDT
+            fhghYDo86a8JxW33VLha10MZJ+DU5r8SpbvzRfc4xdVF9PDDkxzq1hNMrVw2T/9l
+            m3ycRWQ/T/uUT5Amx94yUPSQXZydcUjmA51hfdkmC5agSPSL1A1TBpAuTcv77M0I
+            8wIejUbMCJOl8fFNAalySMg/1a2ZzFuRw7iXNuXcfNIH22z73hLnYfZ+hbElEa/2
+            xUkzAgMBAAGjYzBhMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0G
+            A1UdDgQWBBT5z9dFfwewhrtgEpHj4q7t+1fFcjAfBgNVHSMEGDAWgBT5z9dFfwew
+            hrtgEpHj4q7t+1fFcjANBgkqhkiG9w0BAQsFAAOCAQEAnXecUvthG+PqJ2czn6Ag
+            6vqhDtRcEc2DJv6VQWMEUt9R8QzWEQ7+XodyGlFtDx20O9Nhrhp3tKlQP6wqFsbs
+            k8rkVGJ7fPVa/6aKjkSZ8BVWDEBfkkNE9pdtDlN7G2NFktG1ODco6i3pacEQtSLm
+            6j7zmxJVxb3HGNgdZKdhHfGf0ABA9ErsiKf2Qwj0NPxa6Xhl+TsZKi8X+gwanYUs
+            sx7kgm9uh9kurhKlaSrj8uV18RwyorsKqYxnFMUTRJ9QkNEhFFr1uc32W8Kj1mDo
+            5e2D7/dUGCYLI95vqkyzynt0TWQEc43cZj0/LWlSRA+2wmDBDUqL1OwQfX1TDv2N
+            TQ==
+            -----END CERTIFICATE-----""";
+
+        @BeforeEach
+        void authorize() {
+            assertDoesNotThrow(() -> connector.authToken(TOKEN_ROOT));
+            assumeTrue(connector.isAuthorized());
+        }
+
+        @Test
+        @DisplayName("Generate certificate and key")
+        void generateCertificateAndKeyTest() {
+            PkiResponse pkiResponse = assertDoesNotThrow(
+                () -> connector.pki().generateCertificateAndKey(
+                    "example-com",
+                    PkiRequest.builder()
+                        .withCommonName("test.example.com")
+                        .withAltNames("test2.example.com")
+                        .withIpSans("192.0.2.1")
+                        .withKeyFormat(PkiRequest.KeyFormat.PKCS8)
+                        .build()
+                ),
+                "Failed to issue certificate"
+            );
+
+            assertEquals("rsa", pkiResponse.data().privateKeyType(), "unexpected private key type");
+            assertTrue(pkiResponse.data().expiration() > System.currentTimeMillis() / 1000L, "expiration timestamp should be in future");
+
+            assertEquals(PKI_CA_PEM, pkiResponse.data().issuingCa(), "unexpected issuing CA certificate");
+            if (compareVersions(VAULT_VERSION, "1.11.0") >= 0) {
+                assertEquals(List.of(PKI_CA_PEM), pkiResponse.data().caChain(), "unexpected CA chain");
+            }
+
+            PublicKey caCert = parseCertificate(PKI_CA_PEM).getPublicKey();
+            X509Certificate cert = parseCertificate(pkiResponse.data().certificate());
+            assertNotNull(cert, "failed o parse certificate");
+            assertNotNull(parsePrivateKey(pkiResponse.data().privateKey()), "failed o parse private key");
+            assertDoesNotThrow(() -> cert.verify(caCert), "certificate was not signed by the issuing CA");
+
+            assertHasSAN(cert, 2, "test.example.com");
+            assertHasSAN(cert, 2, "test2.example.com");
+            assertHasSAN(cert, 7, "192.0.2.1");
+        }
+
+        @Test
+        @DisplayName("Revoke certificates")
+        void revokeCertificateAndKeyTest() {
+            // First, generate two certificates
+            PkiResponse pkiResponse1 = assertDoesNotThrow(
+                () -> connector.pki().generateCertificateAndKey("example-com",
+                    PkiRequest.builder().withCommonName("a.example.com").build()),
+                "Failed to issue certificate 1"
+            );
+            PkiResponse pkiResponse2 = assertDoesNotThrow(
+                () -> connector.pki().generateCertificateAndKey("example-com",
+                    PkiRequest.builder().withCommonName("b.example.com").build()),
+                "Failed to issue certificate 2"
+            );
+
+            // Revoke first by serial
+            PkiRevocationResponse res1 = assertDoesNotThrow(
+                () -> connector.pki().revokeBySerial(pkiResponse1.data().serialNumber()),
+                "Failed to revoke certificate 1 by serial"
+            );
+            assertNotNull(res1.data().revocationTime(), "missing revocation time in response");
+            assertNotNull(res1.data().revocationTimeRFC3339(), "missing revocation time (RFC 3339) in response");
+            if (compareVersions(VAULT_VERSION, "1.14.0") >= 0) {
+                assertEquals("revoked", res1.data().state(), "unexpected state in response");
+            }
+
+            if (compareVersions(VAULT_VERSION, "1.12.0") >= 0) {
+                // Revoke second by certificate
+                PkiRevocationResponse res2 = assertDoesNotThrow(
+                    () -> connector.pki().revokeCertificate(pkiResponse2.data().certificate()),
+                    "Failed to revoke certificate 2 by PEM"
+                );
+                assertNotNull(res2.data().revocationTime(), "missing revocation time in response");
+                assertNotNull(res2.data().revocationTimeRFC3339(), "missing revocation time (RFC 3339) in response");
+
+                if (compareVersions(VAULT_VERSION, "1.14.0") >= 0) {
+                    assertEquals("revoked", res2.data().state(), "unexpected state in response");
+                }
+            }
+
+            InvalidResponseException ex = assertThrows(InvalidResponseException.class,
+                () -> connector.pki().revokeBySerial("00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"),
+                "Expected exception on revoking non-existent certificate");
+            assertEquals(400, ex.getStatusCode(), "unexpected status code in response");
+            assertTrue(ex.getResponse().startsWith("certificate with serial 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00 not found"),
+                "unexpected error response message");
+        }
+
+        @Test
+        @DisplayName("Read CA/issuer certificate")
+        void readCaCertificateTest() {
+            PkiCaResponse pkiResponse = assertDoesNotThrow(() -> connector.pki().readCaCert(),
+                "Failed to read CA certificate");
+
+            assertEquals(PKI_CA_PEM, pkiResponse.data().certificate(), "unexpected CA certificate");
+            assertEquals(0, pkiResponse.data().revocationTime(), "unexpected revocation time");
+            assertNull(pkiResponse.data().issuerId(), "unexpected issuer ID");
+            assertNull(pkiResponse.data().issuerName(), "unexpected issuer name");
+
+            if (pkiResponse.data().authorityKeyId() != null) {
+                // Available in Vault 1.21.1+, but not in OpenBao (checked with 2.6.0)
+                assertEquals("f9:cf:d7:45:7f:07:b0:86:bb:60:12:91:e3:e2:ae:ed:fb:57:c5:72",
+                    pkiResponse.data().authorityKeyId(),
+                    "unexpected authority key ID");
+            }
+
+            if (compareVersions(VAULT_VERSION, "1.11.0") >= 0) {
+                assertEquals("", pkiResponse.data().revocationTimeRFC3339(), "unexpected revocation time (RFC 3339)");
+
+                // Request a specific issuer
+                pkiResponse = assertDoesNotThrow(() -> connector.pki().readIssuerCert("default"),
+                    "Failed to read issuer certificate");
+
+                assertEquals(PKI_CA_PEM + "\n", pkiResponse.data().certificate(), "unexpected CA certificate");
+                assertEquals(List.of(PKI_CA_PEM + "\n"), pkiResponse.data().caChain(), "unexpected CA chain");
+                assertNull(pkiResponse.data().revocationTime(), "unexpected revocation time");
+                assertNull(pkiResponse.data().revocationTimeRFC3339(), "unexpected revocation time (RFC 3339)");
+                // Issuers are not initialized in Vaul 1.3.0 test data, so dynamically assigned during upgrade
+                assertNotNull(pkiResponse.data().issuerId(), "unexpected issuer ID");
+                assertNotNull(pkiResponse.data().issuerName(), "unexpected issuer name");
+            }
+        }
+
+        private static X509Certificate parseCertificate(String pem) {
+            try {
+                return (X509Certificate) CertificateFactory.getInstance("X.509")
+                    .generateCertificate(new ByteArrayInputStream(pem.getBytes(UTF_8)));
+            } catch (CertificateException e) {
+                fail("Failed to parse certificate", e);
+                return null;
+            }
+        }
+
+        private static PrivateKey parsePrivateKey(String pem) {
+            try {
+                return KeyFactory.getInstance("RSA")
+                    .generatePrivate(new PKCS8EncodedKeySpec(
+                        Base64.getDecoder().decode(
+                            pem
+                                .replace("-----BEGIN PRIVATE KEY-----", "")
+                                .replaceAll(System.lineSeparator(), "")
+                                .replace("-----END PRIVATE KEY-----", "")
+                                .replaceAll("\\s", ""))
+                    ));
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                fail("Failed to parse private key", e);
+                return null;
+            }
+        }
+
+        private static void assertHasSAN(X509Certificate cert, Integer type, String san) {
+            var rawSans = assertDoesNotThrow(cert::getSubjectAlternativeNames, "unable to extract SANs from certificate");
+            assertNotNull(rawSans, "missing SANs in certificate");
+            for (var item : rawSans) {
+                if (item.size() == 2 && type.equals(item.get(0)) && san.equals(item.get(1))) {
+                    return;
+                }
+            }
+
+            fail("certificate does not contain SAN of type " + type + " and value " + san);
+        }
+    }
+
+    @Nested
     @DisplayName("Misc Tests")
     class MiscTests {
         /**
@@ -1296,5 +1492,32 @@ class HTTPVaultConnectorIT {
         StringWriter sw = new StringWriter();
         th.printStackTrace(new PrintWriter(sw, true));
         return sw.getBuffer().toString();
+    }
+
+    /**
+     * Compare two version strings.
+     *
+     * @param version1 Version 1
+     * @param version2 Version 2
+     * @return negative value if version 1 is smaller than version2, positive value of version 1 is greater, 0 if equal
+     */
+    private static int compareVersions(String version1, String version2) {
+        int comparisonResult = 0;
+
+        String[] version1Splits = version1.split("\\.");
+        String[] version2Splits = version2.split("\\.");
+        int maxLengthOfVersionSplits = Math.max(version1Splits.length, version2Splits.length);
+
+        for (int i = 0; i < maxLengthOfVersionSplits; i++) {
+            Integer v1 = i < version1Splits.length ? Integer.parseInt(version1Splits[i]) : 0;
+            Integer v2 = i < version2Splits.length ? Integer.parseInt(version2Splits[i]) : 0;
+            int compare = v1.compareTo(v2);
+            if (compare != 0) {
+                comparisonResult = compare;
+                break;
+            }
+        }
+
+        return comparisonResult;
     }
 }

@@ -27,6 +27,7 @@ public final class VaultApiPath {
     private static final String SYS = "sys";
     private static final String AUTH = "auth";
     private static final String TRANSIT = "transit";
+    private static final String PKI = "pki";
 
     // System paths
     public static final String SYS_AUTH = SYS + "/auth";
@@ -61,6 +62,13 @@ public final class VaultApiPath {
     public static final String TRANSIT_ENCRYPT = TRANSIT + "/encrypt/";
     public static final String TRANSIT_DECRYPT = TRANSIT + "/decrypt/";
     public static final String TRANSIT_HASH = TRANSIT + "/hash/";
+
+    // PKI engine paths
+    public static final String PKI_ISSUE = PKI + "/issue/";
+    public static final String PKI_ISSUER_ISSUE = PKI + "/%s/issue/%s";
+    public static final String PKI_REVOKE = PKI + "/revoke";
+    public static final String PKI_CA_CERT = PKI + "/cert/ca";
+    public static final String PKI_ISSUER_CERT = PKI + "/issuer/%s/json";
 
     /**
      * Private constructor to prevent instantiation.
