@@ -1,3 +1,15 @@
+## 1.5.4 (2026-04-13)
+
+### Dependencies
+* Updated Jackson to 2.21.2 (#125)
+
+### Improvements
+* Build and test with JDK 25
+
+### Test
+* Tested against Vault 1.2 to 1.21
+
+
 ## 1.5.3 (2025-09-09)
 
 ### Dependencies
