@@ -18,7 +18,7 @@
 * Updated Jackson to 3.1.0 (#116) (#118) (#119) (#123)
 
 ### Test
-* Tested against Vault 1.3 to 1.21 (#117)
+* Tested against Vault 1.3 to 2.0 (#126)
 * Tested against OpenBao 2.5 (#122)
 
 
