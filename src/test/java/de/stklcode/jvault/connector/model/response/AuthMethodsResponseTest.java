@@ -105,16 +105,8 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
         assertEquals(Collections.emptyMap(), res.getSupportedMethods(), "Initial method map should be empty");
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        AuthMethodsResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(RES_JSON, AuthMethodsResponse.class),
-            "AuthResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(AuthMethodsResponse res) {
         // Extract auth data.
         Map<String, AuthMethod> supported = res.getSupportedMethods();
         assertNotNull(supported, "Auth data is NULL");

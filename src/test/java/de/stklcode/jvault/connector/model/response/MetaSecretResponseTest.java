@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -100,16 +99,8 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        // KV v2 secret.
-        MetaSecretResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(SECRET_JSON_V2, MetaSecretResponse.class),
-            "SecretResponse deserialization failed"
-        );
+    @Override
+    protected void jsonAssertions(MetaSecretResponse res) {
         assertSecretData(res);
         assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
         assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");

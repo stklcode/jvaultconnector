@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,16 +52,8 @@ class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse>
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        SecretVersionResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(META_JSON, SecretVersionResponse.class),
-            "SecretVersionResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(SecretVersionResponse res) {
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
         assertFalse(res.getMetadata().isDestroyed(), "Incorrect destroyed state");
         assertEquals(VERSION, res.getMetadata().getVersion(), "Incorrect version");

@@ -113,17 +113,8 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
         EqualsVerifier.simple().forClass(MfaMethodId.class).verify();
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        AuthResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(RES_JSON, AuthResponse.class),
-            "AuthResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
-        // Extract auth data.
+    @Override
+    protected void jsonAssertions(AuthResponse res) {
         AuthData data = res.getAuth();
         assertNotNull(data, "Auth data is NULL");
         assertEquals(AUTH_ACCESSOR, data.getAccessor(), "Incorrect auth accessor");

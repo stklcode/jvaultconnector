@@ -65,17 +65,8 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        SecretResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(SECRET_JSON, PlainSecretResponse.class),
-            "SecretResponse deserialization failed"
-        );
-
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(PlainSecretResponse res) {
         assertEquals(SECRET_REQUEST_ID, res.getRequestId(), "Incorrect request ID");
         assertEquals(SECRET_LEASE_ID, res.getLeaseId(), "Incorrect lease ID");
         assertEquals(SECRET_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");

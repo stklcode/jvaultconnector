@@ -1,7 +1,6 @@
 package de.stklcode.jvault.connector.model.response.embedded;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -67,18 +66,8 @@ class MountConfigTest extends AbstractModelTest<MountConfig> {
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        MountConfig mountConfig = assertDoesNotThrow(
-            () -> objectMapper.readValue(RES_JSON, MountConfig.class),
-            "MountConfig deserialization failed"
-        );
-        assertNotNull(mountConfig, "Parsed response is NULL");
-
-        // Verify data.
+    @Override
+    protected void jsonAssertions(MountConfig mountConfig) {
         assertEquals(DEFAULT_LEASE_TTL, mountConfig.getDefaultLeaseTtl(), "Unexpected default lease TTL");
         assertEquals(MAX_LEASE_TTL, mountConfig.getMaxLeaseTtl(), "Unexpected max lease TTL");
         assertEquals(FORCE_NO_CACHE, mountConfig.getForceNoCache(), "Unexpected force no cache");

@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -72,16 +71,8 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        HealthResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(RES_JSON, HealthResponse.class),
-            "Health deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(HealthResponse res) {
         assertEquals(CLUSTER_ID, res.getClusterID(), "Incorrect cluster ID");
         assertEquals(CLUSTER_NAME, res.getClusterName(), "Incorrect cluster name");
         assertEquals(VERSION, res.getVersion(), "Incorrect version");

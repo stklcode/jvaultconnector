@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * JUnit Test for {@link ErrorResponse} model.
@@ -47,16 +48,8 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault.
-     */
-    @Test
-    void jsonRoundtrip() {
-        ErrorResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(JSON, ErrorResponse.class),
-            "ErrorResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(ErrorResponse res) {
         assertEquals(List.of(ERROR_1, ERROR_2), res.getErrors(), "Unexpected error messages");
         assertEquals(
             JSON,
@@ -64,7 +57,6 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
             "Unexpected JSON string after serialization"
         );
     }
-
 
     @Test
     void testToString() {

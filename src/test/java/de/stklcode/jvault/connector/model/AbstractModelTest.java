@@ -4,13 +4,13 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Abstract testcase for model classes.
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @since 1.1
  */
 public abstract class AbstractModelTest<T> {
-    protected final Class<?> modelClass;
+    protected final Class<T> modelClass;
     protected final ObjectMapper objectMapper;
 
     /**
@@ -30,11 +30,12 @@ public abstract class AbstractModelTest<T> {
     protected AbstractModelTest(Class<T> modelClass) {
         this.modelClass = modelClass;
         this.objectMapper = JsonMapper.builder()
-                .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-                .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
-                .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-                .build();
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .build();
     }
 
     /**
@@ -77,5 +78,28 @@ public abstract class AbstractModelTest<T> {
         } catch (IOException | ClassNotFoundException e) {
             fail("Deserialization failed", e);
         }
+    }
+
+    /**
+     * Test JSON serialization of a full model instance.
+     * Serialization and deserialization must not fail and the resulting object should equal the original object.
+     */
+    @Test
+    void jsonSerializationTest() {
+        T original = createFull();
+        String json = assertDoesNotThrow(() -> objectMapper.writeValueAsString(original), "JSON serialization failed");
+        T copy = assertDoesNotThrow(() -> objectMapper.readValue(json, modelClass), "JSON deserialization failed");
+        assertEquals(original, copy, "Deserialized object should be equal to the original");
+
+        jsonAssertions(original);
+    }
+
+    /**
+     * Apply additional assertions on the deserialized object from {@link #jsonSerializationTest()}.
+     *
+     * @param object Object from JSON
+     */
+    protected void jsonAssertions(T object) {
+        // Override to apply additional assertions.
     }
 }

@@ -82,17 +82,8 @@ class AppRoleResponseTest extends AbstractModelTest<AppRoleResponse> {
         assertNull(res.getRole(), "Initial data should be empty");
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        AppRoleResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(RES_JSON, AppRoleResponse.class),
-            "AuthResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
-        // Extract role data.
+    @Override
+    protected void jsonAssertions(AppRoleResponse res) {
         AppRole role = res.getRole();
         assertNotNull(role, "Role data is NULL");
         assertEquals(ROLE_TOKEN_TTL, role.getTokenTtl(), "Incorrect token TTL");

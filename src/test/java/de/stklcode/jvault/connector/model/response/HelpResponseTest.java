@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,16 +42,8 @@ class HelpResponseTest extends AbstractModelTest<HelpResponse> {
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault.
-     */
-    @Test
-    void jsonRoundtrip() {
-        HelpResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(JSON, HelpResponse.class),
-            "HelpResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(HelpResponse res) {
         assertEquals(HELP, res.getHelp(), "Unexpected help text");
         assertEquals(
             JSON,

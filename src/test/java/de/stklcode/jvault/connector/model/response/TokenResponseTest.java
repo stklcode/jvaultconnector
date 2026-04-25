@@ -111,16 +111,8 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
         assertNull(res.getData(), "Initial data should be empty");
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        TokenResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(RES_JSON, TokenResponse.class),
-            "TokenResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(TokenResponse res) {
         assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
         assertEquals(RES_RENEWABLE, res.isRenewable(), "Incorrect response renewable flag");
         assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect response lease duration");

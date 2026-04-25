@@ -92,7 +92,7 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
      * Test creation from JSON value as returned by Vault when sealed (JSON example close to Vault documentation).
      */
     @Test
-    void jsonRoundtripSealed() {
+    void jsonSerializationTestSealed() {
         // First test sealed Vault's response.
         SealResponse res = assertDoesNotThrow(
             () -> objectMapper.readValue(RES_SEALED, SealResponse.class),

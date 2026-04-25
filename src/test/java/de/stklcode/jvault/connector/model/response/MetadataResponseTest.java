@@ -17,7 +17,6 @@
 package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -85,16 +84,8 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
         );
     }
 
-    /**
-     * Test creation from JSON value as returned by Vault (JSON example copied from Vault documentation).
-     */
-    @Test
-    void jsonRoundtrip() {
-        MetadataResponse res = assertDoesNotThrow(
-            () -> objectMapper.readValue(META_JSON, MetadataResponse.class),
-            "MetadataResponse deserialization failed"
-        );
-        assertNotNull(res, "Parsed response is NULL");
+    @Override
+    protected void jsonAssertions(MetadataResponse res) {
         assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
         assertEquals(CAS_REQUIRED, res.getMetadata().isCasRequired(), "Incorrect CAS required flag");
         assertNotNull(res.getMetadata().getCreatedTime(), "Parting created time failed");
