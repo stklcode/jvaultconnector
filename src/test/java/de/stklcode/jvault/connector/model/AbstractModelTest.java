@@ -1,12 +1,11 @@
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.*;
 
@@ -31,10 +30,11 @@ public abstract class AbstractModelTest<T> {
     protected AbstractModelTest(Class<T> modelClass) {
         this.modelClass = modelClass;
         this.objectMapper = JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-            .build();
+                .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+                .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+                .build();
     }
 
     /**

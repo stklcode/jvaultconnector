@@ -4,6 +4,7 @@ import tools.jackson.core.JacksonException;
 
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.response.ErrorResponse;
+import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -68,6 +69,8 @@ public final class RequestHelper implements Serializable {
         this.jsonMapper = JsonMapper.builder()
             .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+            .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
             .build();
     }
 

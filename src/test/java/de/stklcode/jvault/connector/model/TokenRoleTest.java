@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -117,7 +116,7 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
      * Build token without any parameters.
      */
     @Test
-    void buildDefaultTest() throws JsonProcessingException {
+    void buildDefaultTest() {
         TokenRole role = TokenRole.builder().build();
         assertNull(role.getAllowedPolicies());
         assertNull(role.getDisallowedPolicies());
@@ -139,7 +138,7 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
      * Build token without all parameters NULL.
      */
     @Test
-    void buildNullTest() throws JsonProcessingException {
+    void buildNullTest() {
         TokenRole role = TokenRole.builder()
             .forName(null)
             .withAllowedPolicies(null)
@@ -183,7 +182,7 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
      * Build token without all parameters set.
      */
     @Test
-    void buildFullTest() throws JsonProcessingException {
+    void buildFullTest() {
         TokenRole role = createFull();
         assertEquals(NAME, role.getName());
         assertEquals(ALLOWED_POLICIES.size() + 1, role.getAllowedPolicies().size());

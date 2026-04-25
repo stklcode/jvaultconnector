@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -90,7 +89,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
      * Build role with only a name.
      */
     @Test
-    void buildDefaultTest() throws JsonProcessingException {
+    void buildDefaultTest() {
         AppRole role = AppRole.builder(NAME).build();
         assertNull(role.getId());
         assertNull(role.getBindSecretId());
@@ -116,7 +115,7 @@ class AppRoleTest extends AbstractModelTest<AppRole> {
      * Build token without all parameters set.
      */
     @Test
-    void buildFullTest() throws JsonProcessingException {
+    void buildFullTest() {
         AppRole role = createFull();
         assertEquals(NAME, role.getName());
         assertEquals(ID, role.getId());

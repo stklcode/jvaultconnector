@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -85,7 +84,7 @@ class TokenTest extends AbstractModelTest<Token> {
      * Build token without any parameters.
      */
     @Test
-    void buildDefaultTest() throws JsonProcessingException {
+    void buildDefaultTest() {
         Token token = Token.builder().build();
         assertNull(token.getId());
         assertNull(token.getType());
@@ -112,7 +111,7 @@ class TokenTest extends AbstractModelTest<Token> {
      * Build token without all parameters set.
      */
     @Test
-    void buildFullTest() throws JsonProcessingException {
+    void buildFullTest() {
         Token token = createFull();
         assertEquals(ID, token.getId());
         assertEquals(Token.Type.SERVICE.value(), token.getType());
