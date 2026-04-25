@@ -67,7 +67,7 @@ public final class RequestHelper implements Serializable {
         this.tlsVersion = tlsVersion;
         this.trustedCaCert = trustedCaCert;
         this.jsonMapper = JsonMapper.builder()
-            .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
             .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)

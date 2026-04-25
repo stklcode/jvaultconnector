@@ -16,9 +16,7 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 import de.stklcode.jvault.connector.model.AuthBackend;
 
 import java.io.Serial;
@@ -39,6 +37,8 @@ public final class AuthMethod implements Serializable {
     private static final long serialVersionUID = -439987082190917691L;
 
     private AuthBackend type;
+
+    @JsonIgnore
     private String rawType;
 
     @JsonProperty("accessor")
@@ -96,6 +96,7 @@ public final class AuthMethod implements Serializable {
     /**
      * @return Raw backend type string
      */
+    @JsonGetter("type")
     public String getRawType() {
         return rawType;
     }

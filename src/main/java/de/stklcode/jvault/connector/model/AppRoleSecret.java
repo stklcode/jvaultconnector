@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -126,6 +127,7 @@ public final class AppRoleSecret implements Serializable {
      * @param cidrList List of subnets in CIDR notation
      */
     @JsonSetter("cidr_list")
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
     public void setCidrList(final List<String> cidrList) {
         this.cidrList = cidrList;
     }

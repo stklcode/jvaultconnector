@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.*;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -170,6 +171,7 @@ public final class AppRole implements Serializable {
      * @since 0.9
      */
     @JsonSetter("token_bound_cidrs")
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
     public void setBoundCidrs(final List<String> boundCidrList) {
         this.tokenBoundCidrs = boundCidrList;
     }
@@ -200,6 +202,7 @@ public final class AppRole implements Serializable {
      * @since 0.8 replaces {@code setBoundCidrList(List)}
      */
     @JsonSetter("secret_id_bound_cidrs")
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
     public void setSecretIdBoundCidrs(final List<String> secretIdBoundCidrs) {
         this.secretIdBoundCidrs = secretIdBoundCidrs;
     }
@@ -230,6 +233,7 @@ public final class AppRole implements Serializable {
      * @since 0.9
      */
     @JsonSetter("token_policies")
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
     public void setTokenPolicies(final List<String> tokenPolicies) {
         this.tokenPolicies = tokenPolicies;
     }
