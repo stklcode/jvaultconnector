@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.model.response;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.SecretWrapper;
@@ -41,7 +43,13 @@ public class MetaSecretResponse extends SecretResponse {
     @JsonProperty("data")
     private SecretWrapper secret;
 
+    @JsonGetter("data")
+    public final SecretWrapper getSecretWrapper() {
+        return secret;
+    }
+
     @Override
+    @JsonIgnore
     public final Map<String, Serializable> getData() {
         if (secret != null) {
             return secret.getData();
@@ -51,6 +59,7 @@ public class MetaSecretResponse extends SecretResponse {
     }
 
     @Override
+    @JsonIgnore
     public final VersionMetadata getMetadata() {
         if (secret != null) {
             return secret.getMetadata();
