@@ -54,8 +54,8 @@ class SecretVersionResponseTest extends AbstractModelTest<SecretVersionResponse>
 
     @Override
     protected void jsonAssertions(SecretVersionResponse res) {
-        assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
-        assertFalse(res.getMetadata().isDestroyed(), "Incorrect destroyed state");
-        assertEquals(VERSION, res.getMetadata().getVersion(), "Incorrect version");
+        assertNotNull(res.metadata(), "Parsed metadata is NULL");
+        assertFalse(res.metadata().destroyed(), "Incorrect destroyed state");
+        assertEquals(VERSION, res.metadata().version(), "Incorrect version");
     }
 }

@@ -19,9 +19,7 @@ package de.stklcode.jvault.connector.model.response;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.AuthBackend;
 import de.stklcode.jvault.connector.model.response.embedded.AuthMethod;
-import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,56 +93,46 @@ class AuthMethodsResponseTest extends AbstractModelTest<AuthMethodsResponse> {
         );
     }
 
-    /**
-     * Test getter, setter and get-methods for response data.
-     */
-    @Test
-    void getDataRoundtrip() {
-        // Create empty Object.
-        AuthMethodsResponse res = new AuthMethodsResponse();
-        assertEquals(Collections.emptyMap(), res.getSupportedMethods(), "Initial method map should be empty");
-    }
-
     @Override
     protected void jsonAssertions(AuthMethodsResponse res) {
         // Extract auth data.
-        Map<String, AuthMethod> supported = res.getSupportedMethods();
+        Map<String, AuthMethod> supported = res.supportedMethods();
         assertNotNull(supported, "Auth data is NULL");
         assertEquals(2, supported.size(), "Incorrect number of supported methods");
         assertTrue(supported.keySet().containsAll(Set.of(GH_PATH, TK_PATH)), "Incorrect method paths");
 
         // Verify first method.
         AuthMethod method = supported.get(GH_PATH);
-        assertEquals(GH_TYPE, method.getRawType(), "Incorrect raw type for GitHub");
-        assertEquals(AuthBackend.GITHUB, method.getType(), "Incorrect parsed type for GitHub");
-        assertEquals(GH_DESCR, method.getDescription(), "Incorrect description for GitHub");
-        assertNull(method.getConfig(), "Unexpected config for GitHub");
-        assertEquals(GH_UUID, method.getUuid(), "Unexpected UUID for GitHub");
-        assertEquals(GH_ACCESSOR, method.getAccessor(), "Unexpected accessor for GitHub");
-        assertFalse(method.isLocal(), "Unexpected local flag for GitHub");
-        assertFalse(method.isExternalEntropyAccess(), "Unexpected external entropy flag for GitHub");
-        assertFalse(method.isSealWrap(), "Unexpected seal wrap flag for GitHub");
+        assertEquals(GH_TYPE, method.rawType(), "Incorrect raw type for GitHub");
+        assertEquals(AuthBackend.GITHUB, method.type(), "Incorrect parsed type for GitHub");
+        assertEquals(GH_DESCR, method.description(), "Incorrect description for GitHub");
+        assertNull(method.config(), "Unexpected config for GitHub");
+        assertEquals(GH_UUID, method.uuid(), "Unexpected UUID for GitHub");
+        assertEquals(GH_ACCESSOR, method.accessor(), "Unexpected accessor for GitHub");
+        assertFalse(method.local(), "Unexpected local flag for GitHub");
+        assertFalse(method.externalEntropyAccess(), "Unexpected external entropy flag for GitHub");
+        assertFalse(method.sealWrap(), "Unexpected seal wrap flag for GitHub");
 
         // Verify second method.
         method = supported.get(TK_PATH);
-        assertEquals(TK_TYPE, method.getRawType(), "Incorrect raw type for Token");
-        assertEquals(AuthBackend.TOKEN, method.getType(), "Incorrect parsed type for Token");
-        assertEquals(TK_DESCR, method.getDescription(), "Incorrect description for Token");
-        assertEquals(TK_UUID, method.getUuid(), "Unexpected UUID for Token");
-        assertEquals(TK_ACCESSOR, method.getAccessor(), "Unexpected accessor for Token");
-        assertTrue(method.isLocal(), "Unexpected local flag for Token");
-        assertFalse(method.isExternalEntropyAccess(), "Unexpected external entropy flag for Token");
-        assertFalse(method.isSealWrap(), "Unexpected seal wrap flag for GitHub");
-        assertEquals("", method.getPluginVersion(), "Unexpected plugin version");
-        assertEquals(TK_RUNNING_PLUGIN_VERSION, method.getRunningPluginVersion(), "Unexpected running plugin version");
-        assertEquals("", method.getRunningSha256(), "Unexpected running SHA256");
+        assertEquals(TK_TYPE, method.rawType(), "Incorrect raw type for Token");
+        assertEquals(AuthBackend.TOKEN, method.type(), "Incorrect parsed type for Token");
+        assertEquals(TK_DESCR, method.description(), "Incorrect description for Token");
+        assertEquals(TK_UUID, method.uuid(), "Unexpected UUID for Token");
+        assertEquals(TK_ACCESSOR, method.accessor(), "Unexpected accessor for Token");
+        assertTrue(method.local(), "Unexpected local flag for Token");
+        assertFalse(method.externalEntropyAccess(), "Unexpected external entropy flag for Token");
+        assertFalse(method.sealWrap(), "Unexpected seal wrap flag for GitHub");
+        assertEquals("", method.pluginVersion(), "Unexpected plugin version");
+        assertEquals(TK_RUNNING_PLUGIN_VERSION, method.runningPluginVersion(), "Unexpected running plugin version");
+        assertEquals("", method.runningSha256(), "Unexpected running SHA256");
 
-        assertNotNull(method.getConfig(), "Missing config for Token");
-        assertEquals(TK_LEASE_TTL, method.getConfig().getDefaultLeaseTtl(), "Unexpected default TTL");
-        assertEquals(TK_MAX_LEASE_TTL, method.getConfig().getMaxLeaseTtl(), "Unexpected max TTL");
-        assertEquals(TK_FORCE_NO_CACHE, method.getConfig().getForceNoCache(), "Unexpected force no cache flag");
-        assertEquals(TK_TOKEN_TYPE, method.getConfig().getTokenType(), "Unexpected token type");
+        assertNotNull(method.config(), "Missing config for Token");
+        assertEquals(TK_LEASE_TTL, method.config().defaultLeaseTtl(), "Unexpected default TTL");
+        assertEquals(TK_MAX_LEASE_TTL, method.config().maxLeaseTtl(), "Unexpected max TTL");
+        assertEquals(TK_FORCE_NO_CACHE, method.config().forceNoCache(), "Unexpected force no cache flag");
+        assertEquals(TK_TOKEN_TYPE, method.config().tokenType(), "Unexpected token type");
 
-        assertNull(method.getOptions(), "Unexpected options");
+        assertNull(method.options(), "Unexpected options");
     }
 }

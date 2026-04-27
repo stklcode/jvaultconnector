@@ -16,48 +16,22 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Simple Vault data response.
  *
+ * @param responseHeader Response metadata
+ * @param data           Raw data {@link Map}
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class RawDataResponse extends VaultDataResponse {
-    @Serial
-    private static final long serialVersionUID = -319727427792124071L;
-
-    @JsonProperty("data")
-    private Map<String, Serializable> data;
-
-    /**
-     * @return Raw data {@link Map}
-     */
-    public Map<String, Serializable> getData() {
-        return data;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        RawDataResponse that = (RawDataResponse) o;
-        return Objects.equals(data, that.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), data);
-    }
+public record RawDataResponse(
+    @JsonUnwrapped Header responseHeader,
+    Map<String, Serializable> data
+) implements VaultDataResponse {
 }

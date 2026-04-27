@@ -80,7 +80,7 @@ public interface TokenClient {
      * @since 0.9
      */
     default boolean createOrUpdateRole(final TokenRole role) throws VaultConnectorException {
-        return createOrUpdateRole(role.getName(), role);
+        return createOrUpdateRole(role.name(), role);
     }
 
     /**

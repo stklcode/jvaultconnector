@@ -86,19 +86,19 @@ class MetadataResponseTest extends AbstractModelTest<MetadataResponse> {
 
     @Override
     protected void jsonAssertions(MetadataResponse res) {
-        assertNotNull(res.getMetadata(), "Parsed metadata is NULL");
-        assertEquals(CAS_REQUIRED, res.getMetadata().isCasRequired(), "Incorrect CAS required flag");
-        assertNotNull(res.getMetadata().getCreatedTime(), "Parting created time failed");
-        assertEquals(CURRENT_VERSION, res.getMetadata().getCurrentVersion(), "Incorrect current version");
-        assertEquals(MAX_VERSIONS, res.getMetadata().getMaxVersions(), "Incorrect max versions");
-        assertEquals(OLDEST_VERSION, res.getMetadata().getOldestVersion(), "Incorrect oldest version");
-        assertEquals(Map.of(CUSTOM_META_KEY, CUSTOM_META_VAL), res.getMetadata().getCustomMetadata(), "Incorrect custom metadata");
-        assertEquals(DELETE_VERSION_AFTER, res.getMetadata().getDeleteVersionAfter(), "Incorrect delete version after");
-        assertNotNull(res.getMetadata().getUpdatedTime(), "Parting updated time failed");
-        assertEquals(3, res.getMetadata().getVersions().size(), "Incorrect number of versions");
-        assertNotNull(res.getMetadata().getVersions().get(1).getDeletionTime(), "Parsing version delete time failed");
-        assertTrue(res.getMetadata().getVersions().get(1).isDestroyed(), "Incorrect version 1 destroyed state");
-        assertNotNull(res.getMetadata().getVersions().get(2).getCreatedTime(), "Parsing version created failed");
-        assertFalse(res.getMetadata().getVersions().get(3).isDestroyed(), "Incorrect version 3 destroyed state");
+        assertNotNull(res.metadata(), "Parsed metadata is NULL");
+        assertEquals(CAS_REQUIRED, res.metadata().casRequired(), "Incorrect CAS required flag");
+        assertNotNull(res.metadata().createdTime(), "Parting created time failed");
+        assertEquals(CURRENT_VERSION, res.metadata().currentVersion(), "Incorrect current version");
+        assertEquals(MAX_VERSIONS, res.metadata().maxVersions(), "Incorrect max versions");
+        assertEquals(OLDEST_VERSION, res.metadata().oldestVersion(), "Incorrect oldest version");
+        assertEquals(Map.of(CUSTOM_META_KEY, CUSTOM_META_VAL), res.metadata().customMetadata(), "Incorrect custom metadata");
+        assertEquals(DELETE_VERSION_AFTER, res.metadata().deleteVersionAfter(), "Incorrect delete version after");
+        assertNotNull(res.metadata().updatedTime(), "Parting updated time failed");
+        assertEquals(3, res.metadata().versions().size(), "Incorrect number of versions");
+        assertNotNull(res.metadata().versions().get(1).deletionTime(), "Parsing version delete time failed");
+        assertTrue(res.metadata().versions().get(1).destroyed(), "Incorrect version 1 destroyed state");
+        assertNotNull(res.metadata().versions().get(2).createdTime(), "Parsing version created failed");
+        assertFalse(res.metadata().versions().get(3).destroyed(), "Incorrect version 3 destroyed state");
     }
 }

@@ -16,33 +16,17 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serial;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Vault response in case of errors.
  *
+ * @param errors List of errors
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class ErrorResponse implements VaultResponse {
-    @Serial
-    private static final long serialVersionUID = -6227368087842549149L;
-
-    @JsonProperty("errors")
-    private List<String> errors;
-
-    /**
-     * @return List of errors
-     */
-    public List<String> getErrors() {
-        return errors;
-    }
+public record ErrorResponse(List<String> errors) implements VaultResponse {
 
     @Override
     public String toString() {
@@ -51,21 +35,5 @@ public final class ErrorResponse implements VaultResponse {
         } else {
             return errors.get(0);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ErrorResponse that = (ErrorResponse) o;
-        return Objects.equals(errors, that.errors);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(errors);
     }
 }

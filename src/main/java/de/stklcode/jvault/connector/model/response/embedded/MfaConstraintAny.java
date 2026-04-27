@@ -16,49 +16,16 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Embedded multi-factor-authentication (MFA) constraint "any".
  *
+ * @param any List of "any" MFA methods
  * @author Stefan Kalscheuer
  * @since 1.2
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class MfaConstraintAny implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1226126781813149627L;
-
-    @JsonProperty("any")
-    private List<MfaMethodId> any;
-
-    /**
-     * @return List of "any" MFA methods
-     */
-    public List<MfaMethodId> getAny() {
-        return any;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MfaConstraintAny mfaRequirement = (MfaConstraintAny) o;
-        return Objects.equals(any, mfaRequirement.any);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(any);
-    }
+public record MfaConstraintAny(List<MfaMethodId> any) implements Serializable {
 }

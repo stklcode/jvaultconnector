@@ -16,110 +16,72 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Vault Token Role metamodel.
  *
+ * @param name                   Token Role name
+ * @param allowedPolicies        List of allowed policies
+ * @param allowedPoliciesGlob    List of allowed policy glob patterns
+ * @param disallowedPolicies     List of disallowed policies
+ * @param disallowedPoliciesGlob List of disallowed policy glob patterns
+ * @param orphan                 Is Token Role orphan?
+ * @param renewable              Is Token Role renewable?
+ * @param pathSuffix             Path suffix
+ * @param allowedEntityAliases   List of allowed entity aliases
+ * @param tokenBoundCidrs        Token bound CIDR blocks
+ * @param tokenExplicitMaxTtl    Token explicit maximum TTL
+ * @param tokenNoDefaultPolicy   Token without default policy?
+ * @param tokenNumUses           Token number of uses
+ * @param tokenPeriod            Token period
+ * @param tokenType              Token type
  * @author Stefan Kalscheuer
  * @since 0.9
  * @since 1.1 implements {@link Serializable}
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class TokenRole implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -4856948364869438439L;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record TokenRole(
+    String name,
+    List<String> allowedPolicies,
+    List<String> allowedPoliciesGlob,
+    List<String> disallowedPolicies,
+    List<String> disallowedPoliciesGlob,
+    Boolean orphan,
+    Boolean renewable,
+    String pathSuffix,
+    List<String> allowedEntityAliases,
+    List<String> tokenBoundCidrs,
+    Long tokenExplicitMaxTtl,
+    Boolean tokenNoDefaultPolicy,
+    Integer tokenNumUses,
+    Integer tokenPeriod,
+    String tokenType
+) implements Serializable {
 
-    @JsonProperty("name")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String name;
-
-    @JsonProperty("allowed_policies")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> allowedPolicies;
-
-    @JsonProperty("allowed_policies_glob")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> allowedPoliciesGlob;
-
-    @JsonProperty("disallowed_policies")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> disallowedPolicies;
-
-    @JsonProperty("disallowed_policies_glob")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> disallowedPoliciesGlob;
-
-    @JsonProperty("orphan")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean orphan;
-
-    @JsonProperty("renewable")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean renewable;
-
-    @JsonProperty("path_suffix")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String pathSuffix;
-
-    @JsonProperty("allowed_entity_aliases")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> allowedEntityAliases;
-
-    @JsonProperty("token_bound_cidrs")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> tokenBoundCidrs;
-
-    @JsonProperty("token_explicit_max_ttl")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long tokenExplicitMaxTtl;
-
-    @JsonProperty("token_no_default_policy")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean tokenNoDefaultPolicy;
-
-    @JsonProperty("token_num_uses")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenNumUses;
-
-    @JsonProperty("token_period")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenPeriod;
-
-    @JsonProperty("token_type")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String tokenType;
-
-    /**
-     * Construct empty {@link TokenRole} object.
-     */
-    public TokenRole() {
-    }
-
-    public TokenRole(final Builder builder) {
-        this.name = builder.name;
-        this.allowedPolicies = builder.allowedPolicies;
-        this.allowedPoliciesGlob = builder.allowedPoliciesGlob;
-        this.disallowedPolicies = builder.disallowedPolicies;
-        this.disallowedPoliciesGlob = builder.disallowedPoliciesGlob;
-        this.orphan = builder.orphan;
-        this.renewable = builder.renewable;
-        this.pathSuffix = builder.pathSuffix;
-        this.allowedEntityAliases = builder.allowedEntityAliases;
-        this.tokenBoundCidrs = builder.tokenBoundCidrs;
-        this.tokenExplicitMaxTtl = builder.tokenExplicitMaxTtl;
-        this.tokenNoDefaultPolicy = builder.tokenNoDefaultPolicy;
-        this.tokenNumUses = builder.tokenNumUses;
-        this.tokenPeriod = builder.tokenPeriod;
-        this.tokenType = builder.tokenType != null ? builder.tokenType.value() : null;
+    private TokenRole(final Builder builder) {
+        this(
+            builder.name,
+            builder.allowedPolicies,
+            builder.allowedPoliciesGlob,
+            builder.disallowedPolicies,
+            builder.disallowedPoliciesGlob,
+            builder.orphan,
+            builder.renewable,
+            builder.pathSuffix,
+            builder.allowedEntityAliases,
+            builder.tokenBoundCidrs,
+            builder.tokenExplicitMaxTtl,
+            builder.tokenNoDefaultPolicy,
+            builder.tokenNumUses,
+            builder.tokenPeriod,
+            builder.tokenType != null ? builder.tokenType.value() : null
+        );
     }
 
     /**
@@ -129,145 +91,6 @@ public final class TokenRole implements Serializable {
      */
     public static Builder builder() {
         return new Builder();
-    }
-
-    /**
-     * @return Token Role name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return List of allowed policies
-     */
-    public List<String> getAllowedPolicies() {
-        return allowedPolicies;
-    }
-
-    /**
-     * @return List of allowed policy glob patterns
-     * @since 1.1
-     */
-    public List<String> getAllowedPoliciesGlob() {
-        return allowedPoliciesGlob;
-    }
-
-    /**
-     * @return List of disallowed policies
-     */
-    public List<String> getDisallowedPolicies() {
-        return disallowedPolicies;
-    }
-
-    /**
-     * @return List of disallowed policy glob patterns
-     * @since 1.1
-     */
-    public List<String> getDisallowedPoliciesGlob() {
-        return disallowedPoliciesGlob;
-    }
-
-    /**
-     * @return Is Token Role orphan?
-     */
-    public Boolean getOrphan() {
-        return orphan;
-    }
-
-    /**
-     * @return Is Token Role renewable?
-     */
-    public Boolean getRenewable() {
-        return renewable;
-    }
-
-    /**
-     * @return Path suffix
-     */
-    public String getPathSuffix() {
-        return pathSuffix;
-    }
-
-    /**
-     * @return List of allowed entity aliases
-     */
-    public List<String> getAllowedEntityAliases() {
-        return allowedEntityAliases;
-    }
-
-    /**
-     * @return Token bound CIDR blocks
-     */
-    public List<String> getTokenBoundCidrs() {
-        return tokenBoundCidrs;
-    }
-
-    /**
-     * @return Token explicit maximum TTL
-     */
-    public Long getTokenExplicitMaxTtl() {
-        return tokenExplicitMaxTtl;
-    }
-
-    /**
-     * @return Token without default policy?
-     */
-    public Boolean getTokenNoDefaultPolicy() {
-        return tokenNoDefaultPolicy;
-    }
-
-    /**
-     * @return Token number of uses
-     */
-    public Integer getTokenNumUses() {
-        return tokenNumUses;
-    }
-
-    /**
-     * @return Token period
-     */
-    public Integer getTokenPeriod() {
-        return tokenPeriod;
-    }
-
-    /**
-     * @return Token type
-     */
-    public String getTokenType() {
-        return tokenType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TokenRole tokenRole = (TokenRole) o;
-        return Objects.equals(name, tokenRole.name) &&
-            Objects.equals(allowedPolicies, tokenRole.allowedPolicies) &&
-            Objects.equals(allowedPoliciesGlob, tokenRole.allowedPoliciesGlob) &&
-            Objects.equals(disallowedPolicies, tokenRole.disallowedPolicies) &&
-            Objects.equals(disallowedPoliciesGlob, tokenRole.disallowedPoliciesGlob) &&
-            Objects.equals(orphan, tokenRole.orphan) &&
-            Objects.equals(renewable, tokenRole.renewable) &&
-            Objects.equals(pathSuffix, tokenRole.pathSuffix) &&
-            Objects.equals(allowedEntityAliases, tokenRole.allowedEntityAliases) &&
-            Objects.equals(tokenBoundCidrs, tokenRole.tokenBoundCidrs) &&
-            Objects.equals(tokenExplicitMaxTtl, tokenRole.tokenExplicitMaxTtl) &&
-            Objects.equals(tokenNoDefaultPolicy, tokenRole.tokenNoDefaultPolicy) &&
-            Objects.equals(tokenNumUses, tokenRole.tokenNumUses) &&
-            Objects.equals(tokenPeriod, tokenRole.tokenPeriod) &&
-            Objects.equals(tokenType, tokenRole.tokenType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, allowedPolicies, allowedPoliciesGlob, disallowedPolicies, disallowedPoliciesGlob,
-            orphan, renewable, pathSuffix, allowedEntityAliases, tokenBoundCidrs, tokenExplicitMaxTtl,
-            tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
     }
 
     /**

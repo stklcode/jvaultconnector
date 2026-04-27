@@ -73,19 +73,19 @@ class HealthResponseTest extends AbstractModelTest<HealthResponse> {
 
     @Override
     protected void jsonAssertions(HealthResponse res) {
-        assertEquals(CLUSTER_ID, res.getClusterID(), "Incorrect cluster ID");
-        assertEquals(CLUSTER_NAME, res.getClusterName(), "Incorrect cluster name");
-        assertEquals(VERSION, res.getVersion(), "Incorrect version");
-        assertEquals(SERVER_TIME_UTC, res.getServerTimeUTC(), "Incorrect server time");
-        assertEquals(STANDBY, res.isStandby(), "Incorrect standby state");
-        assertEquals(SEALED, res.isSealed(), "Incorrect seal state");
-        assertEquals(INITIALIZED, res.isInitialized(), "Incorrect initialization state");
-        assertEquals(PERF_STANDBY, res.isPerformanceStandby(), "Incorrect performance standby state");
-        assertEquals(REPL_PERF_MODE, res.getReplicationPerfMode(), "Incorrect replication perf mode");
-        assertEquals(REPL_DR_MODE, res.getReplicationDrMode(), "Incorrect replication DR mode");
-        assertEquals(ECHO_DURATION, res.getEchoDurationMs(), "Incorrect echo duration");
-        assertEquals(CLOCK_SKEW, res.getClockSkewMs(), "Incorrect clock skew");
-        assertEquals(REPL_PRIM_CANARY_AGE, res.getReplicationPrimaryCanaryAgeMs(), "Incorrect canary age");
-        assertEquals(ENTERPRISE, res.isEnterprise(), "Incorrect enterprise flag");
+        assertEquals(CLUSTER_ID, res.clusterID(), "Incorrect cluster ID");
+        assertEquals(CLUSTER_NAME, res.clusterName(), "Incorrect cluster name");
+        assertEquals(VERSION, res.version(), "Incorrect version");
+        assertEquals(SERVER_TIME_UTC, res.serverTimeUTC(), "Incorrect server time");
+        assertEquals(STANDBY, res.standby(), "Incorrect standby state");
+        assertEquals(SEALED, res.sealed(), "Incorrect seal state");
+        assertEquals(INITIALIZED, res.initialized(), "Incorrect initialization state");
+        assertEquals(PERF_STANDBY, res.performanceStandby(), "Incorrect performance standby state");
+        assertEquals(REPL_PERF_MODE, res.replicationPerformanceMode(), "Incorrect replication perf mode");
+        assertEquals(REPL_DR_MODE, res.replicationDrMode(), "Incorrect replication DR mode");
+        assertEquals(ECHO_DURATION, res.echoDurationMs(), "Incorrect echo duration");
+        assertEquals(CLOCK_SKEW, res.clockSkewMs(), "Incorrect clock skew");
+        assertEquals(REPL_PRIM_CANARY_AGE, res.replicationPrimaryCanaryAgeMs(), "Incorrect canary age");
+        assertEquals(ENTERPRISE, res.enterprise(), "Incorrect enterprise flag");
     }
 }

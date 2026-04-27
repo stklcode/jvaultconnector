@@ -61,16 +61,16 @@ class TransitResponseTest extends AbstractModelTest<TransitResponse> {
             "TransitResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
-        assertEquals("987c6daf-b0e2-4142-a970-1e61fdb249d7", res.getRequestId(), "Incorrect request id");
-        assertEquals("", res.getLeaseId(), "Unexpected lease id");
-        assertFalse(res.isRenewable(), "Unexpected renewable flag");
-        assertEquals(0, res.getLeaseDuration(), "Unexpected lease duration");
-        assertEquals(CIPHERTEXT, res.getCiphertext(), "Incorrect ciphertext");
-        assertNull(res.getPlaintext(), "Unexpected plaintext");
-        assertNull(res.getSum(), "Unexpected sum");
-        assertNull(res.getWrapInfo(), "Unexpected wrap info");
-        assertNull(res.getWarnings(), "Unexpected warnings");
-        assertNull(res.getAuth(), "Unexpected auth");
+        assertEquals("987c6daf-b0e2-4142-a970-1e61fdb249d7", res.requestId(), "Incorrect request id");
+        assertEquals("", res.leaseId(), "Unexpected lease id");
+        assertFalse(res.renewable(), "Unexpected renewable flag");
+        assertEquals(0, res.leaseDuration(), "Unexpected lease duration");
+        assertEquals(CIPHERTEXT, res.ciphertext(), "Incorrect ciphertext");
+        assertNull(res.plaintext(), "Unexpected plaintext");
+        assertNull(res.sum(), "Unexpected sum");
+        assertNull(res.wrapInfo(), "Unexpected wrap info");
+        assertNull(res.warnings(), "Unexpected warnings");
+        assertNull(res.auth(), "Unexpected auth");
     }
 
     @Test
@@ -83,16 +83,16 @@ class TransitResponseTest extends AbstractModelTest<TransitResponse> {
             "TransitResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
-        assertEquals("987c6daf-b0e2-4142-a970-1e61fdb249d7", res.getRequestId(), "Incorrect request id");
-        assertEquals("", res.getLeaseId(), "Unexpected lease id");
-        assertFalse(res.isRenewable(), "Unexpected renewable flag");
-        assertEquals(0, res.getLeaseDuration(), "Unexpected lease duration");
-        assertNull(res.getCiphertext(), "Unexpected ciphertext");
-        assertEquals(PLAINTEXT, res.getPlaintext(), "Incorrect plaintext");
-        assertNull(res.getSum(), "Unexpected sum");
-        assertNull(res.getWrapInfo(), "Unexpected wrap info");
-        assertNull(res.getWarnings(), "Unexpected warnings");
-        assertNull(res.getAuth(), "Unexpected auth");
+        assertEquals("987c6daf-b0e2-4142-a970-1e61fdb249d7", res.requestId(), "Incorrect request id");
+        assertEquals("", res.leaseId(), "Unexpected lease id");
+        assertFalse(res.renewable(), "Unexpected renewable flag");
+        assertEquals(0, res.leaseDuration(), "Unexpected lease duration");
+        assertNull(res.ciphertext(), "Unexpected ciphertext");
+        assertEquals(PLAINTEXT, res.plaintext(), "Incorrect plaintext");
+        assertNull(res.sum(), "Unexpected sum");
+        assertNull(res.wrapInfo(), "Unexpected wrap info");
+        assertNull(res.warnings(), "Unexpected warnings");
+        assertNull(res.auth(), "Unexpected auth");
     }
 
     @Test
@@ -105,16 +105,16 @@ class TransitResponseTest extends AbstractModelTest<TransitResponse> {
             "TransitResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
-        assertEquals("987c6daf-b0e2-4142-a970-1e61fdb249d7", res.getRequestId(), "Incorrect request id");
-        assertEquals("", res.getLeaseId(), "Unexpected lease id");
-        assertFalse(res.isRenewable(), "Unexpected renewable flag");
-        assertEquals(0, res.getLeaseDuration(), "Unexpected lease duration");
-        assertNull(res.getCiphertext(), "Unexpected ciphertext");
-        assertNull(res.getPlaintext(), "Unexpected plaintext");
-        assertEquals(SUM, res.getSum(), "Incorrect sum");
-        assertNull(res.getWrapInfo(), "Unexpected wrap info");
-        assertNull(res.getWarnings(), "Unexpected warnings");
-        assertNull(res.getAuth(), "Unexpected auth");
+        assertEquals("987c6daf-b0e2-4142-a970-1e61fdb249d7", res.requestId(), "Incorrect request id");
+        assertEquals("", res.leaseId(), "Unexpected lease id");
+        assertFalse(res.renewable(), "Unexpected renewable flag");
+        assertEquals(0, res.leaseDuration(), "Unexpected lease duration");
+        assertNull(res.ciphertext(), "Unexpected ciphertext");
+        assertNull(res.plaintext(), "Unexpected plaintext");
+        assertEquals(SUM, res.sum(), "Incorrect sum");
+        assertNull(res.wrapInfo(), "Unexpected wrap info");
+        assertNull(res.warnings(), "Unexpected warnings");
+        assertNull(res.auth(), "Unexpected auth");
     }
 
     private static String json(String data) {

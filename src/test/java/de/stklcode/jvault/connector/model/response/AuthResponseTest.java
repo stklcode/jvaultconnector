@@ -115,29 +115,29 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
 
     @Override
     protected void jsonAssertions(AuthResponse res) {
-        AuthData data = res.getAuth();
+        AuthData data = res.auth();
         assertNotNull(data, "Auth data is NULL");
-        assertEquals(AUTH_ACCESSOR, data.getAccessor(), "Incorrect auth accessor");
-        assertEquals(AUTH_CLIENT_TOKEN, data.getClientToken(), "Incorrect auth client token");
-        assertEquals(AUTH_LEASE_DURATION, data.getLeaseDuration(), "Incorrect auth lease duration");
-        assertEquals(AUTH_RENEWABLE, data.isRenewable(), "Incorrect auth renewable flag");
-        assertEquals(AUTH_ORPHAN, data.isOrphan(), "Incorrect auth orphan flag");
-        assertEquals(AUTH_TOKEN_TYPE, data.getTokenType(), "Incorrect auth token type");
-        assertEquals(AUTH_ENTITY_ID, data.getEntityId(), "Incorrect auth entity id");
-        assertEquals(AUTH_NUM_USES, data.getNumUses(), "Incorrect auth num uses");
-        assertEquals(2, data.getPolicies().size(), "Incorrect number of policies");
-        assertTrue(data.getPolicies().containsAll(Set.of(AUTH_POLICY_1, AUTH_POLICY_2)));
-        assertEquals(2, data.getTokenPolicies().size(), "Incorrect number of token policies");
-        assertTrue(data.getTokenPolicies().containsAll(Set.of(AUTH_POLICY_2, AUTH_POLICY_1)), "Incorrect token policies");
-        assertEquals(Map.of(AUTH_META_KEY, AUTH_META_VALUE), data.getMetadata(), "Incorrect auth metadata");
+        assertEquals(AUTH_ACCESSOR, data.accessor(), "Incorrect auth accessor");
+        assertEquals(AUTH_CLIENT_TOKEN, data.clientToken(), "Incorrect auth client token");
+        assertEquals(AUTH_LEASE_DURATION, data.leaseDuration(), "Incorrect auth lease duration");
+        assertEquals(AUTH_RENEWABLE, data.renewable(), "Incorrect auth renewable flag");
+        assertEquals(AUTH_ORPHAN, data.orphan(), "Incorrect auth orphan flag");
+        assertEquals(AUTH_TOKEN_TYPE, data.tokenType(), "Incorrect auth token type");
+        assertEquals(AUTH_ENTITY_ID, data.entityId(), "Incorrect auth entity id");
+        assertEquals(AUTH_NUM_USES, data.numUses(), "Incorrect auth num uses");
+        assertEquals(2, data.policies().size(), "Incorrect number of policies");
+        assertTrue(data.policies().containsAll(Set.of(AUTH_POLICY_1, AUTH_POLICY_2)));
+        assertEquals(2, data.tokenPolicies().size(), "Incorrect number of token policies");
+        assertTrue(data.tokenPolicies().containsAll(Set.of(AUTH_POLICY_2, AUTH_POLICY_1)), "Incorrect token policies");
+        assertEquals(Map.of(AUTH_META_KEY, AUTH_META_VALUE), data.metadata(), "Incorrect auth metadata");
 
-        assertEquals(MFA_REQUEST_ID, data.getMfaRequirement().getMfaRequestId(), "Incorrect MFA request ID");
-        assertEquals(Set.of(MFA_KEY), data.getMfaRequirement().getMfaConstraints().keySet(), "Incorrect MFA constraint keys");
-        var mfaConstraint = data.getMfaRequirement().getMfaConstraints().get(MFA_KEY);
-        assertEquals(1, mfaConstraint.getAny().size(), "Incorrect number of any constraints");
-        assertEquals(MFA_METHOD_TYPE, mfaConstraint.getAny().get(0).getType(), "Incorrect MFA method type");
-        assertEquals(MFA_METHOD_ID, mfaConstraint.getAny().get(0).getId(), "Incorrect MFA method type");
-        assertEquals(MFA_METHOD_USES_PASSCODE, mfaConstraint.getAny().get(0).getUsesPasscode(), "Incorrect MFA method uses passcode");
-        assertEquals(MFA_METHOD_NAME, mfaConstraint.getAny().get(0).getName(), "Incorrect MFA method uses passcode");
+        assertEquals(MFA_REQUEST_ID, data.mfaRequirement().mfaRequestId(), "Incorrect MFA request ID");
+        assertEquals(Set.of(MFA_KEY), data.mfaRequirement().mfaConstraints().keySet(), "Incorrect MFA constraint keys");
+        var mfaConstraint = data.mfaRequirement().mfaConstraints().get(MFA_KEY);
+        assertEquals(1, mfaConstraint.any().size(), "Incorrect number of any constraints");
+        assertEquals(MFA_METHOD_TYPE, mfaConstraint.any().get(0).type(), "Incorrect MFA method type");
+        assertEquals(MFA_METHOD_ID, mfaConstraint.any().get(0).id(), "Incorrect MFA method type");
+        assertEquals(MFA_METHOD_USES_PASSCODE, mfaConstraint.any().get(0).usesPasscode(), "Incorrect MFA method uses passcode");
+        assertEquals(MFA_METHOD_NAME, mfaConstraint.any().get(0).name(), "Incorrect MFA method uses passcode");
     }
 }

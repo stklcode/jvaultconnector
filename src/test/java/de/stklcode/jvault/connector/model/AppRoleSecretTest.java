@@ -18,12 +18,10 @@ package de.stklcode.jvault.connector.model;
 
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 
 /**
@@ -39,7 +37,6 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
         "number", 1337
     );
     private static final List<String> TEST_CIDR = List.of("203.0.113.0/24", "198.51.100.0/24");
-    private static final List<String> TEST_TOKEN_CIDR = List.of("192.0.2.0/24", "198.51.100.0/24");
 
     AppRoleSecretTest() {
         super(AppRoleSecret.class);
@@ -57,80 +54,55 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
     void constructorTest() {
         // Empty constructor.
         AppRoleSecret secret = new AppRoleSecret();
-        assertNull(secret.getId());
-        assertNull(secret.getAccessor());
-        assertNull(secret.getMetadata());
-        assertNull(secret.getCidrList());
-        assertEquals("", secret.getCidrListString());
-        assertNull(secret.getTokenBoundCidrs());
-        assertEquals("", secret.getTokenBoundCidrsString());
-        assertNull(secret.getCreationTime());
-        assertNull(secret.getExpirationTime());
-        assertNull(secret.getLastUpdatedTime());
-        assertNull(secret.getNumUses());
-        assertNull(secret.getTtl());
+        assertNull(secret.id());
+        assertNull(secret.accessor());
+        assertNull(secret.metadata());
+        assertNull(secret.cidrList());
+        assertEquals("", secret.cidrListString());
+        assertNull(secret.tokenBoundCidrs());
+        assertEquals("", secret.tokenBoundCidrsString());
+        assertNull(secret.creationTime());
+        assertNull(secret.expirationTime());
+        assertNull(secret.lastUpdatedTime());
+        assertNull(secret.numUses());
+        assertNull(secret.ttl());
 
         // Constructor with ID.
         secret = new AppRoleSecret(TEST_ID);
-        assertEquals(TEST_ID, secret.getId());
-        assertNull(secret.getAccessor());
-        assertNull(secret.getMetadata());
-        assertNull(secret.getCidrList());
-        assertEquals("", secret.getCidrListString());
-        assertNull(secret.getTokenBoundCidrs());
-        assertEquals("", secret.getTokenBoundCidrsString());
-        assertNull(secret.getCreationTime());
-        assertNull(secret.getExpirationTime());
-        assertNull(secret.getLastUpdatedTime());
-        assertNull(secret.getNumUses());
-        assertNull(secret.getTtl());
+        assertEquals(TEST_ID, secret.id());
+        assertNull(secret.accessor());
+        assertNull(secret.metadata());
+        assertNull(secret.cidrList());
+        assertEquals("", secret.cidrListString());
+        assertNull(secret.tokenBoundCidrs());
+        assertEquals("", secret.tokenBoundCidrsString());
+        assertNull(secret.creationTime());
+        assertNull(secret.expirationTime());
+        assertNull(secret.lastUpdatedTime());
+        assertNull(secret.numUses());
+        assertNull(secret.ttl());
 
         // Constructor with Metadata and CIDR bindings.
         secret = new AppRoleSecret(TEST_ID, TEST_META, TEST_CIDR);
-        assertEquals(TEST_ID, secret.getId());
-        assertNull(secret.getAccessor());
-        assertEquals(TEST_META, secret.getMetadata());
-        assertEquals(TEST_CIDR, secret.getCidrList());
-        assertEquals(String.join(",", TEST_CIDR), secret.getCidrListString());
-        assertNull(secret.getTokenBoundCidrs());
-        assertEquals("", secret.getTokenBoundCidrsString());
-        assertNull(secret.getCreationTime());
-        assertNull(secret.getExpirationTime());
-        assertNull(secret.getLastUpdatedTime());
-        assertNull(secret.getNumUses());
-        assertNull(secret.getTtl());
-    }
-
-    /**
-     * Test setter.
-     */
-    @Test
-    void setterTest() {
-        AppRoleSecret secret = new AppRoleSecret(TEST_ID);
-        assertNull(secret.getCidrList());
-        assertEquals("", secret.getCidrListString());
-        secret.setCidrList(TEST_CIDR);
-        assertEquals(TEST_CIDR, secret.getCidrList());
-        assertEquals(String.join(",", TEST_CIDR), secret.getCidrListString());
-        secret.setCidrList(null);
-        assertNull(secret.getCidrList());
-        assertEquals("", secret.getCidrListString());
-
-        assertNull(secret.getTokenBoundCidrs());
-        assertEquals("", secret.getTokenBoundCidrsString());
-        secret.setTokenBoundCidrs(TEST_TOKEN_CIDR);
-        assertEquals(TEST_TOKEN_CIDR, secret.getTokenBoundCidrs());
-        assertEquals(String.join(",", TEST_TOKEN_CIDR), secret.getTokenBoundCidrsString());
-        secret.setTokenBoundCidrs(null);
-        assertNull(secret.getTokenBoundCidrs());
-        assertEquals("", secret.getTokenBoundCidrsString());
+        assertEquals(TEST_ID, secret.id());
+        assertNull(secret.accessor());
+        assertEquals(TEST_META, secret.metadata());
+        assertEquals(TEST_CIDR, secret.cidrList());
+        assertEquals(String.join(",", TEST_CIDR), secret.cidrListString());
+        assertNull(secret.tokenBoundCidrs());
+        assertEquals("", secret.tokenBoundCidrsString());
+        assertNull(secret.creationTime());
+        assertNull(secret.expirationTime());
+        assertNull(secret.lastUpdatedTime());
+        assertNull(secret.numUses());
+        assertNull(secret.ttl());
     }
 
     /**
      * Test JSON (de)serialization.
      */
     @Test
-    void jsonTest() throws NoSuchFieldException, IllegalAccessException {
+    void jsonTest() {
         // A simple roundtrip first. All set fields should be present afterward.
         AppRoleSecret secret = new AppRoleSecret(TEST_ID, TEST_META, TEST_CIDR);
         String secretJson = assertDoesNotThrow(() -> objectMapper.writeValueAsString(secret), "Serialization failed");
@@ -141,37 +113,26 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
             () -> objectMapper.readValue(secretJson2, AppRoleSecret.class),
             "Deserialization failed"
         );
-        assertEquals(secret2.getId(), secret.getId());
-        assertEquals(secret2.getMetadata(), secret.getMetadata());
-        assertEquals(secret2.getCidrList(), secret.getCidrList());
+        assertEquals(secret2.id(), secret.id());
+        assertEquals(secret2.metadata(), secret.metadata());
+        assertEquals(secret2.cidrList(), secret.cidrList());
 
         // Test fields, that should not be written to JSON.
-        setPrivateField(secret, "accessor", "TEST_ACCESSOR");
-        assumeTrue("TEST_ACCESSOR".equals(secret.getAccessor()));
-        setPrivateField(secret, "creationTime", "TEST_CREATION");
-        assumeTrue("TEST_CREATION".equals(secret.getCreationTime()));
-        setPrivateField(secret, "expirationTime", "TEST_EXPIRATION");
-        assumeTrue("TEST_EXPIRATION".equals(secret.getExpirationTime()));
-        setPrivateField(secret, "lastUpdatedTime", "TEST_UPDATETIME");
-        assumeTrue("TEST_UPDATETIME".equals(secret.getLastUpdatedTime()));
-        setPrivateField(secret, "numUses", 678);
-        assumeTrue(secret.getNumUses() == 678);
-        setPrivateField(secret, "ttl", 12345);
-        assumeTrue(secret.getTtl() == 12345);
-        String secretJson3 = assertDoesNotThrow(() -> objectMapper.writeValueAsString(secret), "Serialization failed");
+        var secret3 = new AppRoleSecret(TEST_ID, "TEST_ACCESSOR", TEST_META, TEST_CIDR, null, "TEST_CREATION", "TEST_EXPIRATION", "TEST_LASTUPDATE", 678, 12345);
+        String secretJson3 = assertDoesNotThrow(() -> objectMapper.writeValueAsString(secret3), "Serialization failed");
         secret2 = assertDoesNotThrow(
             () -> objectMapper.readValue(commaSeparatedToList(secretJson3), AppRoleSecret.class),
             "Deserialization failed"
         );
-        assertEquals(secret2.getId(), secret.getId());
-        assertEquals(secret2.getMetadata(), secret.getMetadata());
-        assertEquals(secret2.getCidrList(), secret.getCidrList());
-        assertNull(secret2.getAccessor());
-        assertNull(secret2.getCreationTime());
-        assertNull(secret2.getExpirationTime());
-        assertNull(secret2.getLastUpdatedTime());
-        assertNull(secret2.getNumUses());
-        assertNull(secret2.getTtl());
+        assertEquals(secret2.id(), secret.id());
+        assertEquals(secret2.metadata(), secret.metadata());
+        assertEquals(secret2.cidrList(), secret.cidrList());
+        assertNull(secret2.accessor());
+        assertNull(secret2.creationTime());
+        assertNull(secret2.expirationTime());
+        assertNull(secret2.lastUpdatedTime());
+        assertNull(secret2.numUses());
+        assertNull(secret2.ttl());
 
         // Those fields should be deserialized from JSON though.
         String secretJson4 = "{\"secret_id\":\"abc123\",\"metadata\":{\"number\":1337,\"foo\":\"bar\"}," +
@@ -180,20 +141,12 @@ class AppRoleSecretTest extends AbstractModelTest<AppRoleSecret> {
             "\"creation_time\":\"TEST_CREATION\",\"expiration_time\":\"TEST_EXPIRATION\"," +
             "\"last_updated_time\":\"TEST_LASTUPDATE\",\"secret_id_num_uses\":678,\"secret_id_ttl\":12345}";
         secret2 = assertDoesNotThrow(() -> objectMapper.readValue(secretJson4, AppRoleSecret.class), "Deserialization failed");
-        assertEquals("TEST_ACCESSOR", secret2.getAccessor());
-        assertEquals("TEST_CREATION", secret2.getCreationTime());
-        assertEquals("TEST_EXPIRATION", secret2.getExpirationTime());
-        assertEquals("TEST_LASTUPDATE", secret2.getLastUpdatedTime());
-        assertEquals(678, secret2.getNumUses());
-        assertEquals(12345, secret2.getTtl());
-    }
-
-    private static void setPrivateField(Object object, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = object.getClass().getDeclaredField(fieldName);
-        boolean accessible = field.canAccess(object);
-        field.setAccessible(true);
-        field.set(object, value);
-        field.setAccessible(accessible);
+        assertEquals("TEST_ACCESSOR", secret2.accessor());
+        assertEquals("TEST_CREATION", secret2.creationTime());
+        assertEquals("TEST_EXPIRATION", secret2.expirationTime());
+        assertEquals("TEST_LASTUPDATE", secret2.lastUpdatedTime());
+        assertEquals(678, secret2.numUses());
+        assertEquals(12345, secret2.ttl());
     }
 
     private static String commaSeparatedToList(String json) {

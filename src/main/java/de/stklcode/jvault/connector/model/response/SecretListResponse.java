@@ -16,11 +16,10 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import de.stklcode.jvault.connector.model.response.embedded.SecretListWrapper;
 
-import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -28,40 +27,24 @@ import java.util.Objects;
 /**
  * Vault response for secret list request.
  *
+ * @param responseHeader Response metadata
+ * @param data           Secret list wrapper
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class SecretListResponse extends VaultDataResponse {
-    @Serial
-    private static final long serialVersionUID = 8597121175002967213L;
-
-    @JsonProperty("data")
-    private SecretListWrapper data;
+public record SecretListResponse(
+    @JsonUnwrapped Header responseHeader,
+    @JsonProperty("data") SecretListWrapper data
+) implements VaultDataResponse {
 
     /**
      * @return List of secret keys
      */
-    public List<String> getKeys() {
+    public List<String> keys() {
         if (data == null) {
             return Collections.emptyList();
         }
-        return Objects.requireNonNullElseGet(data.getKeys(), Collections::emptyList);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        SecretListResponse that = (SecretListResponse) o;
-        return Objects.equals(data, that.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), data);
+        return Objects.requireNonNullElseGet(data.keys(), Collections::emptyList);
     }
 }

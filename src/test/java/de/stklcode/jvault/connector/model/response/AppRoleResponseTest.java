@@ -78,22 +78,22 @@ class AppRoleResponseTest extends AbstractModelTest<AppRoleResponse> {
     @Test
     void getDataRoundtrip() {
         // Create empty Object.
-        AppRoleResponse res = new AppRoleResponse();
-        assertNull(res.getRole(), "Initial data should be empty");
+        AppRoleResponse res = new AppRoleResponse(null, null);
+        assertNull(res.role(), "Initial data should be empty");
     }
 
     @Override
     protected void jsonAssertions(AppRoleResponse res) {
-        AppRole role = res.getRole();
+        AppRole role = res.role();
         assertNotNull(role, "Role data is NULL");
-        assertEquals(ROLE_TOKEN_TTL, role.getTokenTtl(), "Incorrect token TTL");
-        assertEquals(ROLE_TOKEN_MAX_TTL, role.getTokenMaxTtl(), "Incorrect token max TTL");
-        assertEquals(ROLE_SECRET_TTL, role.getSecretIdTtl(), "Incorrect secret ID TTL");
-        assertEquals(ROLE_SECRET_NUM_USES, role.getSecretIdNumUses(), "Incorrect secret ID umber of uses");
-        assertEquals(List.of(ROLE_POLICY), role.getTokenPolicies(), "Incorrect policies");
-        assertEquals(ROLE_PERIOD, role.getTokenPeriod(), "Incorrect role period");
-        assertEquals(ROLE_BIND_SECRET, role.getBindSecretId(), "Incorrect role bind secret ID flag");
-        assertNull(role.getTokenBoundCidrs(), "Incorrect bound CIDR list");
-        assertEquals("", role.getTokenBoundCidrsString(), "Incorrect bound CIDR list string");
+        assertEquals(ROLE_TOKEN_TTL, role.tokenTtl(), "Incorrect token TTL");
+        assertEquals(ROLE_TOKEN_MAX_TTL, role.tokenMaxTtl(), "Incorrect token max TTL");
+        assertEquals(ROLE_SECRET_TTL, role.secretIdTtl(), "Incorrect secret ID TTL");
+        assertEquals(ROLE_SECRET_NUM_USES, role.secretIdNumUses(), "Incorrect secret ID umber of uses");
+        assertEquals(List.of(ROLE_POLICY), role.tokenPolicies(), "Incorrect policies");
+        assertEquals(ROLE_PERIOD, role.tokenPeriod(), "Incorrect role period");
+        assertEquals(ROLE_BIND_SECRET, role.bindSecretId(), "Incorrect role bind secret ID flag");
+        assertNull(role.tokenBoundCidrs(), "Incorrect bound CIDR list");
+        assertEquals("", role.tokenBoundCidrsString(), "Incorrect bound CIDR list string");
     }
 }

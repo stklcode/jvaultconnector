@@ -16,33 +16,23 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-import java.io.Serial;
-import java.util.Map;
-import java.util.Objects;
+import java.io.Serializable;
 
 /**
  * Response entity for transit operations.
  *
+ * @param responseHeader Response metadata
+ * @param data           Transit data wrapper
  * @author Stefan Kalscheuer
  * @since 1.5.0
+ * @since 2.0 class is now a record
  */
-public class TransitResponse extends VaultDataResponse {
-
-    @Serial
-    private static final long serialVersionUID = 6873804240772242771L;
-
-    private String ciphertext;
-    private String plaintext;
-    private String sum;
-
-    @JsonSetter("data")
-    private void setData(Map<String, String> data) {
-        ciphertext = data.get("ciphertext");
-        plaintext = data.get("plaintext");
-        sum = data.get("sum");
-    }
+public record TransitResponse(
+    @JsonUnwrapped Header responseHeader,
+    Data data
+) implements VaultDataResponse {
 
     /**
      * Get ciphertext.
@@ -50,8 +40,11 @@ public class TransitResponse extends VaultDataResponse {
      *
      * @return Ciphertext
      */
-    public String getCiphertext() {
-        return ciphertext;
+    public String ciphertext() {
+        if (data != null) {
+            return data.ciphertext();
+        }
+        return null;
     }
 
     /**
@@ -60,8 +53,11 @@ public class TransitResponse extends VaultDataResponse {
      *
      * @return Plaintext
      */
-    public String getPlaintext() {
-        return plaintext;
+    public String plaintext() {
+        if (data != null) {
+            return data.plaintext();
+        }
+        return null;
     }
 
     /**
@@ -70,25 +66,25 @@ public class TransitResponse extends VaultDataResponse {
      *
      * @return Hash sum
      */
-    public String getSum() {
-        return sum;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
+    public String sum() {
+        if (data != null) {
+            return data.sum();
         }
-        TransitResponse that = (TransitResponse) o;
-        return Objects.equals(ciphertext, that.ciphertext) &&
-            Objects.equals(plaintext, that.plaintext) &&
-            Objects.equals(sum, that.sum);
+        return null;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), ciphertext, plaintext, sum);
+    /**
+     * Transit response data model.
+     *
+     * @param ciphertext Ciphertext
+     * @param plaintext  Plaintext
+     * @param sum        Hash sum
+     * @since 2.0
+     */
+    public record Data(
+        String ciphertext,
+        String plaintext,
+        String sum
+    ) implements Serializable {
     }
 }

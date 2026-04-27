@@ -67,11 +67,11 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
 
     @Override
     protected void jsonAssertions(PlainSecretResponse res) {
-        assertEquals(SECRET_REQUEST_ID, res.getRequestId(), "Incorrect request ID");
-        assertEquals(SECRET_LEASE_ID, res.getLeaseId(), "Incorrect lease ID");
-        assertEquals(SECRET_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
-        assertEquals(SECRET_RENEWABLE, res.isRenewable(), "Incorrect renewable status");
-        assertEquals(SECRET_WARNINGS, res.getWarnings(), "Incorrect warnings");
+        assertEquals(SECRET_REQUEST_ID, res.requestId(), "Incorrect request ID");
+        assertEquals(SECRET_LEASE_ID, res.leaseId(), "Incorrect lease ID");
+        assertEquals(SECRET_LEASE_DURATION, res.leaseDuration(), "Incorrect lease duration");
+        assertEquals(SECRET_RENEWABLE, res.renewable(), "Incorrect renewable status");
+        assertEquals(SECRET_WARNINGS, res.warnings(), "Incorrect warnings");
         assertEquals(SECRET_DATA_V1, res.get(SECRET_DATA_K1), "Response does not contain correct data");
         assertEquals(SECRET_DATA_V2, res.get(SECRET_DATA_K2), "Response does not contain correct data");
     }

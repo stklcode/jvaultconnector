@@ -16,128 +16,113 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
 import de.stklcode.jvault.connector.model.response.embedded.WrapInfo;
 
-import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Abstract Vault response with default payload fields.
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 2.0 abstract class is now an interface
  */
-public abstract class VaultDataResponse implements VaultResponse {
-    @Serial
-    private static final long serialVersionUID = 4787715235558510045L;
+public interface VaultDataResponse extends VaultResponse {
 
-    @JsonProperty("request_id")
-    private String requestId;
-
-    @JsonProperty("lease_id")
-    private String leaseId;
-
-    @JsonProperty("renewable")
-    private boolean renewable;
-
-    @JsonProperty("lease_duration")
-    private Integer leaseDuration;
-
-    @JsonProperty("warnings")
-    private List<String> warnings;
-
-    @JsonProperty("wrap_info")
-    private WrapInfo wrapInfo;
-
-    @JsonProperty("auth")
-    private AuthData auth;
-
-    @JsonProperty("mount_type")
-    private String mountType;
+    /**
+     * This method returns the responseMeta wrapper for the data response.
+     * Primarily designed for internal use, getters delegate to the nested attributes directly.
+     *
+     * @return Data response responseMeta wrapper
+     * @since 2.0
+     */
+    Header responseHeader();
 
     /**
      * @return Request ID
      * @since 1.1
      */
-    public final String getRequestId() {
-        return requestId;
+    default String requestId() {
+        return responseHeader().requestId();
     }
 
     /**
      * @return Lease ID
      */
-    public final String getLeaseId() {
-        return leaseId;
+    default String leaseId() {
+        return responseHeader().leaseId();
     }
 
     /**
      * @return Lease is renewable
      */
-    public final boolean isRenewable() {
-        return renewable;
+    default Boolean renewable() {
+        return responseHeader().renewable();
     }
 
     /**
      * @return Lease duration
      */
-    public final Integer getLeaseDuration() {
-        return leaseDuration;
+    default Integer leaseDuration() {
+        return responseHeader().leaseDuration;
     }
 
     /**
      * @return List of warnings
      */
-    public final List<String> getWarnings() {
-        return warnings;
+    default List<String> warnings() {
+        return responseHeader().warnings();
     }
 
     /**
      * @return Wrapping information
      * @since 1.1
      */
-    public final WrapInfo getWrapInfo() {
-        return wrapInfo;
+    default WrapInfo wrapInfo() {
+        return responseHeader().wrapInfo();
     }
 
     /**
      * @return Authentication information for this response
      * @since 1.3
      */
-    public final AuthData getAuth() {
-        return auth;
+    default AuthData auth() {
+        return responseHeader().auth();
     }
 
     /**
      * @return Information about the type of mount this secret is from (since Vault 1.17)
      * @since 1.3
      */
-    public final String getMountType() {
-        return mountType;
+    default String mountType() {
+        return responseHeader().mountType;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        VaultDataResponse that = (VaultDataResponse) o;
-        return renewable == that.renewable &&
-            Objects.equals(requestId, that.requestId) &&
-            Objects.equals(leaseId, that.leaseId) &&
-            Objects.equals(leaseDuration, that.leaseDuration) &&
-            Objects.equals(warnings, that.warnings) &&
-            Objects.equals(wrapInfo, that.wrapInfo) &&
-            Objects.equals(auth, that.auth) &&
-            Objects.equals(mountType, that.mountType);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(requestId, leaseId, renewable, leaseDuration, warnings, wrapInfo, auth, mountType);
+    /**
+     * Embedded record for common ("responseMeta") attributes of each {@link VaultDataResponse}.
+     *
+     * @param requestId     Request ID
+     * @param leaseId       Lease ID
+     * @param renewable     Lease is renewable
+     * @param leaseDuration Lease duration
+     * @param warnings      List of warnings
+     * @param wrapInfo      Wrapping information
+     * @param auth          Authentication information for this response
+     * @param mountType     Information about the type of mount this secret is from (since Vault 1.17)
+     * @since 2.0
+     */
+    record Header(
+        String requestId,
+        String leaseId,
+        Boolean renewable,
+        Integer leaseDuration,
+        List<String> warnings,
+        WrapInfo wrapInfo,
+        AuthData auth,
+        String mountType
+    ) implements Serializable {
     }
 }

@@ -16,61 +16,51 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Vault AppRole role metamodel.
  *
+ * @param id              Secret ID
+ * @param accessor        Secret accessor
+ * @param metadata        Secret metadata
+ * @param cidrList        List of bound subnets in CIDR notation
+ * @param tokenBoundCidrs List of bound CIDR subnets of associated tokens
+ * @param creationTime    Creation time
+ * @param expirationTime  Expiration time
+ * @param lastUpdatedTime Time of last update
+ * @param numUses         Number of uses
+ * @param ttl             Time-to-live
  * @author Stefan Kalscheuer
  * @since 0.4.0
  * @since 1.1 implements {@link Serializable}
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class AppRoleSecret implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 3079272087137299819L;
-
-    @JsonProperty("secret_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String id;
-
-    @JsonProperty(value = "secret_id_accessor", access = JsonProperty.Access.WRITE_ONLY)
-    private String accessor;
-
-    @JsonProperty("metadata")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Map<String, Object> metadata;
-
-    private List<String> cidrList;
-
-    private List<String> tokenBoundCidrs;
-
-    @JsonProperty(value = "creation_time", access = JsonProperty.Access.WRITE_ONLY)
-    private String creationTime;
-
-    @JsonProperty(value = "expiration_time", access = JsonProperty.Access.WRITE_ONLY)
-    private String expirationTime;
-
-    @JsonProperty(value = "last_updated_time", access = JsonProperty.Access.WRITE_ONLY)
-    private String lastUpdatedTime;
-
-    @JsonProperty(value = "secret_id_num_uses", access = JsonProperty.Access.WRITE_ONLY)
-    private Integer numUses;
-
-    @JsonProperty(value = "secret_id_ttl", access = JsonProperty.Access.WRITE_ONLY)
-    private Integer ttl;
+public record AppRoleSecret(
+    @JsonProperty("secret_id") @JsonInclude(JsonInclude.Include.NON_NULL) String id,
+    @JsonProperty(value = "secret_id_accessor", access = JsonProperty.Access.WRITE_ONLY) String accessor,
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) Map<String, Object> metadata,
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class) List<String> cidrList,
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class) List<String> tokenBoundCidrs,
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String creationTime,
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String expirationTime,
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String lastUpdatedTime,
+    @JsonProperty(value = "secret_id_num_uses", access = JsonProperty.Access.WRITE_ONLY) Integer numUses,
+    @JsonProperty(value = "secret_id_ttl", access = JsonProperty.Access.WRITE_ONLY) Integer ttl
+) implements Serializable {
 
     /**
      * Construct empty {@link AppRoleSecret} object.
      */
     public AppRoleSecret() {
+        this(null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -79,7 +69,7 @@ public final class AppRoleSecret implements Serializable {
      * @param id Secret ID
      */
     public AppRoleSecret(final String id) {
-        this.id = id;
+        this(id, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -90,74 +80,19 @@ public final class AppRoleSecret implements Serializable {
      * @param cidrList List of subnets in CIDR notation, the role is bound to
      */
     public AppRoleSecret(final String id, final Map<String, Object> metadata, final List<String> cidrList) {
-        this.id = id;
-        this.metadata = metadata;
-        this.cidrList = cidrList;
-    }
-
-    /**
-     * @return Secret ID
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @return Secret accessor
-     */
-    public String getAccessor() {
-        return accessor;
-    }
-
-    /**
-     * @return Secret metadata
-     */
-    public Map<String, Object> getMetadata() {
-        return metadata;
-    }
-
-    /**
-     * @return List of bound subnets in CIDR notation
-     */
-    public List<String> getCidrList() {
-        return cidrList;
-    }
-
-    /**
-     * @param cidrList List of subnets in CIDR notation
-     */
-    @JsonSetter("cidr_list")
-    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
-    public void setCidrList(final List<String> cidrList) {
-        this.cidrList = cidrList;
+        this(id, null, metadata, cidrList, null, null, null, null, null, null);
     }
 
     /**
      * @return List of bound subnets in CIDR notation as comma-separated {@link String}
      */
     @JsonGetter("cidr_list")
-    public String getCidrListString() {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public String cidrListString() {
         if (cidrList == null || cidrList.isEmpty()) {
             return "";
         }
         return String.join(",", cidrList);
-    }
-
-    /**
-     * @return list of bound CIDR subnets of associated tokens
-     * @since 1.5.3
-     */
-    public List<String> getTokenBoundCidrs() {
-        return tokenBoundCidrs;
-    }
-
-    /**
-     * @param boundCidrList list of subnets in CIDR notation to bind role to
-     * @since 1.5.3
-     */
-    @JsonSetter("token_bound_cidrs")
-    public void setTokenBoundCidrs(final List<String> boundCidrList) {
-        this.tokenBoundCidrs = boundCidrList;
     }
 
     /**
@@ -166,71 +101,10 @@ public final class AppRoleSecret implements Serializable {
      */
     @JsonGetter("token_bound_cidrs")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public String getTokenBoundCidrsString() {
+    public String tokenBoundCidrsString() {
         if (tokenBoundCidrs == null || tokenBoundCidrs.isEmpty()) {
             return "";
         }
         return String.join(",", tokenBoundCidrs);
-    }
-
-    /**
-     * @return Creation time
-     */
-    public String getCreationTime() {
-        return creationTime;
-    }
-
-    /**
-     * @return Expiration time
-     */
-    public String getExpirationTime() {
-        return expirationTime;
-    }
-
-    /**
-     * @return Time of last update
-     */
-    public String getLastUpdatedTime() {
-        return lastUpdatedTime;
-    }
-
-    /**
-     * @return Number of uses
-     */
-    public Integer getNumUses() {
-        return numUses;
-    }
-
-    /**
-     * @return Time-to-live
-     */
-    public Integer getTtl() {
-        return ttl;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        AppRoleSecret that = (AppRoleSecret) o;
-        return Objects.equals(id, that.id) &&
-            Objects.equals(accessor, that.accessor) &&
-            Objects.equals(metadata, that.metadata) &&
-            Objects.equals(cidrList, that.cidrList) &&
-            Objects.equals(tokenBoundCidrs, that.tokenBoundCidrs) &&
-            Objects.equals(creationTime, that.creationTime) &&
-            Objects.equals(expirationTime, that.expirationTime) &&
-            Objects.equals(lastUpdatedTime, that.lastUpdatedTime) &&
-            Objects.equals(numUses, that.numUses) &&
-            Objects.equals(ttl, that.ttl);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, accessor, metadata, cidrList, tokenBoundCidrs, creationTime, expirationTime,
-            lastUpdatedTime, numUses, ttl);
     }
 }

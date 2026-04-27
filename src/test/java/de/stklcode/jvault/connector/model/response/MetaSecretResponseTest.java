@@ -102,12 +102,12 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
     @Override
     protected void jsonAssertions(MetaSecretResponse res) {
         assertSecretData(res);
-        assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
-        assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");
-        assertNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
-        assertFalse(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
-        assertEquals(1, res.getMetadata().getVersion(), "Incorrect secret version");
-        assertNull(res.getMetadata().getCustomMetadata(), "Incorrect custom metadata");
+        assertNotNull(res.metadata(), "SecretResponse does not contain metadata");
+        assertNotNull(res.metadata().createdTime(), "Creation date parsing failed");
+        assertNull(res.metadata().deletionTime(), "Incorrect deletion date");
+        assertFalse(res.metadata().destroyed(), "Secret destroyed when not expected");
+        assertEquals(1, res.metadata().version(), "Incorrect secret version");
+        assertNull(res.metadata().customMetadata(), "Incorrect custom metadata");
 
         // Deleted KV v2 secret.
         res = assertDoesNotThrow(
@@ -115,21 +115,21 @@ class MetaSecretResponseTest extends AbstractModelTest<MetaSecretResponse> {
             "SecretResponse deserialization failed"
         );
         assertSecretData(res);
-        assertNotNull(res.getMetadata(), "SecretResponse does not contain metadata");
-        assertNotNull(res.getMetadata().getCreatedTime(), "Creation date parsing failed");
-        assertNotNull(res.getMetadata().getDeletionTime(), "Incorrect deletion date");
-        assertTrue(res.getMetadata().isDestroyed(), "Secret destroyed when not expected");
-        assertEquals(2, res.getMetadata().getVersion(), "Incorrect secret version");
-        assertEquals(Map.of(CUSTOM_META_KEY, CUSTOM_META_VAL), res.getMetadata().getCustomMetadata(), "Incorrect custom metadata");
+        assertNotNull(res.metadata(), "SecretResponse does not contain metadata");
+        assertNotNull(res.metadata().createdTime(), "Creation date parsing failed");
+        assertNotNull(res.metadata().deletionTime(), "Incorrect deletion date");
+        assertTrue(res.metadata().destroyed(), "Secret destroyed when not expected");
+        assertEquals(2, res.metadata().version(), "Incorrect secret version");
+        assertEquals(Map.of(CUSTOM_META_KEY, CUSTOM_META_VAL), res.metadata().customMetadata(), "Incorrect custom metadata");
     }
 
     private void assertSecretData(SecretResponse res) {
         assertNotNull(res, "Parsed response is NULL");
-        assertEquals(SECRET_REQUEST_ID, res.getRequestId(), "Incorrect request ID");
-        assertEquals(SECRET_LEASE_ID, res.getLeaseId(), "Incorrect lease ID");
-        assertEquals(SECRET_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
-        assertEquals(SECRET_RENEWABLE, res.isRenewable(), "Incorrect renewable status");
-        assertEquals(SECRET_WARNINGS, res.getWarnings(), "Incorrect warnings");
+        assertEquals(SECRET_REQUEST_ID, res.requestId(), "Incorrect request ID");
+        assertEquals(SECRET_LEASE_ID, res.leaseId(), "Incorrect lease ID");
+        assertEquals(SECRET_LEASE_DURATION, res.leaseDuration(), "Incorrect lease duration");
+        assertEquals(SECRET_RENEWABLE, res.renewable(), "Incorrect renewable status");
+        assertEquals(SECRET_WARNINGS, res.warnings(), "Incorrect warnings");
         assertEquals(SECRET_DATA_V1, res.get(SECRET_DATA_K1), "Response does not contain correct data");
         assertEquals(SECRET_DATA_V2, res.get(SECRET_DATA_K2), "Response does not contain correct data");
     }

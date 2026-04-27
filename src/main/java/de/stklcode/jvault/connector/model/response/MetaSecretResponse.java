@@ -16,71 +16,44 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import de.stklcode.jvault.connector.model.response.embedded.SecretWrapper;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Vault response for secret responses with metadata.
  *
+ * @param responseHeader Response metadata
+ * @param secretWrapper  Secret data wrapper
  * @author Stefan Kalscheuer
- * @since 1.1 abstract
+ * @since 1.1
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class MetaSecretResponse extends SecretResponse {
-    @Serial
-    private static final long serialVersionUID = -1076542846391240162L;
-
-    @JsonProperty("data")
-    private SecretWrapper secret;
-
-    @JsonGetter("data")
-    public final SecretWrapper getSecretWrapper() {
-        return secret;
-    }
+public record MetaSecretResponse(
+    @JsonUnwrapped Header responseHeader,
+    @JsonProperty("data") SecretWrapper secretWrapper
+) implements SecretResponse {
 
     @Override
-    @JsonIgnore
-    public final Map<String, Serializable> getData() {
-        if (secret != null) {
-            return secret.getData();
+    public Map<String, Serializable> data() {
+        if (secretWrapper != null) {
+            return secretWrapper.data();
         } else {
             return Collections.emptyMap();
         }
     }
 
     @Override
-    @JsonIgnore
-    public final VersionMetadata getMetadata() {
-        if (secret != null) {
-            return secret.getMetadata();
+    public VersionMetadata metadata() {
+        if (secretWrapper != null) {
+            return secretWrapper.metadata();
         } else {
             return null;
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        MetaSecretResponse that = (MetaSecretResponse) o;
-        return Objects.equals(secret, that.secret);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), secret);
     }
 }

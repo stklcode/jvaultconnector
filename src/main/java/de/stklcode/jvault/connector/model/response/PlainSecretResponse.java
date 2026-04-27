@@ -16,11 +16,9 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -29,40 +27,24 @@ import java.util.Objects;
 /**
  * Vault response for plain secret responses.
  *
+ * @param responseHeader Response metadata
+ * @param data           Secret data
  * @author Stefan Kalscheuer
  * @since 1.1 abstract
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class PlainSecretResponse extends SecretResponse {
-    @Serial
-    private static final long serialVersionUID = 3010138542437913023L;
-
-    @JsonProperty("data")
-    private Map<String, Serializable> data;
+public record PlainSecretResponse(
+    @JsonUnwrapped Header responseHeader,
+    Map<String, Serializable> data
+) implements SecretResponse {
 
     @Override
-    public final Map<String, Serializable> getData() {
+    public Map<String, Serializable> data() {
         return Objects.requireNonNullElseGet(data, Collections::emptyMap);
     }
 
     @Override
-    public final VersionMetadata getMetadata() {
+    public VersionMetadata metadata() {
         return null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        PlainSecretResponse that = (PlainSecretResponse) o;
-        return Objects.equals(data, that.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), data);
     }
 }

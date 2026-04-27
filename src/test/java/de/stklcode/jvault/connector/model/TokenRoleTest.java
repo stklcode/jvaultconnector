@@ -118,17 +118,17 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     @Test
     void buildDefaultTest() {
         TokenRole role = TokenRole.builder().build();
-        assertNull(role.getAllowedPolicies());
-        assertNull(role.getDisallowedPolicies());
-        assertNull(role.getOrphan());
-        assertNull(role.getRenewable());
-        assertNull(role.getAllowedEntityAliases());
-        assertNull(role.getTokenBoundCidrs());
-        assertNull(role.getTokenExplicitMaxTtl());
-        assertNull(role.getTokenNoDefaultPolicy());
-        assertNull(role.getTokenNumUses());
-        assertNull(role.getTokenPeriod());
-        assertNull(role.getTokenType());
+        assertNull(role.allowedPolicies());
+        assertNull(role.disallowedPolicies());
+        assertNull(role.orphan());
+        assertNull(role.renewable());
+        assertNull(role.allowedEntityAliases());
+        assertNull(role.tokenBoundCidrs());
+        assertNull(role.tokenExplicitMaxTtl());
+        assertNull(role.tokenNoDefaultPolicy());
+        assertNull(role.tokenNumUses());
+        assertNull(role.tokenPeriod());
+        assertNull(role.tokenType());
 
         // Optional fields should be ignored, so JSON string should be empty.
         assertEquals("{}", objectMapper.writeValueAsString(role));
@@ -159,20 +159,17 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
             .withTokenType(null)
             .build();
 
-        assertNull(role.getAllowedPolicies());
-        assertNull(role.getDisallowedPolicies());
-        assertNull(role.getOrphan());
-        assertNull(role.getRenewable());
-        assertNull(role.getAllowedEntityAliases());
-        assertNull(role.getTokenBoundCidrs());
-        assertNull(role.getTokenExplicitMaxTtl());
-        assertNull(role.getTokenNoDefaultPolicy());
-        assertNull(role.getTokenNumUses());
-        assertNull(role.getTokenPeriod());
-        assertNull(role.getTokenType());
-
-        // Empty builder should be equal to no-arg construction.
-        assertEquals(new TokenRole(), role);
+        assertNull(role.allowedPolicies());
+        assertNull(role.disallowedPolicies());
+        assertNull(role.orphan());
+        assertNull(role.renewable());
+        assertNull(role.allowedEntityAliases());
+        assertNull(role.tokenBoundCidrs());
+        assertNull(role.tokenExplicitMaxTtl());
+        assertNull(role.tokenNoDefaultPolicy());
+        assertNull(role.tokenNumUses());
+        assertNull(role.tokenPeriod());
+        assertNull(role.tokenType());
 
         // Optional fields should be ignored, so JSON string should be empty.
         assertEquals("{}", objectMapper.writeValueAsString(role));
@@ -184,26 +181,26 @@ class TokenRoleTest extends AbstractModelTest<TokenRole> {
     @Test
     void buildFullTest() {
         TokenRole role = createFull();
-        assertEquals(NAME, role.getName());
-        assertEquals(ALLOWED_POLICIES.size() + 1, role.getAllowedPolicies().size());
-        assertTrue(role.getAllowedPolicies().containsAll(List.of(ALLOWED_POLICY_1, ALLOWED_POLICY_2, ALLOWED_POLICY_3)));
-        assertEquals(ALLOWED_POLICIES_GLOB.size() + 1, role.getAllowedPoliciesGlob().size());
-        assertTrue(role.getAllowedPoliciesGlob().containsAll(List.of(ALLOWED_POLICY_GLOB_1, ALLOWED_POLICY_GLOB_2, ALLOWED_POLICY_GLOB_3)));
-        assertEquals(DISALLOWED_POLICIES.size() + 1, role.getDisallowedPolicies().size());
-        assertTrue(role.getDisallowedPolicies().containsAll(List.of(DISALLOWED_POLICY_1, DISALLOWED_POLICY_2, DISALLOWED_POLICY_3)));
-        assertEquals(DISALLOWED_POLICIES_GLOB.size() + 1, role.getDisallowedPoliciesGlob().size());
-        assertTrue(role.getDisallowedPoliciesGlob().containsAll(List.of(DISALLOWED_POLICY_GLOB_1, DISALLOWED_POLICY_GLOB_2, DISALLOWED_POLICY_GLOB_3)));
-        assertEquals(ORPHAN, role.getOrphan());
-        assertEquals(RENEWABLE, role.getRenewable());
-        assertEquals(PATH_SUFFIX, role.getPathSuffix());
-        assertEquals(ALLOWED_ENTITY_ALIASES.size() + 1, role.getAllowedEntityAliases().size());
-        assertTrue(role.getAllowedEntityAliases().containsAll(List.of(ALLOWED_ENTITY_ALIAS_1, ALLOWED_ENTITY_ALIAS_2, ALLOWED_ENTITY_ALIAS_3)));
-        assertEquals(TOKEN_BOUND_CIDRS.size() + 1, role.getTokenBoundCidrs().size());
-        assertTrue(role.getTokenBoundCidrs().containsAll(List.of(TOKEN_BOUND_CIDR_1, TOKEN_BOUND_CIDR_2, TOKEN_BOUND_CIDR_3)));
-        assertEquals(TOKEN_NO_DEFAULT_POLICY, role.getTokenNoDefaultPolicy());
-        assertEquals(TOKEN_NUM_USES, role.getTokenNumUses());
-        assertEquals(TOKEN_PERIOD, role.getTokenPeriod());
-        assertEquals(TOKEN_TYPE.value(), role.getTokenType());
+        assertEquals(NAME, role.name());
+        assertEquals(ALLOWED_POLICIES.size() + 1, role.allowedPolicies().size());
+        assertTrue(role.allowedPolicies().containsAll(List.of(ALLOWED_POLICY_1, ALLOWED_POLICY_2, ALLOWED_POLICY_3)));
+        assertEquals(ALLOWED_POLICIES_GLOB.size() + 1, role.allowedPoliciesGlob().size());
+        assertTrue(role.allowedPoliciesGlob().containsAll(List.of(ALLOWED_POLICY_GLOB_1, ALLOWED_POLICY_GLOB_2, ALLOWED_POLICY_GLOB_3)));
+        assertEquals(DISALLOWED_POLICIES.size() + 1, role.disallowedPolicies().size());
+        assertTrue(role.disallowedPolicies().containsAll(List.of(DISALLOWED_POLICY_1, DISALLOWED_POLICY_2, DISALLOWED_POLICY_3)));
+        assertEquals(DISALLOWED_POLICIES_GLOB.size() + 1, role.disallowedPoliciesGlob().size());
+        assertTrue(role.disallowedPoliciesGlob().containsAll(List.of(DISALLOWED_POLICY_GLOB_1, DISALLOWED_POLICY_GLOB_2, DISALLOWED_POLICY_GLOB_3)));
+        assertEquals(ORPHAN, role.orphan());
+        assertEquals(RENEWABLE, role.renewable());
+        assertEquals(PATH_SUFFIX, role.pathSuffix());
+        assertEquals(ALLOWED_ENTITY_ALIASES.size() + 1, role.allowedEntityAliases().size());
+        assertTrue(role.allowedEntityAliases().containsAll(List.of(ALLOWED_ENTITY_ALIAS_1, ALLOWED_ENTITY_ALIAS_2, ALLOWED_ENTITY_ALIAS_3)));
+        assertEquals(TOKEN_BOUND_CIDRS.size() + 1, role.tokenBoundCidrs().size());
+        assertTrue(role.tokenBoundCidrs().containsAll(List.of(TOKEN_BOUND_CIDR_1, TOKEN_BOUND_CIDR_2, TOKEN_BOUND_CIDR_3)));
+        assertEquals(TOKEN_NO_DEFAULT_POLICY, role.tokenNoDefaultPolicy());
+        assertEquals(TOKEN_NUM_USES, role.tokenNumUses());
+        assertEquals(TOKEN_PERIOD, role.tokenPeriod());
+        assertEquals(TOKEN_TYPE.value(), role.tokenType());
 
         // Verify that all parameters are included in JSON string.
         assertEquals(JSON_FULL, objectMapper.writeValueAsString(role));

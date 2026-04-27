@@ -2,6 +2,7 @@ package de.stklcode.jvault.connector.model;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.PropertyNamingStrategies;
@@ -35,6 +36,7 @@ public abstract class AbstractModelTest<T> {
             .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
             .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
             .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .build();
     }
 

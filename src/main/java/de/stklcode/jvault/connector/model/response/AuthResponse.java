@@ -16,19 +16,16 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
-
-import java.io.Serial;
 
 /**
  * Vault response for authentication providing auth info in {@link AuthData} field.
  *
+ * @param responseHeader Response metadata
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class AuthResponse extends VaultDataResponse {
-    @Serial
-    private static final long serialVersionUID = 1628851361067456715L;
+public record AuthResponse(@JsonUnwrapped Header responseHeader) implements VaultDataResponse {
 }

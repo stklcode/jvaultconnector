@@ -68,22 +68,22 @@ class MountConfigTest extends AbstractModelTest<MountConfig> {
 
     @Override
     protected void jsonAssertions(MountConfig mountConfig) {
-        assertEquals(DEFAULT_LEASE_TTL, mountConfig.getDefaultLeaseTtl(), "Unexpected default lease TTL");
-        assertEquals(MAX_LEASE_TTL, mountConfig.getMaxLeaseTtl(), "Unexpected max lease TTL");
-        assertEquals(FORCE_NO_CACHE, mountConfig.getForceNoCache(), "Unexpected force no cache");
-        assertEquals(TOKEN_TYPE, mountConfig.getTokenType(), "Unexpected token type");
-        assertEquals(List.of(AUDIT_NON_HMAC_REQ_KEYS_1, AUDIT_NON_HMAC_REQ_KEYS_2), mountConfig.getAuditNonHmacRequestKeys(), "Unexpected audit no HMAC request keys");
-        assertEquals(List.of(AUDIT_NON_HMAC_RES_KEYS_1, AUDIT_NON_HMAC_RES_KEYS_2), mountConfig.getAuditNonHmacResponseKeys(), "Unexpected audit no HMAC response keys");
-        assertEquals(LISTING_VISIBILITY, mountConfig.getListingVisibility(), "Unexpected listing visibility");
-        assertEquals(List.of(PT_REQ_HEADER_1, PT_REQ_HEADER_2), mountConfig.getPassthroughRequestHeaders(), "Unexpected passthrough request headers");
-        assertEquals(List.of(ALLOWED_RES_HEADER_1, ALLOWED_RES_HEADER_2), mountConfig.getAllowedResponseHeaders(), "Unexpected allowed response headers");
-        assertEquals(List.of(ALLOWED_MANAGED_KEY_1, ALLOWED_MANAGED_KEY_2), mountConfig.getAllowedManagedKeys(), "Unexpected allowed managed keys");
-        assertEquals(List.of(DEL_AUTH_ACCESSOR_1, DEL_AUTH_ACCESSOR_2), mountConfig.getDelegatedAuthAccessors(), "Unexpected delegate auth accessors");
-        assertNotNull(mountConfig.getUserLockoutConfig(), "Missing user lockout config");
-        var ulc = mountConfig.getUserLockoutConfig();
-        assertEquals(LOCKOUT_THRESH, ulc.getLockoutThreshold(), "Unexpected lockout threshold");
-        assertEquals(LOCKOUT_DURATION, ulc.getLockoutDuration(), "Unexpected lockout duration");
-        assertEquals(LOCKOUT_CNT_RESET_DURATION, ulc.getLockoutCounterResetDuration(), "Unexpected lockout counter reset duration");
-        assertEquals(LOCKOUT_DISABLE, ulc.getLockoutDisable(), "Unexpected lockout disable");
+        assertEquals(DEFAULT_LEASE_TTL, mountConfig.defaultLeaseTtl(), "Unexpected default lease TTL");
+        assertEquals(MAX_LEASE_TTL, mountConfig.maxLeaseTtl(), "Unexpected max lease TTL");
+        assertEquals(FORCE_NO_CACHE, mountConfig.forceNoCache(), "Unexpected force no cache");
+        assertEquals(TOKEN_TYPE, mountConfig.tokenType(), "Unexpected token type");
+        assertEquals(List.of(AUDIT_NON_HMAC_REQ_KEYS_1, AUDIT_NON_HMAC_REQ_KEYS_2), mountConfig.auditNonHmacRequestKeys(), "Unexpected audit no HMAC request keys");
+        assertEquals(List.of(AUDIT_NON_HMAC_RES_KEYS_1, AUDIT_NON_HMAC_RES_KEYS_2), mountConfig.auditNonHmacResponseKeys(), "Unexpected audit no HMAC response keys");
+        assertEquals(LISTING_VISIBILITY, mountConfig.listingVisibility(), "Unexpected listing visibility");
+        assertEquals(List.of(PT_REQ_HEADER_1, PT_REQ_HEADER_2), mountConfig.passthroughRequestHeaders(), "Unexpected passthrough request headers");
+        assertEquals(List.of(ALLOWED_RES_HEADER_1, ALLOWED_RES_HEADER_2), mountConfig.allowedResponseHeaders(), "Unexpected allowed response headers");
+        assertEquals(List.of(ALLOWED_MANAGED_KEY_1, ALLOWED_MANAGED_KEY_2), mountConfig.allowedManagedKeys(), "Unexpected allowed managed keys");
+        assertEquals(List.of(DEL_AUTH_ACCESSOR_1, DEL_AUTH_ACCESSOR_2), mountConfig.delegatedAuthAccessors(), "Unexpected delegate auth accessors");
+        assertNotNull(mountConfig.userLockoutConfig(), "Missing user lockout config");
+        var ulc = mountConfig.userLockoutConfig();
+        assertEquals(LOCKOUT_THRESH, ulc.lockoutThreshold(), "Unexpected lockout threshold");
+        assertEquals(LOCKOUT_DURATION, ulc.lockoutDuration(), "Unexpected lockout duration");
+        assertEquals(LOCKOUT_CNT_RESET_DURATION, ulc.lockoutCounterResetDuration(), "Unexpected lockout counter reset duration");
+        assertEquals(LOCKOUT_DISABLE, ulc.lockoutDisable(), "Unexpected lockout disable");
     }
 }

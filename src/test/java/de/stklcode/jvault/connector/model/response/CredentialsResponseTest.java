@@ -60,15 +60,15 @@ class CredentialsResponseTest extends AbstractModelTest<CredentialsResponse> {
     @Test
     void getCredentialsTest() {
         // Create empty Object.
-        CredentialsResponse res = new CredentialsResponse();
-        assertNull(res.getUsername(), "Username not present in data map should not return anything");
-        assertNull(res.getPassword(), "Password not present in data map should not return anything");
+        CredentialsResponse res = new CredentialsResponse(null, null);
+        assertNull(res.username(), "Username not present in data map should not return anything");
+        assertNull(res.password(), "Password not present in data map should not return anything");
 
         res = assertDoesNotThrow(
             () -> objectMapper.readValue(JSON, CredentialsResponse.class),
             "Deserialization of CredentialsResponse failed"
         );
-        assertEquals(VAL_USER, res.getUsername(), "Incorrect username");
-        assertEquals(VAL_PASS, res.getPassword(), "Incorrect password");
+        assertEquals(VAL_USER, res.username(), "Incorrect username");
+        assertEquals(VAL_PASS, res.password(), "Incorrect password");
     }
 }

@@ -99,21 +99,21 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
             "SealResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
-        assertEquals(TYPE, res.getType(), "Incorrect seal type");
-        assertTrue(res.isSealed(), "Incorrect seal status");
-        assertTrue(res.isInitialized(), "Incorrect initialization status");
-        assertEquals(THRESHOLD, res.getThreshold(), "Incorrect threshold");
-        assertEquals(SHARES, res.getNumberOfShares(), "Incorrect number of shares");
-        assertEquals(PROGRESS_SEALED, res.getProgress(), "Incorrect progress");
-        assertEquals("", res.getNonce(), "Nonce not empty");
-        assertEquals(VERSION, res.getVersion(), "Incorrect version");
-        assertEquals(ZonedDateTime.parse(BUILD_DATE), res.getBuildDate(), "Incorrect build date");
-        assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");
-        assertEquals(RECOVERY_SEAL, res.getRecoverySeal(), "Incorrect recovery seal");
-        assertEquals(STORAGE_TYPE, res.getStorageType(), "Incorrect storage type");
+        assertEquals(TYPE, res.type(), "Incorrect seal type");
+        assertTrue(res.sealed(), "Incorrect seal status");
+        assertTrue(res.initialized(), "Incorrect initialization status");
+        assertEquals(THRESHOLD, res.threshold(), "Incorrect threshold");
+        assertEquals(SHARES, res.numberOfShares(), "Incorrect number of shares");
+        assertEquals(PROGRESS_SEALED, res.progress(), "Incorrect progress");
+        assertEquals("", res.nonce(), "Nonce not empty");
+        assertEquals(VERSION, res.version(), "Incorrect version");
+        assertEquals(ZonedDateTime.parse(BUILD_DATE), res.buildDate(), "Incorrect build date");
+        assertEquals(MIGRATION, res.migration(), "Incorrect migration");
+        assertEquals(RECOVERY_SEAL, res.recoverySeal(), "Incorrect recovery seal");
+        assertEquals(STORAGE_TYPE, res.storageType(), "Incorrect storage type");
         // And the fields, that should not be filled.
-        assertNull(res.getClusterName(), "Cluster name should not be populated");
-        assertNull(res.getClusterId(), "Cluster ID should not be populated");
+        assertNull(res.clusterName(), "Cluster name should not be populated");
+        assertNull(res.clusterId(), "Cluster ID should not be populated");
 
 
         // Not test unsealed Vault's response.
@@ -122,19 +122,19 @@ class SealResponseTest extends AbstractModelTest<SealResponse> {
             "SealResponse deserialization failed"
         );
         assertNotNull(res, "Parsed response is NULL");
-        assertEquals(TYPE, res.getType(), "Incorrect seal type");
-        assertFalse(res.isSealed(), "Incorrect seal status");
-        assertTrue(res.isInitialized(), "Incorrect initialization status");
-        assertEquals(THRESHOLD, res.getThreshold(), "Incorrect threshold");
-        assertEquals(SHARES, res.getNumberOfShares(), "Incorrect number of shares");
-        assertEquals(PROGRESS_UNSEALED, res.getProgress(), "Incorrect progress");
-        assertEquals(NONCE, res.getNonce(), "Incorrect nonce");
-        assertEquals(VERSION, res.getVersion(), "Incorrect version");
-        assertEquals(ZonedDateTime.parse(BUILD_DATE), res.getBuildDate(), "Incorrect build date");
-        assertEquals(CLUSTER_NAME, res.getClusterName(), "Incorrect cluster name");
-        assertEquals(CLUSTER_ID, res.getClusterId(), "Incorrect cluster ID");
-        assertEquals(MIGRATION, res.getMigration(), "Incorrect migration");
-        assertEquals(RECOVERY_SEAL, res.getRecoverySeal(), "Incorrect recovery seal");
-        assertEquals(STORAGE_TYPE, res.getStorageType(), "Incorrect storage type");
+        assertEquals(TYPE, res.type(), "Incorrect seal type");
+        assertFalse(res.sealed(), "Incorrect seal status");
+        assertTrue(res.initialized(), "Incorrect initialization status");
+        assertEquals(THRESHOLD, res.threshold(), "Incorrect threshold");
+        assertEquals(SHARES, res.numberOfShares(), "Incorrect number of shares");
+        assertEquals(PROGRESS_UNSEALED, res.progress(), "Incorrect progress");
+        assertEquals(NONCE, res.nonce(), "Incorrect nonce");
+        assertEquals(VERSION, res.version(), "Incorrect version");
+        assertEquals(ZonedDateTime.parse(BUILD_DATE), res.buildDate(), "Incorrect build date");
+        assertEquals(CLUSTER_NAME, res.clusterName(), "Incorrect cluster name");
+        assertEquals(CLUSTER_ID, res.clusterId(), "Incorrect cluster ID");
+        assertEquals(MIGRATION, res.migration(), "Incorrect migration");
+        assertEquals(RECOVERY_SEAL, res.recoverySeal(), "Incorrect recovery seal");
+        assertEquals(STORAGE_TYPE, res.storageType(), "Incorrect storage type");
     }
 }

@@ -44,7 +44,7 @@ class HelpResponseTest extends AbstractModelTest<HelpResponse> {
 
     @Override
     protected void jsonAssertions(HelpResponse res) {
-        assertEquals(HELP, res.getHelp(), "Unexpected help text");
+        assertEquals(HELP, res.help(), "Unexpected help text");
         assertEquals(
             JSON,
             assertDoesNotThrow(() -> objectMapper.writeValueAsString(res), "HelpResponse serialization failed"),

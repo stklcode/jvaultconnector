@@ -16,114 +16,83 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Vault AppRole role metamodel.
  *
+ * @param name                 Role name
+ * @param id                   Role ID
+ * @param bindSecretId         Bind secret ID
+ * @param secretIdBoundCidrs   List of bound CIDR subnets
+ * @param secretIdNumUses      Maximum number of uses per secret
+ * @param secretIdTtl          Maximum TTL in seconds for secrets
+ * @param localSecretIds       Enable local secret IDs?
+ * @param tokenTtl             Token TTL in seconds
+ * @param tokenMaxTtl          Maximum token TTL in seconds, including renewals
+ * @param tokenPolicies        List of token policies
+ * @param tokenBoundCidrs      List of bound CIDR subnets of associated tokens
+ * @param tokenExplicitMaxTtl  Explicit maximum token TTL in seconds, including renewals
+ * @param tokenNoDefaultPolicy Enable default policy for token?
+ * @param tokenNumUses         Number of uses for token
+ * @param tokenPeriod          Duration in seconds, if specified
+ * @param tokenType            Token type
  * @author Stefan Kalscheuer
  * @since 0.4.0
  * @since 1.1 implements {@link Serializable}
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class AppRole implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1546673231280751679L;
-
-    @JsonProperty("role_name")
-    private String name;
-
-    @JsonProperty("role_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String id;
-
-    @JsonProperty("bind_secret_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean bindSecretId;
-
-    private List<String> secretIdBoundCidrs;
-
-    @JsonProperty("secret_id_num_uses")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer secretIdNumUses;
-
-    @JsonProperty("secret_id_ttl")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long secretIdTtl;
-
-    @JsonProperty("local_secret_ids")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean localSecretIds;
-
-    @JsonProperty("token_ttl")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long tokenTtl;
-
-    @JsonProperty("token_max_ttl")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long tokenMaxTtl;
-
-    private List<String> tokenPolicies;
-
-    @JsonProperty("token_bound_cidrs")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> tokenBoundCidrs;
-
-    @JsonProperty("token_explicit_max_ttl")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long tokenExplicitMaxTtl;
-
-    @JsonProperty("token_no_default_policy")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean tokenNoDefaultPolicy;
-
-    @JsonProperty("token_num_uses")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenNumUses;
-
-    @JsonProperty("token_period")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tokenPeriod;
-
-    @JsonProperty("token_type")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String tokenType;
-
-    /**
-     * Construct empty {@link AppRole} object.
-     */
-    public AppRole() {
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record AppRole(
+    @JsonProperty("role_name") String name,
+    @JsonProperty("role_id") String id,
+    Boolean bindSecretId,
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class) List<String> secretIdBoundCidrs,
+    Integer secretIdNumUses,
+    Long secretIdTtl,
+    Boolean localSecretIds,
+    Long tokenTtl,
+    Long tokenMaxTtl,
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class) List<String> tokenPolicies,
+    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class) List<String> tokenBoundCidrs,
+    Long tokenExplicitMaxTtl,
+    Boolean tokenNoDefaultPolicy,
+    Integer tokenNumUses,
+    Integer tokenPeriod,
+    String tokenType
+) implements Serializable {
 
     /**
      * Construct {@link AppRole} object from {@link AppRole.Builder}.
      *
      * @param builder AppRole builder.
      */
-    public AppRole(final Builder builder) {
-        this.name = builder.name;
-        this.id = builder.id;
-        this.bindSecretId = builder.bindSecretId;
-        this.secretIdBoundCidrs = builder.secretIdBoundCidrs;
-        this.secretIdNumUses = builder.secretIdNumUses;
-        this.secretIdTtl = builder.secretIdTtl;
-        this.localSecretIds = builder.localSecretIds;
-        this.tokenTtl = builder.tokenTtl;
-        this.tokenMaxTtl = builder.tokenMaxTtl;
-        this.tokenPolicies = builder.tokenPolicies;
-        this.tokenBoundCidrs = builder.tokenBoundCidrs;
-        this.tokenExplicitMaxTtl = builder.tokenExplicitMaxTtl;
-        this.tokenNoDefaultPolicy = builder.tokenNoDefaultPolicy;
-        this.tokenNumUses = builder.tokenNumUses;
-        this.tokenPeriod = builder.tokenPeriod;
-        this.tokenType = builder.tokenType != null ? builder.tokenType.value() : null;
+    private AppRole(final Builder builder) {
+        this(
+            builder.name,
+            builder.id,
+            builder.bindSecretId,
+            builder.secretIdBoundCidrs,
+            builder.secretIdNumUses,
+            builder.secretIdTtl,
+            builder.localSecretIds,
+            builder.tokenTtl,
+            builder.tokenMaxTtl,
+            builder.tokenPolicies,
+            builder.tokenBoundCidrs,
+            builder.tokenExplicitMaxTtl,
+            builder.tokenNoDefaultPolicy,
+            builder.tokenNumUses,
+            builder.tokenPeriod,
+            builder.tokenType != null ? builder.tokenType.value() : null
+        );
     }
 
     /**
@@ -138,73 +107,16 @@ public final class AppRole implements Serializable {
     }
 
     /**
-     * @return the role name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return the role ID
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @return bind secret ID
-     */
-    public Boolean getBindSecretId() {
-        return bindSecretId;
-    }
-
-    /**
-     * @return list of bound CIDR subnets of associated tokens
-     * @since 0.9
-     */
-    public List<String> getTokenBoundCidrs() {
-        return tokenBoundCidrs;
-    }
-
-    /**
-     * @param boundCidrList list of subnets in CIDR notation to bind role to
-     * @since 0.9
-     */
-    @JsonSetter("token_bound_cidrs")
-    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
-    public void setBoundCidrs(final List<String> boundCidrList) {
-        this.tokenBoundCidrs = boundCidrList;
-    }
-
-    /**
      * @return list of subnets in CIDR notation as comma-separated {@link String}
      * @since 0.9
      */
     @JsonGetter("token_bound_cidrs")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public String getTokenBoundCidrsString() {
+    public String tokenBoundCidrsString() {
         if (tokenBoundCidrs == null || tokenBoundCidrs.isEmpty()) {
             return "";
         }
         return String.join(",", tokenBoundCidrs);
-    }
-
-    /**
-     * @return list of bound CIDR subnets
-     * @since 0.8 replaces {@code getBoundCidrList()}
-     */
-    public List<String> getSecretIdBoundCidrs() {
-        return secretIdBoundCidrs;
-    }
-
-    /**
-     * @param secretIdBoundCidrs List of subnets in CIDR notation to bind secrets of this role to.
-     * @since 0.8 replaces {@code setBoundCidrList(List)}
-     */
-    @JsonSetter("secret_id_bound_cidrs")
-    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
-    public void setSecretIdBoundCidrs(final List<String> secretIdBoundCidrs) {
-        this.secretIdBoundCidrs = secretIdBoundCidrs;
     }
 
     /**
@@ -213,29 +125,11 @@ public final class AppRole implements Serializable {
      */
     @JsonGetter("secret_id_bound_cidrs")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public String getSecretIdBoundCidrsString() {
+    public String secretIdBoundCidrsString() {
         if (secretIdBoundCidrs == null || secretIdBoundCidrs.isEmpty()) {
             return "";
         }
         return String.join(",", secretIdBoundCidrs);
-    }
-
-    /**
-     * @return list of token policies
-     * @since 0.9
-     */
-    public List<String> getTokenPolicies() {
-        return tokenPolicies;
-    }
-
-    /**
-     * @param tokenPolicies list of token policies
-     * @since 0.9
-     */
-    @JsonSetter("token_policies")
-    @JsonDeserialize(using = CommaSeparatedArrayDeserializer.class)
-    public void setTokenPolicies(final List<String> tokenPolicies) {
-        this.tokenPolicies = tokenPolicies;
     }
 
     /**
@@ -244,121 +138,11 @@ public final class AppRole implements Serializable {
      */
     @JsonGetter("token_policies")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public String getTokenPoliciesString() {
+    public String tokenPoliciesString() {
         if (tokenPolicies == null || tokenPolicies.isEmpty()) {
             return "";
         }
         return String.join(",", tokenPolicies);
-    }
-
-    /**
-     * @return maximum number of uses per secret
-     */
-    public Integer getSecretIdNumUses() {
-        return secretIdNumUses;
-    }
-
-    /**
-     * @return maximum TTL in seconds for secrets
-     */
-    public Long getSecretIdTtl() {
-        return secretIdTtl;
-    }
-
-    /**
-     * @return Enable local secret IDs?
-     * @since 0.9
-     * @since 1.3 renamed to {@code getLocalSecretIds()}
-     */
-    public Boolean getLocalSecretIds() {
-        return localSecretIds;
-    }
-
-    /**
-     * @return token TTL in seconds
-     */
-    public Long getTokenTtl() {
-        return tokenTtl;
-    }
-
-    /**
-     * @return maximum token TTL in seconds, including renewals
-     */
-    public Long getTokenMaxTtl() {
-        return tokenMaxTtl;
-    }
-
-    /**
-     * @return explicit maximum token TTL in seconds, including renewals
-     * @since 0.9
-     */
-    public Long getTokenExplicitMaxTtl() {
-        return tokenExplicitMaxTtl;
-    }
-
-    /**
-     * @return enable default policy for token?
-     * @since 0.9
-     */
-    public Boolean getTokenNoDefaultPolicy() {
-        return tokenNoDefaultPolicy;
-    }
-
-    /**
-     * @return number of uses for token
-     * @since 0.9
-     */
-    public Integer getTokenNumUses() {
-        return tokenNumUses;
-    }
-
-    /**
-     * @return duration in seconds, if specified
-     * @since 0.9
-     */
-    public Integer getTokenPeriod() {
-        return tokenPeriod;
-    }
-
-    /**
-     * @return duration in seconds, if specified
-     * @since 0.9
-     */
-    public String getTokenType() {
-        return tokenType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        AppRole appRole = (AppRole) o;
-        return Objects.equals(name, appRole.name) &&
-            Objects.equals(id, appRole.id) &&
-            Objects.equals(bindSecretId, appRole.bindSecretId) &&
-            Objects.equals(secretIdBoundCidrs, appRole.secretIdBoundCidrs) &&
-            Objects.equals(secretIdNumUses, appRole.secretIdNumUses) &&
-            Objects.equals(secretIdTtl, appRole.secretIdTtl) &&
-            Objects.equals(localSecretIds, appRole.localSecretIds) &&
-            Objects.equals(tokenTtl, appRole.tokenTtl) &&
-            Objects.equals(tokenMaxTtl, appRole.tokenMaxTtl) &&
-            Objects.equals(tokenPolicies, appRole.tokenPolicies) &&
-            Objects.equals(tokenBoundCidrs, appRole.tokenBoundCidrs) &&
-            Objects.equals(tokenExplicitMaxTtl, appRole.tokenExplicitMaxTtl) &&
-            Objects.equals(tokenNoDefaultPolicy, appRole.tokenNoDefaultPolicy) &&
-            Objects.equals(tokenNumUses, appRole.tokenNumUses) &&
-            Objects.equals(tokenPeriod, appRole.tokenPeriod) &&
-            Objects.equals(tokenType, appRole.tokenType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, id, bindSecretId, secretIdBoundCidrs, secretIdNumUses, secretIdTtl,
-            localSecretIds, tokenTtl, tokenMaxTtl, tokenPolicies, tokenBoundCidrs, tokenExplicitMaxTtl,
-            tokenNoDefaultPolicy, tokenNumUses, tokenPeriod, tokenType);
     }
 
 

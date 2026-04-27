@@ -151,8 +151,8 @@ public class HTTPVaultConnector implements VaultConnector {
         /* Issue request and parse response */
         AuthResponse auth = request.post(path, payload, token, AuthResponse.class);
         /* verify response */
-        this.token = auth.getAuth().getClientToken();
-        this.tokenTTL = System.currentTimeMillis() + auth.getAuth().getLeaseDuration() * 1000L;
+        this.token = auth.auth().clientToken();
+        this.tokenTTL = System.currentTimeMillis() + auth.auth().leaseDuration() * 1000L;
         this.authorized = true;
 
         return auth;
@@ -171,7 +171,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
         SecretListResponse secrets = request.get(path + "/?list=true", emptyMap(), token, SecretListResponse.class);
 
-        return secrets.getKeys();
+        return secrets.keys();
     }
 
     @Override
@@ -536,10 +536,10 @@ public class HTTPVaultConnector implements VaultConnector {
             requireAuth();
 
             /* Issue request and expect code 204 with empty response */
-            request.postWithoutResponse(AUTH_APPROLE_ROLE + encode(role.getName()), role, token);
+            request.postWithoutResponse(AUTH_APPROLE_ROLE + encode(role.name()), role, token);
 
             /* Set custom ID if provided */
-            return !(role.getId() != null && !role.getId().isEmpty()) || setRoleID(role.getName(), role.getId());
+            return !(role.id() != null && !role.id().isEmpty()) || setRoleID(role.name(), role.id());
         }
 
         @Override
@@ -573,7 +573,7 @@ public class HTTPVaultConnector implements VaultConnector {
                 emptyMap(),
                 token,
                 RawDataResponse.class
-            ).getData().get("role_id").toString();
+            ).data().get("role_id").toString();
         }
 
         @Override
@@ -595,7 +595,7 @@ public class HTTPVaultConnector implements VaultConnector {
             throws VaultConnectorException {
             requireAuth();
 
-            if (secret.getId() != null && !secret.getId().isEmpty()) {
+            if (secret.id() != null && !secret.id().isEmpty()) {
                 return request.post(
                     AUTH_APPROLE_ROLE + encode(roleName) + "/custom-secret-id",
                     secret,
@@ -651,7 +651,7 @@ public class HTTPVaultConnector implements VaultConnector {
                 SecretListResponse.class
             );
 
-            return secrets.getKeys();
+            return secrets.keys();
         }
 
         @Override
@@ -665,7 +665,7 @@ public class HTTPVaultConnector implements VaultConnector {
                 SecretListResponse.class
             );
 
-            return secrets.getKeys();
+            return secrets.keys();
         }
     }
 
@@ -761,7 +761,7 @@ public class HTTPVaultConnector implements VaultConnector {
             /* Issue request and parse response */
             AuthMethodsResponse amr = request.get(SYS_AUTH, emptyMap(), token, AuthMethodsResponse.class);
 
-            return amr.getSupportedMethods().values().stream().map(AuthMethod::getType).toList();
+            return amr.supportedMethods().values().stream().map(AuthMethod::type).toList();
         }
     }
 }

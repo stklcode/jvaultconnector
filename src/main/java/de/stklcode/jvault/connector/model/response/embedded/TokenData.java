@@ -16,235 +16,53 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Embedded token information inside Vault response.
  *
+ * @param accessor       Token accessor
+ * @param creationTime   Creation time
+ * @param creationTtl    Creation TTL (in seconds)
+ * @param displayName    Token name
+ * @param entityId       Entity ID
+ * @param expireTime     Expire time
+ * @param explicitMaxTtl Explicit maximum TTL (in seconds)
+ * @param id             Token ID
+ * @param issueTime      Issue time
+ * @param meta           Metadata
+ * @param numUses        Number of uses
+ * @param orphan         Token is orphan
+ * @param path           Token path
+ * @param policies       Token policies
+ * @param renewable      Token is renewable
+ * @param ttl            Token TTL (in seconds)
+ * @param type           Token type
  * @author Stefan Kalscheuer
  * @since 0.1
  * @since 1.1 implements {@link Serializable}
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class TokenData implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -4168046151053509784L;
-
-    @JsonProperty("accessor")
-    private String accessor;
-
-    @JsonProperty("creation_time")
-    private Integer creationTime;
-
-    @JsonProperty("creation_ttl")
-    private Long creationTtl;
-
-    @JsonProperty("display_name")
-    private String name;
-
-    @JsonProperty("entity_id")
-    private String entityId;
-
-    @JsonProperty("expire_time")
-    private ZonedDateTime expireTime;
-
-    @JsonProperty("explicit_max_ttl")
-    private Long explicitMaxTtl;
-
-    @JsonProperty("id")
-    private String id;
-
-    @JsonProperty("issue_time")
-    private ZonedDateTime issueTime;
-
-    @JsonProperty("meta")
-    private Map<String, Object> meta;
-
-    @JsonProperty("num_uses")
-    private Integer numUses;
-
-    @JsonProperty("orphan")
-    private boolean orphan;
-
-    @JsonProperty("path")
-    private String path;
-
-    @JsonProperty("policies")
-    private List<String> policies;
-
-    @JsonProperty("renewable")
-    private boolean renewable;
-
-    @JsonProperty("ttl")
-    private Long ttl;
-
-    @JsonProperty("type")
-    private String type;
-
-    /**
-     * @return Token accessor
-     */
-    public String getAccessor() {
-        return accessor;
-    }
-
-    /**
-     * @return Creation time
-     */
-    public Integer getCreationTime() {
-        return creationTime;
-    }
-
-    /**
-     * @return Creation TTL (in seconds)
-     */
-    public Long getCreationTtl() {
-        return creationTtl;
-    }
-
-    /**
-     * @return Token name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return Entity ID
-     * @since 0.9
-     */
-    public String getEntityId() {
-        return entityId;
-    }
-
-    /**
-     * @return Expire time (parsed)
-     * @since 0.9
-     */
-    public ZonedDateTime getExpireTime() {
-        return expireTime;
-    }
-
-    /**
-     * @return Explicit maximum TTL
-     * @since 0.9
-     */
-    public Long getExplicitMaxTtl() {
-        return explicitMaxTtl;
-    }
-
-    /**
-     * @return Token ID
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @return Expire time (parsed)
-     * @since 0.9
-     */
-    public ZonedDateTime getIssueTime() {
-        return issueTime;
-    }
-
-    /**
-     * @return Token type
-     * @since 0.9
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @return Number of uses
-     */
-    public Integer getNumUses() {
-        return numUses;
-    }
-
-    /**
-     * @return Token is orphan
-     */
-    public boolean isOrphan() {
-        return orphan;
-    }
-
-    /**
-     * @return Token path
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * @return Token policies
-     * @since 0.9
-     */
-    public List<String> getPolicies() {
-        return policies;
-    }
-
-    /**
-     * @return Token is renewable
-     * @since 0.9
-     */
-    public boolean isRenewable() {
-        return renewable;
-    }
-
-    /**
-     * @return Token TTL (in seconds)
-     */
-    public Long getTtl() {
-        return ttl;
-    }
-
-    /**
-     * @return Metadata
-     */
-    public Map<String, Object> getMeta() {
-        return meta;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TokenData tokenData = (TokenData) o;
-        return orphan == tokenData.orphan &&
-            renewable == tokenData.renewable &&
-            Objects.equals(accessor, tokenData.accessor) &&
-            Objects.equals(creationTime, tokenData.creationTime) &&
-            Objects.equals(creationTtl, tokenData.creationTtl) &&
-            Objects.equals(name, tokenData.name) &&
-            Objects.equals(entityId, tokenData.entityId) &&
-            Objects.equals(expireTime, tokenData.expireTime) &&
-            Objects.equals(explicitMaxTtl, tokenData.explicitMaxTtl) &&
-            Objects.equals(id, tokenData.id) &&
-            Objects.equals(issueTime, tokenData.issueTime) &&
-            Objects.equals(meta, tokenData.meta) &&
-            Objects.equals(numUses, tokenData.numUses) &&
-            Objects.equals(path, tokenData.path) &&
-            Objects.equals(policies, tokenData.policies) &&
-            Objects.equals(ttl, tokenData.ttl) &&
-            Objects.equals(type, tokenData.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(accessor, creationTime, creationTtl, name, entityId, expireTime, explicitMaxTtl, id,
-            issueTime, meta, numUses, orphan, path, policies, renewable, ttl, type);
-    }
+public record TokenData(
+    String accessor,
+    Integer creationTime,
+    Long creationTtl,
+    String displayName,
+    String entityId,
+    ZonedDateTime expireTime,
+    Long explicitMaxTtl,
+    String id,
+    ZonedDateTime issueTime,
+    Map<String, Object> meta,
+    Integer numUses,
+    boolean orphan,
+    String path,
+    List<String> policies,
+    Boolean renewable,
+    Long ttl,
+    String type
+) implements Serializable {
 }

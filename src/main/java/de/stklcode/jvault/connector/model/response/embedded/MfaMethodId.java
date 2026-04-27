@@ -16,81 +16,23 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * Embedded multi-factor-authentication (MFA) requirement.
  *
+ * @param type         MFA method type
+ * @param id           MFA method ID
+ * @param usesPasscode MFA uses passcode id
+ * @param name         MFA method name
  * @author Stefan Kalscheuer
  * @since 1.2
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class MfaMethodId implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 691298070242998814L;
-
-    @JsonProperty("type")
-    private String type;
-
-    @JsonProperty("id")
-    private String id;
-
-    @JsonProperty("uses_passcode")
-    private Boolean usesPasscode;
-
-    @JsonProperty("name")
-    private String name;
-
-    /**
-     * @return MFA method type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @return MFA method id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @return MFA uses passcode id
-     */
-    public Boolean getUsesPasscode() {
-        return usesPasscode;
-    }
-
-    /**
-     * @return MFA method name
-     */
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MfaMethodId mfaMethodId = (MfaMethodId) o;
-        return Objects.equals(type, mfaMethodId.type) &&
-            Objects.equals(id, mfaMethodId.id) &&
-            Objects.equals(usesPasscode, mfaMethodId.usesPasscode) &&
-            Objects.equals(name, mfaMethodId.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, id, usesPasscode, name);
-    }
+public record MfaMethodId(
+    String type,
+    String id,
+    Boolean usesPasscode,
+    String name
+) implements Serializable {
 }

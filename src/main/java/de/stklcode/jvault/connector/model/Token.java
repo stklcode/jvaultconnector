@@ -16,103 +16,70 @@
 
 package de.stklcode.jvault.connector.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
 /**
  * Vault Token metamodel.
  *
+ * @param id              Token ID
+ * @param type            Token type
+ * @param displayName     Token display name
+ * @param noParent        Token has no parent
+ * @param noDefaultPolicy Token has no default policy
+ * @param ttl             Time-to-live in seconds
+ * @param explicitMaxTtl  Explicit maximum time-to-live in seconds
+ * @param numUses         Number of uses
+ * @param policies        List of policies
+ * @param meta            Metadata
+ * @param renewable       Token is renewable
+ * @param period          Token period
+ * @param entityAlias     Token entity alias
  * @author Stefan Kalscheuer
  * @since 0.4.0
  * @since 1.1 implements {@link Serializable}
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class Token implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 7003016071684507115L;
-
-    @JsonProperty("id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String id;
-
-    @JsonProperty("type")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String type;
-
-    @JsonProperty("display_name")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String displayName;
-
-    @JsonProperty("no_parent")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean noParent;
-
-    @JsonProperty("no_default_policy")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean noDefaultPolicy;
-
-    @JsonProperty("ttl")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long ttl;
-
-    @JsonProperty("explicit_max_ttl")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long explicitMaxTtl;
-
-    @JsonProperty("num_uses")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer numUses;
-
-    @JsonProperty("policies")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<String> policies;
-
-    @JsonProperty("meta")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, String> meta;
-
-    @JsonProperty("renewable")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean renewable;
-
-    @JsonProperty("period")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer period;
-
-    @JsonProperty("entity_alias")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String entityAlias;
-
-    /**
-     * Construct empty {@link Token} object.
-     */
-    public Token() {
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record Token(
+    String id,
+    String type,
+    String displayName,
+    Boolean noParent,
+    Boolean noDefaultPolicy,
+    Long ttl,
+    Long explicitMaxTtl,
+    Integer numUses,
+    List<String> policies,
+    Map<String, String> meta,
+    Boolean renewable,
+    Integer period,
+    String entityAlias
+) implements Serializable {
 
     /**
      * Construct {@link Token} object from {@link Builder}.
      *
      * @param builder Token builder.
      */
-    public Token(final Builder builder) {
-        this.id = builder.id;
-        this.type = builder.type != null ? builder.type.value() : null;
-        this.displayName = builder.displayName;
-        this.noParent = builder.noParent;
-        this.noDefaultPolicy = builder.noDefaultPolicy;
-        this.ttl = builder.ttl;
-        this.explicitMaxTtl = builder.explicitMaxTtl;
-        this.numUses = builder.numUses;
-        this.policies = builder.policies;
-        this.meta = builder.meta;
-        this.renewable = builder.renewable;
-        this.period = builder.period;
-        this.entityAlias = builder.entityAlias;
+    private Token(final Builder builder) {
+        this(
+            builder.id,
+            builder.type != null ? builder.type.value() : null,
+            builder.displayName,
+            builder.noParent,
+            builder.noDefaultPolicy,
+            builder.ttl,
+            builder.explicitMaxTtl,
+            builder.numUses,
+            builder.policies,
+            builder.meta,
+            builder.renewable,
+            builder.period,
+            builder.entityAlias
+        );
     }
 
     /**
@@ -125,129 +92,6 @@ public final class Token implements Serializable {
         return new Builder();
     }
 
-    /**
-     * @return Token ID
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @return Token type
-     * @since 0.9
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @return Token display name
-     */
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    /**
-     * @return Token has no parent
-     */
-    public Boolean getNoParent() {
-        return noParent;
-    }
-
-    /**
-     * @return Token has no default policy
-     */
-    public Boolean getNoDefaultPolicy() {
-        return noDefaultPolicy;
-    }
-
-    /**
-     * @return Time-to-live in seconds
-     */
-    public Long getTtl() {
-        return ttl;
-    }
-
-    /**
-     * @return Explicit maximum time-to-live in seconds
-     * @since 0.9
-     */
-    public Long getExplicitMaxTtl() {
-        return explicitMaxTtl;
-    }
-
-    /**
-     * @return Number of uses
-     */
-    public Integer getNumUses() {
-        return numUses;
-    }
-
-    /**
-     * @return List of policies
-     */
-    public List<String> getPolicies() {
-        return policies;
-    }
-
-    /**
-     * @return Metadata
-     */
-    public Map<String, String> getMeta() {
-        return meta;
-    }
-
-    /**
-     * @return Token is renewable
-     */
-    public Boolean isRenewable() {
-        return renewable;
-    }
-
-    /**
-     * @return Token period.
-     * @since 0.9
-     */
-    public Integer getPeriod() {
-        return period;
-    }
-
-    /**
-     * @return Token entity alias.
-     * @since 0.9
-     */
-    public String getEntityAlias() {
-        return entityAlias;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Token token = (Token) o;
-        return Objects.equals(id, token.id) &&
-            Objects.equals(type, token.type) &&
-            Objects.equals(displayName, token.displayName) &&
-            Objects.equals(noParent, token.noParent) &&
-            Objects.equals(noDefaultPolicy, token.noDefaultPolicy) &&
-            Objects.equals(ttl, token.ttl) &&
-            Objects.equals(explicitMaxTtl, token.explicitMaxTtl) &&
-            Objects.equals(numUses, token.numUses) &&
-            Objects.equals(policies, token.policies) &&
-            Objects.equals(meta, token.meta) &&
-            Objects.equals(renewable, token.renewable) &&
-            Objects.equals(period, token.period) &&
-            Objects.equals(entityAlias, token.entityAlias);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, type, displayName, noParent, noDefaultPolicy, ttl, explicitMaxTtl, numUses, policies,
-            meta, renewable, period, entityAlias);
-    }
 
     /**
      * Constants for token types.

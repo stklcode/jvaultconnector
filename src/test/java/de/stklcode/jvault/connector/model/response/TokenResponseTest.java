@@ -18,7 +18,6 @@ package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
-import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -101,42 +100,32 @@ class TokenResponseTest extends AbstractModelTest<TokenResponse> {
         );
     }
 
-    /**
-     * Test getter, setter and get-methods for response data.
-     */
-    @Test
-    void getDataRoundtrip() {
-        // Create empty Object.
-        TokenResponse res = new TokenResponse();
-        assertNull(res.getData(), "Initial data should be empty");
-    }
-
     @Override
     protected void jsonAssertions(TokenResponse res) {
-        assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect lease duration");
-        assertEquals(RES_RENEWABLE, res.isRenewable(), "Incorrect response renewable flag");
-        assertEquals(RES_LEASE_DURATION, res.getLeaseDuration(), "Incorrect response lease duration");
-        assertEquals(MOUNT_TYPE, res.getMountType(), "Incorrect mount type");
+        assertEquals(RES_LEASE_DURATION, res.leaseDuration(), "Incorrect lease duration");
+        assertEquals(RES_RENEWABLE, res.renewable(), "Incorrect response renewable flag");
+        assertEquals(RES_LEASE_DURATION, res.leaseDuration(), "Incorrect response lease duration");
+        assertEquals(MOUNT_TYPE, res.mountType(), "Incorrect mount type");
         // Extract token data.
-        TokenData data = res.getData();
+        TokenData data = res.data();
         assertNotNull(data, "Token data is NULL");
-        assertEquals(TOKEN_ACCESSOR, data.getAccessor(), "Incorrect token accessor");
-        assertEquals(TOKEN_CREATION_TIME, data.getCreationTime(), "Incorrect token creation time");
-        assertEquals(TOKEN_TTL, data.getCreationTtl(), "Incorrect token creation TTL");
-        assertEquals(TOKEN_DISPLAY_NAME, data.getName(), "Incorrect token display name");
-        assertEquals(TOKEN_ENTITY_ID, data.getEntityId(), "Incorrect token entity ID");
-        assertEquals(ZonedDateTime.parse(TOKEN_EXPIRE_TIME), data.getExpireTime(), "Incorrect parsed token expire time");
-        assertEquals(TOKEN_EXPLICIT_MAX_TTL, data.getExplicitMaxTtl(), "Incorrect token explicit max TTL");
-        assertEquals(TOKEN_ID, data.getId(), "Incorrect token ID");
-        assertEquals(ZonedDateTime.parse(TOKEN_ISSUE_TIME), data.getIssueTime(), "Incorrect parsed token issue time");
-        assertEquals(Map.of(TOKEN_META_KEY, TOKEN_META_VALUE), data.getMeta(), "Incorrect token metadata");
-        assertEquals(TOKEN_NUM_USES, data.getNumUses(), "Incorrect token number of uses");
-        assertEquals(TOKEN_ORPHAN, data.isOrphan(), "Incorrect token orphan flag");
-        assertEquals(TOKEN_PATH, data.getPath(), "Incorrect token path");
-        assertEquals(2, data.getPolicies().size(), "Incorrect number of token policies");
-        assertTrue(data.getPolicies().containsAll(List.of(TOKEN_POLICY_1, TOKEN_POLICY_2)), "Incorrect token policies");
-        assertEquals(TOKEN_RENEWABLE, data.isRenewable(), "Incorrect token renewable flag");
-        assertEquals(RES_TTL, data.getTtl(), "Incorrect token TTL");
-        assertEquals(TOKEN_TYPE, data.getType(), "Incorrect token type");
+        assertEquals(TOKEN_ACCESSOR, data.accessor(), "Incorrect token accessor");
+        assertEquals(TOKEN_CREATION_TIME, data.creationTime(), "Incorrect token creation time");
+        assertEquals(TOKEN_TTL, data.creationTtl(), "Incorrect token creation TTL");
+        assertEquals(TOKEN_DISPLAY_NAME, data.displayName(), "Incorrect token display name");
+        assertEquals(TOKEN_ENTITY_ID, data.entityId(), "Incorrect token entity ID");
+        assertEquals(ZonedDateTime.parse(TOKEN_EXPIRE_TIME), data.expireTime(), "Incorrect parsed token expire time");
+        assertEquals(TOKEN_EXPLICIT_MAX_TTL, data.explicitMaxTtl(), "Incorrect token explicit max TTL");
+        assertEquals(TOKEN_ID, data.id(), "Incorrect token ID");
+        assertEquals(ZonedDateTime.parse(TOKEN_ISSUE_TIME), data.issueTime(), "Incorrect parsed token issue time");
+        assertEquals(Map.of(TOKEN_META_KEY, TOKEN_META_VALUE), data.meta(), "Incorrect token metadata");
+        assertEquals(TOKEN_NUM_USES, data.numUses(), "Incorrect token number of uses");
+        assertEquals(TOKEN_ORPHAN, data.orphan(), "Incorrect token orphan flag");
+        assertEquals(TOKEN_PATH, data.path(), "Incorrect token path");
+        assertEquals(2, data.policies().size(), "Incorrect number of token policies");
+        assertTrue(data.policies().containsAll(List.of(TOKEN_POLICY_1, TOKEN_POLICY_2)), "Incorrect token policies");
+        assertEquals(TOKEN_RENEWABLE, data.renewable(), "Incorrect token renewable flag");
+        assertEquals(RES_TTL, data.ttl(), "Incorrect token TTL");
+        assertEquals(TOKEN_TYPE, data.type(), "Incorrect token type");
     }
 }

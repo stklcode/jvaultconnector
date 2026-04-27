@@ -16,50 +16,21 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import de.stklcode.jvault.connector.model.response.embedded.SecretMetadata;
-
-import java.io.Serial;
-import java.util.Objects;
-
 
 /**
  * Vault response for secret metadata (KV v2).
  *
+ * @param responseHeader Response Metadata
+ * @param metadata       The actual secret metadata
  * @author Stefan Kalscheuer
  * @since 0.8
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class MetadataResponse extends VaultDataResponse {
-    @Serial
-    private static final long serialVersionUID = -3679762333630984679L;
-
-    @JsonProperty("data")
-    private SecretMetadata metadata;
-
-    /**
-     * Get the actual metadata.
-     *
-     * @return Metadata.
-     */
-    public SecretMetadata getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        MetadataResponse that = (MetadataResponse) o;
-        return Objects.equals(metadata, that.metadata);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), metadata);
-    }
+public record MetadataResponse(
+    @JsonUnwrapped Header responseHeader,
+    @JsonProperty("data") SecretMetadata metadata
+) implements VaultDataResponse {
 }

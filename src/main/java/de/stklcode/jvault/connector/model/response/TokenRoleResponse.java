@@ -16,48 +16,21 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import de.stklcode.jvault.connector.model.TokenRole;
 import de.stklcode.jvault.connector.model.response.embedded.TokenData;
-
-import java.io.Serial;
-import java.util.Objects;
 
 /**
  * Vault response from token role lookup providing Token information in {@link TokenData} field.
  *
+ * @param responseHeader Response metadata
+ * @param data           Token data
  * @author Stefan Kalscheuer
  * @since 0.9
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class TokenRoleResponse extends VaultDataResponse {
-    @Serial
-    private static final long serialVersionUID = 5265363857731948626L;
-
-    @JsonProperty("data")
-    private TokenRole data;
-
-    /**
-     * @return TokenRole data
-     */
-    public TokenRole getData() {
-        return data;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        TokenRoleResponse that = (TokenRoleResponse) o;
-        return Objects.equals(data, that.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), data);
-    }
+public record TokenRoleResponse(
+    @JsonUnwrapped Header responseHeader,
+    TokenRole data
+) implements VaultDataResponse {
 }

@@ -4,7 +4,9 @@ import tools.jackson.core.JacksonException;
 
 import de.stklcode.jvault.connector.exception.*;
 import de.stklcode.jvault.connector.model.response.ErrorResponse;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -71,6 +73,8 @@ public final class RequestHelper implements Serializable {
             .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
             .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
             .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .build();
     }
 
@@ -450,7 +454,7 @@ public final class RequestHelper implements Serializable {
                 try (var reader = new BufferedReader(new InputStreamReader(body, UTF_8))) {
                     ErrorResponse er = jsonMapper.readValue(reader, ErrorResponse.class);
                     /* Check for "permission denied" response */
-                    if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied")) {
+                    if (!er.errors().isEmpty() && er.errors().get(0).equals("permission denied")) {
                         throw new PermissionDeniedException();
                     }
                     throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), er.toString());

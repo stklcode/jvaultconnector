@@ -16,14 +16,12 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -33,11 +31,9 @@ import java.util.Map;
  * @author Stefan Kalscheuer
  * @since 0.1
  * @since 1.1 abstract
+ * @since 2.0 abstract class is now an interface
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class SecretResponse extends VaultDataResponse {
-    @Serial
-    private static final long serialVersionUID = 5198088815871692951L;
+public interface SecretResponse extends VaultDataResponse {
 
     /**
      * Get complete data object.
@@ -46,7 +42,7 @@ public abstract class SecretResponse extends VaultDataResponse {
      * @since 0.4.0
      * @since 1.1 Serializable map value.
      */
-    public abstract Map<String, Serializable> getData();
+    Map<String, Serializable> data();
 
     /**
      * Get secret metadata. This is only available for KV v2 secrets.
@@ -54,7 +50,7 @@ public abstract class SecretResponse extends VaultDataResponse {
      * @return Metadata of the secret.
      * @since 0.8
      */
-    public abstract VersionMetadata getMetadata();
+    VersionMetadata metadata();
 
     /**
      * Get a single value for given key.
@@ -63,8 +59,11 @@ public abstract class SecretResponse extends VaultDataResponse {
      * @return the value or {@code null} if absent
      * @since 0.4.0
      */
-    public final Object get(final String key) {
-        return getData().get(key);
+    default Object get(final String key) {
+        if (data() != null) {
+            return data().get(key);
+        }
+        return null;
     }
 
     /**
@@ -77,7 +76,7 @@ public abstract class SecretResponse extends VaultDataResponse {
      * @throws InvalidResponseException on parsing error
      * @since 0.4.0
      */
-    public final <C> C get(final String key, final Class<C> type) throws InvalidResponseException {
+    default <C> C get(final String key, final Class<C> type) throws InvalidResponseException {
         try {
             Object rawValue = get(key);
             if (rawValue == null) {

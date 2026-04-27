@@ -68,6 +68,6 @@ class SecretListResponseTest extends AbstractModelTest<SecretListResponse> {
             "SecretListResponse deserialization failed"
         );
 
-        assertEquals(List.of(KEY1, KEY2), res.getKeys(), "Unexpected secret keys");
+        assertEquals(List.of(KEY1, KEY2), res.keys(), "Unexpected secret keys");
     }
 }

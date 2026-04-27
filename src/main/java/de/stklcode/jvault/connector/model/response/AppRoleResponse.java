@@ -16,47 +16,21 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import de.stklcode.jvault.connector.model.AppRole;
-
-import java.io.Serial;
-import java.util.Objects;
 
 /**
  * Vault response for AppRole lookup.
  *
+ * @param responseHeader Response metadata
+ * @param role           AppRole data
  * @author Stefan Kalscheuer
  * @since 0.4.0
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class AppRoleResponse extends VaultDataResponse {
-    @Serial
-    private static final long serialVersionUID = -6536422219633829177L;
-
-    @JsonProperty("data")
-    private AppRole role;
-
-    /**
-     * @return The role
-     */
-    public AppRole getRole() {
-        return role;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass() || !super.equals(o)) {
-            return false;
-        }
-        AppRoleResponse that = (AppRoleResponse) o;
-        return Objects.equals(role, that.role);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), role);
-    }
+public record AppRoleResponse(
+    @JsonUnwrapped Header responseHeader,
+    @JsonProperty("data") AppRole role
+) implements VaultDataResponse {
 }

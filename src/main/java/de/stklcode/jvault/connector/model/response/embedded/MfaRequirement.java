@@ -16,60 +16,20 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Embedded multi-factor-authentication (MFA) requirement.
  *
+ * @param mfaRequestId   MFA request ID
+ * @param mfaConstraints MFA constraints
  * @author Stefan Kalscheuer
  * @since 1.2
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class MfaRequirement implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -2516941512455319638L;
-
-    @JsonProperty("mfa_request_id")
-    private String mfaRequestId;
-
-    @JsonProperty("mfa_constraints")
-    private Map<String, MfaConstraintAny> mfaConstraints;
-
-    /**
-     * @return MFA request ID
-     */
-    public String getMfaRequestId() {
-        return mfaRequestId;
-    }
-
-    /**
-     * @return MFA constraints
-     */
-    public Map<String, MfaConstraintAny> getMfaConstraints() {
-        return mfaConstraints;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MfaRequirement mfaRequirement = (MfaRequirement) o;
-        return Objects.equals(mfaRequestId, mfaRequirement.mfaRequestId) &&
-            Objects.equals(mfaConstraints, mfaRequirement.mfaConstraints);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(mfaRequestId, mfaConstraints);
-    }
+public record MfaRequirement(
+    String mfaRequestId,
+    Map<String, MfaConstraintAny> mfaConstraints
+) implements Serializable {
 }

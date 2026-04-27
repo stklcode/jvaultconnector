@@ -16,46 +16,13 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serial;
-import java.util.Objects;
-
 /**
  * Vault response for help request.
  *
+ * @param help Help text
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class HelpResponse implements VaultResponse {
-    @Serial
-    private static final long serialVersionUID = -1152070966642848490L;
-
-    @JsonProperty("help")
-    private String help;
-
-    /**
-     * @return Help text
-     */
-    public String getHelp() {
-        return help;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        HelpResponse that = (HelpResponse) o;
-        return Objects.equals(help, that.help);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(help);
-    }
+public record HelpResponse(String help) implements VaultResponse {
 }

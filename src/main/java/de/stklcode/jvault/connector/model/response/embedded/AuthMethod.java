@@ -16,213 +16,56 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.model.AuthBackend;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Embedded authentication method response.
  *
+ * @param rawType               Backend type
+ * @param accessor              Accessor
+ * @param deprecationStatus     Deprecation status
+ * @param description           Description
+ * @param config                Configuration data
+ * @param externalEntropyAccess Backend has access to external entropy source
+ * @param local                 Is local backend
+ * @param options               Options
+ * @param pluginVersion         Plugin version
+ * @param runningPluginVersion  Running plugin version
+ * @param runningSha256         Running SHA256
+ * @param sealWrap              Seal wrapping enabled
+ * @param uuid                  Backend UUID
  * @author Stefan Kalscheuer
  * @since 0.1
  * @since 1.1 implements {@link Serializable}
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class AuthMethod implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -439987082190917691L;
-
-    private AuthBackend type;
-
-    @JsonIgnore
-    private String rawType;
-
-    @JsonProperty("accessor")
-    private String accessor;
-
-    @JsonProperty("deprecation_status")
-    private String deprecationStatus;
-
-    @JsonProperty("description")
-    private String description;
-
-    @JsonProperty("config")
-    private MountConfig config;
-
-    @JsonProperty("external_entropy_access")
-    private boolean externalEntropyAccess;
-
-    @JsonProperty("local")
-    private boolean local;
-
-    @JsonProperty("options")
-    private Map<String, String> options;
-
-    @JsonProperty("plugin_version")
-    private String pluginVersion;
-
-    @JsonProperty("running_plugin_version")
-    private String runningPluginVersion;
-
-    @JsonProperty("running_sha256")
-    private String runningSha256;
-
-    @JsonProperty("seal_wrap")
-    private boolean sealWrap;
-
-    @JsonProperty("uuid")
-    private String uuid;
+public record AuthMethod(
+    @JsonProperty("type") String rawType,
+    String accessor,
+    String deprecationStatus,
+    String description,
+    MountConfig config,
+    boolean externalEntropyAccess,
+    boolean local,
+    Map<String, String> options,
+    String pluginVersion,
+    String runningPluginVersion,
+    String runningSha256,
+    boolean sealWrap,
+    String uuid
+) implements Serializable {
 
     /**
-     * @param type Backend type, passed to {@link AuthBackend#forType(String)}
-     */
-    @JsonSetter("type")
-    public void setType(final String type) {
-        this.rawType = type;
-        this.type = AuthBackend.forType(type);
-    }
-
-    /**
+     * Get parsed backend type.
+     *
      * @return Backend type
      */
-    public AuthBackend getType() {
-        return type;
+    public AuthBackend type() {
+        return AuthBackend.forType(rawType);
     }
 
-    /**
-     * @return Raw backend type string
-     */
-    @JsonGetter("type")
-    public String getRawType() {
-        return rawType;
-    }
-
-    /**
-     * @return Accessor
-     * @since 1.1
-     */
-    public String getAccessor() {
-        return accessor;
-    }
-
-    /**
-     * @return Deprecation status
-     * @since 1.2
-     */
-    public String getDeprecationStatus() {
-        return deprecationStatus;
-    }
-
-    /**
-     * @return Description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * @return Configuration data
-     * @since 0.2
-     * @since 1.2 Returns {@link MountConfig} instead of {@link Map}
-     */
-    public MountConfig getConfig() {
-        return config;
-    }
-
-    /**
-     * @return Backend has access to external entropy source
-     * @since 1.1
-     */
-    public boolean isExternalEntropyAccess() {
-        return externalEntropyAccess;
-    }
-
-    /**
-     * @return Is local backend
-     */
-    public boolean isLocal() {
-        return local;
-    }
-
-    /**
-     * @return Options
-     * @since 1.2
-     */
-    public Map<String, String> getOptions() {
-        return options;
-    }
-
-    /**
-     * @return Plugin version
-     * @since 1.2
-     */
-    public String getPluginVersion() {
-        return pluginVersion;
-    }
-
-    /**
-     * @return Running plugin version
-     * @since 1.2
-     */
-    public String getRunningPluginVersion() {
-        return runningPluginVersion;
-    }
-
-    /**
-     * @return Running SHA256
-     * @since 1.2
-     */
-    public String getRunningSha256() {
-        return runningSha256;
-    }
-
-    /**
-     * @return Seal wrapping enabled
-     * @since 1.1
-     */
-    public boolean isSealWrap() {
-        return sealWrap;
-    }
-
-    /**
-     * @return Backend UUID
-     * @since 1.1
-     */
-    public String getUuid() {
-        return uuid;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        AuthMethod that = (AuthMethod) o;
-        return local == that.local &&
-            type == that.type &&
-            externalEntropyAccess == that.externalEntropyAccess &&
-            sealWrap == that.sealWrap &&
-            Objects.equals(rawType, that.rawType) &&
-            Objects.equals(accessor, that.accessor) &&
-            Objects.equals(deprecationStatus, that.deprecationStatus) &&
-            Objects.equals(description, that.description) &&
-            Objects.equals(config, that.config) &&
-            Objects.equals(options, that.options) &&
-            Objects.equals(pluginVersion, that.pluginVersion) &&
-            Objects.equals(runningPluginVersion, that.runningPluginVersion) &&
-            Objects.equals(runningSha256, that.runningSha256) &&
-            Objects.equals(uuid, that.uuid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, rawType, accessor, deprecationStatus, description, config, externalEntropyAccess,
-            local, options, pluginVersion, runningPluginVersion, runningSha256, sealWrap, uuid);
-    }
 }

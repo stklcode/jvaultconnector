@@ -50,7 +50,7 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
 
     @Override
     protected void jsonAssertions(ErrorResponse res) {
-        assertEquals(List.of(ERROR_1, ERROR_2), res.getErrors(), "Unexpected error messages");
+        assertEquals(List.of(ERROR_1, ERROR_2), res.errors(), "Unexpected error messages");
         assertEquals(
             JSON,
             assertDoesNotThrow(() -> objectMapper.writeValueAsString(res), "ErrorResponse serialization failed"),
@@ -72,6 +72,6 @@ class ErrorResponseTest extends AbstractModelTest<ErrorResponse> {
         );
         assertEquals("error response", res.toString());
 
-        assertEquals("error response", new ErrorResponse().toString());
+        assertEquals("error response", new ErrorResponse(null).toString());
     }
 }

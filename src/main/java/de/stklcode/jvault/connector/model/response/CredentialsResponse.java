@@ -16,25 +16,33 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Vault response from credentials lookup. Simple wrapper for data objects containing username and password fields.
  *
+ * @param responseHeader Response metadata
+ * @param data           Secret data
  * @author Stefan Kalscheuer
  * @since 0.5.0
+ * @since 2.0 class is now a record
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class CredentialsResponse extends PlainSecretResponse {
+public record CredentialsResponse(
+    @JsonUnwrapped Header responseHeader,
+    Map<String, Serializable> data
+) implements SecretResponse {
     @Serial
     private static final long serialVersionUID = -1439692963299045425L;
 
     /**
      * @return Username
      */
-    public String getUsername() {
+    public String username() {
         Object username = get("username");
         if (username != null) {
             return username.toString();
@@ -45,11 +53,16 @@ public final class CredentialsResponse extends PlainSecretResponse {
     /**
      * @return Password
      */
-    public String getPassword() {
+    public String password() {
         Object password = get("password");
         if (password != null) {
             return password.toString();
         }
+        return null;
+    }
+
+    @Override
+    public VersionMetadata metadata() {
         return null;
     }
 }
