@@ -16,7 +16,6 @@
 
 package de.stklcode.jvault.connector.model.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import org.junit.jupiter.api.Test;
@@ -169,43 +168,12 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
     /**
      * Test class for complex field mapping.
      */
-    private static class ComplexType {
-        @JsonProperty("field1")
-        private String field1;
-
-        @JsonProperty("field2")
-        private Integer field2;
-
-        private ComplexType() {
-            // Required for JSON deserialization.
-        }
-
-        private ComplexType(String field1, Integer field2) {
-            this.field1 = field1;
-            this.field2 = field2;
-        }
-
+    public record ComplexType(String field1, Integer field2) {
         private Map<String, Object> toMap() {
             return Map.of(
                 "field1", field1,
                 "field2", field2
             );
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            } else if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            ComplexType that = (ComplexType) o;
-            return Objects.equals(field1, that.field1) && Objects.equals(field2, that.field2);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(field1, field2);
         }
     }
 }

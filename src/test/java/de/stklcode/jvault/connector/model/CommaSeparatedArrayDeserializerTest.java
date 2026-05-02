@@ -17,7 +17,7 @@ class CommaSeparatedArrayDeserializerTest {
     private final ObjectMapper mapper = JsonMapper.builder().build();
 
     // Minimal test fixture to apply the deserializer.
-    record TestClass(@JsonDeserialize(using = CommaSeparatedArrayDeserializer.class) List<String> values) {
+    public record TestClass(@JsonDeserialize(using = CommaSeparatedArrayDeserializer.class) List<String> values) {
     }
 
 
