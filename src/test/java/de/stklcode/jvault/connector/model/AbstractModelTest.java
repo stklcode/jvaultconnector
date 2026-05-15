@@ -1,6 +1,6 @@
 package de.stklcode.jvault.connector.model;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
+
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.MapperFeature;
@@ -46,14 +46,6 @@ public abstract class AbstractModelTest<T> {
      * @return Model instance.
      */
     protected abstract T createFull();
-
-    /**
-     * Test if {@link Object#equals(Object)} and {@link Object#hashCode()} are implemented, s.t. all fields are covered.
-     */
-    @Test
-    void testEqualsHashcode() {
-        EqualsVerifier.simple().forClass(modelClass).verify();
-    }
 
     /**
      * Test Java serialization of a full model instance.

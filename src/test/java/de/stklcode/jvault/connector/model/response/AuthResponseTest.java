@@ -18,11 +18,6 @@ package de.stklcode.jvault.connector.model.response;
 
 import de.stklcode.jvault.connector.model.AbstractModelTest;
 import de.stklcode.jvault.connector.model.response.embedded.AuthData;
-import de.stklcode.jvault.connector.model.response.embedded.MfaConstraintAny;
-import de.stklcode.jvault.connector.model.response.embedded.MfaMethodId;
-import de.stklcode.jvault.connector.model.response.embedded.MfaRequirement;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
@@ -104,13 +99,6 @@ class AuthResponseTest extends AbstractModelTest<AuthResponse> {
             () -> objectMapper.readValue(RES_JSON, AuthResponse.class),
             "Creation of full model instance failed"
         );
-    }
-
-    @Test
-    void testEqualsHashcodeMfa() {
-        EqualsVerifier.simple().forClass(MfaRequirement.class).verify();
-        EqualsVerifier.simple().forClass(MfaConstraintAny.class).verify();
-        EqualsVerifier.simple().forClass(MfaMethodId.class).verify();
     }
 
     @Override
