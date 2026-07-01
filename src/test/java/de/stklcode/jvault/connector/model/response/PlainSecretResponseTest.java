@@ -162,6 +162,12 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
             assertDoesNotThrow(() -> res.get(complexKey + "Json", ComplexType.class), "getting complex type from JSON string failed"),
             "unexpected value for complex type from JSON string"
         );
+
+        assertEquals(
+            new FullData(stringVal, numberVal, listVal, complexVal),
+            assertDoesNotThrow(() -> res.get(FullData.class), "getting full object from failed"),
+            "unexpected value for full object getter"
+        );
     }
 
 
@@ -175,5 +181,11 @@ class PlainSecretResponseTest extends AbstractModelTest<PlainSecretResponse> {
                 "field2", field2
             );
         }
+    }
+
+    /**
+     * Test class for complex field mapping.
+     */
+    public record FullData(String string, Double number, List<String> list, ComplexType complex) {
     }
 }

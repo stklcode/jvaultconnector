@@ -11,6 +11,9 @@
 
   Use `connector.sys()`, `.kv2()`, `.token()`, `.appRole()` and `.transit()` to access respective feature sets.
 
+### Features
+* Allow parsing JSON from full dataset in `SecretResponse` (#130)
+
 ### Removal
 * Remove deprecated `read...Credentials()` methods (#112)
 

@@ -100,4 +100,26 @@ public interface SecretResponse extends VaultDataResponse {
             throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
         }
     }
+
+    /**
+     * Get full response parsed as JSON.
+     *
+     * @param type Class to parse response
+     * @param <C>  Class to parse response
+     * @return Parsed object or {@code null} if absent
+     * @throws InvalidResponseException on parsing error
+     * @since 2.0.0
+     */
+    default <C> C get(final Class<C> type) throws InvalidResponseException {
+        try {
+            var om = JsonMapper.builder()
+                .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DateTimeFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .disable(DateTimeFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
+                .build();
+            return om.convertValue(data(), type);
+        } catch (JacksonException e) {
+            throw new InvalidResponseException("Unable to parse response payload: " + e.getMessage());
+        }
+    }
 }
