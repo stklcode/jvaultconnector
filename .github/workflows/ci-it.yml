@@ -16,14 +16,14 @@ jobs:
     strategy:
       matrix:
         jdk: [ 11, 17, 21, 25 ]
-        vault: [ '1.2.0', '1.21.4' ]
+        vault: [ '1.2.0', '1.21.4', '2.0.3' ]
         include:
           - jdk: 21
             vault: '1.21.4'
             analysis: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set up Java
