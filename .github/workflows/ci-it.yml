@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - 'main'
+      - '1.x'
   pull_request:
     branches:
       - 'main'
+      - '1.x'
 
 jobs:
   build-with-it:
-    if: github.ref_name == 'main' || github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
     runs-on: ubuntu-latest
     strategy:
       matrix:
