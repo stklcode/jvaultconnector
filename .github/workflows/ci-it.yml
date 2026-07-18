@@ -10,7 +10,6 @@ on:
 
 jobs:
   build-with-it:
-    if: github.ref_name == 'main' || github.base_ref == 'main' || startsWith(github.ref_name, 'release/')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,7 +21,7 @@ jobs:
             analysis: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
