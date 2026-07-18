@@ -19,7 +19,7 @@
 * Remove deprecated `read...Credentials()` methods (#112)
 
 ### Dependencies
-* Updated Jackson to 3.1.0 (#116) (#118) (#119) (#123)
+* Updated Jackson to 3.2.1 (#116) (#118) (#119) (#123) (#134)
 
 ### Test
 * Tested against Vault 1.3 to 2.0 (#126)
