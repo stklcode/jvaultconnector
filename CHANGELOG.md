@@ -26,6 +26,15 @@
 * Tested against OpenBao 2.6 (#122)
 
 
+## 1.5.5 (2026-07-23)
+
+### Dependencies
+* Updated Jackson to 2.22.1 (#132)
+
+### Test
+* Tested against Vault 1.2 to 2.0 (#133)
+
+
 ## 1.5.4 (2026-04-13)
 
 ### Dependencies
