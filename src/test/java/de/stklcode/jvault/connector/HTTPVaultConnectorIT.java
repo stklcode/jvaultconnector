@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @since 0.1
  */
 class HTTPVaultConnectorIT {
-    private static String VAULT_VERSION = "2.0.3";  // The vault version this test is supposed to run against.
+    private static String VAULT_VERSION = "2.0.4";  // The vault version this test is supposed to run against.
     private static final String KEY1 = "+5n9tlpFnTNBAyutYQLT0o5J0AQ6Lt85u2KrEOan4gzb";
     private static final String KEY2 = "4SSSIsllqY+c//t1M9IhBwzVSeBWgh0E0UbjacUD9/5g";
     private static final String KEY3 = "O7AMGCi9Blt7gHHJdFjz1sHZHsUIOnvdFIV+AN2NwCxv";
@@ -1070,24 +1070,24 @@ class HTTPVaultConnectorIT {
 
         private static final String PKI_CA_PEM = """
             -----BEGIN CERTIFICATE-----
-            MIIDLTCCAhWgAwIBAgIUQJcpa6gCLJWt+TowyNwVrdrjKlgwDQYJKoZIhvcNAQEL
-            BQAwHjEcMBoGA1UEAxMTSlZhdWx0IFRlc3QgUm9vdCBDQTAeFw0yNjA3MTQxODIw
-            MzlaFw0yNjA4MTUxODIxMDlaMB4xHDAaBgNVBAMTE0pWYXVsdCBUZXN0IFJvb3Qg
-            Q0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDI0guomBRZlG9pJOBO
-            y6lRqV7W616f6OS4mWryfICmE7C9emRahsjmlQSQGWO2mct3pwRyLFgSWpusiIkh
-            jssnHM1qyaWeFv1EcjUByQM8xf8KFKqxxw5mX7jH0P0qfGOljvBAlpRa0HzPEYDT
-            fhghYDo86a8JxW33VLha10MZJ+DU5r8SpbvzRfc4xdVF9PDDkxzq1hNMrVw2T/9l
-            m3ycRWQ/T/uUT5Amx94yUPSQXZydcUjmA51hfdkmC5agSPSL1A1TBpAuTcv77M0I
-            8wIejUbMCJOl8fFNAalySMg/1a2ZzFuRw7iXNuXcfNIH22z73hLnYfZ+hbElEa/2
-            xUkzAgMBAAGjYzBhMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0G
-            A1UdDgQWBBT5z9dFfwewhrtgEpHj4q7t+1fFcjAfBgNVHSMEGDAWgBT5z9dFfwew
-            hrtgEpHj4q7t+1fFcjANBgkqhkiG9w0BAQsFAAOCAQEAnXecUvthG+PqJ2czn6Ag
-            6vqhDtRcEc2DJv6VQWMEUt9R8QzWEQ7+XodyGlFtDx20O9Nhrhp3tKlQP6wqFsbs
-            k8rkVGJ7fPVa/6aKjkSZ8BVWDEBfkkNE9pdtDlN7G2NFktG1ODco6i3pacEQtSLm
-            6j7zmxJVxb3HGNgdZKdhHfGf0ABA9ErsiKf2Qwj0NPxa6Xhl+TsZKi8X+gwanYUs
-            sx7kgm9uh9kurhKlaSrj8uV18RwyorsKqYxnFMUTRJ9QkNEhFFr1uc32W8Kj1mDo
-            5e2D7/dUGCYLI95vqkyzynt0TWQEc43cZj0/LWlSRA+2wmDBDUqL1OwQfX1TDv2N
-            TQ==
+            MIIDLTCCAhWgAwIBAgIUIk5Ftm69U+MrzKZ5wVrgzsw2GUcwDQYJKoZIhvcNAQEL
+            BQAwHjEcMBoGA1UEAxMTSlZhdWx0IFRlc3QgUm9vdCBDQTAeFw0yNjA4MTgxNjAz
+            MzJaFw0zNjA4MTUxNjA0MDJaMB4xHDAaBgNVBAMTE0pWYXVsdCBUZXN0IFJvb3Qg
+            Q0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCYbl79aCEAnrpAHzWZ
+            iHMN4ifHNbre5UZUJebvXW0VHdv1fck5ISdRdBnvA5NV5U0513aQ7IyxPkhJ/AGQ
+            XDN8CGXc+EzanFY/OE0NRXcslh3DAEGG2XdSOj1E5qDBW4FPleR+3HnEDHS80VPx
+            r/Dzp9ocdRNHU1/L9kiGIAD6PKu+N1qGwk7nHRhNN0DA+eEugCKqSvmzc44kWv1X
+            edES7gW8V2lBnexelvmWTuCtugkbAv65bNXtUbG6TrU6SnC7xjHbnTbFSE5P3y8R
+            F84KqxEV7t1YGMUH/cyP2SBgr4ov0gY8zk/ztFpB6t7kKudkmfN6bTOXA7lkR+1I
+            lfg7AgMBAAGjYzBhMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0G
+            A1UdDgQWBBSbtEvMeGN31R4EUsm845meQv3+LjAfBgNVHSMEGDAWgBSbtEvMeGN3
+            1R4EUsm845meQv3+LjANBgkqhkiG9w0BAQsFAAOCAQEAdcrUEHPrBb6gxiZG9YID
+            JjeM1BIb4X2Xl+Y3smrIM4XnOoMAgVEbO5wk7Ay8S7FzkwZj+4PGB69PXSlLfxMU
+            c4UQ7OJA6dNDfgIIe2+epJY0uta3/17WAFmTc/zpDLVCvRAyURjmubxSZOQBHFPW
+            5wt6P9wRVbdvVnN4vSrcXinCOzMOldoBtBH8nvoQk0BNvOqDiKlsvtzjEdcOpJ+H
+            9lbB1XthaemInfDWFFcy2LczT3jgUnfhQpkXFoqxjg8RQPhom4TMg/oNwdpy3SST
+            pOYbrmJac/PjsnAlKAF4ZX+C9C6/n88UIXI1znomBsXKQSODPRQnR+Qv1i70Z6IJ
+            3w==
             -----END CERTIFICATE-----""";
 
         @BeforeEach
@@ -1192,7 +1192,7 @@ class HTTPVaultConnectorIT {
 
             if (pkiResponse.data().authorityKeyId() != null) {
                 // Available in Vault 1.21.1+, but not in OpenBao (checked with 2.6.0)
-                assertEquals("f9:cf:d7:45:7f:07:b0:86:bb:60:12:91:e3:e2:ae:ed:fb:57:c5:72",
+                assertEquals("9b:b4:4b:cc:78:63:77:d5:1e:04:52:c9:bc:e3:99:9e:42:fd:fe:2e",
                     pkiResponse.data().authorityKeyId(),
                     "unexpected authority key ID");
             }
