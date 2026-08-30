@@ -1180,6 +1180,46 @@ class HTTPVaultConnectorIT {
         }
 
         @Test
+        @DisplayName("Generate certificate and key with specific issuer")
+        void generateCertificateAndKeyWithIssuerTest() {
+            assumeTrue(
+                compareVersions(VAULT_VERSION, "1.11.0") >= 0,
+                "Issuer-specific certificate issuance requires Vault 1.11.0 or later"
+            );
+
+            // "default" is always a valid issuer_ref, even without naming a custom issuer
+            PkiResponse pkiResponse = assertDoesNotThrow(
+                () -> connector.pki().generateCertificateAndKey(
+                    "default",
+                    "example-com",
+                    PkiRequest.builder().withCommonName("issuer-test.example.com").build()
+                ),
+                "Failed to issue certificate via issuer-specific endpoint"
+            );
+
+            PublicKey caCert = parseCertificate(PKI_CA_PEM).getPublicKey();
+            X509Certificate cert = parseCertificate(pkiResponse.data().certificate());
+            assertNotNull(cert, "failed to parse certificate");
+            assertDoesNotThrow(() -> cert.verify(caCert), "certificate was not signed by the issuing CA");
+            assertHasSAN(cert, 2, "issuer-test.example.com");
+
+            // Requesting an issuer that does not exist
+            InvalidResponseException ex = assertThrows(
+                InvalidResponseException.class,
+                () -> connector.pki().generateCertificateAndKey(
+                    "bogus-issuer",
+                    "example-com",
+                    PkiRequest.builder().withCommonName("wont-issue.example.com").build()
+                ),
+                "Expected exception when referencing a non-existent issuer"
+            );
+            assertTrue(
+                ex.getResponse() != null && ex.getResponse().toLowerCase().contains("issuer"),
+                "Expected error to reference the invalid issuer, got: " + ex.getResponse()
+            );
+        }
+
+        @Test
         @DisplayName("Read CA/issuer certificate")
         void readCaCertificateTest() {
             PkiCaResponse pkiResponse = assertDoesNotThrow(() -> connector.pki().readCaCert(),

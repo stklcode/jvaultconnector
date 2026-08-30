@@ -65,7 +65,7 @@ public final class VaultApiPath {
 
     // PKI engine paths
     public static final String PKI_ISSUE = PKI + "/issue/";
-    public static final String PKI_ISSUER_ISSUE = PKI + "/%s/issue/%s";
+    public static final String PKI_ISSUER_ISSUE = PKI + "/issuer/%s/issue/%s";
     public static final String PKI_REVOKE = PKI + "/revoke";
     public static final String PKI_CA_CERT = PKI + "/cert/ca";
     public static final String PKI_ISSUER_CERT = PKI + "/issuer/%s/json";

@@ -50,7 +50,7 @@ public interface PkiClient {
      * @return PKI response
      * @throws VaultConnectorException on error
      */
-    PkiResponse generateCertificateAndKey(String role, String issuer, PkiRequest request) throws VaultConnectorException;
+    PkiResponse generateCertificateAndKey(String issuer, String role, PkiRequest request) throws VaultConnectorException;
 
     /**
      * Request revocation of a certificate by serial number.
