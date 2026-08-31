@@ -62,6 +62,9 @@ public final class VaultApiPath {
     public static final String TRANSIT_DECRYPT = TRANSIT + "/decrypt/";
     public static final String TRANSIT_HASH = TRANSIT + "/hash/";
 
+    // DB engine paths
+    public static final String DB_CREDS = "/creds/";
+
     /**
      * Private constructor to prevent instantiation.
      */

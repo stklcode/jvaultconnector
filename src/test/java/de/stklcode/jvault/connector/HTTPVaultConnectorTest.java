@@ -19,10 +19,12 @@ package de.stklcode.jvault.connector;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
+import de.stklcode.jvault.connector.model.response.CredentialsResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -48,6 +50,40 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @WireMockTest
 class HTTPVaultConnectorTest {
+
+    @Test
+    void readDbCredentialsTest(WireMockRuntimeInfo wireMock) throws Exception {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).build()) {
+            setPrivate(connector, "authorized", true);
+            setPrivate(connector, "token", "test-token");
+
+            mockHttpResponse(
+                "/v1/database/creds/my-role",
+                200,
+                "{" +
+                    "  \"lease_id\": \"database/creds/my-role/abcd1234\"," +
+                    "  \"lease_duration\": 3600," +
+                    "  \"renewable\": true," +
+                    "  \"data\": {" +
+                    "    \"username\": \"test-user\"," +
+                    "    \"password\": \"s3cr3t\"" +
+                    "  }" +
+                    "}",
+                "application/json"
+            );
+
+            CredentialsResponse res = assertDoesNotThrow(
+                () -> connector.readDbCredentials("my-role", "database"),
+                "readCredentials() should not fail"
+            );
+
+            assertEquals("test-user", res.getUsername(), "unexpected username");
+            assertEquals("s3cr3t", res.getPassword(), "unexpected password");
+            assertEquals("database/creds/my-role/abcd1234", res.getLeaseId(), "unexpected lease ID");
+            assertEquals(3600, res.getLeaseDuration(), "unexpected lease duration");
+            assertTrue(res.isRenewable(), "expected renewable lease");
+        }
+    }
 
     /**
      * Test exceptions thrown during request.
@@ -305,8 +341,16 @@ class HTTPVaultConnectorTest {
     }
 
     private void mockHttpResponse(int status, String body, String contentType) {
+        mockHttpResponse(anyUrl(), status, body, contentType);
+    }
+
+    private void mockHttpResponse(String url, int status, String body, String contentType) {
+        mockHttpResponse(urlEqualTo(url), status, body, contentType);
+    }
+
+    private void mockHttpResponse(UrlPattern urlPattern, int status, String body, String contentType) {
         stubFor(
-            WireMock.any(anyUrl()).willReturn(
+            WireMock.any(urlPattern).willReturn(
                 aResponse().withStatus(status).withBody(body).withHeader("Content-Type", contentType)
             )
         );

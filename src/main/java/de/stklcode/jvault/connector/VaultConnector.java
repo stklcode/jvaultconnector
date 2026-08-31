@@ -812,8 +812,5 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @throws VaultConnectorException on error
      * @since 0.5.0
      */
-    default CredentialsResponse readDbCredentials(final String role, final String mount)
-        throws VaultConnectorException {
-        return (CredentialsResponse) read(mount + "/creds/" + role);
-    }
+    CredentialsResponse readDbCredentials(final String role, final String mount) throws VaultConnectorException;
 }

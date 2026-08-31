@@ -1,3 +1,9 @@
+## unreleased
+
+### Fixes
+* Properly parse response class in DB credential helper (#139)
+
+
 ## 1.5.5 (2026-07-23)
 
 ### Dependencies

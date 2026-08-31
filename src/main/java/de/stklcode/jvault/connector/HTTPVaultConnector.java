@@ -538,6 +538,13 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public CredentialsResponse readDbCredentials(final String role, final String mount) throws VaultConnectorException {
+        requireAuth();
+
+        return request.get(encode(mount) + DB_CREDS + encode(role), emptyMap(), token, CredentialsResponse.class);
+    }
+
+    @Override
     public final void close() {
         authorized = false;
         token = null;
