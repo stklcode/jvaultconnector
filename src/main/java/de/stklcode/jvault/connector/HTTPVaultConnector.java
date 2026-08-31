@@ -258,6 +258,11 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
+    public DbClientImpl db(final String mount) {
+        return new DbClientImpl(mount);
+    }
+
+    @Override
     public final void close() {
         authorized = false;
         token = null;
@@ -804,5 +809,24 @@ public class HTTPVaultConnector implements VaultConnector {
         public PkiCaResponse readIssuerCert(String issuer) throws VaultConnectorException {
             return request.get(PKI_ISSUER_CERT.formatted(encode(issuer)), emptyMap(), token, PkiCaResponse.class);
         }
+    }
+
+    /**
+     * Sub-client for DB methods.
+     */
+    public class DbClientImpl implements DbClient {
+        private final String mount;
+
+        public DbClientImpl(final String mount) {
+            this.mount = mount;
+        }
+
+        @Override
+        public CredentialsResponse readCredentials(final String role) throws VaultConnectorException {
+            requireAuth();
+
+            return request.get(DB_CREDS.formatted(encode(mount), encode(role)), emptyMap(), token, CredentialsResponse.class);
+        }
+
     }
 }

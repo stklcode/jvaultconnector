@@ -228,17 +228,12 @@ public interface VaultConnector extends AutoCloseable, Serializable {
     PkiClient pki();
 
     /**
-     * Read credentials for database backends.
+     * Get client for DB API.
      *
-     * @param role  the role name
-     * @param mount mount point of the database backend
-     * @return the credentials response
-     * @throws VaultConnectorException on error
-     * @since 0.5.0
+     * @param mount Mount point
+     * @return CB client
+     * @since 2.0.0
      */
-    default CredentialsResponse readDbCredentials(final String role, final String mount)
-        throws VaultConnectorException {
-        return (CredentialsResponse) read(mount + "/creds/" + role);
-    }
+    DbClient db(String mount);
 
 }

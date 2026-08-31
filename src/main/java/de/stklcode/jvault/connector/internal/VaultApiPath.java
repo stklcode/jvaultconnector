@@ -70,6 +70,9 @@ public final class VaultApiPath {
     public static final String PKI_CA_CERT = PKI + "/cert/ca";
     public static final String PKI_ISSUER_CERT = PKI + "/issuer/%s/json";
 
+    // DB engine paths
+    public static final String DB_CREDS = "%s/creds/%s";
+
     /**
      * Private constructor to prevent instantiation.
      */

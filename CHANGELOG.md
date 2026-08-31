@@ -15,6 +15,9 @@
 * Allow parsing JSON from full dataset in `SecretResponse` (#130)
 * Introduce `pki()` client to issue certificates via Vault PKI engine (#131)
 
+### Fixes
+* Properly parse response class in DB credential helper (#138)
+
 ### Removal
 * Remove deprecated `read...Credentials()` methods (#112)
 
