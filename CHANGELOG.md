@@ -2,6 +2,7 @@
 
 ### Fixes
 * Properly parse response class in DB credential helper (#139)
+* Properly handle `orphan = false` parameter in `token().create()` method (#141)
 
 
 ## 1.5.5 (2026-07-23)

@@ -520,13 +520,12 @@ public class HTTPVaultConnector implements VaultConnector {
     }
 
     @Override
-    public final AuthResponse createToken(final Token token) throws VaultConnectorException {
-        return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE);
-    }
-
-    @Override
     public final AuthResponse createToken(final Token token, final boolean orphan) throws VaultConnectorException {
-        return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE_ORPHAN);
+        if (orphan) {
+            return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE_ORPHAN);
+        } else {
+            return createTokenInternal(token, AUTH_TOKEN + TOKEN_CREATE);
+        }
     }
 
     @Override

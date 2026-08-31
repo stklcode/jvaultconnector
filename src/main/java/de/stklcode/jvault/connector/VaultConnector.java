@@ -588,7 +588,9 @@ public interface VaultConnector extends AutoCloseable, Serializable {
      * @return the result response
      * @throws VaultConnectorException on error
      */
-    AuthResponse createToken(final Token token) throws VaultConnectorException;
+    default AuthResponse createToken(final Token token) throws VaultConnectorException {
+        return createToken(token, false);
+    }
 
     /**
      * Create a new token.

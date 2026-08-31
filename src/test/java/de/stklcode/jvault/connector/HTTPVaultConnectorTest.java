@@ -24,6 +24,8 @@ import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.InvalidResponseException;
 import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
+import de.stklcode.jvault.connector.model.Token;
+import de.stklcode.jvault.connector.model.response.AuthResponse;
 import de.stklcode.jvault.connector.model.response.CredentialsResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -82,6 +84,65 @@ class HTTPVaultConnectorTest {
             assertEquals("database/creds/my-role/abcd1234", res.getLeaseId(), "unexpected lease ID");
             assertEquals(3600, res.getLeaseDuration(), "unexpected lease duration");
             assertTrue(res.isRenewable(), "expected renewable lease");
+        }
+    }
+
+    @Test
+    void createTokenTest(WireMockRuntimeInfo wireMock) throws Exception {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).build()) {
+            setPrivate(connector, "authorized", true);
+            setPrivate(connector, "token", "test-token");
+
+            stubFor(post(urlEqualTo("/v1/auth/token/create")).willReturn(
+                aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(
+                    "{" +
+                    "  \"auth\": {" +
+                    "    \"client_token\": \"test-id\"," +
+                    "    \"policies\": [\"default\"]," +
+                    "    \"token_policies\": [\"default\"]," +
+                    "    \"renewable\": false," +
+                    "    \"lease_duration\": 0," +
+                    "    \"token_type\": \"service\"," +
+                    "    \"orphan\": false" +
+                    "  }" +
+                    "}")));
+
+            stubFor(post(urlEqualTo("/v1/auth/token/create-orphan")).willReturn(
+                aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(
+                    "{" +
+                    "  \"auth\": {" +
+                    "    \"client_token\": \"orphan-id\"," +
+                    "    \"policies\": [\"default\"]," +
+                    "    \"token_policies\": [\"default\"]," +
+                    "    \"renewable\": false," +
+                    "    \"lease_duration\": 0," +
+                    "    \"token_type\": \"service\"," +
+                    "    \"orphan\": true" +
+                    "  }" +
+                    "}")));
+
+            AuthResponse res = assertDoesNotThrow(
+                () -> connector.createToken(Token.builder().build()),
+                "token().create() should not fail"
+            );
+            assertEquals("test-id", res.getAuth().getClientToken(), "unexpected token ID");
+            assertFalse(res.getAuth().isOrphan(), "token should not be orphan");
+
+            res = assertDoesNotThrow(
+                () -> connector.createToken(Token.builder().build(), false),
+                "token().create() should not fail"
+            );
+            assertEquals("test-id", res.getAuth().getClientToken(), "unexpected token ID with orphan=false");
+            assertFalse(res.getAuth().isOrphan(), "token should not be orphan");
+
+             res = assertDoesNotThrow(
+                () -> connector.createToken(Token.builder().build(), true),
+                "token().create() should not fail"
+            );
+            assertEquals("orphan-id", res.getAuth().getClientToken(), "unexpected token ID with orphan=true");
+            assertTrue(res.getAuth().isOrphan(), "token should be orphan");
+
+
         }
     }
 
