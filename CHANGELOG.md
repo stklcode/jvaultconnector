@@ -17,6 +17,7 @@
 
 ### Fixes
 * Properly parse response class in DB credential helper (#138)
+* Properly handle `orphan = false` parameter in `token().create()` method (#140)
 
 ### Removal
 * Remove deprecated `read...Credentials()` methods (#112)

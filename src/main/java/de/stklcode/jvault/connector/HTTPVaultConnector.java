@@ -441,13 +441,12 @@ public class HTTPVaultConnector implements VaultConnector {
     public class TokenClientImpl implements TokenClient {
 
         @Override
-        public final AuthResponse create(final Token token) throws VaultConnectorException {
-            return createInternal(token, AUTH_TOKEN + TOKEN_CREATE);
-        }
-
-        @Override
         public final AuthResponse create(final Token token, final boolean orphan) throws VaultConnectorException {
-            return createInternal(token, AUTH_TOKEN + TOKEN_CREATE_ORPHAN);
+            if (orphan) {
+                return createInternal(token, AUTH_TOKEN + TOKEN_CREATE_ORPHAN);
+            } else {
+                return createInternal(token, AUTH_TOKEN + TOKEN_CREATE);
+            }
         }
 
         @Override

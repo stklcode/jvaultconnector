@@ -886,7 +886,7 @@ class HTTPVaultConnectorIT {
                 .withoutDefaultPolicy()
                 .withType(Token.Type.BATCH)
                 .build();
-            res = assertDoesNotThrow(() -> connector.token().create(token4), "Token creation failed");
+            res = assertDoesNotThrow(() -> connector.token().create(token4, false), "Token creation failed");
             assertTrue(
                 // Expecting batch token. "hvb." Prefix as of Vault 1.10, "b." before.
                 res.auth().clientToken().startsWith("b.") || res.auth().clientToken().startsWith("hvb."),

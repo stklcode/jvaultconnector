@@ -40,7 +40,9 @@ public interface TokenClient {
      * @return the result response
      * @throws VaultConnectorException on error
      */
-    AuthResponse create(final Token token) throws VaultConnectorException;
+    default AuthResponse create(final Token token) throws VaultConnectorException {
+        return create(token, false);
+    }
 
     /**
      * Create a new token.
