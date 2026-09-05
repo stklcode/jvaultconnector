@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @author Stefan Kalscheuer
  */
 class HTTPVaultConnectorITBase {
-    protected static String VAULT_VERSION = "2.0.4";  // The vault version this test is supposed to run against.
+    protected static String VAULT_VERSION = "2.1.0";  // The vault version this test is supposed to run against.
     protected static final String KEY1 = "+5n9tlpFnTNBAyutYQLT0o5J0AQ6Lt85u2KrEOan4gzb";
     protected static final String KEY2 = "4SSSIsllqY+c//t1M9IhBwzVSeBWgh0E0UbjacUD9/5g";
     protected static final String KEY3 = "O7AMGCi9Blt7gHHJdFjz1sHZHsUIOnvdFIV+AN2NwCxv";
