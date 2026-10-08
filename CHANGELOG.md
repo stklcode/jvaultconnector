@@ -1,4 +1,4 @@
-## unreleased
+## 1.5.5 (2026-10-08)
 
 ### Fixes
 * Properly parse response class in DB credential helper (#139)
