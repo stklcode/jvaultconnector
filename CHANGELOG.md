@@ -4,6 +4,12 @@
 * Properly parse response class in DB credential helper (#139)
 * Properly handle `orphan = false` parameter in `token().create()` method (#141)
 
+### Dependencies
+* Updated Jackson to 2.22.3 (#144)
+
+### Test
+* Tested against Vault 1.2 to 2.1 (#145)
+
 
 ## 1.5.5 (2026-07-23)
 

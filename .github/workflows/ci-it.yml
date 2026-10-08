@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         jdk: [ 11, 17, 21, 25 ]
-        vault: [ '1.2.0', '1.21.4', '2.0.3' ]
+        vault: [ '1.2.0', '1.21.4', '2.1.1' ]
         include:
           - jdk: 21
             vault: '1.21.4'
