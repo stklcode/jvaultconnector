@@ -32,7 +32,7 @@ Java Vault Connector is a connector library for [Vault](https://www.vaultproject
     * Database secret handling
 * Transit API support
 * Connector Factory with builder pattern
-* Tested against Vault 1.2 to 2.1
+* Tested against Vault 1.2 to 2.2
 
 
 ## Maven Artifact
