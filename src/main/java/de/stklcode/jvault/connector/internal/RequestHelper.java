@@ -43,8 +43,9 @@ public final class RequestHelper implements Serializable {
     private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";
 
     private final String baseURL;                   // Base URL of Vault.
-    private final Integer timeout;                  // Timeout in milliseconds.
-    private final int retries;                      // Number of retries on 5xx errors.
+    private final Duration timeout;                 // Overall timeout per request attempt.
+    private final Duration connectTimeout;          // Connect timeout.
+    private final int retries;                     // Number of retries on 5xx errors.
     private final String tlsVersion;                // TLS version (#22).
     private final X509Certificate trustedCaCert;    // Trusted CA certificate.
     private final JsonMapper jsonMapper;
@@ -54,18 +55,22 @@ public final class RequestHelper implements Serializable {
      *
      * @param baseURL       The URL
      * @param retries       Number of retries on 5xx errors
-     * @param timeout       Timeout for HTTP requests (milliseconds)
-     * @param tlsVersion    TLS Version.
-     * @param trustedCaCert Trusted CA certificate
+     * @param timeout        Overall timeout per request attempt ({@code null} for no timeout)
+     * @param connectTimeout Connect timeout ({@code null} to use the overall timeout)
+     * @param tlsVersion     TLS Version.
+     * @param trustedCaCert  Trusted CA certificate
+     * @since 2.0.0 Timeouts as {@link Duration}, separate connect timeout
      */
     public RequestHelper(final String baseURL,
                          final int retries,
-                         final Integer timeout,
+                         final Duration timeout,
+                         final Duration connectTimeout,
                          final String tlsVersion,
                          final X509Certificate trustedCaCert) {
         this.baseURL = baseURL + (baseURL.endsWith("/") ? "" : "/");
         this.retries = retries;
         this.timeout = timeout;
+        this.connectTimeout = connectTimeout != null ? connectTimeout : timeout;
         this.tlsVersion = tlsVersion;
         this.trustedCaCert = trustedCaCert;
         this.jsonMapper = JsonMapper.builder()
@@ -338,9 +343,9 @@ public final class RequestHelper implements Serializable {
 
         var clientBuilder = HttpClient.newBuilder();
 
-        // Set custom timeout, if defined.
-        if (this.timeout != null) {
-            clientBuilder.connectTimeout(Duration.ofMillis(timeout));
+        // Set connect timeout, if defined.
+        if (this.connectTimeout != null) {
+            clientBuilder.connectTimeout(connectTimeout);
         }
 
         // Set custom SSL context.
@@ -350,10 +355,7 @@ public final class RequestHelper implements Serializable {
 
         // Execute request.
         try {
-            HttpResponse<InputStream> response = client.sendAsync(
-                requestBuilder.build(),
-                HttpResponse.BodyHandlers.ofInputStream()
-            ).join();
+            HttpResponse<InputStream> response = send(client, requestBuilder.build());
 
             /* Check if response is valid */
             if (response == null) {
@@ -379,8 +381,6 @@ public final class RequestHelper implements Serializable {
                         throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode());
                     }
             }
-        } catch (CompletionException e) {
-            throw new ConnectionException(Error.CONNECTION, e.getCause());
         } finally {
             if (client instanceof AutoCloseable closeableClient) {
                 // Close the client, which is supported since JDK21.
@@ -390,6 +390,41 @@ public final class RequestHelper implements Serializable {
                     // Ignore
                 }
             }
+        }
+    }
+
+    /**
+     * Send the request and wait for the complete response, enforcing the overall timeout.
+     * <p>
+     * {@link HttpRequest.Builder#timeout(Duration)} only covers the time until response headers are received,
+     * so the deadline is enforced on the response future, which completes after the body has been read.
+     *
+     * @param client  HTTP client.
+     * @param request HTTP request.
+     * @return HTTP response with body
+     * @throws ConnectionException on connection errors, timeouts or interruption
+     * @since 2.0.0
+     */
+    private HttpResponse<InputStream> send(final HttpClient client, final HttpRequest request) throws ConnectionException {
+        var future = client.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream());
+        try {
+            if (timeout != null) {
+                return future.get(timeout.toNanos(), TimeUnit.NANOSECONDS);
+            } else {
+                return future.get();
+            }
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new ConnectionException(Error.TIMEOUT, e);
+        } catch (InterruptedException e) {
+            future.cancel(true);
+            Thread.currentThread().interrupt();
+            throw new ConnectionException(Error.CONNECTION, e);
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof HttpTimeoutException) {
+                throw new ConnectionException(Error.TIMEOUT, e.getCause());
+            }
+            throw new ConnectionException(Error.CONNECTION, e.getCause());
         }
     }
 
@@ -456,7 +491,7 @@ public final class RequestHelper implements Serializable {
                     /* Check for "permission denied" response */
                     if (
                         er != null && er.errors() != null &&
-                        !er.errors().isEmpty() && er.errors().get(0).equals("permission denied")
+                            !er.errors().isEmpty() && er.errors().get(0).equals("permission denied")
                     ) {
                         throw new PermissionDeniedException();
                     }

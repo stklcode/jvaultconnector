@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 
 /**
  * Vault Connector Builder implementation for HTTP Vault connectors.
@@ -51,6 +52,7 @@ public final class HTTPVaultConnectorBuilder {
     public static final String DEFAULT_TLS_VERSION = "TLSv1.2";
     public static final String DEFAULT_PREFIX = "/v1/";
     public static final int DEFAULT_NUMBER_OF_RETRIES = 0;
+    public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
 
     private String host;
     private Integer port;
@@ -59,7 +61,8 @@ public final class HTTPVaultConnectorBuilder {
     private String prefix;
     private X509Certificate trustedCA;
     private int numberOfRetries;
-    private Integer timeout;
+    private Duration timeout;
+    private Duration connectTimeout;    // null = same as timeout
     private String token;
 
     /**
@@ -73,6 +76,7 @@ public final class HTTPVaultConnectorBuilder {
         tlsVersion = DEFAULT_TLS_VERSION;
         prefix = DEFAULT_PREFIX;
         numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
+        timeout = DEFAULT_TIMEOUT;
     }
 
     /**
@@ -357,24 +361,48 @@ public final class HTTPVaultConnectorBuilder {
     }
 
     /**
-     * Define a custom timeout for the HTTP connection.
+     * Overall timeout per request attempt (connect, response headers and body).
+     * Default: 60 seconds. {@code null} disables the timeout.
      *
-     * @param milliseconds Timeout value in milliseconds.
+     * @param timeout Timeout value
      * @return self
      * @since 0.6.0
+     * @since 2.0.0 accepts {@link Duration} instead of milliseconds
      */
-    public HTTPVaultConnectorBuilder withTimeout(final int milliseconds) {
-        this.timeout = milliseconds;
+    public HTTPVaultConnectorBuilder withTimeout(final Duration timeout) {
+        this.timeout = requirePositive(timeout);
+        return this;
+    }
+
+    /**
+     * Timeout for establishing the connection. Defaults to the overall timeout.
+     *
+     * @param connectTimeout Connect timeout value
+     * @return self
+     * @since 2.0.0
+     */
+    public HTTPVaultConnectorBuilder withConnectTimeout(final Duration connectTimeout) {
+        this.connectTimeout = requirePositive(connectTimeout);
         return this;
     }
 
     /**
      * Get custom timeout for the HTTP connection.
      *
-     * @return Timeout value in milliseconds.
+     * @return Timeout value.
      */
-    Integer getTimeout() {
+    Duration getTimeout() {
         return this.timeout;
+    }
+
+    /**
+     * Get custom connect timeout for the HTTP connection.
+     *
+     * @return Connect timeout value ({@code null} = same as overall timeout).
+     * @since 2.0.0
+     */
+    Duration getConnectTimeout() {
+        return this.connectTimeout;
     }
 
     /**
@@ -438,5 +466,12 @@ public final class HTTPVaultConnectorBuilder {
         } catch (IOException | CertificateException e) {
             throw new TlsException("Unable to read certificate.", e);
         }
+    }
+
+    private static Duration requirePositive(final Duration d) {
+        if (d != null && (d.isZero() || d.isNegative())) {
+            throw new IllegalArgumentException("Timeout must be positive");
+        }
+        return d;
     }
 }

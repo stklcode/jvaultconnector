@@ -21,6 +21,9 @@ import de.stklcode.jvault.connector.exception.ConnectionException;
 import de.stklcode.jvault.connector.exception.TlsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -28,7 +31,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,14 +72,14 @@ class HTTPVaultConnectorBuilderTest {
             .withoutTLS()
             .withPort(1234)
             .withPrefix("/foo/")
-            .withTimeout(5678)
+            .withTimeout(Duration.ofMillis(5678))
             .withNumberOfRetries(9);
         connector = builder.build();
 
         assertEquals("http://vault2.example.com:1234/foo/", getRequestHelperPrivate(connector, "baseURL"), "URL not set correctly");
         assertNull(getRequestHelperPrivate(connector, "trustedCaCert"), "Trusted CA cert set when no cert provided");
         assertEquals(9, getRequestHelperPrivate(connector, "retries"), "Unexpected number of retries");
-        assertEquals(5678, getRequestHelperPrivate(connector, "timeout"), "Number timeout value");
+        assertEquals(Duration.ofMillis(5678), getRequestHelperPrivate(connector, "timeout"), "Number timeout value");
         assertThrows(ConnectionException.class, builder::buildAndAuth, "Immediate authentication should throw exception without token");
 
         // Initialization from URL.
@@ -223,6 +228,78 @@ class HTTPVaultConnectorBuilderTest {
 
             return null;
         });
+    }
+
+    /**
+     * Test reading the client timeout from {@code VAULT_CLIENT_TIMEOUT}.
+     */
+    @Test
+    void testFromEnvTimeout() throws Exception {
+        // Not set: default timeout.
+        withVaultEnv(VAULT_ADDR, null, null, null).and("VAULT_CLIENT_TIMEOUT", null).execute(() -> {
+            var connector = HTTPVaultConnector.builder().fromEnv().build();
+            assertEquals(HTTPVaultConnectorBuilder.DEFAULT_TIMEOUT, getRequestHelperPrivate(connector, "timeout"), "Default timeout expected");
+            return null;
+        });
+
+        // Plain seconds.
+        withVaultEnv(VAULT_ADDR, null, null, null).and("VAULT_CLIENT_TIMEOUT", "30").execute(() -> {
+            var connector = HTTPVaultConnector.builder().fromEnv().build();
+            assertEquals(Duration.ofSeconds(30), getRequestHelperPrivate(connector, "timeout"), "Timeout not set correctly");
+            assertEquals(Duration.ofSeconds(30), getRequestHelperPrivate(connector, "connectTimeout"), "Connect timeout should default to timeout");
+            return null;
+        });
+
+        // Go duration.
+        withVaultEnv(VAULT_ADDR, null, null, null).and("VAULT_CLIENT_TIMEOUT", "1m30s").execute(() -> {
+            var connector = HTTPVaultConnector.builder().fromEnv().build();
+            assertEquals(Duration.ofSeconds(90), getRequestHelperPrivate(connector, "timeout"), "Timeout not set correctly");
+            return null;
+        });
+
+        // Zero disables the timeout.
+        withVaultEnv(VAULT_ADDR, null, null, null).and("VAULT_CLIENT_TIMEOUT", "0").execute(() -> {
+            var connector = HTTPVaultConnector.builder().fromEnv().build();
+            assertNull(getRequestHelperPrivate(connector, "timeout"), "Timeout should be disabled");
+            assertNull(getRequestHelperPrivate(connector, "connectTimeout"), "Connect timeout should be disabled");
+            return null;
+        });
+
+        // Malformed value is ignored.
+        withVaultEnv(VAULT_ADDR, null, null, null).and("VAULT_CLIENT_TIMEOUT", "soon").execute(() -> {
+            var connector = HTTPVaultConnector.builder().withTimeout(Duration.ofSeconds(5)).fromEnv().build();
+            assertEquals(Duration.ofSeconds(5), getRequestHelperPrivate(connector, "timeout"), "Malformed value should be ignored");
+            return null;
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("durations")
+    void testParseDuration(String value, Duration expected) {
+        assertEquals(expected, HTTPVaultConnectorBuilder.parseDuration(value));
+    }
+
+    static Stream<Arguments> durations() {
+        return Stream.of(
+            Arguments.of("0", Duration.ZERO),
+            Arguments.of("60", Duration.ofSeconds(60)),
+            Arguments.of("0s", Duration.ZERO),
+            Arguments.of("45s", Duration.ofSeconds(45)),
+            Arguments.of("500ms", Duration.ofMillis(500)),
+            Arguments.of("1.5s", Duration.ofMillis(1500)),
+            Arguments.of("2m", Duration.ofMinutes(2)),
+            Arguments.of("1h2m3s", Duration.ofSeconds(3723)),
+            Arguments.of("250us", Duration.ofNanos(250_000)),
+            Arguments.of("10ns", Duration.ofNanos(10)),
+            Arguments.of("", null),
+            Arguments.of("-5", null),
+            Arguments.of("-5s", null),
+            Arguments.of("1.5", null),
+            Arguments.of("5x", null),
+            Arguments.of("s", null),
+            Arguments.of("10s foo", null),
+            Arguments.of("99999999999h", null)
+        );
     }
 
     private SystemLambda.WithEnvironmentVariables withVaultEnv(String vaultAddr, String vaultCacert, String vaultMaxRetries, String vaultToken) {

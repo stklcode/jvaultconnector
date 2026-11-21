@@ -61,6 +61,7 @@ public class HTTPVaultConnector implements VaultConnector {
                 builder.getPrefix(),
             builder.getNumberOfRetries(),
             builder.getTimeout(),
+            builder.getConnectTimeout(),
             builder.getTlsVersion(),
             builder.getTrustedCA()
         );

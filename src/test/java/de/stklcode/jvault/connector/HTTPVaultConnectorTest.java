@@ -40,7 +40,9 @@ import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.TimeoutException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,6 +56,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @WireMockTest
 class HTTPVaultConnectorTest {
+    private static final Duration TIMEOUT = Duration.ofSeconds(5);
 
     @Test
     void readDbCredentialsTest(WireMockRuntimeInfo wireMock) throws Exception {
@@ -212,7 +215,7 @@ class HTTPVaultConnectorTest {
      */
     @Test
     void requestExceptionTest(WireMockRuntimeInfo wireMock) throws IOException, URISyntaxException {
-        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build()) {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(TIMEOUT).build()) {
             // Test invalid response code.
             final int responseCode = 400;
             mockHttpResponse(responseCode, "", "application/json");
@@ -235,8 +238,23 @@ class HTTPVaultConnectorTest {
         }
 
         // Test exception thrown during request.
-        try (ServerSocket s = new ServerSocket(0);
-            var connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort() + "/").withTimeout(250).build()) {
+        int closedPort;
+        try (
+            ServerSocket s = new ServerSocket(0);
+            var connector = HTTPVaultConnector.builder("http://localhost:" + s.getLocalPort() + "/").withTimeout(TIMEOUT).build()
+        ) {
+            var e = assertThrows(
+                ConnectionException.class,
+                () -> connector.sys().getHealth(),
+                "Querying health status succeeded on invalid instance"
+            );
+            assertEquals("Request to Vault server timed out", e.getMessage(), "Unexpected exception message");
+            assertInstanceOf(TimeoutException.class, e.getCause(), "Unexpected cause");
+            // Memorize the port that will be closed after this block.
+            closedPort = s.getLocalPort();
+        }
+
+        try (var connector = HTTPVaultConnector.builder("http://localhost:" + closedPort + "/").withTimeout(TIMEOUT).build()) {
             var e = assertThrows(
                 ConnectionException.class,
                 () -> connector.sys().getHealth(),
@@ -247,7 +265,7 @@ class HTTPVaultConnectorTest {
         }
 
         // Now simulate a failing request that succeeds on second try.
-        try (var connector3 = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withNumberOfRetries(1).withTimeout(250).build()) {
+        try (var connector3 = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withNumberOfRetries(1).withTimeout(TIMEOUT).build()) {
             stubFor(
                 WireMock.any(anyUrl())
                     .willReturn(aResponse().withStatus(500))
@@ -271,7 +289,7 @@ class HTTPVaultConnectorTest {
         {"errors":["test error"]},test error
         """)
     void malformedErrorResponseTest(String body, String expectedResponse, WireMockRuntimeInfo wireMock) throws Exception {
-        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build()) {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(TIMEOUT).build()) {
             mockHttpResponse(400, body, "application/json");
             InvalidResponseException e = assertThrows(
                 InvalidResponseException.class,
@@ -338,7 +356,7 @@ class HTTPVaultConnectorTest {
         // Simulate no connection.
         VaultConnector connector;
         try (ServerSocket s = new ServerSocket(0)) {
-            connector = HTTPVaultConnector.builder("http://localst:" + s.getLocalPort()).withTimeout(250).build();
+            connector = HTTPVaultConnector.builder("http://localhost:" + s.getLocalPort()).withTimeout(TIMEOUT).build();
         }
         ConnectionException e = assertThrows(
             ConnectionException.class,
@@ -356,7 +374,7 @@ class HTTPVaultConnectorTest {
         // Simulate no connection.
         HTTPVaultConnector connector;
         try (ServerSocket s = new ServerSocket(0)) {
-            connector = HTTPVaultConnector.builder("http://localhost:" + s.getLocalPort() + "/").withTimeout(250).build();
+            connector = HTTPVaultConnector.builder("http://localhost:" + s.getLocalPort() + "/").withTimeout(TIMEOUT).build();
         }
         ConnectionException e = assertThrows(
             ConnectionException.class,
@@ -371,7 +389,7 @@ class HTTPVaultConnectorTest {
      */
     @Test
     void parseExceptionTest(WireMockRuntimeInfo wireMock) throws URISyntaxException {
-        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build();
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(TIMEOUT).build();
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
@@ -405,7 +423,7 @@ class HTTPVaultConnectorTest {
      */
     @Test
     void nonEmpty204ResponseTest(WireMockRuntimeInfo wireMock) throws URISyntaxException {
-        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build();
+        HTTPVaultConnector connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(TIMEOUT).build();
         // Mock authorization.
         setPrivate(connector, "authorized", true);
         // Mock response.
