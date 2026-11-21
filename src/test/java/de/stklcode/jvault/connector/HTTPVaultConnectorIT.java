@@ -910,9 +910,6 @@ class HTTPVaultConnectorIT {
                 .build();
             assertDoesNotThrow(() -> connector.createToken(token), "Token creation failed");
 
-            authRoot();
-            assumeTrue(connector.isAuthorized());
-
             TokenResponse res = assertDoesNotThrow(() -> connector.lookupToken("my-token"), "Token creation failed");
             assertEquals(token.getId(), res.getData().getId(), "Unexpected token ID");
             assertEquals(1, res.getData().getPolicies().size(), "Unexpected number of policies");

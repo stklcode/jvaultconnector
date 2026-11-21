@@ -3,6 +3,9 @@
 ### Dependencies
 * Updated Jackson to 2.23.0 (#158)
 
+### Fixes
+* Use the connector's token for `lookupToken()` (#149) (#159)
+
 
 ## 1.5.6 (2026-10-08)
 

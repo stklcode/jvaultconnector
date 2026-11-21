@@ -577,7 +577,7 @@ public class HTTPVaultConnector implements VaultConnector {
         return request.get(
             AUTH_TOKEN + TOKEN_LOOKUP,
             singletonMap("token", token),
-            token,
+            this.token,
             TokenResponse.class
         );
     }
