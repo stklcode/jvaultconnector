@@ -17,10 +17,19 @@
 package de.stklcode.jvault.connector.model;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * JUnit Test for {@link PkiRequest} model.
@@ -44,7 +53,7 @@ class PkiRequestTest extends AbstractModelTest<PkiRequest> {
     private static final boolean EXCLUDE_CN_FROM_SANS = true;
     private static final String NOT_AFTER_DATE = "2030-12-31T23:59:59Z";
     private static final boolean REMOVE_ROOTS_FROM_CHAIN = true;
-    private static final List<String> USER_IDS = List.of("user-role","group-admin");
+    private static final List<String> USER_IDS = List.of("user-role", "group-admin");
     private static final String USER_IDS_STRING = "user-role,group-admin";
     private static final String CERT_METADATA = "dGVzdCBtZXRhZGF0YQ==";
 
@@ -100,7 +109,7 @@ class PkiRequestTest extends AbstractModelTest<PkiRequest> {
                 "\"format\":\"" + FORMAT.value() + "\"," +
                 "\"private_key_format\":\"" + KEY_FORMAT.value() + "\"," +
                 "\"exclude_cn_from_sans\":" + EXCLUDE_CN_FROM_SANS + "," +
-                "\"not_after\":\"" + NOT_AFTER_DATE  + "\"," +
+                "\"not_after\":\"" + NOT_AFTER_DATE + "\"," +
                 "\"remove_roots_from_chain\":" + REMOVE_ROOTS_FROM_CHAIN + "," +
                 "\"user_ids\":\"" + USER_IDS_STRING + "\"," +
                 "\"cert_metadata\":\"" + CERT_METADATA + "\"" +
@@ -153,7 +162,7 @@ class PkiRequestTest extends AbstractModelTest<PkiRequest> {
                 "\"format\":\"" + FORMAT.value() + "\"," +
                 "\"private_key_format\":\"" + KEY_FORMAT.value() + "\"," +
                 "\"exclude_cn_from_sans\":" + EXCLUDE_CN_FROM_SANS + "," +
-                "\"not_after\":\"" + NOT_AFTER_DATE  + "\"," +
+                "\"not_after\":\"" + NOT_AFTER_DATE + "\"," +
                 "\"remove_roots_from_chain\":" + REMOVE_ROOTS_FROM_CHAIN + "," +
                 "\"user_ids\":\"" + USER_IDS_STRING + "\"," +
                 "\"cert_metadata\":\"" + CERT_METADATA + "\"" +
@@ -171,7 +180,7 @@ class PkiRequestTest extends AbstractModelTest<PkiRequest> {
 
         assertEquals(COMMON_NAME, request.commonName(), "commonName mismatch");
         assertNull(request.altNames(), "unexpected altNames");
-        assertNull( request.ipSans(), "unexpected ipSans");
+        assertNull(request.ipSans(), "unexpected ipSans");
         assertNull(request.urlSans(), "unexpected urlSans");
         assertNull(request.otherSans(), "unexpected otherSans");
         assertNull(request.ttl(), "unexpected ttl");
@@ -187,6 +196,48 @@ class PkiRequestTest extends AbstractModelTest<PkiRequest> {
             "{\"common_name\":\"" + COMMON_NAME + "\"}",
             objectMapper.writeValueAsString(request),
             "unexpected JSON output for minimal request"
+        );
+    }
+
+    /**
+     * {@code not_after} from a {@link ZonedDateTime} must be sent in the documented UTC format
+     * {@code YYYY-MM-ddTHH:MM:SSZ}, regardless of the zone type of the given date.
+     *
+     * @param notAfter Not after date
+     * @param expected Expected {@code not_after} value
+     */
+    @ParameterizedTest
+    @MethodSource("notAfterDates")
+    void notAfterZonedDateTimeTest(ZonedDateTime notAfter, String expected) {
+        var request = PkiRequest.builder()
+            .withCommonName(COMMON_NAME)
+            .withNotAfter(notAfter)
+            .build();
+
+        assertEquals(expected, request.notAfter(), "unexpected notAfter for " + notAfter);
+        assertEquals(
+            "{\"common_name\":\"" + COMMON_NAME + "\",\"not_after\":\"" + expected + "\"}",
+            objectMapper.writeValueAsString(request),
+            "unexpected JSON output for notAfter " + notAfter
+        );
+    }
+
+    private static Stream<Arguments> notAfterDates() {
+        LocalDateTime dateTime = LocalDateTime.of(2030, 12, 31, 23, 59, 59);
+        LocalDateTime dateTimeNano = LocalDateTime.of(2030, 12, 31, 23, 59, 59, 123456789);
+        return Stream.of(
+            // Offset-based zone.
+            Arguments.of(ZonedDateTime.of(dateTime, ZoneOffset.UTC), "2030-12-31T23:59:59Z"),
+            Arguments.of(ZonedDateTime.of(dateTimeNano, ZoneOffset.UTC), "2030-12-31T23:59:59Z"),
+            // Region-based UTC zone, e.g. from ZonedDateTime.now(ZoneId.of("UTC")).
+            Arguments.of(ZonedDateTime.of(dateTime, ZoneId.of("UTC")), "2030-12-31T23:59:59Z"),
+            Arguments.of(ZonedDateTime.of(dateTimeNano, ZoneId.of("UTC")), "2030-12-31T23:59:59Z"),
+            // Region-based non-UTC zone, e.g. from ZonedDateTime.now() on a server in Germany.
+            Arguments.of(ZonedDateTime.of(dateTime, ZoneId.of("Europe/Berlin")), "2030-12-31T22:59:59Z"),
+            Arguments.of(ZonedDateTime.of(dateTimeNano, ZoneId.of("Europe/Berlin")), "2030-12-31T22:59:59Z"),
+            // Non-UTC offset.
+            Arguments.of(ZonedDateTime.of(dateTime, ZoneOffset.ofHours(-5)), "2031-01-01T04:59:59Z"),
+            Arguments.of(ZonedDateTime.of(dateTimeNano, ZoneOffset.ofHours(-5)), "2031-01-01T04:59:59Z")
         );
     }
 }

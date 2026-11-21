@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 
 /**
@@ -362,7 +363,7 @@ public record PkiRequest(
          */
         public Builder withNotAfter(final ZonedDateTime notAfter) {
             if (notAfter != null) {
-                this.notAfter = notAfter.format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+                this.notAfter = DateTimeFormatter.ISO_INSTANT.format(notAfter.truncatedTo(ChronoUnit.SECONDS));
             } else {
                 this.notAfter = null;
             }
