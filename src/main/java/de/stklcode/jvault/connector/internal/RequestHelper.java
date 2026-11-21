@@ -359,7 +359,7 @@ public final class RequestHelper implements Serializable {
 
         // Execute request.
         try {
-            HttpResponse<InputStream> response = send(client, requestBuilder.build());
+            HttpResponse<String> response = send(client, requestBuilder.build());
 
             /* Check if response is valid */
             if (response == null) {
@@ -368,7 +368,7 @@ public final class RequestHelper implements Serializable {
 
             switch (response.statusCode()) {
                 case 200:
-                    return handleResult(response);
+                    return Objects.requireNonNullElse(response.body(), "");
                 case 204:
                     return "";
                 case 403:
@@ -409,8 +409,8 @@ public final class RequestHelper implements Serializable {
      * @throws ConnectionException on connection errors, timeouts or interruption
      * @since 2.0.0
      */
-    private HttpResponse<InputStream> send(final HttpClient client, final HttpRequest request) throws ConnectionException {
-        var future = client.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream());
+    private HttpResponse<String> send(final HttpClient client, final HttpRequest request) throws ConnectionException {
+        var future = client.sendAsync(request, HttpResponse.BodyHandlers.ofString(UTF_8));
         try {
             if (timeout != null) {
                 return future.get(timeout.toNanos(), TimeUnit.NANOSECONDS);
@@ -467,43 +467,28 @@ public final class RequestHelper implements Serializable {
     }
 
     /**
-     * Handle successful result.
-     *
-     * @param response The raw HTTP response (assuming status code 200)
-     * @return Complete response body as String
-     * @throws InvalidResponseException on reading errors
-     */
-    private String handleResult(final HttpResponse<InputStream> response) throws InvalidResponseException {
-        try (var reader = new BufferedReader(new InputStreamReader(response.body(), UTF_8))) {
-            return reader.lines().collect(Collectors.joining("\n"));
-        } catch (IOException ignored) {
-            throw new InvalidResponseException(Error.READ_RESPONSE, 200);
-        }
-    }
-
-    /**
      * Handle unsuccessful response. Throw detailed exception if possible.
      *
      * @param response The raw HTTP response (assuming status code 5xx)
      * @throws VaultConnectorException Expected exception with details to throw
      */
-    private void handleError(final HttpResponse<InputStream> response) throws VaultConnectorException {
-        try (var body = response.body()) {
-            if (body != null) {
-                try (var reader = new BufferedReader(new InputStreamReader(body, UTF_8))) {
-                    ErrorResponse er = jsonMapper.readValue(reader, ErrorResponse.class);
-                    /* Check for "permission denied" response */
-                    if (
-                        er != null && er.errors() != null &&
-                            !er.errors().isEmpty() && er.errors().get(0).equals("permission denied")
-                    ) {
-                        throw new PermissionDeniedException();
-                    }
-                    throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), String.valueOf(er));
-                }
-            }
-        } catch (IOException | JacksonException ignored) {
-            // Exception ignored.
+    private void handleError(final HttpResponse<String> response) throws VaultConnectorException {
+        var body = response.body();
+        if (body == null || body.isBlank()) {
+            return;
         }
+
+        ErrorResponse er = null;
+        try {
+            er = jsonMapper.readValue(body, ErrorResponse.class);
+        } catch (JacksonException ignored) {
+            // Unparsable error body, fall back to generic exception.
+        }
+
+        /* Check for "permission denied" response */
+        if (er != null && er.errors() != null && !er.errors().isEmpty() && er.errors().get(0).equals("permission denied")) {
+            throw new PermissionDeniedException();
+        }
+        throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), String.valueOf(er));
     }
 }
