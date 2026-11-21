@@ -224,7 +224,7 @@ public class HTTPVaultConnector implements VaultConnector {
         );
 
         /* Issue request and parse secret response */
-        return request.put(SYS_LEASES_RENEW, payload, token, SecretResponse.class);
+        return request.put(SYS_LEASES_RENEW, payload, token, PlainSecretResponse.class);
     }
 
     @Override

@@ -26,6 +26,7 @@ import de.stklcode.jvault.connector.exception.PermissionDeniedException;
 import de.stklcode.jvault.connector.model.Token;
 import de.stklcode.jvault.connector.model.response.AuthResponse;
 import de.stklcode.jvault.connector.model.response.CredentialsResponse;
+import de.stklcode.jvault.connector.model.response.SecretResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -87,6 +88,59 @@ class HTTPVaultConnectorTest {
             assertEquals("database/creds/my-role/abcd1234", res.leaseId(), "unexpected lease ID");
             assertEquals(3600, res.leaseDuration(), "unexpected lease duration");
             assertTrue(res.renewable(), "expected renewable lease");
+        }
+    }
+
+    @Test
+    void renewTest(WireMockRuntimeInfo wireMock) throws Exception {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).build()) {
+            setPrivate(connector, "authorized", true);
+            setPrivate(connector, "token", "test-token");
+
+            // Response as returned by Vault, without data.
+            mockHttpResponse(
+                "/v1/sys/leases/renew",
+                200,
+                """
+                    {
+                      "request_id": "a1b2c3d4-0000-0000-0000-000000000000",
+                      "lease_id": "database/creds/my-role/abcd1234",
+                      "renewable": true,
+                      "lease_duration": 7200
+                    }
+                    """,
+                "application/json"
+            );
+
+            // Renew with increment.
+            SecretResponse res = assertDoesNotThrow(
+                () -> connector.renew("database/creds/my-role/abcd1234", 7200),
+                "renew() should not fail"
+            );
+            verify(
+                putRequestedFor(urlEqualTo("/v1/sys/leases/renew"))
+                    .withHeader("X-Vault-Token", equalTo("test-token"))
+                    .withRequestBody(equalToJson(
+                        "{\"lease_id\":\"database/creds/my-role/abcd1234\",\"increment\":\"7200\"}"
+                    ))
+            );
+            assertEquals("a1b2c3d4-0000-0000-0000-000000000000", res.requestId(), "unexpected request ID");
+            assertEquals("database/creds/my-role/abcd1234", res.leaseId(), "unexpected lease ID");
+            assertEquals(7200, res.leaseDuration(), "unexpected lease duration");
+            assertTrue(res.renewable(), "expected renewable lease");
+            assertNotNull(res.data(), "data should not be null");
+            assertTrue(res.data().isEmpty(), "expected empty data");
+            assertNull(res.metadata(), "unexpected metadata");
+
+            // Renew without increment, i.e. the parameter is omitted.
+            assertDoesNotThrow(
+                () -> connector.renew("database/creds/my-role/abcd1234"),
+                "renew() without increment should not fail"
+            );
+            verify(
+                putRequestedFor(urlEqualTo("/v1/sys/leases/renew"))
+                    .withRequestBody(equalToJson("{\"lease_id\":\"database/creds/my-role/abcd1234\"}"))
+            );
         }
     }
 
