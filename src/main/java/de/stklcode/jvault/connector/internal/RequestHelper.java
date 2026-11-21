@@ -449,10 +449,13 @@ public final class RequestHelper implements Serializable {
                 try (var reader = new BufferedReader(new InputStreamReader(body, UTF_8))) {
                     ErrorResponse er = jsonMapper.readValue(reader, ErrorResponse.class);
                     /* Check for "permission denied" response */
-                    if (!er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied")) {
+                    if (
+                        er != null && er.getErrors() != null &&
+                        !er.getErrors().isEmpty() && er.getErrors().get(0).equals("permission denied")
+                    ) {
                         throw new PermissionDeniedException();
                     }
-                    throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), er.toString());
+                    throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode(), String.valueOf(er));
                 }
             }
         } catch (IOException ignored) {

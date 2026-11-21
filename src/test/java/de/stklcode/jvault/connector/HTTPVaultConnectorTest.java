@@ -29,6 +29,8 @@ import de.stklcode.jvault.connector.model.response.AuthResponse;
 import de.stklcode.jvault.connector.model.response.CredentialsResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -135,7 +137,7 @@ class HTTPVaultConnectorTest {
             assertEquals("test-id", res.getAuth().getClientToken(), "unexpected token ID with orphan=false");
             assertFalse(res.getAuth().isOrphan(), "token should not be orphan");
 
-             res = assertDoesNotThrow(
+            res = assertDoesNotThrow(
                 () -> connector.createToken(Token.builder().build(), true),
                 "token().create() should not fail"
             );
@@ -196,6 +198,30 @@ class HTTPVaultConnectorTest {
                 .willReturn(aResponse().withStatus(200).withBody("{}").withHeader("Content-Type", "application/json"))
         );
         assertDoesNotThrow(connector::getHealth, "Request failed unexpectedly");
+    }
+
+    /**
+     * Test error responses with malformed or incomplete error body (#5).
+     */
+    @ParameterizedTest
+    @CsvSource({
+        "{},error response",
+        "null,null",
+        "{\"errors\":null},error response",
+        "{\"errors\":[]},error response",
+        "{\"errors\":[\"test error\"]},test error"
+    })
+    void malformedErrorResponseTest(String body, String expectedResponse, WireMockRuntimeInfo wireMock) throws Exception {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(250).build()) {
+            mockHttpResponse(400, body, "application/json");
+            InvalidResponseException e = assertThrows(
+                InvalidResponseException.class,
+                connector::sealStatus,
+                "Expected InvalidResponseException for error body " + body
+            );
+            assertEquals(400, e.getStatusCode(), "Unexpected status code in exception");
+            assertEquals(expectedResponse, e.getResponse(), "Unexpected response message in exception");
+        }
     }
 
     /**

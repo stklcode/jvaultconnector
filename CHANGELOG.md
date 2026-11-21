@@ -5,6 +5,7 @@
 
 ### Fixes
 * Use the connector's token for `lookupToken()` (#149) (#159)
+* Prevent NUllPointerException on null or empty error responses (#150) (#159)
 
 
 ## 1.5.6 (2026-10-08)
