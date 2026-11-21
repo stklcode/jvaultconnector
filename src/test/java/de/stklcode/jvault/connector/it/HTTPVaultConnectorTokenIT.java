@@ -166,9 +166,6 @@ class HTTPVaultConnectorTokenIT extends HTTPVaultConnectorITBase {
             .build();
         assertDoesNotThrow(() -> connector.token().create(token), "Token creation failed");
 
-        authRoot();
-        assumeTrue(connector.isAuthorized());
-
         TokenResponse res = assertDoesNotThrow(() -> connector.token().lookup("my-token"), "Token creation failed");
         assertEquals(token.id(), res.data().id(), "Unexpected token ID");
         assertEquals(1, res.data().policies().size(), "Unexpected number of policies");
