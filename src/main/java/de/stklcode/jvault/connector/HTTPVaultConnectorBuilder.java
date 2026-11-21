@@ -22,6 +22,7 @@ import de.stklcode.jvault.connector.exception.VaultConnectorException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +33,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Vault Connector Builder implementation for HTTP Vault connectors.
@@ -45,6 +48,8 @@ public final class HTTPVaultConnectorBuilder {
     private static final String ENV_VAULT_CACERT = "VAULT_CACERT";
     private static final String ENV_VAULT_TOKEN = "VAULT_TOKEN";
     private static final String ENV_VAULT_MAX_RETRIES = "VAULT_MAX_RETRIES";
+    private static final String ENV_VAULT_CLIENT_TIMEOUT = "VAULT_CLIENT_TIMEOUT";
+    private static final Pattern GO_DURATION_PART = Pattern.compile("(\\d+(?:\\.\\d*)?|\\.\\d+)(ns|us|µs|μs|ms|s|m|h)");
 
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final Integer DEFAULT_PORT = 8200;
@@ -301,6 +306,11 @@ public final class HTTPVaultConnectorBuilder {
 
     /**
      * Build connector based on the {@code VAULT_ADDR} and {@code VAULT_CACERT} (optional) environment variables.
+     * <p>
+     * Further optional environment variables: {@code VAULT_TOKEN}, {@code VAULT_MAX_RETRIES} and
+     * {@code VAULT_CLIENT_TIMEOUT}. The latter follows the Vault CLI semantics: plain number of seconds (e.g. {@code 30})
+     * or a Go-style duration (e.g. {@code 1m30s}, {@code 500ms}). A value of {@code 0} disables the timeout.
+     * Malformed values are ignored.
      *
      * @return self
      * @throws VaultConnectorException if Vault address from environment variables is malformed
@@ -322,6 +332,15 @@ public final class HTTPVaultConnectorBuilder {
                 withNumberOfRetries(Integer.parseInt(System.getenv(ENV_VAULT_MAX_RETRIES)));
             } catch (NumberFormatException ignored) {
                 /* Ignore malformed values. */
+            }
+        }
+
+        /* Read client timeout */
+        String envTimeout = System.getenv(ENV_VAULT_CLIENT_TIMEOUT);
+        if (envTimeout != null && !envTimeout.isBlank()) {
+            Duration parsed = parseDuration(envTimeout.trim());
+            if (parsed != null) {
+                timeout = parsed.isZero() ? null : parsed;
             }
         }
 
@@ -465,6 +484,46 @@ public final class HTTPVaultConnectorBuilder {
             return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(is);
         } catch (IOException | CertificateException e) {
             throw new TlsException("Unable to read certificate.", e);
+        }
+    }
+
+    /**
+     * Parse duration string as used by the Vault CLI.
+     * Accepts plain (decimal) seconds or a Go-style duration like {@code 1h2m3.5s}.
+     *
+     * @param value Duration string.
+     * @return Parsed non-negative duration or {@code null}, if the value is malformed.
+     */
+    static Duration parseDuration(final String value) {
+        try {
+            if (value.matches("\\d+")) {
+                return Duration.ofSeconds(Long.parseLong(value));
+            }
+
+            Matcher m = GO_DURATION_PART.matcher(value);
+            BigDecimal nanos = BigDecimal.ZERO;
+            int pos = 0;
+            while (m.lookingAt()) {
+                BigDecimal amount = new BigDecimal(m.group(1));
+                long factor = switch (m.group(2)) {
+                    case "ns" -> 1L;
+                    case "us", "µs", "μs" -> 1_000L;
+                    case "ms" -> 1_000_000L;
+                    case "s" -> 1_000_000_000L;
+                    case "m" -> 60_000_000_000L;
+                    default -> 3_600_000_000_000L;  // h
+                };
+                nanos = nanos.add(amount.multiply(BigDecimal.valueOf(factor)));
+                pos = m.end();
+                m.region(pos, value.length());
+            }
+
+            if (pos == 0 || pos != value.length()) {
+                return null;
+            }
+            return Duration.ofNanos(nanos.longValueExact());
+        } catch (ArithmeticException | NumberFormatException e) {
+            return null;
         }
     }
 

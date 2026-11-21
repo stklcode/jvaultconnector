@@ -15,6 +15,7 @@
 * Allow parsing JSON from full dataset in `SecretResponse` (#130)
 * Introduce `pki()` client to issue certificates via Vault PKI engine (#131)
 * Support separate connect and request timeouts (#153)
+* Support `VAULT_CLIENT_TIMEOUT` when building client `fromEnv()` (#153)
 
 ### Fixes
 * Properly parse response class in DB credential helper (#138)
