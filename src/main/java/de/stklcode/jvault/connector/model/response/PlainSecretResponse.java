@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
 import de.stklcode.jvault.connector.model.response.embedded.VersionMetadata;
 
 import java.io.Serializable;
@@ -46,5 +47,13 @@ public record PlainSecretResponse(
     @Override
     public VersionMetadata metadata() {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("PlainSecretResponse")
+            .add("responseHeader", responseHeader)
+            .maskedValues("data", data)
+            .toString();
     }
 }

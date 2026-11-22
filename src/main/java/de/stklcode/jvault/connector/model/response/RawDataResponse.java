@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -34,4 +35,12 @@ public record RawDataResponse(
     @JsonUnwrapped Header responseHeader,
     Map<String, Serializable> data
 ) implements VaultDataResponse {
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("RawDataResponse")
+            .add("responseHeader", responseHeader)
+            .maskedValues("data", data)
+            .toString();
+    }
 }

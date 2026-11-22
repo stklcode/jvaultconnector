@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
 
 import java.io.Serializable;
 
@@ -86,5 +87,13 @@ public record TransitResponse(
         String plaintext,
         String sum
     ) implements Serializable {
+        @Override
+        public String toString() {
+            return ToStringBuilder.of("Data")
+                .abbreviated("ciphertext", ciphertext, 16)
+                .masked("plaintext", plaintext)
+                .add("sum", sum)
+                .toString();
+        }
     }
 }

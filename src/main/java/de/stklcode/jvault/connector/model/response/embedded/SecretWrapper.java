@@ -1,5 +1,7 @@
 package de.stklcode.jvault.connector.model.response.embedded;
 
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -17,4 +19,12 @@ public record SecretWrapper(
 
     VersionMetadata metadata
 ) implements Serializable {
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("SecretWrapper")
+            .maskedValues("data", data)
+            .add("metadata", metadata)
+            .toString();
+    }
 }

@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -54,4 +56,22 @@ public record AuthData(
     Integer numUses,
     MfaRequirement mfaRequirement
 ) implements Serializable {
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("AuthData")
+            .masked("clientToken", clientToken)
+            .add("accessor", accessor)
+            .add("policies", policies)
+            .add("tokenPolicies", tokenPolicies)
+            .add("metadata", metadata)
+            .add("leaseDuration", leaseDuration)
+            .add("renewable", renewable)
+            .add("entityId", entityId)
+            .add("tokenType", tokenType)
+            .add("orphan", orphan)
+            .add("numUses", numUses)
+            .add("mfaRequirement", mfaRequirement)
+            .toString();
+    }
 }

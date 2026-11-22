@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -32,4 +34,12 @@ public record MfaRequirement(
     String mfaRequestId,
     Map<String, MfaConstraintAny> mfaConstraints
 ) implements Serializable {
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("MfaRequirement")
+            .masked("mfaRequestId", mfaRequestId)
+            .add("mfaConstraints", mfaConstraints)
+            .toString();
+    }
 }

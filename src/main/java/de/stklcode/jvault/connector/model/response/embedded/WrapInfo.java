@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
+
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
@@ -36,4 +38,14 @@ public record WrapInfo(
     ZonedDateTime creationTime,
     String creationPath
 ) implements Serializable {
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("WrapInfo")
+            .masked("token", token)
+            .add("ttl", ttl)
+            .add("creationTime", creationTime)
+            .add("creationPath", creationPath)
+            .toString();
+    }
 }

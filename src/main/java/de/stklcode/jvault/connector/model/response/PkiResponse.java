@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.List;
@@ -55,5 +56,17 @@ public record PkiResponse(
         @JsonProperty("private_key_type") String privateKeyType,
         @JsonProperty("serial_number") String serialNumber
     ) implements Serializable {
+        @Override
+        public String toString() {
+            return ToStringBuilder.of("Data")
+                .add("expiration", expiration)
+                .summarized("certificate", certificate)
+                .summarized("issuingCa", issuingCa)
+                .summarized("caChain", caChain)
+                .masked("privateKey", privateKey)
+                .add("privateKeyType", privateKeyType)
+                .add("serialNumber", serialNumber)
+                .toString();
+        }
     }
 }

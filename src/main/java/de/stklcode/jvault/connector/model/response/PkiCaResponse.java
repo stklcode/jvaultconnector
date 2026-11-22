@@ -18,6 +18,7 @@ package de.stklcode.jvault.connector.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.List;
@@ -55,5 +56,17 @@ public record PkiCaResponse(
         @JsonProperty("issuer_id") String issuerId,
         @JsonProperty("issuer_name") String issuerName
     ) implements Serializable {
+        @Override
+        public String toString() {
+            return ToStringBuilder.of("Data")
+                .add("authorityKeyId", authorityKeyId)
+                .summarized("certificate", certificate)
+                .add("revocationTime", revocationTime)
+                .add("revocationTimeRFC3339", revocationTimeRFC3339)
+                .summarized("caChain", caChain)
+                .add("issuerId", issuerId)
+                .add("issuerName", issuerName)
+                .toString();
+        }
     }
 }

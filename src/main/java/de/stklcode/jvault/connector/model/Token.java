@@ -17,6 +17,7 @@
 package de.stklcode.jvault.connector.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.*;
@@ -92,6 +93,24 @@ public record Token(
         return new Builder();
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("Token")
+            .masked("id", id)
+            .add("type", type)
+            .add("displayName", displayName)
+            .add("noParent", noParent)
+            .add("noDefaultPolicy", noDefaultPolicy)
+            .add("ttl", ttl)
+            .add("explicitMaxTtl", explicitMaxTtl)
+            .add("numUses", numUses)
+            .add("policies", policies)
+            .add("meta", meta)
+            .add("renewable", renewable)
+            .add("period", period)
+            .add("entityAlias", entityAlias)
+            .toString();
+    }
 
     /**
      * Constants for token types.

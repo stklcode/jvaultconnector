@@ -19,6 +19,7 @@ package de.stklcode.jvault.connector.model;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
 import tools.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
@@ -106,5 +107,21 @@ public record AppRoleSecret(
             return "";
         }
         return String.join(",", tokenBoundCidrs);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("AppRoleSecret")
+            .masked("id", id)
+            .add("accessor", accessor)
+            .add("metadata", metadata)
+            .add("cidrList", cidrList)
+            .add("tokenBoundCidrs", tokenBoundCidrs)
+            .add("creationTime", creationTime)
+            .add("expirationTime", expirationTime)
+            .add("lastUpdatedTime", lastUpdatedTime)
+            .add("numUses", numUses)
+            .add("ttl", ttl)
+            .toString();
     }
 }

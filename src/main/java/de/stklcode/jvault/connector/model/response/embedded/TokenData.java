@@ -16,6 +16,8 @@
 
 package de.stklcode.jvault.connector.model.response.embedded;
 
+import de.stklcode.jvault.connector.internal.ToStringBuilder;
+
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -65,4 +67,27 @@ public record TokenData(
     Long ttl,
     String type
 ) implements Serializable {
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of("TokenData")
+            .add("accessor", accessor)
+            .add("creationTime", creationTime)
+            .add("creationTtl", creationTtl)
+            .add("displayName", displayName)
+            .add("entityId", entityId)
+            .add("expireTime", expireTime)
+            .add("explicitMaxTtl", explicitMaxTtl)
+            .masked("id", id)
+            .add("issueTime", issueTime)
+            .add("meta", meta)
+            .add("numUses", numUses)
+            .add("orphan", orphan)
+            .add("path", path)
+            .add("policies", policies)
+            .add("renewable", renewable)
+            .add("ttl", ttl)
+            .add("type", type)
+            .toString();
+    }
 }
