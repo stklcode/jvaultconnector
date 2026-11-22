@@ -342,10 +342,10 @@ class HTTPVaultConnectorTest {
         assertEquals(retries, getRequestHelperPrivate(connector, "retries"), "Number of retries not set correctly");
 
         // Test TLS version (#22).
-        assertEquals("TLSv1.2", getRequestHelperPrivate(connector, "tlsVersion"), "TLS version should be 1.2 if not specified");
+        assertEquals("TLS", getRequestHelperPrivate(connector, "tlsVersion"), "TLS version should be 1.2 if not specified");
         // Now override.
-        connector = HTTPVaultConnector.builder(url).withTrustedCA(trustedCaCert).withNumberOfRetries(retries).withTLS("TLSv1.1").build();
-        assertEquals("TLSv1.1", getRequestHelperPrivate(connector, "tlsVersion"), "Overridden TLS version 1.1 not correct");
+        connector = HTTPVaultConnector.builder(url).withTrustedCA(trustedCaCert).withNumberOfRetries(retries).withTLS("TLSv1.3").build();
+        assertEquals("TLSv1.3", getRequestHelperPrivate(connector, "tlsVersion"), "Overridden TLS version 1.3 not correct");
     }
 
     /**

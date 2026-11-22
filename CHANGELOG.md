@@ -10,6 +10,7 @@
 * Split client interface to group feature sets together (#113)
 
   Use `connector.sys()`, `.kv2()`, `.token()`, `.appRole()` and `.transit()` to access respective feature sets.
+* Use "TLS" by default instead of "TLSv1.2" (#155)
 
 ### Features
 * Allow parsing JSON from full dataset in `SecretResponse` (#130)

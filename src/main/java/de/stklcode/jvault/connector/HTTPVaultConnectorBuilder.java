@@ -54,7 +54,7 @@ public final class HTTPVaultConnectorBuilder {
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final Integer DEFAULT_PORT = 8200;
     public static final boolean DEFAULT_TLS = true;
-    public static final String DEFAULT_TLS_VERSION = "TLSv1.2";
+    public static final String DEFAULT_TLS_VERSION = "TLS";
     public static final String DEFAULT_PREFIX = "/v1/";
     public static final int DEFAULT_NUMBER_OF_RETRIES = 0;
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
