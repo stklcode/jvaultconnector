@@ -19,7 +19,6 @@ package de.stklcode.jvault.connector;
 import de.stklcode.jvault.connector.exception.VaultConnectorException;
 import de.stklcode.jvault.connector.model.response.*;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -28,8 +27,9 @@ import java.util.*;
  *
  * @author Stefan Kalscheuer
  * @since 0.1
+ * @since 2.0.0 No longer extends {@link java.io.Serializable}
  */
-public interface VaultConnector extends AutoCloseable, Serializable {
+public interface VaultConnector extends AutoCloseable {
 
     /**
      * Reset authorization information.

@@ -13,7 +13,6 @@ import tools.jackson.databind.json.JsonMapper;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -45,9 +44,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author Stefan Kalscheuer
  * @since 0.8 Extracted methods from {@link de.stklcode.jvault.connector.HTTPVaultConnector}.
- * @since 2.0.0 Reuse HTTP client, implements {@link AutoCloseable}
+ * @since 2.0.0 Reuse HTTP client, implements {@link AutoCloseable}, no longer {@link java.io.Serializable}
  */
-public final class RequestHelper implements Serializable, AutoCloseable {
+public final class RequestHelper implements AutoCloseable {
     private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";
 
     private final String baseURL;                   // Base URL of Vault.
@@ -58,8 +57,8 @@ public final class RequestHelper implements Serializable, AutoCloseable {
     private final X509Certificate trustedCaCert;    // Trusted CA certificate.
     private final JsonMapper jsonMapper;
 
-    private transient HttpClient client;            // HTTP client, created on first request.
-    private transient boolean closed;               // Helper has been closed.
+    private HttpClient client;                      // HTTP client, created on first request.
+    private boolean closed;                         // Helper has been closed.
 
     /**
      * Constructor of the request helper.
@@ -383,8 +382,6 @@ public final class RequestHelper implements Serializable, AutoCloseable {
 
     /**
      * Get the HTTP client, create it on first use.
-     * <p>
-     * The client is not serialized, so a deserialized helper creates a new one.
      *
      * @return The HTTP client
      * @throws ConnectionException if the helper has been closed

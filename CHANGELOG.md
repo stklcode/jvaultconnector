@@ -6,6 +6,9 @@
 * Modified interface structure
 * Requires Vault 1.3 (#121)
 * `close()` releases the HTTP client, a closed connector can no longer be used (#156)
+* `VaultConnector` no longer extends `Serializable` (#157)
+
+  Mark connector fields `transient` and recreate the connector after deserialization.
 
 ### Improvements
 * Split client interface to group feature sets together (#113)
