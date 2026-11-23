@@ -30,6 +30,7 @@ final class Error {
     static final String RESPONSE_CODE = "Invalid response code";
     static final String INIT_SSL_CONTEXT = "Unable to initialize SSLContext";
     static final String CONNECTION = "Unable to connect to Vault server";
+    static final String CLOSED = "Connector has been closed";
     static final String TIMEOUT = "Request to Vault server timed out";
 
     /**

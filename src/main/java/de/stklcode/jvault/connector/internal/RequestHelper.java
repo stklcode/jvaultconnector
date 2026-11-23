@@ -39,11 +39,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Helper class to bundle Vault HTTP requests.
+ * <p>
+ * A single {@link HttpClient} is created lazily on the first request and reused for all subsequent requests,
+ * so connections and TLS sessions are pooled. It is released by {@link #close()}.
  *
  * @author Stefan Kalscheuer
  * @since 0.8 Extracted methods from {@link de.stklcode.jvault.connector.HTTPVaultConnector}.
+ * @since 2.0.0 Reuse HTTP client, implements {@link AutoCloseable}
  */
-public final class RequestHelper implements Serializable {
+public final class RequestHelper implements Serializable, AutoCloseable {
     private static final String HEADER_VAULT_TOKEN = "X-Vault-Token";
 
     private final String baseURL;                   // Base URL of Vault.
@@ -53,6 +57,9 @@ public final class RequestHelper implements Serializable {
     private final String tlsVersion;                // TLS version (#22).
     private final X509Certificate trustedCaCert;    // Trusted CA certificate.
     private final JsonMapper jsonMapper;
+
+    private transient HttpClient client;            // HTTP client, created on first request.
+    private transient boolean closed;               // Helper has been closed.
 
     /**
      * Constructor of the request helper.
@@ -345,54 +352,90 @@ public final class RequestHelper implements Serializable {
         // Set JSON Header.
         requestBuilder.setHeader("accept", "application/json");
 
-        var clientBuilder = HttpClient.newBuilder();
+        // Execute request.
+        HttpResponse<String> response = send(client(), requestBuilder.build());
 
-        // Set connect timeout, if defined.
-        if (this.connectTimeout != null) {
-            clientBuilder.connectTimeout(connectTimeout);
+        /* Check if response is valid */
+        if (response == null) {
+            throw new InvalidResponseException("Response unavailable");
         }
 
-        // Set custom SSL context.
-        clientBuilder.sslContext(createSSLContext());
+        switch (response.statusCode()) {
+            case 200:
+                return Objects.requireNonNullElse(response.body(), "");
+            case 204:
+                return "";
+            case 403:
+                throw new PermissionDeniedException();
+            default:
+                if (response.statusCode() >= 500 && response.statusCode() < 600 && retries > 0) {
+                    // Retry on 5xx errors.
+                    return request(requestBuilder, retries - 1);
+                } else {
+                    // Fail on different error code and/or no retries left.
+                    handleError(response);
 
-        HttpClient client = clientBuilder.build();
-
-        // Execute request.
-        try {
-            HttpResponse<String> response = send(client, requestBuilder.build());
-
-            /* Check if response is valid */
-            if (response == null) {
-                throw new InvalidResponseException("Response unavailable");
-            }
-
-            switch (response.statusCode()) {
-                case 200:
-                    return Objects.requireNonNullElse(response.body(), "");
-                case 204:
-                    return "";
-                case 403:
-                    throw new PermissionDeniedException();
-                default:
-                    if (response.statusCode() >= 500 && response.statusCode() < 600 && retries > 0) {
-                        // Retry on 5xx errors.
-                        return request(requestBuilder, retries - 1);
-                    } else {
-                        // Fail on different error code and/or no retries left.
-                        handleError(response);
-
-                        // Throw exception without details, if response entity is empty.
-                        throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode());
-                    }
-            }
-        } finally {
-            if (client instanceof AutoCloseable closeableClient) {
-                // Close the client, which is supported since JDK21.
-                try {
-                    closeableClient.close();
-                } catch (Exception ignored) {
-                    // Ignore
+                    // Throw exception without details, if response entity is empty.
+                    throw new InvalidResponseException(Error.RESPONSE_CODE, response.statusCode());
                 }
+        }
+    }
+
+    /**
+     * Get the HTTP client, create it on first use.
+     * <p>
+     * The client is not serialized, so a deserialized helper creates a new one.
+     *
+     * @return The HTTP client
+     * @throws ConnectionException if the helper has been closed
+     * @throws TlsException        if the SSL context could not be initialized
+     * @since 2.0.0
+     */
+    private synchronized HttpClient client() throws VaultConnectorException {
+        if (closed) {
+            throw new ConnectionException(Error.CLOSED);
+        }
+
+        if (client == null) {
+            var clientBuilder = HttpClient.newBuilder();
+
+            // Set connect timeout, if defined.
+            if (connectTimeout != null) {
+                clientBuilder.connectTimeout(connectTimeout);
+            }
+
+            // Set custom SSL context.
+            clientBuilder.sslContext(createSSLContext());
+
+            client = clientBuilder.build();
+        }
+
+        return client;
+    }
+
+    /**
+     * Close the helper and release the HTTP client.
+     * <p>
+     * Subsequent requests fail with a {@link ConnectionException}. Closing an already closed helper has no effect.
+     * On Java 21 and later, this waits for running requests to complete.
+     *
+     * @since 2.0.0
+     */
+    @Override
+    public void close() {
+        HttpClient c;
+        synchronized (this) {
+            closed = true;
+            c = client;
+            client = null;
+        }
+
+        if (c instanceof AutoCloseable closeable) {
+            // HttpClient is AutoCloseable since Java 21. Earlier versions release resources on garbage collection.
+            try {
+                closeable.close();
+            } catch (Exception ignored) {
+                // Ignore.
             }
         }
     }

@@ -473,6 +473,55 @@ class HTTPVaultConnectorTest {
         );
     }
 
+    /**
+     * The HTTP client is created once and reused for subsequent requests, including retries.
+     */
+    @Test
+    void clientReuseTest(WireMockRuntimeInfo wireMock) throws URISyntaxException {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withNumberOfRetries(1).withTimeout(TIMEOUT).build()) {
+            assertNull(getRequestHelperPrivate(connector, "client"), "Client should be created lazily");
+
+            mockHttpResponse(200, "{}", "application/json");
+            assertDoesNotThrow(() -> connector.sys().sealStatus(), "First request failed");
+            Object client = getRequestHelperPrivate(connector, "client");
+            assertNotNull(client, "Client not created on first request");
+
+            assertDoesNotThrow(() -> connector.sys().sealStatus(), "Second request failed");
+            assertSame(client, getRequestHelperPrivate(connector, "client"), "Client not reused");
+
+            // Retry after 5xx error.
+            stubFor(
+                WireMock.any(anyUrl())
+                    .willReturn(aResponse().withStatus(500))
+                    .willReturn(aResponse().withStatus(200).withBody("{}").withHeader("Content-Type", "application/json"))
+            );
+            assertDoesNotThrow(() -> connector.sys().sealStatus(), "Request with retry failed");
+            assertSame(client, getRequestHelperPrivate(connector, "client"), "Client not reused on retry");
+        }
+    }
+
+    /**
+     * Closing the connector releases the HTTP client, subsequent requests fail.
+     */
+    @Test
+    void closeTest(WireMockRuntimeInfo wireMock) throws URISyntaxException {
+        var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(TIMEOUT).build();
+        mockHttpResponse(200, "{}", "application/json");
+        assertDoesNotThrow(() -> connector.sys().sealStatus(), "Request failed");
+
+        connector.close();
+        assertNull(getRequestHelperPrivate(connector, "client"), "Client not released on close");
+        ConnectionException e = assertThrows(
+            ConnectionException.class,
+            () -> connector.sys().sealStatus(),
+            "Request on closed connector succeeded"
+        );
+        assertEquals("Connector has been closed", e.getMessage(), "Unexpected exception message");
+        assertNull(getRequestHelperPrivate(connector, "client"), "Client recreated after close");
+
+        assertDoesNotThrow(connector::close, "Closing twice failed");
+    }
+
     private Object getRequestHelperPrivate(HTTPVaultConnector connector, String fieldName) {
         try {
             return getPrivate(getPrivate(connector, "request"), fieldName);

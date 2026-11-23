@@ -5,12 +5,14 @@
 * Requires Jackson 3
 * Modified interface structure
 * Requires Vault 1.3 (#121)
+* `close()` releases the HTTP client, a closed connector can no longer be used (#156)
 
 ### Improvements
 * Split client interface to group feature sets together (#113)
 
   Use `connector.sys()`, `.kv2()`, `.token()`, `.appRole()` and `.transit()` to access respective feature sets.
 * Use "TLS" by default instead of "TLSv1.2" (#155)
+* Reuse the internal HTTP client and SSL context (#156)
 
 ### Features
 * Allow parsing JSON from full dataset in `SecretResponse` (#130)

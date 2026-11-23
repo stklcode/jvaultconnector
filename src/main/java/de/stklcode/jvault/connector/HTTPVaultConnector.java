@@ -263,11 +263,21 @@ public class HTTPVaultConnector implements VaultConnector {
         return new DbClientImpl(mount);
     }
 
+    /**
+     * Close the connector.
+     * <p>
+     * Resets the authorization and releases the underlying HTTP client.
+     * The connector cannot be used afterward, subsequent requests fail with a
+     * {@link de.stklcode.jvault.connector.exception.ConnectionException}.
+     *
+     * @since 2.0.0 Releases the HTTP client, connector is unusable afterward
+     */
     @Override
     public final void close() {
         authorized = false;
         token = null;
         tokenTTL = 0;
+        request.close();
     }
 
     /**
