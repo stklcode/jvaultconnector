@@ -1,4 +1,4 @@
-## unreleased
+## 1.5.7 (2026-11-25)
 
 ### Dependencies
 * Updated Jackson to 2.23.0 (#158)
@@ -6,6 +6,9 @@
 ### Fixes
 * Use the connector's token for `lookupToken()` (#149) (#159)
 * Prevent NUllPointerException on null or empty error responses (#150) (#159)
+
+### Test
+* Tested against Vault 1.2 to 2.2
 
 
 ## 1.5.6 (2026-10-08)
