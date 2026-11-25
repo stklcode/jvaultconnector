@@ -1,4 +1,10 @@
-## 1.5.5 (2026-10-08)
+## unreleased
+
+### Dependencies
+* Updated Jackson to 2.23.0 (#158)
+
+
+## 1.5.6 (2026-10-08)
 
 ### Fixes
 * Properly parse response class in DB credential helper (#139)
