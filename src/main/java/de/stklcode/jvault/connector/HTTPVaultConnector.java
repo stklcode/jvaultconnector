@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.stklcode.jvault.connector.internal.RequestHelper.encode;
+import static de.stklcode.jvault.connector.internal.RequestHelper.encodePath;
 import static de.stklcode.jvault.connector.internal.VaultApiPath.*;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
@@ -163,14 +164,14 @@ public class HTTPVaultConnector implements VaultConnector {
     public final SecretResponse read(final String key) throws VaultConnectorException {
         requireAuth();
         /* Issue request and parse secret response */
-        return request.get(key, emptyMap(), token, PlainSecretResponse.class);
+        return request.get(encodePath(key), emptyMap(), token, PlainSecretResponse.class);
     }
 
     @Override
     public final List<String> list(final String path) throws VaultConnectorException {
         requireAuth();
 
-        SecretListResponse secrets = request.get(path + "/?list=true", emptyMap(), token, SecretListResponse.class);
+        SecretListResponse secrets = request.get(encodePath(path) + "/?list=true", emptyMap(), token, SecretListResponse.class);
 
         return secrets.keys();
     }
@@ -196,7 +197,7 @@ public class HTTPVaultConnector implements VaultConnector {
         }
 
         /* Issue request and expect code 204 with empty response */
-        request.postWithoutResponse(key, payload, token);
+        request.postWithoutResponse(encodePath(key), payload, token);
     }
 
     @Override
@@ -204,7 +205,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.deleteWithoutResponse(key, token);
+        request.deleteWithoutResponse(encodePath(key), token);
     }
 
     @Override
@@ -212,7 +213,7 @@ public class HTTPVaultConnector implements VaultConnector {
         requireAuth();
 
         /* Issue request and expect code 204 with empty response */
-        request.putWithoutResponse(SYS_LEASES_REVOKE + encode(leaseID), emptyMap(), token);
+        request.putWithoutResponse(SYS_LEASES_REVOKE + encodePath(leaseID), emptyMap(), token);
     }
 
     @Override
@@ -341,7 +342,7 @@ public class HTTPVaultConnector implements VaultConnector {
             /* Request HTTP response and parse secret metadata */
             Map<String, String> args = mapOfStrings("version", version);
 
-            return request.get(mount + SECRET_DATA + key, args, token, MetaSecretResponse.class);
+            return request.get(kv2Path(mount, SECRET_DATA, key), args, token, MetaSecretResponse.class);
         }
 
         @Override
@@ -350,7 +351,7 @@ public class HTTPVaultConnector implements VaultConnector {
             requireAuth();
 
             /* Request HTTP response and parse secret metadata */
-            return request.get(mount + SECRET_METADATA + key, emptyMap(), token, MetadataResponse.class);
+            return request.get(kv2Path(mount, SECRET_METADATA, key), emptyMap(), token, MetadataResponse.class);
         }
 
         @Override
@@ -365,7 +366,7 @@ public class HTTPVaultConnector implements VaultConnector {
                 "cas_required", casRequired
             );
 
-            write(mount + SECRET_METADATA + key, payload);
+            request.postWithoutResponse(kv2Path(mount, SECRET_METADATA, key), payload, token);
         }
 
         @Override
@@ -384,7 +385,7 @@ public class HTTPVaultConnector implements VaultConnector {
 
             /* Issue request and parse metadata response */
             return request.post(
-                mount + SECRET_DATA + key,
+                kv2Path(mount, SECRET_DATA, key),
                 Map.of(
                     "data", data,
                     "options", options
@@ -396,12 +397,14 @@ public class HTTPVaultConnector implements VaultConnector {
 
         @Override
         public final void deleteLatestVersion(final String mount, final String key) throws VaultConnectorException {
-            delete(mount + SECRET_DATA + key);
+            requireAuth();
+            request.deleteWithoutResponse(kv2Path(mount, SECRET_DATA, key), token);
         }
 
         @Override
         public final void deleteAllVersions(final String mount, final String key) throws VaultConnectorException {
-            delete(mount + SECRET_METADATA + key);
+            requireAuth();
+            request.deleteWithoutResponse(kv2Path(mount, SECRET_METADATA, key), token);
         }
 
         @Override
@@ -442,7 +445,22 @@ public class HTTPVaultConnector implements VaultConnector {
             Map<String, Object> payload = singletonMap("versions", versions);
 
             /* Issue request and expect code 204 with empty response */
-            request.postWithoutResponse(mount + pathPart + key, payload, token);
+            request.postWithoutResponse(kv2Path(mount, pathPart, key), payload, token);
+        }
+
+        /**
+         * Build the request path for a KV v2 operation.
+         * Mount and key may consist of multiple segments, e.g. {@code path/to/secret}.
+         * Each segment is encoded, the separating slashes are preserved.
+         *
+         * @param mount    Secret store mount point (without leading or trailing slash).
+         * @param pathPart Operation path part, e.g. {@code /data/}.
+         * @param key      Secret key.
+         * @return Encoded request path
+         * @since 2.0.0
+         */
+        private String kv2Path(final String mount, final String pathPart, final String key) {
+            return encodePath(mount) + pathPart + encodePath(key);
         }
     }
 
@@ -835,7 +853,7 @@ public class HTTPVaultConnector implements VaultConnector {
         public CredentialsResponse readCredentials(final String role) throws VaultConnectorException {
             requireAuth();
 
-            return request.get(DB_CREDS.formatted(encode(mount), encode(role)), emptyMap(), token, CredentialsResponse.class);
+            return request.get(DB_CREDS.formatted(encodePath(mount), encode(role)), emptyMap(), token, CredentialsResponse.class);
         }
 
     }

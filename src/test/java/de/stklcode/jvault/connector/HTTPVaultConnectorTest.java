@@ -29,8 +29,11 @@ import de.stklcode.jvault.connector.model.response.CredentialsResponse;
 import de.stklcode.jvault.connector.model.response.SecretResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +45,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -470,6 +475,148 @@ class HTTPVaultConnectorTest {
             InvalidResponseException.class,
             () -> connector.revoke("leaseID"),
             "destroyAppRoleSecret() with 200 response succeeded"
+        );
+    }
+
+    /**
+     * Names inserted into the request path must be percent-encoded, i.e. a space becomes {@code %20}.
+     * Vault reads a {@code +} in the path as a literal plus sign, so form encoding addresses a different object.
+     */
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("pathEncodingCases")
+    void pathEncodingTest(String name, ThrowingConsumer<HTTPVaultConnector> call, String expectedUrl,
+                          WireMockRuntimeInfo wireMock) throws Throwable {
+        try (var connector = HTTPVaultConnector.builder(wireMock.getHttpBaseUrl()).withTimeout(TIMEOUT).build()) {
+            setPrivate(connector, "authorized", true);
+            mockHttpResponse(200, "{}", "application/json");
+
+            try {
+                call.accept(connector);
+            } catch (InvalidResponseException ignored) {
+                // Response content does not matter, only the requested URL.
+            }
+
+            verify(anyRequestedFor(urlEqualTo(expectedUrl)));
+        }
+    }
+
+    static Stream<Arguments> pathEncodingCases() {
+        return Stream.of(
+            Arguments.of(
+                "appRole().lookup()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.appRole().lookup("my role"),
+                "/v1/auth/approle/role/my%20role"
+            ),
+            Arguments.of(
+                "token().readRole()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.token().readRole("my role"),
+                "/v1/auth/token/roles/my%20role"
+            ),
+            Arguments.of(
+                "transit().encrypt()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.transit().encrypt("my key", "data"),
+                "/v1/transit/encrypt/my%20key"
+            ),
+            Arguments.of(
+                "revoke()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.revoke("my lease"),
+                "/v1/sys/leases/revoke/my%20lease"
+            ),
+            Arguments.of(
+                "appRole().lookup() with plus sign",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.appRole().lookup("a+b"),
+                "/v1/auth/approle/role/a%2Bb"
+            ),
+            Arguments.of(
+                "kv2().readData()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().readData("kv", "path/to/my secret"),
+                "/v1/kv/data/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().readVersion()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().readVersion("kv", "path/to/my secret", 2),
+                "/v1/kv/data/path/to/my%20secret?version=2"
+            ),
+            Arguments.of(
+                "kv2().readMetadata()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().readMetadata("kv", "path/to/my secret"),
+                "/v1/kv/metadata/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().updateMetadata()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().updateMetadata("kv", "path/to/my secret", 5, false),
+                "/v1/kv/metadata/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().writeData()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().writeData("kv", "path/to/my secret", Map.of("k", "v")),
+                "/v1/kv/data/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().deleteLatestVersion()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().deleteLatestVersion("kv", "path/to/my secret"),
+                "/v1/kv/data/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().deleteAllVersions()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().deleteAllVersions("kv", "path/to/my secret"),
+                "/v1/kv/metadata/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().deleteVersions()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().deleteVersions("kv", "path/to/my secret", 1),
+                "/v1/kv/delete/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().undeleteVersions()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().undeleteVersions("kv", "path/to/my secret", 1),
+                "/v1/kv/undelete/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "kv2().destroyVersions()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().destroyVersions("kv", "path/to/my secret", 1),
+                "/v1/kv/destroy/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "read()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.read("secret/path/to/my secret"),
+                "/v1/secret/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "list()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.list("secret/my path"),
+                "/v1/secret/my%20path/?list=true"
+            ),
+            Arguments.of(
+                "write()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.write("secret/path/to/my secret", "value"),
+                "/v1/secret/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "delete()",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.delete("secret/path/to/my secret"),
+                "/v1/secret/path/to/my%20secret"
+            ),
+            Arguments.of(
+                "read() with special characters",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.read("secret/a+b/c?d#e"),
+                "/v1/secret/a%2Bb/c%3Fd%23e"
+            ),
+            Arguments.of(
+                "revoke() with lease path",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.revoke("database/creds/my-role/abc123"),
+                "/v1/sys/leases/revoke/database/creds/my-role/abc123"
+            ),
+            Arguments.of(
+                "db().readCredentials() with nested mount",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.db("team/database").readCredentials("my role"),
+                "/v1/team/database/creds/my%20role"
+            ),
+            Arguments.of(
+                "kv2().readData() with nested mount and special characters",
+                (ThrowingConsumer<HTTPVaultConnector>) c -> c.kv2().readData("team/kv", "a+b/c?d"),
+                "/v1/team/kv/data/a%2Bb/c%3Fd"
+            )
         );
     }
 

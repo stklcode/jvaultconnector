@@ -27,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -330,13 +331,39 @@ public final class RequestHelper implements AutoCloseable {
 
     /**
      * Encode URL part.
+     * <p>
+     * Percent-encodes the given value for use as a single path segment or query parameter (RFC 3986).
+     * Spaces are encoded as {@code %20}. Vault reads a {@code +} in the path as a literal plus sign,
+     * so the form encoding of {@link URLEncoder} would address a different object.
      *
      * @param part Path part to URL-encode and insert into the template
      * @return Encoded URL part
      * @since 1.5.3
+     * @since 2.0.0 Encode spaces as {@code %20} instead of {@code +}
      */
     public static String encode(final String part) {
-        return URLEncoder.encode(Objects.requireNonNullElse(part, ""), UTF_8);
+        /* URLEncoder applies form encoding. A literal "+" is already encoded as "%2B" at this point,
+           so every remaining "+" represents a space. */
+        return URLEncoder.encode(Objects.requireNonNullElse(part, ""), UTF_8).replace("+", "%20");
+    }
+
+    /**
+     * Encode a multi-segment URL path, e.g. a secret key like {@code path/to/my secret}.
+     * <p>
+     * Each segment is encoded with {@link #encode(String)}, the separating slashes are preserved.
+     *
+     * @param path Path to encode, segments separated by {@code /}
+     * @return Encoded path
+     * @since 2.0.0
+     */
+    public static String encodePath(final String path) {
+        if (path == null) {
+            return "";
+        }
+
+        return Arrays.stream(path.split("/", -1))
+            .map(RequestHelper::encode)
+            .collect(Collectors.joining("/"));
     }
 
     /**
